@@ -13,24 +13,64 @@ const crumbs = [{ name: 'About', href: '/about/' }];
 const years = new Date().getFullYear() - SITE.founded;
 const strengths = [
   { icon: 'calendar-days', t: `${years}+ years of renting`, d: `Renting IT equipment to businesses since ${SITE.founded}, through hiring booms, office moves and every Windows upgrade in between.` },
-  { icon: 'layers', t: 'The whole setup, not just laptops', d: `${CATEGORIES.length} categories, from laptops and Macs to servers, routers and phones, quoted together.` },
+  { icon: 'layers', t: 'The whole setup, not just laptops', d: `${CATEGORIES.length} categories, from laptops and Macs to servers, routers and phones, quoted together and delivered together.` },
+  { icon: 'clipboard-check', t: 'Prepared before it leaves', d: 'Every device is inspected, tested, cleaned and configured before dispatch, so your team logs in instead of raising tickets.' },
   { icon: 'map-pinned', t: 'Pan-India reach', d: `Offices in ${OFFICES.map((o) => o.city).join(' and ')}, with delivery and support in ${CITIES.length}+ cities.` },
-  { icon: 'headset', t: 'Support that stays', d: 'A replacement when something fails and a person to call while the devices are with you.' },
+  { icon: 'headset', t: 'Support that stays', d: 'A replacement when something fails and a person to call for as long as the devices are with you.' },
+  { icon: 'repeat', t: 'Flexible as you grow', d: 'Add machines when you hire, return them when a project ends. The rental follows your headcount, not the other way round.' },
 ];
 const claims = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
+
+const team = [
+  { icon: 'clipboard-list', t: 'Order desk', d: 'Turns a headcount and a start date into a configuration, a quote and a delivery plan.' },
+  { icon: 'cpu', t: 'Technical team', d: 'Inspects, tests, images and configures every device, and handles replacements on site.' },
+  { icon: 'truck', t: 'Logistics', d: 'Packs, labels and routes each batch so it reaches the right desk on the agreed day.' },
+  { icon: 'headset', t: 'Support', d: 'The people you call once the devices are in use, for faults, swaps and changes to the order.' },
+];
+
+const leaders = [
+  {
+    initials: 'VG',
+    name: 'Vivek Garg',
+    role: 'Managing Director',
+    bio: [
+      'With more than 20 years in the industry, Vivek leads the company’s direction and its customer relationships. Many of the businesses we serve today have worked with him for years.',
+      'His focus has stayed the same since day one: dependable equipment, a quick response when something goes wrong, and long-term partnerships rather than one-off orders.',
+    ],
+    focus: ['Strategy and growth', 'Customer relationships', 'Enterprise accounts'],
+  },
+  {
+    initials: 'LP',
+    name: 'Lakhendra Prasad',
+    role: 'Partner, Managing Lead for Operations',
+    bio: [
+      'Lakhendra heads operations, the supplier network and hardware distribution. He runs the part of the business customers rarely see but always feel: stock that is available when you need it, and devices that move from warehouse to desk on schedule.',
+      'When a large order needs sourcing at short notice, it is his supplier relationships and his operations team that make the delivery date hold.',
+    ],
+    focus: ['Operations', 'Supplier networks', 'Hardware distribution'],
+  },
+];
+
+const principles = [
+  { t: 'Straight answers on stock', d: 'If we can’t supply a model for your dates, we say so and offer the closest match, before you plan around it.' },
+  { t: 'No device leaves untested', d: 'Inspection, diagnostics, cleaning and configuration happen on every unit, not on a sample.' },
+  { t: 'One contact for your account', d: 'The person who quoted your order is the person you call when it changes.' },
+  { t: 'We’re still here after delivery', d: 'Faults are fixed or swapped quickly, for the whole rental period.' },
+];
+
 const schema = [{
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
   name: `About ${SITE.name}`,
   url: new URL('/about/', SITE.url).href,
   about: { '@id': `${SITE.url}/#organization` },
-}, {
+}, ...leaders.map((l) => ({
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Vivek Garg',
-  jobTitle: 'Managing Director',
+  name: l.name,
+  jobTitle: l.role,
   worksFor: { '@id': `${SITE.url}/#organization` },
-}];
+}))];
 ---
 <Base
   title={`About ${SITE.name}: IT Equipment Rental Since ${SITE.founded}`}
@@ -43,7 +83,19 @@ const schema = [{
     title={`Renting IT to Indian businesses since ${SITE.founded}`}
     lead="We started with a simple idea: most companies need more computers than they want to own. More than a decade later, we supply complete IT setups to startups, enterprises and public-sector teams across India."
     crumbs={crumbs}
-  />
+  >
+    <figure slot="aside" class="workplace">
+      <img
+        src="/brand/workplace-1200.webp"
+        srcset="/brand/workplace-800.webp 800w, /brand/workplace-1200.webp 1200w"
+        sizes="(min-width: 1000px) 40vw, 100vw"
+        width="1200" height="725"
+        alt="Glass-walled meeting room in a modern office, with a long table, upholstered chairs and potted trees"
+        fetchpriority="high"
+      />
+      <figcaption><span class="mono">Est. {SITE.founded}</span><span class="mono">{OFFICES.map((o) => o.city).join(' · ')}</span></figcaption>
+    </figure>
+  </PageHero>
 
   <section class="section" aria-labelledby="then-title">
     <div class="wrap then">
@@ -64,23 +116,19 @@ const schema = [{
     </div>
   </section>
 
-  <section class="section section--sunk" aria-labelledby="lead-title">
-    <div class="wrap leader">
-      <div class="monogram" aria-hidden="true">VG</div>
-      <div>
-        <h2 id="lead-title" class="h2">Leadership</h2>
-        <p class="name">Vivek Garg <span>Managing Director</span></p>
-        <p class="lead">With more than 20 years in the industry, Vivek leads the company’s operations and customer relationships. His focus has stayed the same since day one: dependable equipment, quick response when something goes wrong, and long-term partnerships with the businesses we serve.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="str-title">
+  <section class="section section--sunk" aria-labelledby="str-title">
     <div class="wrap">
-      <div class="section-head"><h2 id="str-title" class="h2">What we are good at</h2></div>
+      <div class="section-head section-head--split">
+        <h2 id="str-title" class="h2">What we are good at</h2>
+        <p class="lead">Renting a laptop is easy. Getting the right machines, set up the same way, to the right people on the right morning, and keeping them working for months, is the part we have spent {years} years getting good at.</p>
+      </div>
       <ul role="list" class="strengths">
-        {strengths.map((s) => (
-          <li><span class="ic"><Icon name={s.icon} size={30} stroke={1.5} /></span><h3 class="h3">{s.t}</h3><p class="muted">{s.d}</p></li>
+        {strengths.map((s, i) => (
+          <li>
+            <div class="s-top" aria-hidden="true"><span class="mono">{String(i + 1).padStart(2, '0')}</span><Icon name={s.icon} size={28} stroke={1.5} /></div>
+            <h3 class="h3">{s.t}</h3>
+            <p class="muted">{s.d}</p>
+          </li>
         ))}
       </ul>
       {claims.length > 0 && (
@@ -89,14 +137,82 @@ const schema = [{
     </div>
   </section>
 
-  <section class="section section--sunk" aria-labelledby="trust-title">
+  <section class="section section--ink team" aria-labelledby="team-title">
+    <div class="wrap">
+      <div class="team-top">
+        <div>
+          <p class="mono">The team</p>
+          <h2 id="team-title" class="h2">The people who make the deadline</h2>
+        </div>
+        <blockquote class="pull">
+          <p>When an order has a go-live date, the team works day and night until every device is ready.</p>
+        </blockquote>
+      </div>
+      <div class="team-copy">
+        <p class="lead">Behind every delivery is a small, tight team that treats your start date as its own. Large orders often arrive with little notice: a new office opening on Monday, a batch of hires starting next week, an audit that cannot move. When that happens, our people stay late, come in early and work through weekends, imaging, testing, labelling and packing until the last unit is ready to go.</p>
+        <p class="lead">It is the reason clients come back. Not because nothing ever goes wrong, but because when it does, someone picks up the phone and fixes it.</p>
+      </div>
+      <ul role="list" class="crew">
+        {team.map((m) => (
+          <li>
+            <span class="ic"><Icon name={m.icon} size={26} stroke={1.5} /></span>
+            <h3 class="h4">{m.t}</h3>
+            <p class="muted small">{m.d}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="lead-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="lead-title" class="h2">Leadership</h2>
+        <p class="lead">Two partners, one running the relationships and one running the operations, both close enough to the work to answer a customer’s call themselves.</p>
+      </div>
+      <div class="leaders">
+        {leaders.map((l) => (
+          <article class="leader" aria-labelledby={`ld-${l.initials}`}>
+            <div class="monogram" aria-hidden="true">{l.initials}</div>
+            <div class="leader-body">
+              <h3 id={`ld-${l.initials}`} class="name">{l.name}</h3>
+              <p class="role mono">{l.role}</p>
+              {l.bio.map((p) => <p class="muted bio">{p}</p>)}
+              <ul role="list" class="focus" aria-label={`${l.name}’s focus areas`}>
+                {l.focus.map((f) => <li class="tag">{f}</li>)}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head"><h2 id="how-title" class="h2">How we work</h2></div>
+      <ol role="list" class="principles">
+        {principles.map((p, i) => (
+          <li>
+            <span class="pn num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="h3">{p.t}</h3>
+              <p class="muted">{p.d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="trust-title">
     <div class="wrap">
       <div class="section-head"><h2 id="trust-title" class="h2">Trusted by serious businesses</h2></div>
       <ClientWall />
     </div>
   </section>
 
-  <section class="section" aria-labelledby="fp-title">
+  <section class="section section--sunk" aria-labelledby="fp-title">
     <div class="wrap">
       <div class="section-head"><h2 id="fp-title" class="h2">Our footprint</h2></div>
       <IndiaMap />
@@ -107,6 +223,14 @@ const schema = [{
 </Base>
 
 <style>
+  /* Hero photo */
+  .workplace { margin: 0; position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--night); box-shadow: 0 40px 80px -40px rgba(23,19,15,.55), 0 0 0 1px rgba(23,19,15,.12); }
+  .workplace img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 725; object-fit: cover; }
+  .workplace::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(18,14,13,.62) 0%, transparent 34%); }
+  .workplace figcaption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; }
+  .workplace figcaption .mono { color: rgba(243,238,229,.85); }
+
+  /* Story */
   .then { display: grid; gap: var(--s-6); align-items: center; }
   @media (min-width: 900px) { .then { grid-template-columns: 1fr auto 1.2fr; gap: var(--s-7); } }
   .era { border-top: 1px solid var(--line-strong); padding-top: var(--s-4); }
@@ -117,16 +241,49 @@ const schema = [{
   .now strong { font-family: var(--font-display); font-size: 1.75rem; margin-right: 6px; }
   .arrow { color: var(--ink-3); justify-self: center; }
   @media (max-width: 899px) { .arrow { transform: rotate(90deg); } }
-  .leader { display: grid; gap: var(--s-6); align-items: start; }
-  @media (min-width: 860px) { .leader { grid-template-columns: 240px 1fr; gap: var(--s-8); } }
-  .monogram { aspect-ratio: 1; max-width: 240px; display: grid; place-items: center; border-radius: var(--r-xl); background: var(--ink); color: var(--paper); font-family: var(--font-display); font-weight: 400; font-size: 6rem; box-shadow: inset 0 0 0 1px rgba(243,238,229,.1), 0 30px 60px -30px rgba(23,19,15,.6); }
-  .name { font-size: 1.5rem; font-weight: 700; margin: var(--s-4) 0; }
-  .name span { display: block; font-size: 1rem; font-weight: 500; color: var(--ink-2); }
-  .strengths { display: grid; gap: var(--s-6); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); list-style: none; }
+
+  /* Strengths */
+  .strengths { display: grid; gap: var(--s-7) var(--s-6); list-style: none; }
+  @media (min-width: 640px) { .strengths { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1000px) { .strengths { grid-template-columns: repeat(3, 1fr); gap: var(--s-7); } }
   .strengths li { border-top: 1px solid var(--line-strong); padding-top: var(--s-4); }
-  .strengths .ic { color: var(--red-ink); display: block; margin-bottom: var(--s-3); }
-  .strengths h3 { margin-bottom: var(--s-2); }
-  .claims { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: var(--s-7); list-style: none; font-weight: 600; }
+  .s-top { display: flex; justify-content: space-between; align-items: flex-start; color: var(--red-ink); }
+  .strengths h3 { margin: var(--s-3) 0 var(--s-2); }
+  .claims { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line); list-style: none; font-weight: 600; }
   .claims li { display: inline-flex; gap: 6px; align-items: center; }
-  .claims :global(svg) { color: var(--green); }
+  .claims :global(svg) { color: var(--red-ink); }
+
+  /* Team */
+  .team-top { display: grid; gap: var(--s-6); align-items: end; margin-bottom: var(--s-7); }
+  @media (min-width: 960px) { .team-top { grid-template-columns: 1fr 1fr; gap: var(--s-8); } }
+  .team-top .mono { margin-bottom: var(--s-4); }
+  .pull { margin: 0; padding-left: var(--s-5); border-left: 2px solid var(--red); }
+  .pull p { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(1.375rem, 1rem + 1.2vw, 2rem); line-height: 1.25; letter-spacing: -0.01em; color: var(--on-dark); }
+  .team-copy { display: grid; gap: var(--s-5); padding-top: var(--s-6); border-top: 1px solid var(--hair-dark); }
+  @media (min-width: 960px) { .team-copy { grid-template-columns: 1fr 1fr; gap: var(--s-8); } }
+  .team-copy .lead { max-width: none; }
+  .crew { display: grid; gap: 1px; margin-top: var(--s-8); list-style: none; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); background: var(--hair-dark); border: 1px solid var(--hair-dark); border-radius: var(--r-lg); overflow: hidden; }
+  .crew li { background: rgba(18,14,13,.92); padding: var(--s-6) var(--s-5); display: grid; gap: var(--s-2); align-content: start; }
+  .crew .ic { color: var(--red-soft); margin-bottom: var(--s-2); }
+  .crew h3 { color: var(--on-dark); }
+
+  /* Leadership */
+  .leaders { display: grid; gap: var(--s-6); }
+  @media (min-width: 1000px) { .leaders { grid-template-columns: 1fr 1fr; } }
+  .leader { display: grid; gap: var(--s-5); align-content: start; padding: clamp(24px, 3vw, 40px); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--card); box-shadow: var(--shadow-block); }
+  @media (min-width: 600px) { .leader { grid-template-columns: 132px 1fr; gap: var(--s-6); } }
+  .monogram { aspect-ratio: 1; width: 100%; max-width: 132px; display: grid; place-items: center; border-radius: var(--r-lg); color: var(--paper); font-family: var(--font-display); font-weight: 400; font-size: 3.25rem; letter-spacing: -0.02em;
+    background: radial-gradient(80% 80% at 80% 0%, rgba(185,41,30,.45) 0%, transparent 60%), var(--night);
+    box-shadow: inset 0 0 0 1px rgba(243,238,229,.1), 0 24px 48px -28px rgba(23,19,15,.6); }
+  .name { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem); line-height: 1.05; letter-spacing: -0.015em; }
+  .role { margin: var(--s-2) 0 var(--s-4); color: var(--red-ink); }
+  .bio + .bio { margin-top: var(--s-3); }
+  .focus { display: flex; flex-wrap: wrap; gap: 8px; margin-top: var(--s-5); list-style: none; }
+
+  /* Principles */
+  .principles { display: grid; gap: 0 var(--s-8); list-style: none; }
+  @media (min-width: 900px) { .principles { grid-template-columns: 1fr 1fr; } }
+  .principles li { display: grid; grid-template-columns: auto 1fr; gap: var(--s-5); padding: var(--s-6) 0; border-top: 1px solid var(--line-strong); }
+  .pn { font-family: var(--font-display); font-size: 2.5rem; line-height: .9; color: var(--red-ink); min-width: 2ch; }
+  .principles h3 { margin-bottom: var(--s-2); }
 </style>
