@@ -27,6 +27,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v18 | `a70e2ea` | Popular models moved directly below the scale selector on the home page | https://claude.ai/artifact/4HbpSdoEzRqVF47a41DPYT |
 | v19 | `7b45e89` | Lakhendra Prasad's photo on the About page | https://claude.ai/artifact/FzvuVSEbswWNtTPP9ZF66K |
 | v20 | `54471fe` | 'Need 25 or more devices?' section removed from every page | https://claude.ai/artifact/PevpeAvLUfkruFwz6GVJVX |
+| v21 | `d6cd7fa` | About: Our footprint moved directly below Leadership | https://claude.ai/artifact/4GiREPGdefbcSx4jHUkYkS |
 
 ## Going back to a version
 
