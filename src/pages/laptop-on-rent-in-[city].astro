@@ -6,7 +6,6 @@ import Steps from '../components/Steps.astro';
 import FAQ from '../components/FAQ.astro';
 import QuoteForm from '../components/QuoteForm.astro';
 import IndiaMap from '../components/IndiaMap.astro';
-import FinalCTA from '../components/FinalCTA.astro';
 import Icon from '../components/Icon.astro';
 import { pageCities, cityPath, type City } from '../data/cities';
 import { categoryById, CATEGORIES } from '../data/categories';
@@ -161,7 +160,6 @@ const schema = [
     </div>
   </section>
 
-  <FinalCTA waMessage={waMessage} title={`Equipping a team in ${c.name}?`} />
 </Base>
 
 <style>

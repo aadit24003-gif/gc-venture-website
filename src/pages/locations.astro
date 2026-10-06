@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import IndiaMap from '../components/IndiaMap.astro';
-import FinalCTA from '../components/FinalCTA.astro';
 import Icon from '../components/Icon.astro';
 import { OFFICES, CONTACT, formatPhone, telLink } from '../config/site';
 import { pageCities, cityPath } from '../data/cities';
@@ -49,7 +48,6 @@ const crumbs = [{ name: 'Locations', href: '/locations/' }];
       <IndiaMap />
     </div>
   </section>
-  <FinalCTA />
 </Base>
 
 <style>

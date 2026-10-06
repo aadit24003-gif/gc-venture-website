@@ -2,7 +2,6 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import FinalCTA from '../../components/FinalCTA.astro';
 import Icon from '../../components/Icon.astro';
 import { PRODUCTS, facets, formatGb } from '../../data/products';
 import { CATEGORIES } from '../../data/categories';
@@ -84,7 +83,7 @@ const schema = [{
       <div class="results">
         <div class="results-head">
           <p class="small" role="status" aria-live="polite" data-result-count>{PRODUCTS.length} models</p>
-          <a class="link-arrow small" href="/request-a-quote/?type=enterprise">Need 25+ devices? Get an enterprise quote <Icon name="arrow-right" /></a>
+          <a class="link-arrow small" href="/request-a-quote/?type=enterprise">Bulk order? Get an enterprise quote <Icon name="arrow-right" /></a>
         </div>
         <div class="pgrid" data-grid>
           {PRODUCTS.map((p) => <ProductCard p={p} catalogue headingLevel="h3" />)}
@@ -131,7 +130,6 @@ const schema = [{
     </dialog>
   </section>
 
-  <FinalCTA />
 </Base>
 
 <style>

@@ -61,7 +61,7 @@ function prefill(form: HTMLFormElement) {
   if (q.get('type') === 'enterprise') {
     const t = form.querySelector<HTMLInputElement>('[data-enquiry-type]');
     if (t) t.value = 'enterprise';
-    if (qtyEl && !qtyEl.value) qtyEl.placeholder = '25 or more';
+    if (qtyEl && !qtyEl.value) qtyEl.placeholder = 'e.g. 100';
   }
   const product = q.get('product');
   const ps = form.querySelector<HTMLInputElement>('[data-product-slug]');
