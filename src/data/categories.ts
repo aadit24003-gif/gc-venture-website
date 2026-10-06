@@ -42,13 +42,13 @@ export const CATEGORIES: Category[] = [
     hue: 'ink',
     group: 'computing',
     hasCatalogue: true,
-    navBlurb: 'ThinkPad, Latitude, EliteBook. Core i3 to i9.',
+    navBlurb: 'ThinkPad, Latitude, EliteBook. Core i5 to Core Ultra.',
     seoTitle: 'Laptop on Rent for Business | Laptop Rental India',
     seoDescription:
       'Rent business laptops from Lenovo, Dell and HP for teams of 10 to 1,000+. Configured before delivery, supported until return. Get a quote.',
     h1: 'Laptop rental for teams of ten to a thousand',
     intro:
-      'Business laptops from Lenovo ThinkPad, Dell Latitude and HP EliteBook ranges, with Intel Core i3 to i9 or AMD Ryzen processors. Every machine is checked, imaged with the software you specify and labelled before it leaves us, so your people log in on day one.',
+      'Business laptops from the Lenovo ThinkPad, Dell Latitude and HP EliteBook ranges, from 6th Gen Intel Core i5 to the latest Core Ultra, with the processor, memory and storage chosen on each model. Every machine is checked, imaged with the software you specify and labelled before it leaves us, so your people log in on day one.',
     included: [
       'Charger and asset tag with every unit',
       'Windows, Office and your company software pre-installed',
@@ -56,10 +56,10 @@ export const CATEGORIES: Category[] = [
       'Pickup at the end of the rental',
     ],
     tiers: [
-      { name: 'Business essentials', spec: 'Core i5, 8 GB RAM, 256 GB SSD', fit: 'Email, CRM, browser-based work, BPO seats' },
-      { name: 'Productivity', spec: 'Core i5 or i7, 16 GB RAM, 512 GB SSD', fit: 'Heavy spreadsheets, multitasking, analysts' },
-      { name: 'Premium', spec: 'Core i7, 16 GB+ RAM, 512 GB+ SSD', fit: 'Managers, client-facing teams, travel' },
-      { name: 'High performance', spec: 'Newer-generation Core i7 / i9 or Ryzen', fit: 'Developers, data work, design tools' },
+      { name: 'Business essentials', spec: 'Core i5 (6th–8th Gen), 8 GB RAM, 256 GB SSD', fit: 'Email, CRM, browser-based work, BPO seats' },
+      { name: 'Productivity', spec: 'Core i5 (10th–13th Gen), 8–16 GB RAM, 256–512 GB NVMe SSD', fit: 'Heavy spreadsheets, multitasking, analysts' },
+      { name: 'Premium', spec: 'Core Ultra 5 or 7, 16 GB RAM, 512 GB NVMe SSD', fit: 'Managers, client-facing teams, travel' },
+      { name: 'High performance', spec: 'Core Ultra 7 or 9, 32 GB RAM, 1 TB NVMe SSD', fit: 'Developers, data work, design tools' },
     ],
     useCases: [
       { title: 'New office or branch', text: 'Equip a full floor before the lease starts, without a capital purchase order.' },
@@ -83,13 +83,13 @@ export const CATEGORIES: Category[] = [
     hue: 'paper',
     group: 'apple',
     hasCatalogue: true,
-    navBlurb: 'MacBook Air, MacBook Pro and iMac on Apple silicon.',
+    navBlurb: 'MacBook Air and Pro from 2019 to M5, plus iMac.',
     seoTitle: 'MacBook on Rent | MacBook Air & Pro Rental',
     seoDescription:
-      'Rent MacBook Air, MacBook Pro and iMac with Apple silicon for design, development and leadership teams. Monthly rental with support. Get a quote.',
+      'Rent MacBook Air and MacBook Pro from 2019 to M5, M5 Pro and M5 Max, plus iMac, for design, development and leadership teams. Get a quote.',
     h1: 'MacBook rental for design, engineering and leadership teams',
     intro:
-      'MacBook Air and MacBook Pro on Apple silicon, plus iMac for fixed desks. Useful when a project needs macOS for a few months, a design team grows quickly, or new joiners expect a Mac on day one.',
+      'MacBook Air and MacBook Pro in every generation from the 2019 Intel models to M5, plus iMac for fixed desks. Useful when a project needs macOS for a few months, a design team grows quickly, or new joiners expect a Mac on day one.',
     included: [
       'Charger with every unit',
       'Clean macOS install, ready for your MDM enrolment',
@@ -97,8 +97,8 @@ export const CATEGORIES: Category[] = [
       'Data wipe on return',
     ],
     tiers: [
-      { name: 'MacBook Air', spec: 'Apple M-series, 8 GB+, 256 GB+ SSD', fit: 'Product, marketing, leadership' },
-      { name: 'MacBook Pro', spec: 'Apple M-series, higher memory options', fit: 'Developers, video, design' },
+      { name: 'MacBook Air', spec: 'Intel 2019–2020 or M1 to M5, 8–32 GB, 13 or 15 inch', fit: 'Product, marketing, leadership' },
+      { name: 'MacBook Pro', spec: 'M1 to M5, including Pro and Max chips, up to 128 GB', fit: 'Developers, video, design' },
       { name: 'iMac', spec: 'All-in-one desktop', fit: 'Studios, reception, fixed design desks' },
     ],
     useCases: [
@@ -107,7 +107,7 @@ export const CATEGORIES: Category[] = [
       { title: 'Leadership offsites', text: 'Short-term Macs for presentations, events and visiting executives.' },
     ],
     faqs: [
-      { q: 'Which Apple chips do you offer?', a: 'Apple silicon MacBooks (M-series). Exact chip, memory and storage depend on what is in stock for your dates; we confirm it in the quote.' },
+      { q: 'Which Apple chips do you offer?', a: 'Every MacBook Air and MacBook Pro generation from the 2019 Intel models to M5, including Pro and Max chips. Exact chip, memory and storage depend on what is in stock for your dates; we confirm it in the quote.' },
       { q: 'Can the Macs be enrolled in our MDM?', a: 'Yes. We deliver a clean macOS install so your IT team can enrol devices in Jamf, Intune or any other MDM.' },
       { q: 'Do you rent iMacs?', a: 'Yes, for fixed desks and studios. Ask for current configurations.' },
     ],

@@ -43,6 +43,7 @@ const related = PRODUCTS.filter((x) => x.category === p.category && x.id !== p.i
   .map((x) => ({ x, score: (x.brand === p.brand ? 0 : 100) + Math.abs(genOf(x) - genOf(p)) }))
   .sort((a, b) => a.score - b.score).slice(0, 3).map((r) => r.x);
 const configurable = !!p.configs?.length;
+const isMac = p.configLabel === 'Generation';
 /** Short processor label for titles: "Core i5, 7th/8th Gen", "Core Ultra 7/9", "M1 to M5". */
 function procShort(x: Product) {
   if (x.brand === 'Apple' && x.processor_generation?.length) return `${x.processor_generation[0]} to ${x.processor_generation[x.processor_generation.length - 1]}`;
@@ -63,18 +64,11 @@ const faqs = [
   { q: 'What is included with each unit?', a: cat.included.join('. ') + '.' },
   ...(claim('noLockIn') ? [{ q: 'How long do I have to rent it for?', a: claim('noLockIn')!.long }] : []),
 ];
+/**
+ * No Product markup: Google treats Product without a price, offer or reviews as an
+ * error. Add it back (with offers) once monthly prices are published.
+ */
 const schema = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: p.name,
-    brand: { '@type': 'Brand', name: p.brand },
-    category: cat.name,
-    description: p.description,
-    url: new URL(path, SITE.url).href,
-    ...(p.images[0] ? { image: new URL(p.images[0].src, SITE.url).href } : {}),
-    additionalProperty: specs.map(([k, v]) => ({ '@type': 'PropertyValue', name: k, value: v })),
-  },
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
 ];
 ---
@@ -140,8 +134,8 @@ const schema = [
           <table class="cfg-table">
             <thead>
               <tr>
-                <th scope="col">{p.configLabel ?? 'Processor'}</th>
-                <th scope="col">{p.brand === 'Apple' ? 'Chip' : 'Processor'}</th>
+                {isMac && <th scope="col">Generation</th>}
+                <th scope="col">{isMac ? 'Chip' : 'Processor'}</th>
                 {p.configs!.some((c) => c.year) && <th scope="col">Year</th>}
                 <th scope="col">Screen</th>
                 <th scope="col">Memory</th>
@@ -151,7 +145,7 @@ const schema = [
             <tbody>
               {p.configs!.map((c) => (
                 <tr>
-                  <td>{c.group}</td>
+                  {isMac && <td>{c.group}</td>}
                   <th scope="row">{c.chip}</th>
                   {p.configs!.some((x) => x.year) && <td class="num">{c.year}</td>}
                   <td>{(c.screens ?? []).join(', ') || '—'}</td>

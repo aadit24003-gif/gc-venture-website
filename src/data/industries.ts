@@ -9,7 +9,7 @@ export interface Industry {
 
 export const INDUSTRIES: Industry[] = [
   { id: 'bpo', name: 'BPO and KPO', icon: 'headset', need: 'Identical seats for a new process, ready before the client go-live date.', kit: ['Desktops with monitors', 'Business laptops', 'Mini PCs'] },
-  { id: 'it', name: 'IT and software', icon: 'code-xml', need: 'Machines for project teams and contractors, returned when the engagement ends.', kit: ['Core i7 laptops', 'MacBook Pro', 'Test servers'] },
+  { id: 'it', name: 'IT and software', icon: 'code-xml', need: 'Machines for project teams and contractors, returned when the engagement ends.', kit: ['Core Ultra laptops', 'MacBook Pro', 'Test servers'] },
   { id: 'bfsi', name: 'Banking and financial services', icon: 'landmark', need: 'Clean, wipeable devices that IT can lock down to policy for audits and peaks.', kit: ['Business laptops', 'Desktops', 'MacBooks'] },
   { id: 'healthcare', name: 'Healthcare', icon: 'stethoscope', need: 'Front-desk and back-office equipment for new wings, camps and drives.', kit: ['Desktops', 'Monitors', 'Laptops'] },
   { id: 'staffing', name: 'Manpower and outsourcing', icon: 'users', need: 'Devices that follow headcount up and down as contracts change.', kit: ['Laptops', 'Mobile phones', 'Desktops'] },
