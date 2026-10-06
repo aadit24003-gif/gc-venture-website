@@ -1,0 +1,187 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ProductCard from '../components/ProductCard.astro';
+import CategoryIndex from '../components/CategoryIndex.astro';
+import Steps from '../components/Steps.astro';
+import FAQ from '../components/FAQ.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Icon from '../components/Icon.astro';
+import { CATEGORIES, type Category } from '../data/categories';
+import { PRODUCTS } from '../data/products';
+import { pageCities, cityPath } from '../data/cities';
+import { SITE, enabledClaims } from '../config/site';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { service: c.slug }, props: { cat: c } }));
+}
+
+const { cat } = Astro.props as { cat: Category };
+const products = PRODUCTS.filter((p) => p.category === cat.id);
+const related = CATEGORIES.filter((c) => c.id !== cat.id && (c.group === cat.group || c.id === 'laptops')).slice(0, 4);
+const perks = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
+const waMessage = `Hi IT Rentals, I would like to enquire about ${cat.name.toLowerCase()}.`;
+const path = `/${cat.slug}/`;
+const crumbs = [{ name: 'Equipment', href: '/equipment/' }, { name: cat.name, href: path }];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: cat.name,
+    serviceType: `${cat.name} for businesses`,
+    description: cat.seoDescription,
+    provider: { '@id': `${SITE.url}/#organization` },
+    areaServed: { '@type': 'Country', name: 'India' },
+    url: new URL(path, SITE.url).href,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: cat.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+---
+<Base title={cat.seoTitle} description={cat.seoDescription} path={path} crumbs={crumbs} schema={schema} waMessage={waMessage}>
+  <PageHero title={cat.h1} lead={cat.intro} crumbs={crumbs} waMessage={waMessage} quoteHref={`/request-a-quote/?category=${cat.id}`}>
+    <aside slot="aside" class="panel panel--pad included" aria-labelledby="inc-title">
+      <span class="inc-icon"><Icon name={cat.icon} size={34} stroke={1.5} /></span>
+      <h2 id="inc-title" class="h4">With every rental</h2>
+      <ul role="list">
+        {cat.included.map((i) => <li><Icon name="check" size={18} stroke={2.5} />{i}</li>)}
+        {perks.map((p) => <li><Icon name="check" size={18} stroke={2.5} />{p.short}</li>)}
+      </ul>
+    </aside>
+  </PageHero>
+
+  {cat.tiers && (
+    <section class="section" aria-labelledby="tiers-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="tiers-title" class="h2">Pick a configuration</h2>
+          <p class="lead">Typical configurations customers ask for. Exact models depend on stock for your dates; we confirm them in your quote.</p>
+        </div>
+        <div class="tiers" role="table" aria-label="Configurations">
+          <div class="tr th" role="row"><span role="columnheader">Tier</span><span role="columnheader">Typical specification</span><span role="columnheader">Suits</span><span role="columnheader"><span class="sr-only">Action</span></span></div>
+          {cat.tiers.map((t) => (
+            <div class="tr" role="row">
+              <span role="cell" class="tier-name">{t.name}</span>
+              <span role="cell" class="tier-spec">{t.spec}</span>
+              <span role="cell" class="muted">{t.fit}</span>
+              <span role="cell"><a class="link-arrow small" href={`/request-a-quote/?category=${cat.id}`}>Quote <Icon name="arrow-right" /></a></span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {products.length > 0 && (
+    <section class="section section--sunk" aria-labelledby="models-title">
+      <div class="wrap">
+        <div class="head-row">
+          <div class="section-head">
+            <h2 id="models-title" class="h2">{cat.noun} in our range</h2>
+            <p class="lead">Models we rent regularly. Ask for anything not shown.</p>
+          </div>
+          <a class="link-arrow" href={`/equipment/?category=${cat.id}`}>Filter in the catalogue <Icon name="arrow-right" /></a>
+        </div>
+        <div class="pgrid">{products.map((p) => <ProductCard p={p} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="uses-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="uses-title" class="h2">When businesses rent {cat.noun}</h2>
+      </div>
+      <ul role="list" class="uses">
+        {cat.useCases.map((u) => (
+          <li><h3 class="h3">{u.title}</h3><p class="muted">{u.text}</p></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head"><h2 id="how-title" class="h2">How it works</h2></div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="cities-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="cities-title" class="h2">Available across India</h2>
+        <p class="lead">Offices in Gurgaon and Bangalore, with delivery and support in these cities and beyond.</p>
+      </div>
+      <ul role="list" class="city-links">
+        {pageCities.map((c) => (
+          <li><a href={cityPath(c)}>{cat.id === 'laptops' ? `Laptop rental in ${c.name}` : c.name}</a>{c.office && <span class="tag tag--office">Office</span>}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="q-title">
+    <div class="wrap qf-layout">
+      <div>
+        <h2 id="q-title" class="h2">Ask for a quote</h2>
+        <p class="lead">Tell us the quantity and city. We reply with configurations and monthly pricing.</p>
+        <h3 class="h4 faq-h">Common questions</h3>
+        <FAQ items={cat.faqs} />
+      </div>
+      <div class="panel panel--pad form-panel">
+        <QuoteForm variant="compact" category={cat.id} formId={`q-${cat.id}`} />
+      </div>
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section" aria-labelledby="rel-title">
+      <div class="wrap">
+        <div class="section-head"><h2 id="rel-title" class="h2">Often rented together</h2></div>
+        <CategoryIndex items={related} />
+      </div>
+    </section>
+  )}
+
+  <FinalCTA waMessage={waMessage} />
+</Base>
+
+<style>
+  .included { box-shadow: var(--shadow-block); border: 1.5px solid var(--ink); }
+  .inc-icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; background: var(--paper-2); margin-bottom: var(--s-4); }
+  .included h2 { margin-bottom: var(--s-3); }
+  .included ul { display: grid; gap: 10px; list-style: none; }
+  .included li { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
+  .included li :global(svg) { color: var(--green); flex: none; margin-top: 3px; }
+
+  .tiers { border-top: 1.5px solid var(--ink); }
+  .tr { display: grid; grid-template-columns: 1fr; gap: 4px 24px; padding: 18px 0; border-bottom: 1px solid var(--line-strong); align-items: center; }
+  .th { display: none; }
+  @media (min-width: 860px) {
+    .tr { grid-template-columns: 1.1fr 1.6fr 1.6fr auto; }
+    .th { display: grid; font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); padding: 12px 0; }
+  }
+  .tier-name { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.5rem; line-height: 1.05; }
+  .tier-spec { font-weight: 600; }
+
+  .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
+  .head-row .section-head { margin-bottom: 0; }
+  .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .uses { display: grid; gap: var(--s-6) var(--s-7); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); list-style: none; }
+  .uses li { border-top: 1.5px solid var(--ink); padding-top: var(--s-4); }
+  .uses h3 { margin-bottom: var(--s-2); }
+  .city-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 24px; list-style: none; }
+  .city-links li { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .city-links a { font-weight: 600; }
+  .qf-layout { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 1000px) { .qf-layout { grid-template-columns: 1fr 1fr; } }
+  .qf-layout .lead { margin-top: var(--s-4); }
+  .faq-h { margin: var(--s-7) 0 var(--s-3); }
+  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+</style>

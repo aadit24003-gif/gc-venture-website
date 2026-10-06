@@ -1,0 +1,277 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { CATEGORIES } from '../data/categories';
+import { pageCities, cityPath } from '../data/cities';
+import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
+
+interface Props { waMessage?: string }
+const { waMessage } = Astro.props;
+
+const groups = [
+  { title: 'Computing', ids: ['laptops', 'macbooks', 'desktops', 'monitors'] },
+  { title: 'Infrastructure', ids: ['servers', 'switches', 'routers', 'firewalls'] },
+  { title: 'Mobility and more', ids: ['phones', 'other'] },
+].map((g) => ({ ...g, items: g.ids.map((id) => CATEGORIES.find((c) => c.id === id)!).filter(Boolean) }));
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+const equipmentActive = CATEGORIES.some((c) => path.startsWith(`/${c.slug}/`)) || path.startsWith('/equipment/');
+const locationsActive = path.startsWith('/locations/') || path.startsWith('/laptop-on-rent-in-');
+---
+<header class="site-header" data-track-zone="header">
+  <div class="bar wrap">
+    <div class="bar-inner">
+      <a href="/" class="brand" aria-label="IT Rental Solutions home"><Logo /></a>
+
+      <nav class="desk-nav" aria-label="Main">
+        <ul role="list">
+          <li>
+            <button class="nav-btn" aria-expanded="false" aria-controls="mega-equipment" data-menu-trigger aria-current={equipmentActive ? 'page' : undefined}>
+              Equipment <Icon name="chevron-down" size={16} />
+            </button>
+          </li>
+          <li><a class="nav-link" href="/industries/" aria-current={isActive('/industries/') ? 'page' : undefined}>Industries</a></li>
+          <li>
+            <button class="nav-btn" aria-expanded="false" aria-controls="mega-locations" data-menu-trigger aria-current={locationsActive ? 'page' : undefined}>
+              Locations <Icon name="chevron-down" size={16} />
+            </button>
+          </li>
+          <li><a class="nav-link" href="/about/" aria-current={isActive('/about/') ? 'page' : undefined}>About</a></li>
+          <li><a class="nav-link" href="/contact/" aria-current={isActive('/contact/') ? 'page' : undefined}>Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="bar-actions">
+        <a class="phone-link" href={telLink()}><Icon name="phone" size={18} /><span class="num">{formatPhone(CONTACT.PRIMARY_PHONE)}</span></a>
+        <a class="icon-btn wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><Icon name="whatsapp" size={22} /></a>
+        <a class="btn btn--primary btn--sm quote-btn" href="/request-a-quote/">Get a quote</a>
+        <button class="icon-btn burger" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-burger>
+          <Icon name="menu" size={24} />
+        </button>
+      </div>
+    </div>
+
+    <!-- Equipment mega menu -->
+    <div class="mega" id="mega-equipment" hidden data-menu-panel>
+      <div class="mega-grid">
+        {groups.map((g) => (
+          <div class="mega-col">
+            <p class="mega-title">{g.title}</p>
+            <ul role="list">
+              {g.items.map((c) => (
+                <li>
+                  <a href={`/${c.slug}/`} class="mega-item">
+                    <span class="mi-icon"><Icon name={c.icon} /></span>
+                    <span><strong>{c.name}</strong><span class="mi-blurb">{c.navBlurb}</span></span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <aside class="mega-cta">
+          <Icon name="laptop" badge="layers" size={40} stroke={1.5} />
+          <p class="mega-cta-title">Planning a large deployment?</p>
+          <p class="small">Fifty seats or five hundred, configured and delivered on your schedule.</p>
+          <a class="link-arrow" href="/request-a-quote/?type=enterprise">Get an enterprise quote <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href="/equipment/">Browse the catalogue <Icon name="arrow-right" /></a>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Locations mega menu -->
+    <div class="mega" id="mega-locations" hidden data-menu-panel>
+      <div class="mega-loc">
+        <div>
+          <p class="mega-title">Laptop rental by city</p>
+          <ul role="list" class="city-list">
+            {pageCities.map((c) => (
+              <li><a href={cityPath(c)}>{c.name}{c.office && <span class="tag tag--office">Office</span>}</a></li>
+            ))}
+          </ul>
+        </div>
+        <aside class="mega-cta">
+          <Icon name="map-pin" badge="check" size={40} stroke={1.5} />
+          <p class="mega-cta-title">Offices in Gurgaon and Bangalore</p>
+          <p class="small">Delivery and support across India from both.</p>
+          <a class="link-arrow" href="/locations/">See where we deliver <Icon name="arrow-right" /></a>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobile-menu" hidden data-mobile-menu>
+    <div class="mm-head wrap">
+      <a href="/" class="brand" aria-label="IT Rental Solutions home"><Logo /></a>
+      <button class="icon-btn" aria-label="Close menu" data-burger-close><Icon name="x" size={24} /></button>
+    </div>
+    <nav class="mm-body wrap" aria-label="Mobile">
+      <details open>
+        <summary>Equipment <Icon name="chevron-down" size={20} /></summary>
+        <ul role="list" class="mm-list">
+          {CATEGORIES.map((c) => <li><a href={`/${c.slug}/`}><Icon name={c.icon} size={20} />{c.name}</a></li>)}
+          <li><a href="/equipment/"><Icon name="list-filter" size={20} />Browse the catalogue</a></li>
+        </ul>
+      </details>
+      <details>
+        <summary>Locations <Icon name="chevron-down" size={20} /></summary>
+        <ul role="list" class="mm-list mm-cities">
+          {pageCities.map((c) => <li><a href={cityPath(c)}>{c.name}</a></li>)}
+          <li><a href="/locations/">All locations</a></li>
+        </ul>
+      </details>
+      <ul role="list" class="mm-links">
+        <li><a href="/industries/">Industries</a></li>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+        <li><a href="/support/">Support and complaints</a></li>
+      </ul>
+      <div class="mm-ctas">
+        <a class="btn btn--primary btn--lg btn--block" href="/request-a-quote/">Get a quote</a>
+        <div class="mm-row">
+          <a class="btn btn--block" href={telLink()}><Icon name="phone" />Call</a>
+          <a class="btn btn--block btn--wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: var(--z-header); padding-top: 12px; }
+  .bar { position: relative; }
+  .bar-inner {
+    display: flex; align-items: center; gap: var(--s-5); justify-content: space-between;
+    background: color-mix(in srgb, var(--card) 94%, transparent);
+    backdrop-filter: saturate(1.2) blur(8px);
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+    padding: 10px 10px 10px 18px; box-shadow: var(--shadow-soft);
+  }
+  .brand { display: block; flex: none; line-height: 0; }
+  .brand :global(img) { height: 42px; width: auto; }
+  .desk-nav { display: none; }
+  .desk-nav ul { display: flex; gap: 4px; }
+  .nav-link, .nav-btn {
+    display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px; border-radius: var(--r-sm);
+    font-weight: 600; font-size: 1rem; text-decoration: none; background: none; border: 0; min-height: 44px;
+  }
+  .nav-link:hover, .nav-btn:hover, .nav-btn[aria-expanded='true'] { background: var(--paper-2); }
+  .nav-btn :global(svg) { transition: transform var(--t-fast) var(--ease-out); }
+  .nav-btn[aria-expanded='true'] :global(svg) { transform: rotate(180deg); }
+  [aria-current='page'] { box-shadow: inset 0 -2px 0 var(--red); border-radius: 0; }
+  .bar-actions { display: flex; align-items: center; gap: 8px; }
+  .phone-link { display: none; align-items: center; gap: 6px; font-weight: 600; text-decoration: none; padding: 8px 10px; }
+  .icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-sm); border: 1.5px solid var(--line-strong); background: var(--card); }
+  .icon-btn:hover { background: var(--paper-2); }
+  .wa { color: var(--whatsapp); }
+  .quote-btn { display: none; }
+
+  .mega {
+    position: absolute; left: var(--gutter); right: var(--gutter); top: calc(100% + 8px);
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg);
+    box-shadow: 0 30px 60px -30px rgba(23,20,15,.45); padding: var(--s-6);
+    z-index: var(--z-menu);
+  }
+  .mega:not([hidden]) { animation: drop var(--t-med) var(--ease-out); }
+  @keyframes drop { from { opacity: 0; transform: translateY(-6px); } }
+  .mega-grid { display: grid; grid-template-columns: repeat(3, 1fr) 1.1fr; gap: var(--s-6); }
+  .mega-title { font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); margin-bottom: var(--s-3); }
+  .mega-item { display: flex; gap: 12px; padding: 10px; margin-inline: -10px; border-radius: var(--r-md); text-decoration: none; }
+  .mega-item:hover { background: var(--paper); }
+  .mega-item strong { display: block; font-size: 1rem; }
+  .mi-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: var(--paper-2); flex: none; }
+  .mi-blurb { display: block; font-size: var(--fs-xs); color: var(--ink-2); line-height: 1.4; }
+  .mega-cta { background: var(--paper); border-radius: var(--r-md); padding: var(--s-5); display: grid; gap: var(--s-3); align-content: start; }
+  .mega-cta-title { font-weight: 700; font-size: 1.125rem; margin: 0; line-height: 1.25; }
+  .mega-cta .small { margin: 0; color: var(--ink-2); }
+  .mega-loc { display: grid; grid-template-columns: 3fr 1.1fr; gap: var(--s-6); }
+  .city-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px 16px; }
+  .city-list a { display: flex; align-items: center; gap: 8px; padding: 9px 0; font-weight: 600; text-decoration: none; }
+  .city-list a:hover { color: var(--red-ink); }
+
+  .mobile-menu {
+    position: fixed; inset: 0; z-index: var(--z-modal); background: var(--paper); overflow-y: auto;
+    padding-bottom: 32px;
+  }
+  .mm-head { display: flex; justify-content: space-between; align-items: center; padding-block: 16px; border-bottom: 1px solid var(--line); }
+  .mm-body { padding-top: 8px; }
+  .mm-body details { border-bottom: 1px solid var(--line); }
+  .mm-body summary { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; font-family: var(--font-display); font-weight: 800; font-size: 1.75rem; text-transform: uppercase; list-style: none; cursor: pointer; }
+  .mm-body summary::-webkit-details-marker { display: none; }
+  .mm-body details[open] summary :global(svg) { transform: rotate(180deg); }
+  .mm-list { padding-bottom: 16px; display: grid; gap: 2px; }
+  .mm-list a { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-weight: 600; text-decoration: none; min-height: 44px; }
+  .mm-cities { grid-template-columns: 1fr 1fr; }
+  .mm-links a { display: block; padding: 16px 0; border-bottom: 1px solid var(--line); font-family: var(--font-display); font-weight: 800; font-size: 1.75rem; text-transform: uppercase; text-decoration: none; }
+  .mm-ctas { display: grid; gap: 12px; margin-top: 24px; }
+  .mm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  @media (min-width: 640px) { .quote-btn { display: inline-flex; } }
+  @media (min-width: 1080px) {
+    .desk-nav { display: block; }
+    .burger { display: none; }
+  }
+  @media (min-width: 1240px) { .phone-link { display: inline-flex; } }
+</style>
+
+<script>
+  const triggers = [...document.querySelectorAll<HTMLButtonElement>('[data-menu-trigger]')];
+  const panelOf = (t: HTMLButtonElement) => document.getElementById(t.getAttribute('aria-controls')!)!;
+  let hoverTimer: number | undefined;
+
+  function closeAll(except?: HTMLButtonElement) {
+    triggers.forEach((t) => { if (t !== except) { t.setAttribute('aria-expanded', 'false'); panelOf(t).hidden = true; } });
+  }
+  function open(t: HTMLButtonElement) { closeAll(t); t.setAttribute('aria-expanded', 'true'); panelOf(t).hidden = false; }
+
+  triggers.forEach((t) => {
+    t.addEventListener('click', () => (t.getAttribute('aria-expanded') === 'true' ? closeAll() : open(t)));
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const zone = [t, panelOf(t)];
+      zone.forEach((el) => {
+        el.addEventListener('mouseenter', () => { clearTimeout(hoverTimer); hoverTimer = window.setTimeout(() => open(t), 90); });
+        el.addEventListener('mouseleave', () => { clearTimeout(hoverTimer); hoverTimer = window.setTimeout(() => closeAll(), 220); });
+      });
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const openT = triggers.find((t) => t.getAttribute('aria-expanded') === 'true');
+    if (openT) { closeAll(); openT.focus(); }
+  });
+  document.addEventListener('click', (e) => {
+    const el = e.target as Element;
+    if (!el.closest('[data-menu-trigger]') && !el.closest('[data-menu-panel]')) closeAll();
+  });
+  document.querySelectorAll('[data-menu-panel]').forEach((p) =>
+    p.addEventListener('focusout', (e) => {
+      const next = (e as FocusEvent).relatedTarget as Element | null;
+      if (next && !p.contains(next) && !next.closest('[data-menu-trigger]')) closeAll();
+    }),
+  );
+
+  // Mobile menu
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]')!;
+  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]')!;
+  const closeBtn = menu.querySelector<HTMLButtonElement>('[data-burger-close]')!;
+  const setMenu = (on: boolean) => {
+    menu.hidden = !on;
+    burger.setAttribute('aria-expanded', String(on));
+    document.documentElement.style.overflow = on ? 'hidden' : '';
+    document.documentElement.classList.toggle('menu-open', on);
+    (on ? closeBtn : burger).focus();
+  };
+  burger.addEventListener('click', () => setMenu(true));
+  closeBtn.addEventListener('click', () => setMenu(false));
+  menu.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') setMenu(false);
+    if (e.key === 'Tab') {
+      const f = [...menu.querySelectorAll<HTMLElement>('a, button, summary')].filter((el) => el.offsetParent !== null);
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+  });
+</script>

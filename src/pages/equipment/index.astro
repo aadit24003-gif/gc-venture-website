@@ -1,0 +1,286 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import FinalCTA from '../../components/FinalCTA.astro';
+import Icon from '../../components/Icon.astro';
+import { PRODUCTS, facets } from '../../data/products';
+import { CATEGORIES } from '../../data/categories';
+import { pageCities } from '../../data/cities';
+import { SITE } from '../../config/site';
+
+const f = facets();
+const catalogueCats = CATEGORIES.filter((c) => c.hasCatalogue);
+const serviceOnly = CATEGORIES.filter((c) => !c.hasCatalogue);
+const crumbs = [{ name: 'Equipment', href: '/equipment/' }];
+const groups: { key: string; legend: string; options: { v: string; l: string }[] }[] = [
+  { key: 'category', legend: 'Category', options: catalogueCats.map((c) => ({ v: c.id, l: c.name.replace(' rental', 's').replace('Laptops', 'Laptops') })) },
+  { key: 'brand', legend: 'Brand', options: f.brands.map((b) => ({ v: b, l: b })) },
+  { key: 'proc', legend: 'Processor', options: f.processors.map((p) => ({ v: p, l: p })) },
+  { key: 'gen', legend: 'Generation', options: f.generations.map((g) => ({ v: g, l: g })) },
+  { key: 'ram', legend: 'Memory', options: f.ram.map((r) => ({ v: String(r), l: `${r} GB` })) },
+  { key: 'storage', legend: 'Storage', options: f.storage.map((s) => ({ v: String(s), l: `${s} GB SSD` })) },
+  { key: 'screen', legend: 'Screen size', options: f.screens.map((s) => ({ v: s, l: s })) },
+];
+const catLabel: Record<string, string> = { laptops: 'Laptops', macbooks: 'Apple Macs', desktops: 'Desktops', monitors: 'Monitors' };
+groups[0].options = catalogueCats.map((c) => ({ v: c.id, l: catLabel[c.id] ?? c.name }));
+
+const schema = [{
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'IT equipment available on rent',
+  itemListElement: PRODUCTS.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: new URL(`/equipment/${p.slug}/`, SITE.url).href, name: p.name })),
+}];
+---
+<Base
+  title="Equipment Catalogue: Laptops & Desktops on Rent"
+  description="Browse business laptops, MacBooks, desktops and monitors on rent. Filter by brand, processor, memory and screen size, compare models and request a quote."
+  path="/equipment/"
+  crumbs={crumbs}
+  schema={schema}
+>
+  <PageHero
+    title="Equipment catalogue"
+    lead="Filter by what your team actually needs. Every listing can be configured with your software and rented in any quantity."
+    crumbs={crumbs}
+    ctas={false}
+  />
+
+  <section class="section cat-section">
+    <div class="wrap cat-layout" data-catalogue>
+      <aside class="filters" aria-labelledby="filters-title">
+        <div class="filters-head">
+          <h2 id="filters-title" class="h4">Filter</h2>
+          <button type="button" class="reset" data-reset hidden>Clear all</button>
+        </div>
+        <div class="field search">
+          <label for="q" class="sr-only">Search equipment</label>
+          <span class="search-ic"><Icon name="search" size={20} /></span>
+          <input id="q" class="input" type="search" placeholder="Search models, e.g. ThinkPad, i7" data-search autocomplete="off" />
+        </div>
+        <details class="mobile-toggle" data-filter-details>
+          <summary><Icon name="list-filter" size={20} />Show filters <span class="count" data-active-count></span></summary>
+          <div class="groups">
+            {groups.filter((g) => g.options.length > 0).map((g) => (
+              <fieldset class="fgroup">
+                <legend>{g.legend}</legend>
+                {g.options.map((o) => (
+                  <label class="opt"><input type="checkbox" name={g.key} value={o.v} data-filter={g.key} />{o.l}</label>
+                ))}
+              </fieldset>
+            ))}
+            <fieldset class="fgroup">
+              <legend>Delivery city</legend>
+              <label for="city-filter" class="sr-only">Delivery city</label>
+              <select id="city-filter" class="select" data-city>
+                <option value="">Any city</option>
+                {pageCities.map((c) => <option value={c.id}>{c.name}</option>)}
+              </select>
+            </fieldset>
+          </div>
+        </details>
+      </aside>
+
+      <div class="results">
+        <div class="results-head">
+          <p class="small" role="status" aria-live="polite" data-result-count>{PRODUCTS.length} models</p>
+          <a class="link-arrow small" href="/request-a-quote/?type=enterprise">Need 25+ devices? Get an enterprise quote <Icon name="arrow-right" /></a>
+        </div>
+        <div class="pgrid" data-grid>
+          {PRODUCTS.map((p) => <ProductCard p={p} catalogue headingLevel="h3" />)}
+        </div>
+        <div class="empty" hidden data-empty>
+          <Icon name="search" size={36} />
+          <h3 class="h3">No models match those filters</h3>
+          <p class="muted">Clear a filter, or tell us the specification and we will check current stock for you.</p>
+          <div class="empty-actions">
+            <button type="button" class="btn" data-reset>Clear filters</button>
+            <a class="btn btn--primary" href="/request-a-quote/">Request a configuration</a>
+          </div>
+        </div>
+
+        <div class="also">
+          <h2 class="h3">Also available on request</h2>
+          <p class="muted small">Specific inventory for these is quoted to your requirement.</p>
+          <ul role="list">
+            {serviceOnly.map((c) => <li><a href={`/${c.slug}/`}><Icon name={c.icon} size={20} />{c.name}</a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compare tray -->
+    <div class="tray" hidden data-tray aria-live="polite">
+      <div class="wrap tray-inner">
+        <p class="small"><strong data-tray-count>0</strong> of 3 selected for comparison</p>
+        <div class="tray-actions">
+          <button type="button" class="btn btn--sm" data-tray-clear>Clear</button>
+          <button type="button" class="btn btn--sm btn--dark" data-tray-open>Compare</button>
+        </div>
+      </div>
+    </div>
+    <dialog class="cmp-dialog" data-dialog aria-labelledby="cmp-title">
+      <div class="dlg-head">
+        <h2 id="cmp-title" class="h3">Compare models</h2>
+        <button type="button" class="icon-close" data-dialog-close aria-label="Close comparison"><Icon name="x" size={22} /></button>
+      </div>
+      <div class="dlg-body" data-dialog-body></div>
+    </dialog>
+  </section>
+
+  <FinalCTA />
+</Base>
+
+<style>
+  .cat-section { padding-top: var(--s-7); }
+  .cat-layout { display: grid; gap: var(--s-6); align-items: start; }
+  @media (min-width: 1000px) { .cat-layout { grid-template-columns: 270px 1fr; gap: var(--s-7); } }
+  .filters { display: grid; gap: var(--s-4); }
+  @media (min-width: 1000px) { .filters { position: sticky; top: 104px; max-height: calc(100vh - 120px); overflow: auto; padding-right: 6px; } }
+  .filters-head { display: flex; justify-content: space-between; align-items: center; }
+  .reset { background: none; border: 0; font-weight: 700; text-decoration: underline; min-height: 44px; }
+  .search { position: relative; }
+  .search .input { padding-left: 42px; }
+  .search-ic { position: absolute; left: 14px; top: 15px; color: var(--ink-2); pointer-events: none; }
+  .mobile-toggle summary { display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px; border: 1.5px solid var(--ink); border-radius: var(--r-md); font-weight: 700; cursor: pointer; list-style: none; background: var(--card); }
+  .mobile-toggle summary::-webkit-details-marker { display: none; }
+  .count:not(:empty) { background: var(--ink); color: var(--paper); border-radius: var(--r-pill); padding: 0 8px; font-size: var(--fs-xs); }
+  @media (min-width: 1000px) {
+    .mobile-toggle summary { display: none; }
+  }
+  .groups { display: grid; gap: var(--s-5); padding-top: var(--s-4); }
+  .fgroup { border: 0; border-top: 1.5px solid var(--ink); padding: var(--s-3) 0 0; margin: 0; display: grid; gap: 2px; }
+  .fgroup legend { float: left; width: 100%; font-weight: 700; padding: 0; margin-bottom: 6px; }
+  .opt { display: flex; align-items: center; gap: 10px; min-height: 36px; cursor: pointer; font-size: var(--fs-small); }
+  .opt input { width: 18px; height: 18px; accent-color: var(--ink); flex: none; }
+  .results-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s-3); margin-bottom: var(--s-5); }
+  .results-head p { margin: 0; font-weight: 600; }
+  .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .empty { display: grid; gap: var(--s-3); justify-items: start; padding: var(--s-7); border: 1.5px dashed var(--line-strong); border-radius: var(--r-lg); }
+  .empty-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .also { margin-top: var(--s-8); padding-top: var(--s-6); border-top: 1.5px solid var(--ink); }
+  .also ul { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--s-4); list-style: none; }
+  .also a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--r-pill); text-decoration: none; font-weight: 600; background: var(--card); }
+  .also a:hover { border-color: var(--ink); }
+
+  .tray { position: fixed; left: 0; right: 0; bottom: 76px; z-index: var(--z-bar); }
+  @media (min-width: 900px) { .tray { bottom: 0; } }
+  .tray-inner { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); background: var(--ink); color: var(--paper); border-radius: var(--r-md) var(--r-md) 0 0; padding-block: 12px; }
+  .tray-inner p { margin: 0; }
+  .tray-actions { display: flex; gap: 8px; }
+  .tray .btn { border-color: var(--paper); box-shadow: 2px 2px 0 var(--paper); }
+  .tray .btn--dark { --btn-bg: var(--red-ink); --btn-fg: #fff; }
+  .cmp-dialog { width: min(960px, calc(100vw - 24px)); max-height: calc(100vh - 48px); border: 1.5px solid var(--ink); border-radius: var(--r-lg); padding: 0; background: var(--card); color: var(--ink); box-shadow: var(--shadow-block); }
+  .cmp-dialog::backdrop { background: rgba(23,20,15,.55); }
+  .dlg-head { display: flex; justify-content: space-between; align-items: center; padding: var(--s-4) var(--s-5); border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--card); }
+  .icon-close { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--r-sm); border: 1.5px solid var(--line-strong); background: none; }
+  .dlg-body { padding: var(--s-5); overflow-x: auto; }
+  .dlg-body :global(table) { width: 100%; border-collapse: collapse; min-width: 520px; }
+  .dlg-body :global(th), .dlg-body :global(td) { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: var(--fs-small); }
+  .dlg-body :global(thead th) { font-size: 1rem; border-bottom: 1.5px solid var(--ink); }
+  .dlg-body :global(tbody th) { color: var(--ink-2); font-weight: 600; width: 120px; }
+  .dlg-body :global(.diff) { background: var(--amber-tint); }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-catalogue]')!;
+  const cards = [...root.querySelectorAll<HTMLElement>('[data-product]')];
+  const search = root.querySelector<HTMLInputElement>('[data-search]')!;
+  const city = root.querySelector<HTMLSelectElement>('[data-city]')!;
+  const checks = [...root.querySelectorAll<HTMLInputElement>('[data-filter]')];
+  const countEl = root.querySelector<HTMLElement>('[data-result-count]')!;
+  const empty = root.querySelector<HTMLElement>('[data-empty]')!;
+  const resets = [...document.querySelectorAll<HTMLButtonElement>('[data-reset]')];
+  const activeCount = root.querySelector<HTMLElement>('[data-active-count]')!;
+  const details = root.querySelector<HTMLDetailsElement>('[data-filter-details]')!;
+  if (matchMedia('(min-width: 1000px)').matches) details.open = true;
+
+  const keys = ['category', 'brand', 'proc', 'gen', 'ram', 'storage', 'screen'];
+  const attr: Record<string, string> = { category: 'category', brand: 'brand', proc: 'proc', gen: 'gen', ram: 'ram', storage: 'storage', screen: 'screen' };
+
+  function selected() {
+    const s: Record<string, string[]> = {};
+    keys.forEach((k) => (s[k] = checks.filter((c) => c.dataset.filter === k && c.checked).map((c) => c.value)));
+    return s;
+  }
+
+  function apply(push = true) {
+    const sel = selected();
+    const q = search.value.trim().toLowerCase();
+    const terms = q.split(/\s+/).filter(Boolean);
+    const cityV = city.value;
+    let shown = 0;
+    cards.forEach((card) => {
+      let ok = keys.every((k) => {
+        if (!sel[k].length) return true;
+        const vals = (card.dataset[attr[k]] ?? '').split('|');
+        return sel[k].some((v) => vals.includes(v));
+      });
+      if (ok && terms.length) ok = terms.every((t) => (card.dataset.search ?? '').includes(t));
+      if (ok && cityV) { const cs = card.dataset.cities; ok = !cs || cs.split('|').includes(cityV); }
+      card.hidden = !ok;
+      if (ok) shown++;
+    });
+    countEl.textContent = `${shown} ${shown === 1 ? 'model' : 'models'}`;
+    empty.hidden = shown > 0;
+    const active = Object.values(sel).flat().length + (q ? 1 : 0) + (cityV ? 1 : 0);
+    activeCount.textContent = active ? String(active) : '';
+    resets.forEach((r) => { if (r.closest('.filters-head')) r.hidden = !active; });
+    if (push) {
+      const params = new URLSearchParams();
+      Object.entries(sel).forEach(([k, v]) => v.length && params.set(k, v.join(',')));
+      if (q) params.set('q', q);
+      if (cityV) params.set('city', cityV);
+      const qs = params.toString();
+      history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+    }
+  }
+
+  // Restore from URL
+  const params = new URLSearchParams(location.search);
+  keys.forEach((k) => (params.get(k) ?? '').split(',').filter(Boolean).forEach((v) => {
+    const c = checks.find((x) => x.dataset.filter === k && x.value === v); if (c) c.checked = true;
+  }));
+  search.value = params.get('q') ?? '';
+  city.value = params.get('city') ?? '';
+  apply(false);
+
+  checks.forEach((c) => c.addEventListener('change', () => apply()));
+  city.addEventListener('change', () => apply());
+  let t: number | undefined;
+  search.addEventListener('input', () => { clearTimeout(t); t = window.setTimeout(() => apply(), 150); });
+  resets.forEach((r) => r.addEventListener('click', () => {
+    checks.forEach((c) => (c.checked = false)); search.value = ''; city.value = ''; apply(); search.focus();
+  }));
+
+  // Compare
+  const tray = document.querySelector<HTMLElement>('[data-tray]')!;
+  const trayCount = tray.querySelector<HTMLElement>('[data-tray-count]')!;
+  const dialog = document.querySelector<HTMLDialogElement>('[data-dialog]')!;
+  const body = dialog.querySelector<HTMLElement>('[data-dialog-body]')!;
+  const boxes = [...root.querySelectorAll<HTMLInputElement>('[data-compare]')];
+  const picked = () => boxes.filter((b) => b.checked);
+  function syncTray() {
+    const n = picked().length;
+    tray.hidden = n === 0;
+    trayCount.textContent = String(n);
+    boxes.forEach((b) => (b.disabled = !b.checked && n >= 3));
+  }
+  boxes.forEach((b) => b.addEventListener('change', syncTray));
+  tray.querySelector('[data-tray-clear]')!.addEventListener('click', () => { boxes.forEach((b) => (b.checked = false)); syncTray(); });
+  tray.querySelector('[data-tray-open]')!.addEventListener('click', () => {
+    const items = picked().map((b) => JSON.parse(b.closest<HTMLElement>('[data-product]')!.dataset.json!)) as { name: string; slug: string; rows: [string, string][] }[];
+    const labels = [...new Set(items.flatMap((i) => i.rows.map((r) => r[0])))];
+    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+    const rows = labels.map((l) => {
+      const vals = items.map((i) => i.rows.find((r) => r[0] === l)?.[1] ?? '—');
+      const differs = new Set(vals).size > 1;
+      return `<tr${differs ? ' class="diff"' : ''}><th scope="row">${esc(l)}</th>${vals.map((v) => `<td>${esc(v)}</td>`).join('')}</tr>`;
+    }).join('');
+    const quote = `<tr><th scope="row"></th>${items.map((i) => `<td><a class="btn btn--primary btn--sm" href="/request-a-quote/?product=${encodeURIComponent(i.slug)}">Request quote</a></td>`).join('')}</tr>`;
+    body.innerHTML = `<table><thead><tr><th scope="col"><span class="sr-only">Specification</span></th>${items.map((i) => `<th scope="col"><a href="/equipment/${i.slug}/">${esc(i.name)}</a></th>`).join('')}</tr></thead><tbody>${rows}${quote}</tbody></table><p class="xs muted" style="margin-top:12px">Highlighted rows differ between models.</p>`;
+    dialog.showModal();
+  });
+  dialog.querySelector('[data-dialog-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+</script>

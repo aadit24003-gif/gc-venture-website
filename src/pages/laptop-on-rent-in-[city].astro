@@ -1,0 +1,195 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Steps from '../components/Steps.astro';
+import FAQ from '../components/FAQ.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import IndiaMap from '../components/IndiaMap.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Icon from '../components/Icon.astro';
+import { pageCities, cityPath, type City } from '../data/cities';
+import { categoryById, CATEGORIES } from '../data/categories';
+import { PRODUCTS } from '../data/products';
+import { SITE, OFFICES, enabledClaims, claim } from '../config/site';
+
+export function getStaticPaths() {
+  return pageCities.map((c) => ({ params: { city: c.seoName }, props: { c } }));
+}
+const { c } = Astro.props as { c: City };
+const path = cityPath(c);
+const office = c.office ? OFFICES.find((o) => o.id === c.id) : undefined;
+const laptops = categoryById('laptops')!;
+const featured = PRODUCTS.filter((p) => p.category === 'laptops' || p.category === 'macbooks').filter((p) => p.featured).slice(0, 4);
+const perks = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'preinstalled', 'support247', 'monthlyBilling']);
+const crumbs = [{ name: 'Locations', href: '/locations/' }, { name: `Laptop rental in ${c.name}`, href: path }];
+const others = pageCities.filter((x) => x.id !== c.id);
+const waMessage = `Hi IT Rentals, I would like to enquire about renting laptops in ${c.name}.`;
+
+const title = `Laptop on Rent in ${c.name} | Business Laptop Rental`;
+const quick = [claim('zeroDeposit') && 'no deposit', claim('noLockIn') && 'no lock-in'].filter(Boolean).join(', ');
+const description = `Rent business laptops, desktops and MacBooks in ${c.name}${quick ? ` with ${quick}` : ''}. Serving ${c.areas.slice(0, 3).join(', ')} and more. Get a quote today.`.slice(0, 158);
+
+const faqs = [
+  ...c.faqs,
+  { q: `What is the minimum rental period for a laptop in ${c.name}?`, a: claim('noLockIn') ? 'There is no minimum commitment. Rent for a few weeks or a few years.' : 'We confirm the minimum term in your quote.' },
+  { q: `How fast can you deliver laptops in ${c.name}?`, a: claim('fastDelivery') ? `Same-day or next-day in most cases, depending on quantity and configuration. Larger ${c.name} deployments are scheduled to your start date.` : 'We confirm a delivery date in your quote.' },
+];
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Laptop rental in ${c.name}`,
+    serviceType: 'Laptop and IT equipment rental',
+    provider: { '@id': office ? `${SITE.url}/#office-${office.id}` : `${SITE.url}/#organization` },
+    areaServed: { '@type': 'City', name: c.name, containedInPlace: { '@type': 'State', name: c.state } },
+    url: new URL(path, SITE.url).href,
+  },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title={title} description={description} path={path} crumbs={crumbs} schema={schema} waMessage={waMessage}>
+  <PageHero
+    title={`Laptop rental in ${c.name} for businesses and teams`}
+    lead={c.intro}
+    crumbs={crumbs}
+    waMessage={waMessage}
+    quoteHref={`/request-a-quote/?city=${encodeURIComponent(c.name)}`}
+  >
+    <aside slot="aside" class="panel panel--pad local">
+      {office ? (
+        <>
+          <span class="tag tag--office">Our {c.name} office</span>
+          <address>
+            {office.lines.map((l) => <>{l}<br /></>)}
+            {office.locality}, {office.region} {office.postalCode}
+          </address>
+        </>
+      ) : (
+        <span class="tag">Serving businesses in {c.name}</span>
+      )}
+      <p class="small muted">{c.note}</p>
+      <p class="label">Areas we deliver to</p>
+      <ul role="list" class="areas">{c.areas.map((a) => <li>{a}</li>)}</ul>
+    </aside>
+  </PageHero>
+
+  <section class="section" aria-labelledby="avail-title">
+    <div class="wrap">
+      <div class="head-row">
+        <div class="section-head">
+          <h2 id="avail-title" class="h2">Laptops for rent in {c.name}</h2>
+          <p class="lead">ThinkPad, Latitude and EliteBook business laptops and MacBooks, set up with your software before they reach your {c.name} office.</p>
+        </div>
+        <a class="link-arrow" href="/equipment/?category=laptops">See all models <Icon name="arrow-right" /></a>
+      </div>
+      <div class="pgrid">{featured.map((p) => <ProductCard p={p} />)}</div>
+      {laptops.tiers && (
+        <div class="tiers">
+          {laptops.tiers.map((t) => (
+            <div><p class="tier">{t.name}</p><p class="small"><strong>{t.spec}</strong></p><p class="small muted">{t.fit}</p></div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <section class="section section--ink" aria-labelledby="why-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="why-title" class="h2">Why {c.name} teams rent from us</h2>
+        <p class="lead">Renting since {SITE.founded}, with {office ? `an office in ${c.name}` : `delivery and support across ${c.name}`}.</p>
+      </div>
+      <ul role="list" class="perks">
+        {perks.map((p) => <li><Icon name="check" size={20} stroke={2.4} /><span><strong>{p.short}.</strong> {p.long}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="who-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="who-title" class="h2">Who rents laptops in {c.name}</h2>
+        <p class="lead">The sectors that drive most of our {c.name} enquiries.</p>
+      </div>
+      <ul role="list" class="who">
+        {c.industries.map((i) => <li>{i}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="also-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="also-title" class="h2">More than laptops in {c.name}</h2>
+        <p class="lead">Rent the rest of the setup from the same supplier.</p>
+      </div>
+      <ul role="list" class="also">
+        {CATEGORIES.filter((x) => x.id !== 'laptops').map((x) => <li><a href={`/${x.slug}/`}><Icon name={x.icon} size={20} />{x.name}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head"><h2 id="how-title" class="h2">How laptop rental works</h2></div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="price-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="price-title" class="h2">Laptop rental pricing in {c.name}</h2>
+        <p class="lead">Monthly rates depend on the configuration, quantity and rental term. Larger and longer rentals cost less per device. Send your requirement and we reply with exact pricing.</p>
+        <h3 class="h4 faq-h">Questions from {c.name} customers</h3>
+        <FAQ items={faqs} />
+      </div>
+      <div class="panel panel--pad form-panel" id="quote">
+        <QuoteForm variant="compact" city={c.id} category="laptops" formId={`q-${c.id}`} heading={`Get a quote for ${c.name}`} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="map-title">
+    <div class="wrap">
+      <div class="section-head"><h2 id="map-title" class="h2">Other cities we serve</h2></div>
+      <IndiaMap highlight={c.id} showList={false} />
+      <ul role="list" class="others">
+        {others.map((o) => <li><a href={cityPath(o)}>Laptop rental in {o.name}</a></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <FinalCTA waMessage={waMessage} title={`Equipping a team in ${c.name}?`} />
+</Base>
+
+<style>
+  .local { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); display: grid; gap: var(--s-3); justify-items: start; }
+  .local address { font-style: normal; font-weight: 600; line-height: 1.5; }
+  .local p { margin: 0; }
+  .areas { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
+  .areas li { padding: 4px 10px; border-radius: var(--r-pill); background: var(--paper-2); font-size: var(--fs-small); font-weight: 600; }
+  .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
+  .head-row .section-head { margin-bottom: 0; }
+  .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+  .tiers { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: var(--s-7); border-top: 1.5px solid var(--ink); padding-top: var(--s-5); }
+  .tiers p { margin: 0 0 4px; }
+  .tier { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.375rem; }
+  .two { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 960px) { .two { grid-template-columns: 1fr 1.1fr; } }
+  .two .lead { margin-top: var(--s-4); }
+  .perks { display: grid; gap: var(--s-4); list-style: none; }
+  .perks li { display: flex; gap: 12px; align-items: flex-start; color: var(--on-dark-2); }
+  .perks strong { color: var(--paper); }
+  .perks :global(svg) { color: var(--amber); flex: none; margin-top: 3px; }
+  .who { display: grid; gap: 0; list-style: none; border-top: 1.5px solid var(--ink); }
+  .who li { padding: 16px 0; border-bottom: 1px solid var(--line-strong); font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.75rem; line-height: 1; }
+  .also { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; }
+  .also a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--r-pill); text-decoration: none; font-weight: 600; background: var(--card); }
+  .also a:hover { border-color: var(--ink); }
+  .faq-h { margin: var(--s-7) 0 var(--s-3); }
+  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .others { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px 24px; margin-top: var(--s-7); list-style: none; }
+  .others a { display: block; padding: 8px 0; font-weight: 600; }
+</style>

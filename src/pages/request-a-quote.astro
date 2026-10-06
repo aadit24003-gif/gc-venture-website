@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import FAQ from '../components/FAQ.astro';
+import Icon from '../components/Icon.astro';
+import { CONTACT, formatPhone, telLink, whatsappLink, enabledClaims } from '../config/site';
+import { GENERAL_FAQS } from '../data/faqs';
+import { visibleClients } from '../data/clients';
+
+const crumbs = [{ name: 'Request a quote', href: '/request-a-quote/' }];
+const claims = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
+---
+<Base
+  title="Request a Quote for Laptop & IT Equipment Rental"
+  description="Get a quote for renting laptops, desktops, MacBooks, servers, networking or phones. Share quantity, city and dates; we reply with configurations and pricing."
+  path="/request-a-quote/"
+  crumbs={crumbs}
+>
+  <section class="rq grid-paper">
+    <div class="wrap rq-grid">
+      <div class="intro">
+        <nav aria-label="Breadcrumb"><ol class="crumbs" role="list"><li><a href="/">Home</a></li><li><span aria-current="page">Request a quote</span></li></ol></nav>
+        <h1 class="h1">Tell us what your team needs</h1>
+        <p class="lead">One device or a thousand. We reply with configurations, availability and monthly pricing for your exact requirement.</p>
+        {claims.length > 0 && <ul role="list" class="claims">{claims.map((c) => <li><Icon name="check" size={18} stroke={2.5} />{c.short}</li>)}</ul>}
+        <div class="alt">
+          <p class="label">Prefer to talk?</p>
+          <a class="btn btn--wa btn--block" href={whatsappLink()} target="_blank" rel="noopener" data-track-location="quote-page"><Icon name="whatsapp" />WhatsApp {formatPhone(CONTACT.PRIMARY_PHONE)}</a>
+          <a class="btn btn--block" href={telLink()} data-track-location="quote-page"><Icon name="phone" />Call {formatPhone(CONTACT.PRIMARY_PHONE)}</a>
+        </div>
+        <p class="small muted trusted">Trusted by teams at {visibleClients.slice(0, 6).map((c) => c.name).join(', ')} and more.</p>
+      </div>
+      <div class="panel panel--pad form-panel">
+        <QuoteForm formId="quote-main" />
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap faq-grid">
+      <h2 class="h2">Before you ask</h2>
+      <FAQ items={GENERAL_FAQS} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .rq { padding: var(--s-6) 0 var(--s-9); border-bottom: 1.5px solid var(--ink); }
+  .rq-grid { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 1040px) { .rq-grid { grid-template-columns: 1fr 1.5fr; } .intro { position: sticky; top: 110px; } }
+  .intro .lead { margin-top: var(--s-4); }
+  .claims { display: grid; gap: 8px; margin-top: var(--s-5); list-style: none; font-weight: 600; }
+  .claims li { display: flex; gap: 8px; align-items: center; }
+  .claims :global(svg) { color: var(--green); }
+  .alt { display: grid; gap: var(--s-3); margin-top: var(--s-6); max-width: 360px; }
+  .alt .label { font-weight: 700; margin: 0; }
+  .trusted { margin-top: var(--s-5); max-width: 46ch; }
+  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .faq-grid { display: grid; gap: var(--s-6); }
+  @media (min-width: 960px) { .faq-grid { grid-template-columns: 1fr 1.4fr; } }
+</style>

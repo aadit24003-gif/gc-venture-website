@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from './PageHero.astro';
+interface Props { title: string; description: string; path: string; updated: string; draft?: boolean }
+const { title, description, path, updated, draft = true } = Astro.props;
+const crumbs = [{ name: title, href: path }];
+---
+<Base title={title} description={description} path={path} crumbs={crumbs} noindex={draft}>
+  <PageHero title={title} crumbs={crumbs} ctas={false} lead={`Last updated: ${updated}`} />
+  <section class="section">
+    <div class="wrap">
+      {draft && (
+        <p class="draft" role="note"><strong>Draft.</strong> Sections marked [REQUIRES CONFIRMATION] must be reviewed and completed before this page is treated as final. This page is hidden from search engines until then.</p>
+      )}
+      <article class="legal"><slot /></article>
+    </div>
+  </section>
+</Base>
+<style>
+  .draft { max-width: 72ch; padding: var(--s-4); border: 1.5px solid var(--warning); background: var(--amber-tint); border-radius: var(--r-md); margin-bottom: var(--s-6); }
+  .legal { max-width: 72ch; }
+  .legal :global(h2) { font-size: 1.5rem; font-weight: 700; margin: var(--s-7) 0 var(--s-3); }
+  .legal :global(ul) { padding-left: 1.25rem; margin-bottom: 1em; }
+  .legal :global(li) { margin-bottom: 6px; }
+  .legal :global(mark) { background: var(--amber-tint); padding: 0 4px; border-radius: 3px; }
+</style>

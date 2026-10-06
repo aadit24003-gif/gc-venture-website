@@ -1,0 +1,47 @@
+---
+import Icon from './Icon.astro';
+import { telLink, whatsappLink } from '../config/site';
+interface Props { waMessage?: string }
+const { waMessage } = Astro.props;
+---
+<nav class="mbar" aria-label="Quick contact" data-track-zone="mobile-bar">
+  <a href={telLink()} class="mb-item"><Icon name="phone" size={22} /><span>Call</span></a>
+  <a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="mb-item wa"><Icon name="whatsapp" size={22} /><span>WhatsApp</span></a>
+  <a href="/request-a-quote/" class="mb-item quote"><Icon name="clipboard-list" size={22} /><span>Get quote</span></a>
+</nav>
+
+<!-- Floating WhatsApp on larger screens -->
+<aside aria-label="WhatsApp chat">
+<a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="wa-fab" aria-label="Chat with us on WhatsApp" data-track-location="floating">
+  <Icon name="whatsapp" size={28} />
+</a>
+</aside>
+
+<style>
+  .mbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar);
+    display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    background: var(--card); border-top: 1.5px solid var(--ink);
+  }
+  .mb-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    min-height: 56px; border-radius: var(--r-md); text-decoration: none; font-weight: 700; font-size: 0.875rem;
+    border: 1.5px solid var(--line-strong);
+  }
+  .mb-item.wa :global(svg) { color: var(--whatsapp); }
+  .mb-item.quote { background: var(--red-ink); color: #fff; border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+  .wa-fab {
+    display: none; position: fixed; right: 24px; bottom: 24px; z-index: var(--z-bar);
+    width: 60px; height: 60px; place-items: center; border-radius: 50%;
+    background: var(--whatsapp); color: #fff; border: 2px solid var(--ink); box-shadow: var(--shadow-block-sm);
+    transition: transform var(--t-fast) var(--ease-out);
+  }
+  .wa-fab:hover { transform: translate(-1px, -1px) scale(1.04); }
+  :global(html.menu-open) .mbar, :global(html.menu-open) .wa-fab { display: none; }
+  :global(body:has([data-tray]:not([hidden]))) .wa-fab { bottom: 88px; }
+  @media (min-width: 900px) {
+    .mbar { display: none; }
+    .wa-fab { display: grid; }
+  }
+</style>

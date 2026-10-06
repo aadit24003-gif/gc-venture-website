@@ -1,0 +1,44 @@
+---
+import Icon from './Icon.astro';
+import { CATEGORIES, type Category } from '../data/categories';
+
+interface Props { items?: Category[]; exclude?: string }
+const { items = CATEGORIES, exclude } = Astro.props;
+const list = items.filter((c) => c.id !== exclude);
+---
+<ul role="list" class="cat-index">
+  {list.map((c) => (
+    <li>
+      <a href={`/${c.slug}/`} class="row">
+        <span class={`ico hue-${c.hue}`}><Icon name={c.icon} size={28} stroke={1.6} /></span>
+        <span class="txt">
+          <span class="name">{c.name}</span>
+          <span class="blurb">{c.navBlurb}</span>
+        </span>
+        <span class="go"><Icon name="arrow-up-right" size={22} /></span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .cat-index { display: grid; grid-template-columns: 1fr; border-top: 1.5px solid var(--ink); }
+  @media (min-width: 860px) { .cat-index { grid-template-columns: 1fr 1fr; column-gap: var(--s-7); } }
+  .row {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--s-4);
+    padding: 18px 4px; border-bottom: 1px solid var(--line-strong); text-decoration: none;
+    transition: background var(--t-fast), padding var(--t-med) var(--ease-out);
+  }
+  .row:hover { background: var(--card); padding-inline: 14px; text-decoration: none; }
+  .ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; border: 1.5px solid var(--ink); }
+  .hue-ink { background: var(--ink); color: var(--paper); }
+  .hue-red { background: var(--red-ink); color: #fff; }
+  .hue-green { background: var(--green); color: #fff; }
+  .hue-blue { background: var(--blue); color: #fff; }
+  .hue-amber { background: var(--amber); color: var(--ink); }
+  .hue-paper { background: var(--card); color: var(--ink); }
+  .name { display: block; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height: 1; }
+  .blurb { display: block; color: var(--ink-2); font-size: var(--fs-small); margin-top: 4px; }
+  .go { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line-strong); transition: background var(--t-fast), color var(--t-fast), transform var(--t-med) var(--ease-out); }
+  .row:hover .go { background: var(--ink); color: var(--paper); border-color: var(--ink); transform: rotate(45deg); }
+</style>

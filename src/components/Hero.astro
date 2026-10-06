@@ -1,0 +1,100 @@
+---
+import Icon from './Icon.astro';
+import ClientMarquee from './ClientMarquee.astro';
+import { SITE, whatsappLink, enabledClaims } from '../config/site';
+
+/** The pile: everything we rent, as physical-feeling chips. Hue = equipment family. */
+const pile: { label: string; icon: string; hue: string; r: number; href: string }[] = [
+  { label: 'Lenovo ThinkPads', icon: 'laptop', hue: 'ink', r: -6, href: '/laptop-rental/' },
+  { label: 'Asset-tagged and labelled', icon: 'tag', hue: 'paper', r: 4, href: '/laptop-rental/' },
+  { label: 'Rack servers', icon: 'server', hue: 'green', r: -3, href: '/server-rental/' },
+  { label: 'MacBook Air and Pro', icon: 'laptop-minimal', hue: 'paper', r: 7, href: '/macbook-rental/' },
+  { label: 'Desktops with monitors', icon: 'monitor', hue: 'blue', r: -9, href: '/desktop-rental/' },
+  { label: 'Firewalls', icon: 'brick-wall-shield', hue: 'red', r: 5, href: '/firewall-rental/' },
+  { label: 'Dell Latitudes', icon: 'laptop', hue: 'ink', r: 12, href: '/laptop-rental/' },
+  { label: 'Windows and Office pre-installed', icon: 'package-check', hue: 'paper', r: -4, href: '/laptop-rental/' },
+  { label: 'Managed switches', icon: 'network', hue: 'green', r: 8, href: '/switch-rental/' },
+  { label: 'Android and iPhone', icon: 'smartphone', hue: 'amber', r: -11, href: '/mobile-phone-rental/' },
+  { label: 'HP EliteBooks', icon: 'laptop', hue: 'ink', r: 3, href: '/laptop-rental/' },
+  { label: 'Routers and Wi-Fi', icon: 'router', hue: 'green', r: -7, href: '/router-rental/' },
+  { label: 'Mini PCs', icon: 'cpu', hue: 'blue', r: 10, href: '/desktop-rental/' },
+  { label: 'Replacement if one fails', icon: 'refresh-ccw', hue: 'red', r: -2, href: '/support/' },
+  { label: '24" monitors', icon: 'monitor', hue: 'paper', r: 6, href: '/monitor-rental/' },
+];
+
+const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
+---
+<section class="hero grid-paper" aria-labelledby="hero-title">
+  <div class="wrap hero-inner">
+    <p class="since"><span class="since-dot" aria-hidden="true"></span>Renting IT to Indian businesses since {SITE.founded}</p>
+    <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
+    <p class="lead">
+      Laptops, desktops, MacBooks, servers, networking and phones on rent across India.
+      Configured before they ship. Supported until they come back.
+    </p>
+    <div class="ctas">
+      <a href="/request-a-quote/" class="btn btn--primary btn--lg" data-track-location="hero">Get a quote</a>
+      <a href={whatsappLink()} class="btn btn--lg btn--wa" target="_blank" rel="noopener" data-track-location="hero"><Icon name="whatsapp" />WhatsApp us</a>
+      <a href="/equipment/" class="link-arrow">Explore equipment <Icon name="arrow-right" /></a>
+    </div>
+    {trust.length > 0 && (
+      <ul class="trust" role="list">
+        {trust.map((t) => <li><Icon name="check" size={18} stroke={2.5} />{t.short}</li>)}
+      </ul>
+    )}
+  </div>
+
+  <div class="pile-wrap">
+    <ul class="pile" role="list" aria-label="What you can rent">
+      {pile.map((c, i) => (
+        <li style={`--r:${c.r}deg; --i:${i}`}>
+          <a href={c.href} class={`chip chip--${c.hue}`}><Icon name={c.icon} />{c.label}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <ClientMarquee />
+</section>
+
+<style>
+  .hero { position: relative; overflow: hidden; padding-top: clamp(56px, 8vw, 104px); border-bottom: 1.5px solid var(--ink); }
+  .hero-inner { display: grid; justify-items: center; text-align: center; }
+  .since {
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-5);
+    padding: 8px 16px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft); font-weight: 600; font-size: var(--fs-small);
+  }
+  .since-dot { width: 10px; height: 10px; border-radius: 3px; background: var(--red); box-shadow: 4px 4px 0 -1px var(--red-tint); }
+  .display { max-width: 16ch; }
+  .lead { margin: var(--s-5) auto 0; color: var(--ink-2); max-width: 54ch; }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-4) var(--s-5); margin-top: var(--s-6); }
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: var(--s-6); list-style: none; font-weight: 600; font-size: var(--fs-small); }
+  .trust li { display: inline-flex; align-items: center; gap: 6px; }
+  .trust :global(svg) { color: var(--green); }
+
+  .pile-wrap { position: relative; margin-top: clamp(40px, 6vw, 72px); padding-inline: var(--gutter); }
+  .pile {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
+    max-width: 1180px; margin: 0 auto; list-style: none; padding: 0 0 var(--s-6);
+  }
+  .pile li { margin: 0 -2px; transform: rotate(var(--r)); }
+  .pile .chip {
+    font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1.0625rem); padding: 10px 18px 10px 14px;
+    text-decoration: none; box-shadow: 0 2px 0 rgba(23,20,15,.25), 0 10px 18px -12px rgba(23,20,15,.6);
+    transition: transform var(--t-fast) var(--ease-out);
+  }
+  .pile .chip:hover { transform: translateY(-4px) rotate(calc(var(--r) * -0.4)); text-decoration: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pile li { animation: drop 800ms var(--ease-spring) both; animation-delay: calc(200ms + var(--i) * 40ms); }
+    @keyframes drop {
+      0% { transform: translateY(-110vh) rotate(calc(var(--r) * 3)); }
+      100% { transform: translateY(0) rotate(var(--r)); }
+    }
+  }
+  @media (max-width: 639px) {
+    .pile li:nth-child(n + 11) { display: none; }
+    .pile li { margin: 0 -2px; }
+  }
+</style>

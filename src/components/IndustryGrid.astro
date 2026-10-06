@@ -1,0 +1,29 @@
+---
+import Icon from './Icon.astro';
+import { INDUSTRIES, type Industry } from '../data/industries';
+interface Props { items?: Industry[]; headingLevel?: 'h2' | 'h3' }
+const { items = INDUSTRIES, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+---
+<ul role="list" class="ind">
+  {items.map((it) => (
+    <li id={`industry-${it.id}`}>
+      <span class="ic"><Icon name={it.icon} size={30} stroke={1.5} /></span>
+      <H class="h4">{it.name}</H>
+      <p class="need">{it.need}</p>
+      <p class="kit"><span class="sr-only">Typical setup: </span>{it.kit.map((k) => <span class="tag">{k}</span>)}</p>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .ind { display: grid; grid-template-columns: 1fr; border-top: 1.5px solid var(--ink); border-left: 1px solid var(--line-strong); list-style: none; }
+  @media (min-width: 640px) { .ind { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .ind { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1280px) { .ind { grid-template-columns: repeat(4, 1fr); } }
+  .ind li { padding: var(--s-5); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); display: grid; gap: var(--s-2); align-content: start; transition: background var(--t-fast); }
+  .ind li:hover { background: var(--card); }
+  .ic { color: var(--red-ink); margin-bottom: var(--s-2); }
+  .need { color: var(--ink-2); font-size: var(--fs-small); margin: 0; }
+  .kit { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--s-2) 0 0; }
+</style>

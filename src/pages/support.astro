@@ -1,0 +1,119 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { FORM_ENDPOINT, CONTACT, formatPhone, telLink, whatsappLink, claim } from '../config/site';
+
+const crumbs = [{ name: 'Support', href: '/support/' }];
+const types = [
+  { v: 'Technical issue', i: 'wrench' },
+  { v: 'Device not working', i: 'laptop' },
+  { v: 'Replacement request', i: 'refresh-ccw' },
+  { v: 'Billing', i: 'receipt' },
+  { v: 'General support', i: 'life-buoy' },
+  { v: 'Complaint', i: 'triangle-alert' },
+];
+const s247 = claim('support247');
+const fid = 'support-form';
+---
+<Base
+  title="Customer Support, Replacements & Complaints"
+  description="Existing customers: report a device issue, request a replacement, raise a billing query or register a complaint with IT Rentals support."
+  path="/support/"
+  crumbs={crumbs}
+  waMessage="Hi IT Rentals, I need support with a rented device."
+>
+  <PageHero
+    title="Support for rented equipment"
+    lead={`Something not working? Tell us the device and the issue and we will get it fixed or replaced.${s247 ? ' Support is available 24/7.' : ''}`}
+    crumbs={crumbs}
+    ctas={false}
+  />
+
+  <section class="section">
+    <div class="wrap two">
+      <aside class="side">
+        <h2 class="h3">Urgent? Skip the form</h2>
+        <a class="btn btn--wa btn--block" href={whatsappLink('Hi IT Rentals, I need urgent support with a rented device.')} target="_blank" rel="noopener" data-track-location="support"><Icon name="whatsapp" />WhatsApp support</a>
+        <a class="btn btn--block" href={telLink()} data-track-location="support"><Icon name="phone" />Call {formatPhone(CONTACT.PRIMARY_PHONE)}</a>
+        <p class="small muted">Have your asset tag number ready. It is on the sticker on the device.</p>
+      </aside>
+
+      <form class="panel panel--pad sform" id={fid} action={FORM_ENDPOINT} method="post" enctype="multipart/form-data" novalidate data-enquiry data-form-type="support">
+        <div class="err-summary" role="alert" tabindex="-1" hidden data-error-summary><p><strong>Please fix the highlighted fields:</strong></p><ul></ul></div>
+        <input type="hidden" name="form_type" value="support" />
+        <input type="hidden" name="source_page" value="" data-source-page />
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+        <fieldset class="block">
+          <legend class="h4">What do you need help with?</legend>
+          <div class="seg">
+            {types.map((t, i) => (
+              <>
+                <input type="radio" name="issue_type" id={`${fid}-t${i}`} value={t.v} checked={i === 0} />
+                <label for={`${fid}-t${i}`}><Icon name={t.i} />{t.v}</label>
+              </>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="form-grid form-grid--2">
+          <div class="field"><label for={`${fid}-name`}>Name <span class="req" aria-hidden="true">*</span></label><input class="input" id={`${fid}-name`} name="name" autocomplete="name" required maxlength="120" /></div>
+          <div class="field"><label for={`${fid}-company`}>Company <span class="req" aria-hidden="true">*</span></label><input class="input" id={`${fid}-company`} name="company" autocomplete="organization" required maxlength="160" /></div>
+          <div class="field"><label for={`${fid}-phone`}>Phone <span class="req" aria-hidden="true">*</span></label><input class="input" type="tel" id={`${fid}-phone`} name="phone" autocomplete="tel" required pattern="[0-9 \+\-\(\)]{8,20}" /></div>
+          <div class="field"><label for={`${fid}-email`}>Email <span class="req" aria-hidden="true">*</span></label><input class="input" type="email" id={`${fid}-email`} name="email" autocomplete="email" required maxlength="160" /></div>
+          <div class="field"><label for={`${fid}-equip`}>Device or asset tag</label><input class="input" id={`${fid}-equip`} name="equipment" placeholder="e.g. ThinkPad L490, tag IR-10234" maxlength="200" /></div>
+          <div class="field">
+            <label for={`${fid}-prio`}>Priority</label>
+            <select class="select" id={`${fid}-prio`} name="priority">
+              <option>Normal</option>
+              <option>High: work is blocked</option>
+              <option>Low: whenever possible</option>
+            </select>
+          </div>
+          <div class="field span-2"><label for={`${fid}-issue`}>Describe the issue <span class="req" aria-hidden="true">*</span></label><textarea class="textarea" id={`${fid}-issue`} name="message" required maxlength="4000"></textarea></div>
+          <div class="field span-2">
+            <label for={`${fid}-file`}>Attachment</label>
+            <input class="input file" type="file" id={`${fid}-file`} name="attachment" accept=".jpg,.jpeg,.png,.pdf" />
+            <span class="hint">Optional photo or PDF, up to 5 MB.</span>
+          </div>
+        </div>
+
+        <div class="submit-row">
+          <button class="btn btn--primary btn--lg" type="submit" data-submit><span data-label>Submit request</span></button>
+          <p class="xs muted">We use these details only to resolve your request. <a href="/privacy-policy/">Privacy policy</a></p>
+        </div>
+        <div class="form-success" role="status" tabindex="-1" hidden data-success>
+          <Icon name="circle-check" size={40} stroke={1.6} />
+          <h3 class="h3">Request submitted</h3>
+          <p>Our support team will contact you on the number you provided. If work is blocked, WhatsApp us as well so we can prioritise it.</p>
+        </div>
+        <p class="form-fail" role="alert" hidden data-fail>Your request did not go through. Try again, or WhatsApp us and we will log it for you.</p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .two { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 1000px) { .two { grid-template-columns: 1fr 2fr; } .side { position: sticky; top: 110px; } }
+  .side { display: grid; gap: var(--s-3); }
+  .side .h3 { margin-bottom: var(--s-2); }
+  .sform { display: grid; gap: var(--s-6); border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .sform.is-done > :not([data-success]) { display: none; }
+  .block { border: 0; padding: 0; margin: 0; min-width: 0; }
+  .block legend { margin-bottom: var(--s-4); padding: 0; }
+  .file { padding: 10px; }
+  .submit-row { display: grid; gap: var(--s-3); }
+  @media (min-width: 640px) { .submit-row { grid-template-columns: auto 1fr; align-items: center; gap: var(--s-5); } }
+  .submit-row p { margin: 0; }
+  .err-summary { border: 2px solid var(--error); background: #FDECEA; border-radius: var(--r-md); padding: var(--s-4); }
+  .err-summary ul { margin: 6px 0 0 18px; }
+  .form-success { display: grid; gap: var(--s-3); padding: var(--s-6); background: var(--green-tint); border: 1.5px solid var(--green); border-radius: var(--r-md); }
+  .form-success :global(svg) { color: var(--green); }
+  .form-fail { color: var(--error); font-weight: 600; margin: 0; }
+</style>
+
+<script>
+  import '../scripts/forms';
+</script>

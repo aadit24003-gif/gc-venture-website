@@ -1,0 +1,33 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import IndustryGrid from '../components/IndustryGrid.astro';
+import ClientWall from '../components/ClientWall.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+const crumbs = [{ name: 'Industries', href: '/industries/' }];
+---
+<Base
+  title="Industries We Serve | IT Rental by Sector"
+  description="IT equipment rental for BPOs, banks, IT companies, healthcare, education, telecom, manufacturing, logistics, hospitality and government. See what each sector rents."
+  path="/industries/"
+  crumbs={crumbs}
+>
+  <PageHero
+    title="IT rental for every kind of business"
+    lead="A BPO floor, a bank's audit team and a training institute rent for different reasons. Here is what each sector usually needs from us."
+    crumbs={crumbs}
+  />
+  <section class="section" aria-label="Industries">
+    <div class="wrap"><IndustryGrid headingLevel="h2" /></div>
+  </section>
+  <section class="section section--sunk" aria-labelledby="clients-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="clients-title" class="h2">Businesses that have rented from us</h2>
+        <p class="lead">From global customer-experience companies to banks, utilities and hotels.</p>
+      </div>
+      <ClientWall />
+    </div>
+  </section>
+  <FinalCTA />
+</Base>

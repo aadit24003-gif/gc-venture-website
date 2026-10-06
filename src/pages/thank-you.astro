@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { whatsappLink } from '../config/site';
+---
+<Base title="Thank You" description="Your request has been received." path="/thank-you/" noindex>
+  <section class="section grid-paper ty">
+    <div class="wrap">
+      <Icon name="circle-check" size={56} stroke={1.5} />
+      <h1 class="h1">Request received</h1>
+      <p class="lead">Thank you. Our team will contact you shortly on the number you gave us. For anything urgent, message us on WhatsApp.</p>
+      <div class="ctas">
+        <a class="btn btn--wa btn--lg" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+        <a class="btn btn--lg" href="/equipment/">Browse equipment</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .ty { min-height: 60vh; }
+  .ty :global(svg) { color: var(--green); margin-bottom: var(--s-4); }
+  .lead { margin-top: var(--s-4); }
+  .ctas { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
+</style>

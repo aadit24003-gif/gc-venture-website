@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Icon from '../components/Icon.astro';
+import { CONTACT, OFFICES, formatPhone, telLink, mailLink, whatsappLink } from '../config/site';
+
+const crumbs = [{ name: 'Contact', href: '/contact/' }];
+const channels = [
+  { icon: 'whatsapp', t: 'WhatsApp', v: formatPhone(CONTACT.PRIMARY_PHONE), href: whatsappLink(), d: 'Fastest for quotes and quick questions.', ext: true },
+  { icon: 'phone', t: 'Call sales', v: formatPhone(CONTACT.PRIMARY_PHONE), href: telLink(CONTACT.PRIMARY_PHONE), d: `Second line: ${formatPhone(CONTACT.SECONDARY_PHONE)}` },
+  { icon: 'mail', t: 'Email', v: CONTACT.PRIMARY_EMAIL, href: mailLink(CONTACT.SALES_EMAIL), d: 'For detailed requirements and documents.' },
+  { icon: 'life-buoy', t: 'Existing customer?', v: 'Raise a support request', href: '/support/', d: 'Device issues, replacements, billing and complaints.' },
+];
+---
+<Base
+  title="Contact Us: Laptop & IT Rental Enquiries"
+  description="Call, WhatsApp or email for laptop and IT equipment rental. Offices in Gurgaon and Bangalore. Existing customers can raise support requests online."
+  path="/contact/"
+  crumbs={crumbs}
+>
+  <PageHero title="Talk to us" lead="Pick whichever is easiest. Every channel reaches the same team." crumbs={crumbs} ctas={false} />
+
+  <section class="section" aria-label="Contact options">
+    <div class="wrap">
+      <ul role="list" class="channels" data-track-zone="contact">
+        {channels.map((c) => (
+          <li>
+            <a href={c.href} target={c.ext ? '_blank' : undefined} rel={c.ext ? 'noopener' : undefined} class="ch">
+              <span class="ch-ic"><Icon name={c.icon} size={26} /></span>
+              <span class="ch-t">{c.t}</span>
+              <span class="ch-v">{c.v}</span>
+              <span class="ch-d small muted">{c.d}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      {CONTACT.BUSINESS_HOURS && <p class="hours"><Icon name="clock" size={18} /> {CONTACT.BUSINESS_HOURS}</p>}
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="off-title">
+    <div class="wrap two">
+      <div>
+        <h2 id="off-title" class="h2">Offices</h2>
+        <div class="offices">
+          {OFFICES.map((o) => {
+            const q = encodeURIComponent([...o.lines, o.locality, o.region, o.postalCode].join(', '));
+            return (
+              <div class="office">
+                <h3 class="h3">{o.city}</h3>
+                <address>{o.lines.join(', ')}<br />{o.locality}, {o.region} {o.postalCode}</address>
+                <a class="link-arrow small" href={`https://www.google.com/maps/search/?api=1&query=${q}`} target="_blank" rel="noopener">Get directions <Icon name="external-link" /></a>
+              </div>
+            );
+          })}
+        </div>
+        <details class="map-embed">
+          <summary>Show Gurgaon office on map</summary>
+          <iframe
+            title="Map of the Gurgaon office"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            src={`https://maps.google.com/maps?q=${encodeURIComponent('Spaze iTech Park Sector 49 Gurgaon')}&output=embed`}
+            width="600" height="360"></iframe>
+        </details>
+      </div>
+      <div class="panel panel--pad form-panel">
+        <QuoteForm variant="compact" formId="q-contact" heading="Send us your requirement" />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .channels { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); list-style: none; }
+  .ch { display: grid; gap: 4px; height: 100%; padding: var(--s-5); border: 1.5px solid var(--ink); border-radius: var(--r-md); background: var(--card); text-decoration: none; transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast); }
+  .ch:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-block); text-decoration: none; }
+  .ch-ic { margin-bottom: var(--s-3); color: var(--red-ink); }
+  .ch-t { font-weight: 600; color: var(--ink-2); font-size: var(--fs-small); }
+  .ch-v { font-weight: 700; font-size: 1.25rem; overflow-wrap: anywhere; }
+  .hours { display: flex; align-items: center; gap: 8px; margin-top: var(--s-5); font-weight: 600; }
+  .two { display: grid; gap: var(--s-7); align-items: start; }
+  @media (min-width: 960px) { .two { grid-template-columns: 1fr 1fr; } }
+  .offices { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
+  .office { border-top: 1.5px solid var(--ink); padding-top: var(--s-4); display: grid; gap: var(--s-2); justify-items: start; }
+  .office address { font-style: normal; color: var(--ink-2); }
+  .map-embed { margin-top: var(--s-6); }
+  .map-embed summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+  .map-embed iframe { width: 100%; height: 320px; border: 1.5px solid var(--ink); border-radius: var(--r-md); margin-top: var(--s-3); }
+  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+</style>

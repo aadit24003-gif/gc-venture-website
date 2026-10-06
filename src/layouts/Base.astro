@@ -1,0 +1,120 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import MobileBar from '../components/MobileBar.astro';
+import { SITE, CONTACT, OFFICES, ANALYTICS } from '../config/site';
+import { CITIES } from '../data/cities';
+
+export interface Crumb { name: string; href: string }
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute path, e.g. "/laptop-rental/". Defaults to current URL. */
+  path?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  schema?: Record<string, unknown>[];
+  crumbs?: Crumb[];
+  /** Pre-filled WhatsApp text for this page's CTAs */
+  waMessage?: string;
+}
+
+const { title, description, path, ogImage = SITE.ogImage, noindex = false, schema = [], crumbs, waMessage } = Astro.props;
+const canonical = new URL(path ?? Astro.url.pathname, SITE.url).href;
+const withSuffix = `${title} | ${SITE.shortName}`;
+const fullTitle = title.includes(SITE.shortName) || title.includes(SITE.name) || withSuffix.length > 62 ? title : withSuffix;
+
+const orgId = `${SITE.url}/#organization`;
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': orgId,
+  name: SITE.name,
+  alternateName: SITE.shortName,
+  url: SITE.url,
+  logo: new URL(SITE.logo, SITE.url).href,
+  foundingDate: String(SITE.founded),
+  email: CONTACT.PRIMARY_EMAIL,
+  telephone: CONTACT.PRIMARY_PHONE,
+  areaServed: { '@type': 'Country', name: 'India' },
+  contactPoint: [{ '@type': 'ContactPoint', telephone: CONTACT.PRIMARY_PHONE, contactType: 'sales', areaServed: 'IN', availableLanguage: ['en', 'hi'] }],
+  subOrganization: OFFICES.map((o) => ({
+    '@type': 'LocalBusiness',
+    '@id': `${SITE.url}/#office-${o.id}`,
+    name: `${SITE.name} – ${o.city}`,
+    telephone: CONTACT.PRIMARY_PHONE,
+    email: CONTACT.PRIMARY_EMAIL,
+    image: new URL(SITE.logo, SITE.url).href,
+    address: { '@type': 'PostalAddress', streetAddress: o.lines.join(', '), addressLocality: o.locality, addressRegion: o.region, postalCode: o.postalCode, addressCountry: 'IN' },
+    ...(o.geo ? { geo: { '@type': 'GeoCoordinates', latitude: o.geo.lat, longitude: o.geo.lng } } : {}),
+    areaServed: CITIES.map((c) => c.name),
+  })),
+};
+
+const breadcrumbSchema = crumbs?.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [{ name: 'Home', href: '/' }, ...crumbs].map((c, i) => ({
+        '@type': 'ListItem', position: i + 1, name: c.name, item: new URL(c.href, SITE.url).href,
+      })),
+    }
+  : null;
+
+const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : []), ...schema];
+---
+<!doctype html>
+<html lang="en-IN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="theme-color" content="#F3EEE5" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-32.png" />
+    <link rel="apple-touch-icon" href="/brand/icon-180.png" />
+    <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(ogImage, SITE.url).href} />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(ogImage, SITE.url).href} />
+
+    {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    {ANALYTICS.GA4_ID && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${ANALYTICS.GA4_ID}`}></script>
+        <script is:inline define:vars={{ id: ANALYTICS.GA4_ID }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date()); gtag('config', id);
+        </script>
+      </>
+    )}
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header waMessage={waMessage} />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <MobileBar waMessage={waMessage} />
+    <script>
+      import '../scripts/track';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import IndiaMap from '../components/IndiaMap.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Icon from '../components/Icon.astro';
+import { OFFICES, CONTACT, formatPhone, telLink } from '../config/site';
+import { pageCities, cityPath } from '../data/cities';
+const crumbs = [{ name: 'Locations', href: '/locations/' }];
+---
+<Base
+  title="Laptop & IT Rental Locations Across India"
+  description="Offices in Gurgaon and Bangalore with delivery and support across Delhi NCR, Mumbai, Pune, Hyderabad, Chennai, Kolkata, Jaipur, Lucknow, Chandigarh and Kerala."
+  path="/locations/"
+  crumbs={crumbs}
+>
+  <PageHero
+    title="Where we deliver"
+    lead="Two offices and a delivery network that covers India's major business cities. If your city is not listed, ask; we deliver further than this."
+    crumbs={crumbs}
+  />
+
+  <section class="section" aria-labelledby="offices-title">
+    <div class="wrap">
+      <h2 id="offices-title" class="h2 head">Our offices</h2>
+      <div class="offices">
+        {OFFICES.map((o) => (
+          <article class="panel panel--pad office">
+            <span class="tag tag--office">Office</span>
+            <h3 class="h1">{o.city}</h3>
+            <address>{o.lines.join(', ')}<br />{o.locality}, {o.region} {o.postalCode}</address>
+            <div class="o-actions">
+              <a class="btn btn--sm" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([...o.lines, o.locality, o.region, o.postalCode].join(', '))}`} target="_blank" rel="noopener"><Icon name="map-pin" />Open in Maps</a>
+              <a class="btn btn--sm" href={telLink()}><Icon name="phone" />{formatPhone(CONTACT.PRIMARY_PHONE)}</a>
+            </div>
+            <a class="link-arrow" href={cityPath(pageCities.find((c) => c.id === o.id)!)}>Laptop rental in {o.city} <Icon name="arrow-right" /></a>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="map-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="map-title" class="h2">Delivery and support</h2>
+        <p class="lead">Every city below has its own page with local areas, typical customers and FAQs.</p>
+      </div>
+      <IndiaMap />
+    </div>
+  </section>
+  <FinalCTA />
+</Base>
+
+<style>
+  .head { margin-bottom: var(--s-6); }
+  .offices { display: grid; gap: var(--s-5); }
+  @media (min-width: 860px) { .offices { grid-template-columns: 1fr 1fr; } }
+  .office { display: grid; gap: var(--s-4); justify-items: start; border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .office address { font-style: normal; font-size: 1.125rem; line-height: 1.5; }
+  .o-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+</style>

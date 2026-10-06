@@ -1,0 +1,125 @@
+---
+import Icon from './Icon.astro';
+import { claim } from '../config/site';
+
+const fast = claim('fastDelivery');
+const steps = [
+  {
+    n: 1, label: '1', title: 'One laptop, set up properly',
+    text: `For a new joiner or a replacement. It arrives charged, configured and asset-tagged${fast ? ', usually the same or next day' : ''}.`,
+    points: ['Your software pre-installed', 'Replacement if it fails', 'Return it whenever you like'],
+  },
+  {
+    n: 10, label: '10', title: 'A team kit',
+    text: 'Matched machines with the same software image, so ten people start work on the same morning.',
+    points: ['Identical configuration', 'One invoice for the team', 'Add or return units any month'],
+  },
+  {
+    n: 50, label: '50', title: 'A full floor',
+    text: 'Seats planned with your facilities team, delivered and labelled desk by desk.',
+    points: ['Asset tags mapped to users', 'Delivery timed to move-in', 'Single point of contact'],
+  },
+  {
+    n: 100, label: '100', title: 'A deployment',
+    text: 'A rollout plan: imaging to your specification, staggered delivery by site and a replacement plan agreed upfront.',
+    points: ['Imaging to your spec', 'Staggered, multi-site delivery', 'Tailored pricing'],
+  },
+  {
+    n: 500, label: '500+', title: 'An enterprise rollout',
+    text: 'Multi-city delivery for new centres, hiring waves or migrations, managed against your go-live dates.',
+    points: ['Pan-India delivery', 'Dedicated technical support', 'Tailored commercial terms'],
+  },
+];
+const initial = 50;
+---
+<section class="section scale" aria-labelledby="scale-title" data-scale>
+  <div class="wrap">
+    <div class="section-head section-head--split">
+      <h2 id="scale-title" class="h2">From one device to enterprise scale</h2>
+      <p class="lead">The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
+    </div>
+
+    <div class="scale-board panel">
+      <fieldset class="seg scale-seg">
+        <legend class="label">How many people are you equipping?</legend>
+        {steps.map((s) => (
+          <>
+            <input type="radio" name="scale" id={`scale-${s.n}`} value={s.n} checked={s.n === initial} />
+            <label for={`scale-${s.n}`}><span class="num">{s.label}</span></label>
+          </>
+        ))}
+      </fieldset>
+
+      <div class="scale-body">
+        <div class="fleet" data-fleet data-n={initial} aria-hidden="true">
+          {Array.from({ length: 100 }, (_, i) => <i class={i < initial ? 'on' : ''} style={`--d:${(i % 25) * 8}ms`}></i>)}
+        </div>
+        <div class="scale-copy">
+          {steps.map((s) => (
+            <div class="step" data-step={s.n} hidden={s.n !== initial}>
+              <p class="count num">{s.label}<span>{s.n === 1 ? ' laptop' : ' laptops'}</span></p>
+              <h3 class="h3">{s.title}</h3>
+              <p class="muted">{s.text}</p>
+              <ul role="list" class="points">
+                {s.points.map((p) => <li><Icon name="check" size={18} stroke={2.5} />{p}</li>)}
+              </ul>
+              {s.n === 500 && <p class="xs muted note">Grid shows 100 icons, each one is 5 laptops.</p>}
+            </div>
+          ))}
+          <a class="btn btn--primary btn--lg" href={`/request-a-quote/?qty=${initial}`} data-scale-cta>Get a quote for&nbsp;<span data-scale-cta-n>{initial} laptops</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .scale-board { padding: clamp(20px, 3vw, 40px); border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .scale-seg { gap: 10px; margin-bottom: var(--s-6); align-items: center; }
+  .scale-seg legend { float: left; width: 100%; margin-bottom: var(--s-3); font-weight: 700; font-size: 1.125rem; }
+  .scale-seg label { min-width: 72px; justify-content: center; font-family: var(--font-display); font-weight: 800; font-size: 1.375rem; padding: 8px 18px; }
+  .scale-body { display: grid; gap: var(--s-6); align-items: center; }
+  @media (min-width: 900px) { .scale-body { grid-template-columns: 1.15fr 1fr; gap: var(--s-8); } }
+
+  .fleet { display: grid; grid-template-columns: repeat(20, 1fr); gap: 6px; }
+  @media (max-width: 520px) { .fleet { grid-template-columns: repeat(10, 1fr); } }
+  .fleet i {
+    aspect-ratio: 1; background: var(--paper-3);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5V15H5z M2.5 16.5h19v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5V15H5z M2.5 16.5h19v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5z'/%3E%3C/svg%3E") center / contain no-repeat;
+    transition: background-color 200ms var(--ease-out) var(--d), transform 300ms var(--ease-spring) var(--d);
+  }
+  .fleet i.on { background: var(--ink); }
+  .fleet i.on:first-child { background: var(--red); }
+  .fleet[data-n='500'] i.on { background: var(--red-ink); }
+  .fleet i.pop { transform: scale(1.2); }
+
+  .count { font-family: var(--font-display); font-weight: 800; font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem); line-height: .85; margin-bottom: var(--s-3); }
+  .count span { font-size: .4em; color: var(--ink-2); text-transform: uppercase; margin-left: 6px; }
+  .step .h3 { margin-bottom: var(--s-2); }
+  .points { display: grid; gap: 8px; margin: var(--s-4) 0 0; list-style: none; font-weight: 600; }
+  .points li { display: flex; gap: 8px; align-items: center; }
+  .points :global(svg) { color: var(--green); flex: none; }
+  .note { margin-top: var(--s-3); }
+  .scale-copy .btn { margin-top: var(--s-6); white-space: normal; text-align: center; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-scale]').forEach((root) => {
+    const fleet = root.querySelector<HTMLElement>('[data-fleet]')!;
+    const cells = [...fleet.querySelectorAll('i')];
+    const cta = root.querySelector<HTMLAnchorElement>('[data-scale-cta]')!;
+    const ctaN = root.querySelector<HTMLElement>('[data-scale-cta-n]')!;
+    root.querySelectorAll<HTMLInputElement>('input[name="scale"]').forEach((r) =>
+      r.addEventListener('change', () => {
+        const n = Number(r.value);
+        const lit = n >= 500 ? 100 : n;
+        fleet.dataset.n = String(n);
+        cells.forEach((c, i) => { c.classList.toggle('on', i < lit); });
+        root.querySelectorAll<HTMLElement>('[data-step]').forEach((s) => { s.hidden = s.dataset.step !== String(n); });
+        cta.href = `/request-a-quote/?qty=${n}`;
+        ctaN.textContent = `${n >= 500 ? '500+' : n} ${n === 1 ? 'laptop' : 'laptops'}`;
+      }),
+    );
+  });
+</script>

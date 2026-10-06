@@ -1,0 +1,50 @@
+---
+import Icon from './Icon.astro';
+import type { Crumb } from '../layouts/Base.astro';
+import { whatsappLink } from '../config/site';
+
+interface Props {
+  title: string;
+  lead?: string;
+  crumbs?: Crumb[];
+  ctas?: boolean;
+  waMessage?: string;
+  quoteHref?: string;
+}
+const { title, lead, crumbs = [], ctas = true, waMessage, quoteHref = '/request-a-quote/' } = Astro.props;
+---
+<section class="phero grid-paper">
+  <div class="wrap phero-inner">
+    {crumbs.length > 0 && (
+      <nav aria-label="Breadcrumb">
+        <ol class="crumbs" role="list">
+          <li><a href="/">Home</a></li>
+          {crumbs.map((c, i) => <li>{i === crumbs.length - 1 ? <span aria-current="page">{c.name}</span> : <a href={c.href}>{c.name}</a>}</li>)}
+        </ol>
+      </nav>
+    )}
+    <div class="phero-grid">
+      <div>
+        <h1 class="h1">{title}</h1>
+        {lead && <p class="lead">{lead}</p>}
+        {ctas && (
+          <div class="ctas">
+            <a class="btn btn--primary btn--lg" href={quoteHref} data-track-location="page-hero">Get a quote</a>
+            <a class="btn btn--lg btn--wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener" data-track-location="page-hero"><Icon name="whatsapp" />WhatsApp us</a>
+          </div>
+        )}
+      </div>
+      <slot name="aside" />
+    </div>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .phero { padding: clamp(40px, 6vw, 80px) 0 clamp(48px, 6vw, 88px); border-bottom: 1.5px solid var(--ink); }
+  .phero-grid { display: grid; gap: var(--s-7); align-items: end; }
+  @media (min-width: 1000px) { .phero-grid:has(> :nth-child(2)) { grid-template-columns: 1.5fr 1fr; } }
+  .h1 { max-width: 18ch; }
+  .lead { margin-top: var(--s-5); }
+  .ctas { display: flex; flex-wrap: wrap; gap: var(--s-4); margin-top: var(--s-6); }
+</style>

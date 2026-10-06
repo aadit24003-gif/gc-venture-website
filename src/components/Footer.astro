@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { SITE, CONTACT, OFFICES, formatPhone, telLink, mailLink, whatsappLink } from '../config/site';
+import { CATEGORIES } from '../data/categories';
+import { pageCities, cityPath } from '../data/cities';
+
+const year = new Date().getFullYear();
+---
+<footer class="footer" data-track-zone="footer">
+  <div class="wrap">
+    <div class="top">
+      <div class="about">
+        <a href="/" class="brand" aria-label="IT Rental Solutions home"><Logo eager={false} /></a>
+        <p class="muted">
+          Laptops, desktops, MacBooks, servers, networking and phones on rent for businesses across India, since {SITE.founded}.
+        </p>
+        <ul role="list" class="contact">
+          <li><Icon name="phone" size={18} /><a href={telLink(CONTACT.PRIMARY_PHONE)} class="num">{formatPhone(CONTACT.PRIMARY_PHONE)}</a>, <a href={telLink(CONTACT.SECONDARY_PHONE)} class="num">{formatPhone(CONTACT.SECONDARY_PHONE)}</a></li>
+          <li><Icon name="whatsapp" size={18} /><a href={whatsappLink()} target="_blank" rel="noopener">WhatsApp {formatPhone(CONTACT.PRIMARY_PHONE)}</a></li>
+          <li><Icon name="mail" size={18} /><a href={mailLink()}>{CONTACT.PRIMARY_EMAIL}</a></li>
+          {CONTACT.BUSINESS_HOURS && <li><Icon name="clock" size={18} />{CONTACT.BUSINESS_HOURS}</li>}
+        </ul>
+      </div>
+
+      <nav class="cols" aria-label="Footer">
+        <div>
+          <p class="col-title">Equipment</p>
+          <ul role="list">
+            {CATEGORIES.map((c) => <li><a href={`/${c.slug}/`}>{c.name}</a></li>)}
+            <li><a href="/equipment/">Full catalogue</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="col-title">Locations</p>
+          <ul role="list">
+            {pageCities.map((c) => <li><a href={cityPath(c)}>Laptop rental in {c.name}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <p class="col-title">Company</p>
+          <ul role="list">
+            <li><a href="/about/">About us</a></li>
+            <li><a href="/industries/">Industries</a></li>
+            <li><a href="/locations/">Where we deliver</a></li>
+            <li><a href="/request-a-quote/">Request a quote</a></li>
+            <li><a href="/contact/">Contact</a></li>
+            <li><a href="/support/">Support and complaints</a></li>
+          </ul>
+          <p class="col-title offices-title">Offices</p>
+          {OFFICES.map((o) => (
+            <address>
+              <strong>{o.city}</strong><br />
+              {o.lines.join(', ')}, {o.locality}, {o.region} {o.postalCode}
+            </address>
+          ))}
+        </div>
+      </nav>
+    </div>
+
+    <div class="bottom">
+      <p>© {year} {SITE.name}. All rights reserved.</p>
+      <ul role="list">
+        <li><a href="/privacy-policy/">Privacy policy</a></li>
+        <li><a href="/terms/">Terms</a></li>
+        <li><a href="/sitemap-index.xml">Sitemap</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer { background: var(--paper-2); border-top: 1.5px solid var(--ink); padding: var(--s-9) 0 calc(var(--s-6) + 76px); font-size: var(--fs-small); }
+  @media (min-width: 900px) { .footer { padding-bottom: var(--s-6); } }
+  .top { display: grid; gap: var(--s-7); }
+  @media (min-width: 1000px) { .top { grid-template-columns: 1fr 2fr; } }
+  .brand :global(img) { height: 46px; width: auto; }
+  .about .muted { margin: var(--s-5) 0; max-width: 40ch; font-size: 1rem; }
+  .contact { display: grid; gap: 10px; list-style: none; }
+  .contact li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .contact :global(svg) { flex: none; }
+  .cols { display: grid; gap: var(--s-6); grid-template-columns: 1fr 1fr; }
+  @media (min-width: 720px) { .cols { grid-template-columns: repeat(3, 1fr); } }
+  .col-title { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; text-transform: uppercase; margin-bottom: var(--s-3); }
+  .offices-title { margin-top: var(--s-6); }
+  .cols ul { display: grid; gap: 6px; }
+  .cols a { text-decoration: none; color: var(--ink-2); }
+  .cols a:hover { color: var(--ink); text-decoration: underline; }
+  address { font-style: normal; color: var(--ink-2); margin-bottom: var(--s-4); line-height: 1.5; }
+  address strong { color: var(--ink); }
+  .bottom { display: flex; flex-wrap: wrap; gap: var(--s-4); justify-content: space-between; margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line-strong); color: var(--ink-2); }
+  .bottom p { margin: 0; }
+  .bottom ul { display: flex; gap: var(--s-5); flex-wrap: wrap; }
+  .bottom a { color: inherit; }
+</style>

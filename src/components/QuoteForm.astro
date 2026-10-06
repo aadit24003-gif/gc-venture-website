@@ -1,0 +1,204 @@
+---
+import Icon from './Icon.astro';
+import { FORM_ENDPOINT, whatsappLink } from '../config/site';
+import { CATEGORIES } from '../data/categories';
+import { pageCities } from '../data/cities';
+
+interface Props {
+  variant?: 'full' | 'compact';
+  /** pre-select city id */
+  city?: string;
+  /** pre-select category id */
+  category?: string;
+  /** product name for context */
+  product?: string;
+  formId?: string;
+  heading?: string;
+}
+const { variant = 'full', city, category, product, formId = 'quote-form', heading } = Astro.props;
+
+const equipment = [
+  { v: 'laptops', l: 'Laptops', i: 'laptop' },
+  { v: 'macbooks', l: 'MacBooks', i: 'laptop-minimal' },
+  { v: 'desktops', l: 'Desktops', i: 'monitor-smartphone' },
+  { v: 'monitors', l: 'Monitors', i: 'monitor' },
+  { v: 'servers', l: 'Servers', i: 'server' },
+  { v: 'networking', l: 'Switches and routers', i: 'network' },
+  { v: 'firewalls', l: 'Firewalls', i: 'brick-wall-shield' },
+  { v: 'phones', l: 'Mobile phones', i: 'smartphone' },
+  { v: 'other', l: 'Other', i: 'package' },
+];
+const catToEquip: Record<string, string> = { switches: 'networking', routers: 'networking', other: 'other' };
+const preEquip = category ? catToEquip[category] ?? category : undefined;
+const durations = ['Less than 1 month', '1 to 3 months', '3 to 6 months', '6 to 12 months', 'More than 12 months', 'Not sure yet'];
+const today = new Date().toISOString().slice(0, 10);
+const compact = variant === 'compact';
+---
+<form
+  class:list={['qform', { compact }]}
+  id={formId}
+  action={FORM_ENDPOINT}
+  method="post"
+  novalidate
+  data-enquiry
+  data-form-type="quote"
+>
+  {heading && <h2 class="h3 form-heading">{heading}</h2>}
+  <div class="err-summary" role="alert" tabindex="-1" hidden data-error-summary>
+    <p><strong>Please fix the highlighted fields:</strong></p>
+    <ul></ul>
+  </div>
+
+  <input type="hidden" name="form_type" value="quote" />
+  <input type="hidden" name="source_page" value="" data-source-page />
+  <input type="hidden" name="enquiry_type" value="standard" data-enquiry-type />
+  {product && <input type="hidden" name="product" value={product} />}
+  {compact && preEquip && <input type="hidden" name="equipment[]" value={preEquip} />}
+  <input type="hidden" name="product_slug" value="" data-product-slug />
+  <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
+
+  {!compact && (
+    <fieldset class="block">
+      <legend class="h4">What do you need?</legend>
+      <div class="seg equip" role="group" aria-label="Equipment">
+        {equipment.map((e) => (
+          <>
+            <input type="checkbox" name="equipment[]" id={`${formId}-eq-${e.v}`} value={e.v} checked={preEquip === e.v} />
+            <label for={`${formId}-eq-${e.v}`}><Icon name={e.i} />{e.l}</label>
+          </>
+        ))}
+      </div>
+    </fieldset>
+  )}
+
+  <div class="form-grid form-grid--2 block">
+    {compact && product && <p class="span-2 ctx small">Enquiring about <strong>{product}</strong></p>}
+    <div class="field">
+      <label for={`${formId}-qty`}>Quantity <span class="req" aria-hidden="true">*</span></label>
+      <input class="input" type="number" inputmode="numeric" min="1" max="100000" id={`${formId}-qty`} name="quantity" required data-qty />
+    </div>
+    <div class="field">
+      <label for={`${formId}-city`}>Delivery city <span class="req" aria-hidden="true">*</span></label>
+      <select class="select" id={`${formId}-city`} name="city" required>
+        <option value="">Choose a city</option>
+        {pageCities.map((c) => <option value={c.name} selected={c.id === city}>{c.name}</option>)}
+        <option value="Other">Other city</option>
+      </select>
+    </div>
+    {!compact && (
+      <>
+        <div class="field">
+          <label for={`${formId}-dur`}>Rental duration</label>
+          <select class="select" id={`${formId}-dur`} name="duration">
+            <option value="">Choose a duration</option>
+            {durations.map((d) => <option>{d}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for={`${formId}-date`}>Needed by</label>
+          <input class="input" type="date" min={today} id={`${formId}-date`} name="needed_by" />
+        </div>
+      </>
+    )}
+  </div>
+
+  {!compact && (
+    <details class="more block">
+      <summary><Icon name="plus" size={18} />Add configuration and software details <span class="muted">(optional)</span></summary>
+      <div class="form-grid form-grid--2">
+        <div class="field">
+          <label for={`${formId}-config`}>Configuration</label>
+          <textarea class="textarea" id={`${formId}-config`} name="configuration" placeholder="e.g. Core i5, 16 GB RAM, 512 GB SSD, 14 inch"></textarea>
+        </div>
+        <div class="field">
+          <label for={`${formId}-software`}>Software</label>
+          <textarea class="textarea" id={`${formId}-software`} name="software" placeholder="e.g. Windows 11 Pro, Office 365, VPN client"></textarea>
+        </div>
+        <div class="field">
+          <label for={`${formId}-budget`}>Budget per device per month</label>
+          <input class="input" type="text" id={`${formId}-budget`} name="budget" placeholder="Optional" />
+        </div>
+        <div class="field">
+          <label for={`${formId}-extra`}>Anything else</label>
+          <textarea class="textarea" id={`${formId}-extra`} name="message"></textarea>
+        </div>
+      </div>
+    </details>
+  )}
+
+  <fieldset class="block">
+    {!compact && <legend class="h4">Your details</legend>}
+    <div class="form-grid form-grid--2">
+      <div class="field">
+        <label for={`${formId}-name`}>Name <span class="req" aria-hidden="true">*</span></label>
+        <input class="input" type="text" id={`${formId}-name`} name="name" autocomplete="name" required maxlength="120" />
+      </div>
+      <div class="field">
+        <label for={`${formId}-company`}>Company <span class="req" aria-hidden="true">*</span></label>
+        <input class="input" type="text" id={`${formId}-company`} name="company" autocomplete="organization" required maxlength="160" />
+      </div>
+      <div class="field">
+        <label for={`${formId}-email`}>Work email <span class="req" aria-hidden="true">*</span></label>
+        <input class="input" type="email" id={`${formId}-email`} name="email" autocomplete="email" required maxlength="160" />
+      </div>
+      <div class="field">
+        <label for={`${formId}-phone`}>Phone <span class="req" aria-hidden="true">*</span></label>
+        <input class="input" type="tel" id={`${formId}-phone`} name="phone" autocomplete="tel" required pattern="[0-9 \+\-\(\)]{8,20}" />
+        <span class="hint">We call or WhatsApp you with the quote.</span>
+      </div>
+      {compact && (
+        <div class="field span-2">
+          <label for={`${formId}-msg`}>Requirement</label>
+          <textarea class="textarea" id={`${formId}-msg`} name="message" placeholder="Configuration, dates, software or anything else"></textarea>
+        </div>
+      )}
+    </div>
+  </fieldset>
+
+  <div class="submit-row">
+    <button class="btn btn--primary btn--lg" type="submit" data-submit>
+      <span data-label>Get my quote</span>
+    </button>
+    <p class="xs muted">We use your details only to respond to this enquiry. <a href="/privacy-policy/">Privacy policy</a></p>
+  </div>
+
+  <div class="form-success" role="status" tabindex="-1" hidden data-success>
+    <Icon name="circle-check" size={40} stroke={1.6} />
+    <h3 class="h3">Request received</h3>
+    <p>We will contact you shortly with configurations and pricing. For anything urgent, message us on WhatsApp.</p>
+    <a class="btn btn--wa" href={whatsappLink()} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+  </div>
+  <p class="form-fail" role="alert" hidden data-fail>
+    Your request did not go through. Check your connection and try again, or WhatsApp us and we will take it from there.
+  </p>
+</form>
+
+<style>
+  .qform { display: grid; gap: var(--s-6); }
+  .qform.compact { gap: var(--s-5); }
+  .form-heading { margin: 0; }
+  .block { border: 0; padding: 0; margin: 0; min-width: 0; }
+  .block legend { margin-bottom: var(--s-4); padding: 0; }
+  .equip label { background: #fff; }
+  .more { border: 1.5px dashed var(--line-strong); border-radius: var(--r-md); padding: 0 var(--s-4); }
+  .more summary { display: flex; align-items: center; gap: 8px; min-height: 52px; font-weight: 700; cursor: pointer; list-style: none; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more[open] { padding-bottom: var(--s-4); }
+  .more[open] summary :global(svg) { transform: rotate(45deg); }
+  .ctx { margin: 0; padding: 10px 14px; background: var(--paper-2); border-radius: var(--r-sm); }
+  .submit-row { display: grid; gap: var(--s-3); }
+  @media (min-width: 640px) { .submit-row { grid-template-columns: auto 1fr; align-items: center; gap: var(--s-5); } }
+  .submit-row p { margin: 0; }
+  .err-summary { border: 2px solid var(--error); background: #FDECEA; border-radius: var(--r-md); padding: var(--s-4); }
+  .err-summary ul { margin: 6px 0 0 18px; }
+  .err-summary a { color: var(--error); font-weight: 600; }
+  .form-success { display: grid; gap: var(--s-3); justify-items: start; padding: var(--s-6); background: var(--green-tint); border: 1.5px solid var(--green); border-radius: var(--r-md); }
+  .form-success :global(svg) { color: var(--green); }
+  .form-fail { color: var(--error); font-weight: 600; margin: 0; }
+  .qform.is-done > :not([data-success]) { display: none; }
+  [data-submit][aria-busy='true'] { opacity: .7; cursor: progress; }
+</style>
+
+<script>
+  import '../scripts/forms';
+</script>

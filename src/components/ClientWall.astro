@@ -1,0 +1,26 @@
+---
+import { clientsBySector } from '../data/clients';
+const groups = clientsBySector();
+---
+<div class="wall">
+  {groups.map(([sector, list]) => (
+    <div class="grp">
+      <p class="sector">{sector}</p>
+      <ul role="list">
+        {list.map((c) => <li>{c.logo ? <img src={c.logo} alt={c.name} height="36" loading="lazy" /> : c.name}</li>)}
+      </ul>
+    </div>
+  ))}
+</div>
+<p class="xs muted disclaimer">Names shown are businesses that have rented equipment from us. Trademarks belong to their owners; no endorsement is implied.</p>
+
+<style>
+  .wall { display: grid; gap: 0; border-top: 1.5px solid var(--ink); }
+  .grp { display: grid; gap: var(--s-3); padding: var(--s-5) 0; border-bottom: 1px solid var(--line-strong); }
+  @media (min-width: 900px) { .grp { grid-template-columns: 260px 1fr; align-items: baseline; } }
+  .sector { margin: 0; font-weight: 600; color: var(--ink-2); font-size: var(--fs-small); }
+  ul { display: flex; flex-wrap: wrap; gap: 8px 36px; list-style: none; }
+  li { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.375rem); line-height: 1.05; }
+  li img { height: 36px; width: auto; filter: grayscale(1); }
+  .disclaimer { margin-top: var(--s-4); }
+</style>

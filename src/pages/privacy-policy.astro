@@ -1,0 +1,39 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { SITE, CONTACT, ANALYTICS } from '../config/site';
+---
+<LegalPage title="Privacy Policy" description={`How ${SITE.name} collects, uses and protects information submitted through itrentals.in.`} path="/privacy-policy/" updated="[REQUIRES CONFIRMATION]">
+  <p>This policy explains what information {SITE.name} ("we") collects through {SITE.domain} and how we use it. It is written to reflect India's Digital Personal Data Protection Act, 2023. <mark>[REQUIRES CONFIRMATION: legal review]</mark></p>
+
+  <h2>Who we are</h2>
+  <p>{SITE.name}, operated by <mark>[REQUIRES CONFIRMATION: registered legal entity name, CIN and registered address]</mark>. Contact: <a href={`mailto:${CONTACT.PRIMARY_EMAIL}`}>{CONTACT.PRIMARY_EMAIL}</a>.</p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li><strong>Enquiry and quote forms:</strong> name, company, work email, phone, city, equipment requirements and any details you choose to add.</li>
+    <li><strong>Support form:</strong> the above plus device details, issue description and any attachment you upload.</li>
+    <li><strong>Technical data:</strong> your IP address is recorded briefly to prevent spam and abuse of our forms.</li>
+    {ANALYTICS.GA4_ID
+      ? <li><strong>Analytics:</strong> we use Google Analytics to understand how the site is used. It sets cookies and collects pseudonymous usage data.</li>
+      : <li><strong>Analytics:</strong> the site does not currently use analytics or advertising cookies.</li>}
+  </ul>
+
+  <h2>How we use it</h2>
+  <ul>
+    <li>To respond to your enquiry, prepare quotes and deliver rental services.</li>
+    <li>To provide support, replacements and billing for active rentals.</li>
+    <li>We do not sell your information or share it for third-party marketing.</li>
+  </ul>
+
+  <h2>How long we keep it</h2>
+  <p><mark>[REQUIRES CONFIRMATION: retention period for enquiries that do not become customers, and for customer records]</mark></p>
+
+  <h2>Your rights</h2>
+  <p>You can ask us to access, correct or delete your personal data, or withdraw consent, by emailing <a href={`mailto:${CONTACT.PRIMARY_EMAIL}`}>{CONTACT.PRIMARY_EMAIL}</a>.</p>
+
+  <h2>Grievance officer</h2>
+  <p><mark>[REQUIRES CONFIRMATION: name and contact details of the grievance officer]</mark></p>
+
+  <h2>Data on returned devices</h2>
+  <p>Devices returned at the end of a rental are wiped before they are reconditioned or rented again. Back up anything you need before returning a device.</p>
+</LegalPage>

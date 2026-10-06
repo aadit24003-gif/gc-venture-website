@@ -1,0 +1,25 @@
+---
+import LegalPage from '../components/LegalPage.astro';
+import { SITE } from '../config/site';
+---
+<LegalPage title="Terms of Use" description={`Terms governing use of the ${SITE.name} website.`} path="/terms/" updated="[REQUIRES CONFIRMATION]">
+  <p>These terms cover use of the {SITE.domain} website. Rental agreements, including payment, damage, loss and return terms, are set out in the individual rental contract or quote you sign with us, and those documents take precedence. <mark>[REQUIRES CONFIRMATION: legal review]</mark></p>
+
+  <h2>Information on this website</h2>
+  <p>Product specifications, availability and service descriptions are provided for guidance. Exact configurations, availability, prices and delivery dates are confirmed in writing in your quote.</p>
+
+  <h2>Quotes</h2>
+  <p>A quote is not a binding contract until accepted in writing by both parties. <mark>[REQUIRES CONFIRMATION: quote validity period]</mark></p>
+
+  <h2>Rental terms</h2>
+  <p><mark>[REQUIRES CONFIRMATION: summary of security deposit, billing cycle, minimum term, damage and loss liability, replacement SLA and return conditions, or a link to the standard rental agreement]</mark></p>
+
+  <h2>Cancellation and refunds</h2>
+  <p><mark>[REQUIRES CONFIRMATION: cancellation and refund policy, if applicable]</mark></p>
+
+  <h2>Trademarks</h2>
+  <p>Brand names such as Lenovo, Dell, HP and Apple, and the names of our clients, belong to their respective owners. Their use on this site identifies products we rent or businesses we have worked with and does not imply endorsement.</p>
+
+  <h2>Governing law</h2>
+  <p><mark>[REQUIRES CONFIRMATION: governing law and jurisdiction]</mark></p>
+</LegalPage>

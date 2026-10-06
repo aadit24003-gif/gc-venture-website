@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import CategoryIndex from '../components/CategoryIndex.astro';
+---
+<Base title="Page Not Found" description="The page you were looking for does not exist." noindex>
+  <section class="section grid-paper">
+    <div class="wrap">
+      <p class="code" aria-hidden="true">404</p>
+      <h1 class="h1">This page has been returned</h1>
+      <p class="lead">The link may be old or mistyped. Here is everything we rent; or <a href="/request-a-quote/">ask for a quote</a> and tell us what you need.</p>
+      <div class="list"><CategoryIndex /></div>
+    </div>
+  </section>
+</Base>
+<style>
+  .code { font-family: var(--font-display); font-weight: 800; font-size: clamp(6rem, 4rem + 10vw, 14rem); line-height: .8; color: var(--red); margin: 0 0 var(--s-4); }
+  .lead { margin-top: var(--s-4); }
+  .list { margin-top: var(--s-7); }
+</style>

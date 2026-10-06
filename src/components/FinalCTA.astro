@@ -1,0 +1,35 @@
+---
+import Icon from './Icon.astro';
+import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
+interface Props { title?: string; text?: string; waMessage?: string }
+const {
+  title = 'Need 25 or more devices?',
+  text = 'Send us the headcount, city and start date. We come back with configurations, a delivery plan and tailored pricing.',
+  waMessage,
+} = Astro.props;
+---
+<section class="fcta" aria-labelledby="fcta-title" data-track-zone="final-cta">
+  <div class="wrap fcta-inner">
+    <div>
+      <h2 id="fcta-title" class="h1">{title}</h2>
+      <p class="lead">{text}</p>
+    </div>
+    <div class="fcta-actions">
+      <a class="btn btn--primary btn--lg btn--block" href="/request-a-quote/?type=enterprise">Get an enterprise quote</a>
+      <a class="btn btn--lg btn--block btn--wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+      <a class="call" href={telLink()}><Icon name="phone" size={20} />Or call <span class="num">{formatPhone(CONTACT.PRIMARY_PHONE)}</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fcta { background: var(--red-ink); color: #fff; padding-block: clamp(64px, 8vw, 112px); border-top: 1.5px solid var(--ink); }
+  .fcta-inner { display: grid; gap: var(--s-7); align-items: center; }
+  @media (min-width: 960px) { .fcta-inner { grid-template-columns: 1.6fr 1fr; } }
+  .fcta .h1 { color: #fff; }
+  .fcta .lead { color: #fff; opacity: 1; margin-top: var(--s-4); font-weight: 500; }
+  .fcta-actions { display: grid; gap: var(--s-4); }
+  .fcta .btn { box-shadow: 4px 4px 0 var(--ink); }
+  .fcta .btn--primary { --btn-bg: var(--ink); --btn-fg: #fff; }
+  .call { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: #fff; }
+</style>

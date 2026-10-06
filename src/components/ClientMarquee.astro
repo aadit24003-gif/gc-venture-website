@@ -1,0 +1,61 @@
+---
+import Icon from './Icon.astro';
+import { visibleClients } from '../data/clients';
+---
+<div class="cm" data-marquee>
+  <div class="wrap cm-head">
+    <p class="cm-label">Businesses that have rented from us</p>
+    <button class="cm-toggle" type="button" aria-pressed="false" data-marquee-toggle>
+      <span class="when-playing"><Icon name="circle-pause" size={18} />Pause</span>
+      <span class="when-paused"><Icon name="circle-play" size={18} />Play</span>
+    </button>
+  </div>
+  <div class="cm-viewport">
+    <div class="cm-track">
+      <ul role="list" class="cm-list">
+        {visibleClients.map((c) => (
+          <li>{c.logo ? <img src={c.logo} alt={c.name} height="32" loading="lazy" /> : <span>{c.name}</span>}</li>
+        ))}
+      </ul>
+      <ul role="list" class="cm-list" aria-hidden="true">
+        {visibleClients.map((c) => (
+          <li>{c.logo ? <img src={c.logo} alt="" height="32" loading="lazy" /> : <span>{c.name}</span>}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cm { border-top: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 70%, transparent); padding: var(--s-5) 0 var(--s-6); }
+  .cm-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); margin-bottom: var(--s-4); }
+  .cm-label { margin: 0; font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); }
+  .cm-toggle { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); min-height: 44px; padding: 0 4px; }
+  .cm-toggle span { display: inline-flex; align-items: center; gap: 6px; }
+  .cm-toggle .when-paused, .cm.is-paused .when-playing { display: none; }
+  .cm.is-paused .when-paused { display: inline-flex; }
+  .cm-viewport { overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+  .cm-track { display: flex; width: max-content; animation: scroll 60s linear infinite; }
+  .cm.is-paused .cm-track, .cm-viewport:hover .cm-track, .cm-viewport:focus-within .cm-track { animation-play-state: paused; }
+  .cm-list { display: flex; gap: clamp(32px, 4vw, 56px); padding-right: clamp(32px, 4vw, 56px); list-style: none; }
+  .cm-list li { white-space: nowrap; font-family: var(--font-display); font-weight: 700; font-size: clamp(1.375rem, 1.1rem + 1vw, 2rem); text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.01em; }
+  .cm-list img { height: 32px; width: auto; filter: grayscale(1) contrast(1.1); opacity: .75; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .cm-toggle { display: none; }
+    .cm-track { animation: none; width: auto; }
+    .cm-list[aria-hidden] { display: none; }
+    .cm-list { flex-wrap: wrap; justify-content: center; gap: 12px 32px; padding: 0 var(--gutter); }
+    .cm-viewport { mask-image: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-marquee]').forEach((m) => {
+    const btn = m.querySelector<HTMLButtonElement>('[data-marquee-toggle]')!;
+    btn.addEventListener('click', () => {
+      const paused = m.classList.toggle('is-paused');
+      btn.setAttribute('aria-pressed', String(paused));
+    });
+  });
+</script>

@@ -1,0 +1,131 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import ScaleSelector from '../components/ScaleSelector.astro';
+import CategoryIndex from '../components/CategoryIndex.astro';
+import WhyUs from '../components/WhyUs.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Steps from '../components/Steps.astro';
+import IndustryGrid from '../components/IndustryGrid.astro';
+import IndiaMap from '../components/IndiaMap.astro';
+import FAQ from '../components/FAQ.astro';
+import FinalCTA from '../components/FinalCTA.astro';
+import Icon from '../components/Icon.astro';
+import { PRODUCTS } from '../data/products';
+import { GENERAL_FAQS } from '../data/faqs';
+import { TESTIMONIALS } from '../data/clients';
+import { SITE } from '../config/site';
+
+const featured = PRODUCTS.filter((p) => p.featured).slice(0, 4);
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: GENERAL_FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: SITE.url };
+---
+<Base
+  title="Laptop & IT Equipment on Rent for Business | IT Rentals"
+  description="Rent laptops, desktops, MacBooks, servers, networking and phones for teams of 1 to 1,000+ across India. Configured, delivered and supported. Since 2013."
+  path="/"
+  schema={[websiteSchema, faqSchema]}
+>
+  <Hero />
+
+  <ScaleSelector />
+
+  <section class="section section--sunk" aria-labelledby="equip-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="equip-title" class="h2">More than laptops</h2>
+        <p class="lead">Most customers rent a whole setup: seats, screens, a server, the network that connects them and the phones their field team carries. One supplier, one quote, one support line.</p>
+      </div>
+      <CategoryIndex />
+    </div>
+  </section>
+
+  <WhyUs />
+
+  <section class="section" aria-labelledby="cat-title">
+    <div class="wrap">
+      <div class="head-row">
+        <div class="section-head">
+          <h2 id="cat-title" class="h2">Business machines, ready to ship</h2>
+          <p class="lead">Popular models from the ThinkPad, Latitude, EliteBook and MacBook ranges. Filter by processor, memory and screen size in the full catalogue.</p>
+        </div>
+        <a class="link-arrow" href="/equipment/">Open the catalogue <Icon name="arrow-right" /></a>
+      </div>
+      <div class="pgrid">
+        {featured.map((p) => <ProductCard p={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="how-title" class="h2">How renting works</h2>
+        <p class="lead">Four steps from first message to devices on desks.</p>
+      </div>
+      <Steps />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ind-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="ind-title" class="h2">Who we equip</h2>
+        <p class="lead">Every sector rents for a different reason. Here is what teams in each one usually ask us for.</p>
+      </div>
+      <IndustryGrid />
+    </div>
+  </section>
+
+  <section class="section section--sunk" aria-labelledby="map-title">
+    <div class="wrap">
+      <div class="section-head section-head--split">
+        <h2 id="map-title" class="h2">Delivered across India</h2>
+        <p class="lead">Two offices, in Gurgaon and Bangalore, and delivery and support in every city below. Not on the list? Ask us; we deliver further than this.</p>
+      </div>
+      <IndiaMap />
+    </div>
+  </section>
+
+  {TESTIMONIALS.length > 0 && (
+    <section class="section" aria-labelledby="quotes-title">
+      <div class="wrap">
+        <h2 id="quotes-title" class="h2">What customers say</h2>
+        <div class="quotes">
+          {TESTIMONIALS.map((t) => (
+            <figure class="panel panel--pad">
+              <blockquote><p>{t.quote}</p></blockquote>
+              <figcaption><strong>{t.name}</strong>, {t.role}, {t.company}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="wrap faq-layout">
+      <div>
+        <h2 id="faq-title" class="h2">Questions buyers ask</h2>
+        <p class="lead faq-lead">Can't see yours? Ask on WhatsApp or call, and you will speak to someone who knows the inventory.</p>
+      </div>
+      <FAQ items={GENERAL_FAQS} />
+    </div>
+  </section>
+
+  <FinalCTA />
+</Base>
+
+<style>
+  .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
+  .head-row .section-head { margin-bottom: 0; }
+  .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .faq-layout { display: grid; gap: var(--s-7); }
+  .faq-lead { margin-top: var(--s-5); }
+  @media (min-width: 960px) { .faq-layout { grid-template-columns: 1fr 1.4fr; } }
+  .quotes { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: var(--s-7); }
+</style>

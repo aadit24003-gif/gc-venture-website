@@ -1,0 +1,99 @@
+---
+import { CITIES, cityPath } from '../data/cities';
+import { projectPct } from '../data/geo';
+
+interface Props { highlight?: string; showList?: boolean }
+const { highlight, showList = true } = Astro.props;
+
+const pins = CITIES.map((c) => ({ ...c, pos: projectPct(c.lat, c.lng) }))
+  // draw offices last so they sit on top
+  .sort((a, b) => Number(a.office) - Number(b.office));
+// NCR cities overlap at this scale: label only the office there.
+const quietLabel = new Set(['delhi', 'noida', 'ghaziabad']);
+// Labels drawn to the left where they would collide with a neighbour.
+const leftLabel = new Set(['mumbai', 'surat', 'bangalore', 'jaipur', 'kochi']);
+const regions = ['North', 'West', 'South', 'East'] as const;
+---
+<div class="india">
+  <figure class="map">
+    <div class="map-art" role="img" aria-label={`Map of India. Offices in ${CITIES.filter((c) => c.office).map((c) => c.name).join(" and ")}. Delivery and support in ${CITIES.filter((c) => !c.office).map((c) => c.name).join(", ")}.`}>
+    <img src="/maps/india.svg" alt="" width="612" height="696" loading="lazy" decoding="async" />
+    <ul role="list" class="pins">
+      {pins.map((c) => {
+        return (
+          <li
+            class:list={['pin', c.office ? 'pin--office' : 'pin--service', { 'is-hl': highlight === c.id, 'quiet': quietLabel.has(c.id) && highlight !== c.id, 'lbl-left': leftLabel.has(c.id) }]}
+            style={`left:${c.pos.left.toFixed(2)}%;top:${c.pos.top.toFixed(2)}%`}
+          >
+            <span class="pin-hit" aria-hidden="true">
+              <span class="dot" aria-hidden="true"></span>
+              <span class="pin-label">{c.name}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ul>
+    </div>
+    <figcaption class="xs">
+      <span class="lg lg-office" aria-hidden="true"></span>Office
+      <span class="lg lg-service" aria-hidden="true"></span>Delivery and support
+      <span class="credit">Map: @svg-maps/india, CC BY 4.0</span>
+    </figcaption>
+  </figure>
+
+  {showList && (
+    <div class="regions">
+      {regions.map((r) => (
+        <div>
+          <p class="r-title">{r}</p>
+          <ul role="list">
+            {CITIES.filter((c) => c.region === r).map((c) => (
+              <li>
+                {c.page ? <a href={cityPath(c)}>{c.name}</a> : <span>{c.name}</span>}
+                {c.office && <span class="tag tag--office">Office</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .india { display: grid; gap: var(--s-7); align-items: center; }
+  @media (min-width: 960px) { .india { grid-template-columns: 1.1fr 1fr; } }
+  .map { position: relative; margin: 0; max-width: 560px; width: 100%; justify-self: center; }
+  .map-art { position: relative; }
+  .map img { width: 100%; height: auto; }
+  .pins { position: absolute; inset: 0 0 auto 0; aspect-ratio: 612 / 696; list-style: none; }
+  .pin { position: absolute; transform: translate(-50%, -50%); }
+  .pin-hit { position: relative; display: grid; place-items: center; width: 28px; height: 28px; text-decoration: none; color: var(--ink); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px var(--paper); transition: transform var(--t-fast) var(--ease-out); }
+  .pin--office .dot { width: 16px; height: 16px; border-radius: 4px; background: var(--red); box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--red); }
+  .pin-label {
+    position: absolute; left: 22px; top: 50%; transform: translateY(-50%);
+    white-space: nowrap; font-weight: 700; font-size: 0.8125rem; line-height: 1;
+    background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 5px 9px;
+  }
+  .lbl-left .pin-label { left: auto; right: 22px; }
+  .pin--office .pin-label { background: var(--ink); color: var(--paper); border-color: var(--ink); font-size: 0.875rem; }
+  .pin.quiet .pin-label { opacity: 0; pointer-events: none; transition: opacity var(--t-fast); }
+  .pin.quiet:hover .pin-label, .pin.quiet:focus-within .pin-label { opacity: 1; }
+  .pin:hover .dot, .pin:focus-within .dot, .pin.is-hl .dot { transform: scale(1.4); }
+  .pin.is-hl .pin-label { background: var(--red-ink); color: #fff; border-color: var(--red-ink); }
+  .pin:hover, .pin:focus-within { z-index: 2; }
+  @media (max-width: 640px) {
+    .pin--service:not(.is-hl) .pin-label { display: none; }
+  }
+  figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: var(--s-4); color: var(--ink-2); }
+  .lg { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); }
+  .lg-office { border-radius: 3px; background: var(--red); }
+  .lg-service { margin-left: 8px; }
+  .credit { margin-left: auto; color: var(--ink-2); }
+  .regions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-6); }
+  .r-title { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.5rem; border-bottom: 1.5px solid var(--ink); padding-bottom: 6px; margin-bottom: 8px; }
+  .regions ul { display: grid; gap: 4px; list-style: none; }
+  .regions li { display: flex; align-items: center; gap: 8px; min-height: 32px; }
+  .regions a { font-weight: 600; }
+</style>

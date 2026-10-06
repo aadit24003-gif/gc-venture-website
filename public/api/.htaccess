@@ -1,0 +1,4 @@
+# Only the handler is reachable; config and data are private.
+<FilesMatch "^(?!enquiry\.php$).*$">
+  Require all denied
+</FilesMatch>

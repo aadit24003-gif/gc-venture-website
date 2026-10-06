@@ -1,0 +1,89 @@
+---
+import Icon from './Icon.astro';
+import { AVAILABILITY_LABEL, type Product } from '../data/products';
+import { categoryById } from '../data/categories';
+
+interface Props { p: Product; headingLevel?: 'h2' | 'h3'; catalogue?: boolean }
+const { p, headingLevel = 'h3', catalogue = false } = Astro.props;
+const H = headingLevel;
+const cat = categoryById(p.category)!;
+const img = p.images[0];
+const rows = [
+  ['Processor', p.processor_family?.join(' / ') ?? p.processor],
+  ['Generation', p.processor_generation?.join(' / ')],
+  ['Memory', p.ram],
+  ['Storage', p.storage],
+  ['Display', p.display_size && `${p.display_size}${p.resolution ? ` ${p.resolution}` : ''}`],
+].filter(([, v]) => v) as [string, string][];
+const availClass = p.availability === 'in-stock' ? 'tag--ok' : p.availability === 'limited' ? 'tag--warn' : '';
+const href = `/equipment/${p.slug}/`;
+const data = catalogue
+  ? {
+      'data-category': p.category,
+      'data-brand': p.brand,
+      'data-proc': (p.processor_family ?? []).join('|'),
+      'data-gen': (p.processor_generation ?? []).join('|'),
+      'data-ram': p.ram_gb ?? '',
+      'data-storage': p.storage_gb ?? '',
+      'data-screen': p.display_size ?? '',
+      'data-avail': p.availability,
+      'data-cities': (p.city_availability ?? []).join('|'),
+      'data-search': [p.name, p.brand, p.subcategory, p.processor, ...(p.processor_family ?? []), ...(p.tags ?? [])].join(' ').toLowerCase(),
+      'data-slug': p.slug,
+      'data-json': JSON.stringify({ name: p.name, slug: p.slug, rows }),
+    }
+  : {};
+---
+<article class="pcard" data-product {...data}>
+  <a href={href} class="frame" tabindex="-1" aria-hidden="true">
+    {img ? (
+      <img src={img.src} alt="" width={img.width} height={img.height} loading="lazy" decoding="async" />
+    ) : (
+      <span class="ph"><Icon name={cat.icon} size={72} stroke={1.1} /><span class="ph-brand">{p.brand}</span></span>
+    )}
+  </a>
+  <div class="body">
+    <p class="sub">{p.subcategory ?? cat.name}</p>
+    <H class="name"><a href={href}>{p.name}</a></H>
+    {rows.length > 0 ? (
+      <dl class="specs">
+        {rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+      </dl>
+    ) : (
+      <p class="small muted">Configuration confirmed with your quote.</p>
+    )}
+    <div class="meta">
+      <span class={`tag ${availClass}`}>{AVAILABILITY_LABEL[p.availability]}</span>
+      {p.tags.map((t) => <span class="tag">{t}</span>)}
+    </div>
+    <div class="actions">
+      <a class="btn btn--primary btn--sm" href={`/request-a-quote/?product=${encodeURIComponent(p.slug)}`}>Request quote</a>
+      <a class="link-arrow small" href={href}>Details <Icon name="arrow-right" /></a>
+    </div>
+    {catalogue && (
+      <label class="cmp"><input type="checkbox" data-compare value={p.slug} /> Compare<span class="sr-only"> {p.name}</span></label>
+    )}
+  </div>
+</article>
+
+<style>
+  .pcard { display: flex; flex-direction: column; background: var(--card); border: 1.5px solid var(--ink); border-radius: var(--r-md); overflow: hidden; transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out); }
+  .pcard:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-block); }
+  .frame { display: block; aspect-ratio: 16 / 10; background: var(--paper-2); border-bottom: 1.5px solid var(--ink); }
+  .frame img { width: 100%; height: 100%; object-fit: contain; }
+  .ph { position: relative; display: grid; place-items: center; height: 100%; color: var(--ink); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 14px 14px; }
+  .ph-brand { position: absolute; left: 14px; bottom: 10px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.25rem; color: var(--ink-3); }
+  .body { display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-5); flex: 1; }
+  .sub { margin: 0; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); }
+  .name { font-size: 1.25rem; font-weight: 700; line-height: 1.2; margin: -6px 0 0; }
+  .name a { text-decoration: none; }
+  .name a:hover { text-decoration: underline; }
+  .specs { margin: 0; display: grid; border-top: 1px solid var(--line); }
+  .specs div { display: grid; grid-template-columns: 96px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: var(--fs-small); }
+  .specs dt { color: var(--ink-2); }
+  .specs dd { margin: 0; font-weight: 600; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cmp { display: inline-flex; align-items: center; gap: 8px; font-size: var(--fs-small); font-weight: 600; min-height: 32px; cursor: pointer; }
+  .cmp input { width: 18px; height: 18px; accent-color: var(--ink); }
+  .actions { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); margin-top: auto; padding-top: var(--s-2); }
+</style>

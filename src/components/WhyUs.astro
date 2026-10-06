@@ -1,0 +1,55 @@
+---
+import Icon from './Icon.astro';
+import { SITE, OFFICES, enabledClaims } from '../config/site';
+
+const years = new Date().getFullYear() - SITE.founded;
+const icons: Record<string, [string, string?]> = {
+  zeroDeposit: ['wallet'], noLockIn: ['calendar-days', 'x'], fastDelivery: ['truck', 'clock'], support247: ['headset'],
+  noAdvance: ['receipt'], preinstalled: ['laptop', 'check'], monthlyBilling: ['calendar-days', 'check'], costSaving: ['trending-down'],
+};
+const claims = enabledClaims(['zeroDeposit', 'noAdvance', 'noLockIn', 'monthlyBilling', 'fastDelivery', 'preinstalled', 'support247', 'costSaving']);
+---
+<section class="section section--ink why" aria-labelledby="why-title">
+  <div class="wrap">
+    <div class="why-top">
+      <div>
+        <h2 id="why-title" class="h2">Renting should be the easy part</h2>
+        <p class="lead">Buying hardware ties up capital and leaves you with machines to manage when the project ends. Renting from us moves that work off your plate.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Since</dt><dd class="num big">{SITE.founded}</dd><dd class="note">{years}+ years renting IT to Indian businesses.</dd></div>
+        <div><dt>Offices</dt><dd class="num big">{OFFICES.length}</dd><dd class="note">{OFFICES.map((o) => o.city).join(' and ')}, with delivery across India.</dd></div>
+      </dl>
+    </div>
+
+    <ul role="list" class="claims">
+      {claims.map((c) => (
+        <li>
+          <span class="ci"><Icon name={icons[c.key][0]} badge={icons[c.key][1]} size={30} stroke={1.6} /></span>
+          <h3 class="h4">{c.short}</h3>
+          <p>{c.long}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .why { --icon-accent: var(--amber); }
+  .why-top { display: grid; gap: var(--s-7); margin-bottom: var(--s-8); align-items: end; }
+  @media (min-width: 960px) { .why-top { grid-template-columns: 1.3fr 1fr; } }
+  .why .lead { margin-top: var(--s-5); }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); margin: 0; }
+  .facts > div { border-top: 1.5px solid var(--paper); padding-top: var(--s-4); }
+  .facts dt { font-weight: 600; color: var(--on-dark-2); font-size: var(--fs-small); }
+  .facts dd { margin: 0; }
+  .facts dd.big { margin: 4px 0 8px; font-family: var(--font-display); font-weight: 800; font-size: clamp(3.5rem, 2.6rem + 3vw, 5.5rem); line-height: .85; color: var(--paper); }
+  .facts .note { color: var(--on-dark-2); font-size: var(--fs-small); }
+  .claims { display: grid; grid-template-columns: 1fr; gap: 0; list-style: none; border-top: 1px solid rgba(243,238,229,.2); }
+  @media (min-width: 640px) { .claims { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1060px) { .claims { grid-template-columns: repeat(4, 1fr); } }
+  .claims li { padding: var(--s-6) var(--s-5) var(--s-6) 0; border-bottom: 1px solid rgba(243,238,229,.2); }
+  .ci { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: rgba(243,238,229,.08); color: var(--paper); margin-bottom: var(--s-4); }
+  .claims h3 { margin-bottom: 6px; }
+  .claims p { color: var(--on-dark-2); font-size: var(--fs-small); margin: 0; }
+</style>
