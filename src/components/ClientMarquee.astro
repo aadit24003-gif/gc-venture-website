@@ -29,7 +29,7 @@ const { tone = 'light' } = Astro.props;
 </div>
 
 <style>
-  .cm { border-top: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 70%, transparent); padding: var(--s-5) 0 var(--s-6); }
+  .cm { border-block: 1px solid var(--line); background: transparent; padding: var(--s-6) 0 var(--s-7); }
   .cm-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); margin-bottom: var(--s-4); }
   .cm-label { margin: 0; color: var(--ink-3); }
   .cm-toggle { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); min-height: 44px; padding: 0 4px; }
@@ -40,7 +40,7 @@ const { tone = 'light' } = Astro.props;
   .cm-track { display: flex; width: max-content; animation: scroll 60s linear infinite; }
   .cm.is-paused .cm-track, .cm-viewport:hover .cm-track, .cm-viewport:focus-within .cm-track { animation-play-state: paused; }
   .cm-list { display: flex; gap: clamp(32px, 4vw, 56px); padding-right: clamp(32px, 4vw, 56px); list-style: none; }
-  .cm-list li { white-space: nowrap; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.25rem, 1rem + .9vw, 1.75rem); color: var(--ink-3); letter-spacing: -0.01em; }
+  .cm-list li { white-space: nowrap; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.375rem, 1.05rem + 1vw, 2rem); color: var(--ink-2); letter-spacing: -0.01em; }
   .cm-list img { height: 32px; width: auto; filter: grayscale(1) contrast(1.1); opacity: .75; }
   @keyframes scroll { to { transform: translateX(-50%); } }
   .cm--dark { background: transparent; border-top: 1px solid var(--hair-dark); position: relative; z-index: 1; }

@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
+import ClientMarquee from '../components/ClientMarquee.astro';
 import ScaleSelector from '../components/ScaleSelector.astro';
 import Preparation from '../components/Preparation.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
@@ -32,6 +33,7 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
   schema={[websiteSchema, faqSchema]}
 >
   <Hero />
+  <ClientMarquee />
 
   <Preparation />
 
