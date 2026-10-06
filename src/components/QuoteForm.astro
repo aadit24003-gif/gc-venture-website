@@ -23,12 +23,11 @@ const equipment = [
   { v: 'desktops', l: 'Desktops', i: 'monitor-smartphone' },
   { v: 'monitors', l: 'Monitors', i: 'monitor' },
   { v: 'servers', l: 'Servers', i: 'server' },
-  { v: 'networking', l: 'Switches and routers', i: 'network' },
-  { v: 'firewalls', l: 'Firewalls', i: 'brick-wall-shield' },
+  { v: 'routers', l: 'Routers and Wi-Fi', i: 'router' },
   { v: 'phones', l: 'Mobile phones', i: 'smartphone' },
   { v: 'other', l: 'Other', i: 'package' },
 ];
-const catToEquip: Record<string, string> = { switches: 'networking', routers: 'networking', other: 'other' };
+const catToEquip: Record<string, string> = { other: 'other' };
 const preEquip = category ? catToEquip[category] ?? category : undefined;
 const durations = ['Less than 1 month', '1 to 3 months', '3 to 6 months', '6 to 12 months', 'More than 12 months', 'Not sure yet'];
 const today = new Date().toISOString().slice(0, 10);
@@ -76,6 +75,7 @@ const compact = variant === 'compact';
     <div class="field">
       <label for={`${formId}-qty`}>Quantity <span class="req" aria-hidden="true">*</span></label>
       <input class="input" type="number" inputmode="numeric" min="1" max="100000" id={`${formId}-qty`} name="quantity" required data-qty />
+      <span class="hint">Laptop rentals start at 10 units.</span>
     </div>
     <div class="field">
       <label for={`${formId}-city`}>Delivery city <span class="req" aria-hidden="true">*</span></label>

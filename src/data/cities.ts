@@ -61,7 +61,7 @@ export const CITIES: City[] = [
     intro: 'Noida’s IT parks along Sector 62, 63 and the Expressway run large, shift-based teams that grow and shrink with contracts. Renting lets those floors scale without a procurement cycle each time a new process goes live.',
     note: 'Serving Noida and Greater Noida from our NCR operations.',
     faqs: [
-      { q: 'Can you set up desktops for a new BPO process in Noida?', a: 'Yes. We rent complete seats (CPU, monitor, keyboard, mouse) imaged identically, plus switches to connect the floor.' },
+      { q: 'Can you set up desktops for a new BPO process in Noida?', a: 'Yes. We rent complete seats (CPU, monitor, keyboard, mouse) imaged identically and set up desk by desk.' },
       { q: 'Do you deliver to Greater Noida?', a: 'Yes, along with Noida and the rest of NCR.' },
     ],
   },
@@ -73,7 +73,7 @@ export const CITIES: City[] = [
     intro: 'Ghaziabad’s industrial belt in Sahibabad and its fast-growing offices in Indirapuram and Kaushambi need practical, durable equipment: desktops for plant offices, laptops for supervisors, and networking for new warehouses.',
     note: 'Serving Ghaziabad from our NCR operations.',
     faqs: [
-      { q: 'Do you rent equipment for factories and warehouses?', a: 'Yes. Desktops for plant offices, laptops for supervisors, and routers and switches for warehouse networks.' },
+      { q: 'Do you rent equipment for factories and warehouses?', a: 'Yes. Desktops for plant offices, laptops for supervisors, and routers for warehouse Wi-Fi.' },
       { q: 'Which areas of Ghaziabad do you cover?', a: 'Indirapuram, Vaishali, Kaushambi, Raj Nagar Extension, Sahibabad and nearby areas.' },
     ],
   },

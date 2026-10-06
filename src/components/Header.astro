@@ -10,7 +10,7 @@ const { waMessage } = Astro.props;
 
 const groups = [
   { title: 'Computing', ids: ['laptops', 'macbooks', 'desktops', 'monitors'] },
-  { title: 'Infrastructure', ids: ['servers', 'switches', 'routers', 'firewalls'] },
+  { title: 'Infrastructure', ids: ['servers', 'routers'] },
   { title: 'Mobility and more', ids: ['phones', 'other'] },
 ].map((g) => ({ ...g, items: g.ids.map((id) => CATEGORIES.find((c) => c.id === id)!).filter(Boolean) }));
 

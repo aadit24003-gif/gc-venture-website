@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import ScaleSelector from '../components/ScaleSelector.astro';
+import Preparation from '../components/Preparation.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
 import WhyUs from '../components/WhyUs.astro';
 import ProductCard from '../components/ProductCard.astro';
@@ -26,11 +27,13 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
 ---
 <Base
   title="Laptop & IT Equipment on Rent for Business | IT Rentals"
-  description="Rent laptops, desktops, MacBooks, servers, networking and phones for teams of 1 to 1,000+ across India. Configured, delivered and supported. Since 2013."
+  description="Rent laptops, desktops, MacBooks, servers, networking and phones for teams of 10 to 1,000+ across India. Configured, delivered and supported. Since 2013."
   path="/"
   schema={[websiteSchema, faqSchema]}
 >
   <Hero />
+
+  <Preparation />
 
   <ScaleSelector />
 

@@ -10,8 +10,8 @@ Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one s
 
 | Area | URL | Notes |
 |---|---|---|
-| Home | `/` | Hero drawn as a laptop with the chip pile spilling onto the desk, client marquee, "1 → 500+" scale selector, equipment index, why us, featured models, how it works, industries, India map, FAQ |
-| Service pages (10) | `/laptop-rental/`, `/macbook-rental/`, `/desktop-rental/`, `/monitor-rental/`, `/server-rental/`, `/switch-rental/`, `/router-rental/`, `/firewall-rental/`, `/mobile-phone-rental/`, `/it-equipment-rental/` | Generated from `src/data/categories.ts` |
+| Home | `/` | Hero drawn as a laptop with the chip pile spilling onto the desk, client marquee, quality/testing/delivery steps, "10 → 500+" scale selector, equipment index, why us, featured models, how it works, industries, India map, FAQ |
+| Service pages (8) | `/laptop-rental/`, `/macbook-rental/`, `/desktop-rental/`, `/monitor-rental/`, `/server-rental/`, `/router-rental/`, `/mobile-phone-rental/`, `/it-equipment-rental/` | Generated from `src/data/categories.ts` |
 | Catalogue | `/equipment/` | Search, filters (category, brand, processor, generation, RAM, storage, screen, city), shareable filter URLs, compare up to 3 |
 | Product pages (22) | `/equipment/<model>/` | Specs, rental terms, "Need 20 of these?" quote form, WhatsApp with product name |
 | City pages (14) | `/laptop-on-rent-in-<city>/` | Unique intro, areas, industries and FAQs per city; office address only for Gurgaon and Bangalore |
@@ -43,6 +43,7 @@ Common tasks:
 
 - **Turn a promise off** (e.g. if "zero deposit" changes): set `enabled: false` for it in `CLAIMS` in `site.ts`. It disappears everywhere, and FAQ answers adapt.
 - **Add a product photo:** put the image in `public/products/` and add it to that product's `images` array with real `width`/`height` and alt text such as "Dell Latitude 7490 on rent".
+- **Minimum order:** laptop rentals start at 10 units; this is stated on the laptop page, the scale selector and the quote form.
 - **Show a price:** set `rental_price` (₹/month) on a product. Leave `null` for "Request a quote".
 - **Mark stock:** `availability: 'in-stock' | 'limited' | 'on-request'`. Everything is `on-request` until stock is confirmed.
 - **Add a client logo:** put a monochrome SVG/PNG in `public/clients/` and set `logo: '/clients/name.svg'`. Without a logo the name is typeset.
@@ -96,6 +97,8 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Gurgaon address**: the company profile says **836 A**, Tower B3, Spaze iTech Park; the brief says **Office 821/A**. Currently 836 A.
 - [ ] **Bangalore address**: profile says **HN 49, Royal Placid Layout, HSR Layout, 560102**; brief says **KNA Complex, First Floor, Haralur Main Road, HSR Layout, 560068**. Currently the profile version.
 - [ ] **Service promises** (all currently published, please confirm the wording): zero security deposit, no lock-in, same/next-day delivery, 24/7 support, no advance payment, software pre-installed, monthly billing, up to 50% lower cost.
+- [ ] **Preparation steps** on the home page (inspection, testing, diagnostics, cleaning, configuration, security check, packaging, scheduled delivery): confirm these match how devices are actually prepared.
+- [ ] **Product photos**: add real or licensed photos to `public/products/` (see "Add a product photo").
 - [ ] **Business hours** (`CONTACT.BUSINESS_HOURS`).
 - [ ] **Client list**: 17 names shown. Ericsson, Samsung, Tower and Xceed are hidden until confirmed.
 - [ ] **Leadership copy** on About (Vivek Garg, Managing Director, 20+ years), and a photo if you'd like one instead of the monogram.

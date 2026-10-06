@@ -21,7 +21,7 @@ const claims = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'suppor
       <div class="intro">
         <nav aria-label="Breadcrumb"><ol class="crumbs" role="list"><li><a href="/">Home</a></li><li><span aria-current="page">Request a quote</span></li></ol></nav>
         <h1 class="h1">Tell us what your team needs</h1>
-        <p class="lead">One device or a thousand. We reply with configurations, availability and monthly pricing for your exact requirement.</p>
+        <p class="lead">Ten laptops or a thousand. We reply with configurations, availability and monthly pricing for your exact requirement.</p>
         {claims.length > 0 && <ul role="list" class="claims">{claims.map((c) => <li><Icon name="check" size={18} stroke={2.5} />{c.short}</li>)}</ul>}
         <div class="alt">
           <p class="label">Prefer to talk?</p>

@@ -1,0 +1,108 @@
+---
+/**
+ * The preparation story, from the Visual Asset Library ("Quality, testing & delivery"):
+ * every device goes through the same sequence from inspection to the customer's desk.
+ */
+import Icon from './Icon.astro';
+
+const quality: { t: string; icon: string; badge?: string }[] = [
+  { t: 'Device inspection', icon: 'laptop', badge: 'search' },
+  { t: 'Laptop testing', icon: 'laptop', badge: 'activity' },
+  { t: 'Quality control', icon: 'award' },
+  { t: 'Hardware diagnostics', icon: 'cpu', badge: 'activity' },
+  { t: 'Device cleaning', icon: 'laptop', badge: 'sparkles' },
+  { t: 'Device preparation', icon: 'clipboard-check' },
+  { t: 'Configuration', icon: 'sliders-horizontal' },
+  { t: 'Verification', icon: 'badge-check' },
+  { t: 'Security check', icon: 'shield-check' },
+  { t: 'Ready to deploy', icon: 'box', badge: 'check' },
+];
+const delivery: { t: string; d: string; icon: string; badge?: string }[] = [
+  { t: 'Laptop package', d: 'Each device boxed with its charger and asset tag.', icon: 'package' },
+  { t: 'Protective packaging', d: 'Packed to travel safely across cities.', icon: 'package', badge: 'shield' },
+  { t: 'Scheduled delivery', d: 'A delivery slot agreed around your start date.', icon: 'package', badge: 'clock' },
+  { t: 'Batch prepared', d: 'Large orders grouped and labelled by user or desk.', icon: 'layers' },
+  { t: 'Delivery route', d: 'Planned by site for multi-office rollouts.', icon: 'route' },
+  { t: 'Office arrival', d: 'Handed over at your office, ready to log in.', icon: 'door-open', badge: 'check' },
+];
+---
+<section class="section section--ink prep" aria-labelledby="prep-title">
+  <div class="wrap">
+    <div class="section-head section-head--split">
+      <h2 id="prep-title" class="h2">Checked, prepared and delivered ready to work</h2>
+      <p class="lead">Every device goes through the same steps before it reaches your office, so your team logs in on day one instead of raising tickets.</p>
+    </div>
+
+    <div class="track">
+      <h3 class="track-title">Quality and testing</h3>
+      <ol class="qa" role="list">
+        {quality.map((q, i) => (
+          <li>
+            <span class="n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="ic"><Icon name={q.icon} badge={q.badge} size={28} stroke={1.5} /></span>
+            <span class="t">{q.t}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="track">
+      <h3 class="track-title">Delivery and deployment</h3>
+      <ol class="route" role="list">
+        {delivery.map((d, i) => (
+          <li class:list={{ last: i === delivery.length - 1 }}>
+            <span class="node"><Icon name={d.icon} badge={d.badge} size={30} stroke={1.5} /></span>
+            <span class="t">{d.t}</span>
+            <span class="d">{d.d}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .prep { --icon-accent: var(--amber); }
+  .track { margin-top: var(--s-7); }
+  .track-title { font-weight: 600; font-size: var(--fs-small); color: var(--on-dark-2); margin-bottom: var(--s-4); }
+
+  .qa { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; list-style: none; }
+  @media (min-width: 900px) { .qa { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1180px) { .qa { grid-template-columns: repeat(5, 1fr); } }
+  .qa li {
+    position: relative; display: flex; align-items: center; gap: 14px; min-height: 84px;
+    padding: 16px 18px; border: 1px solid rgba(243,238,229,.16); border-radius: var(--r-md);
+    background: rgba(243,238,229,.04); transition: background var(--t-fast), border-color var(--t-fast);
+  }
+  .qa li:hover { background: rgba(243,238,229,.08); border-color: rgba(243,238,229,.32); }
+  .qa .n { position: absolute; top: 8px; right: 12px; font-size: var(--fs-xs); color: var(--on-dark-2); }
+  .qa .ic { color: var(--paper); flex: none; }
+  .qa .t { font-weight: 600; line-height: 1.25; padding-right: 16px; }
+  @media (max-width: 559px) {
+    .qa li { flex-direction: column; align-items: flex-start; gap: 10px; min-height: 0; padding: 14px; }
+    .qa .t { font-size: var(--fs-small); padding-right: 0; }
+  }
+
+  .route { position: relative; display: grid; grid-template-columns: 1fr; gap: var(--s-5); list-style: none; }
+  @media (min-width: 900px) {
+    .route { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (min-width: 1180px) {
+    .route { grid-template-columns: repeat(6, 1fr); gap: var(--s-4); }
+    /* dashed delivery route behind the nodes */
+    .route::before { content: ''; position: absolute; left: 32px; right: 32px; top: 32px; border-top: 2px dashed rgba(243,238,229,.3); }
+  }
+  .route li { position: relative; display: grid; gap: 6px; align-content: start; }
+  @media (max-width: 1179px) {
+    .route li { grid-template-columns: 64px 1fr; column-gap: 16px; }
+    .route li .node { grid-row: span 2; }
+  }
+  .node {
+    position: relative; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px;
+    background: var(--ink); border: 1.5px solid rgba(243,238,229,.4); color: var(--paper);
+  }
+  .route .last .node { background: var(--red-ink); border-color: var(--red-ink); color: #fff; --icon-accent: #fff; }
+  .route .t { font-weight: 700; margin-top: 8px; }
+  @media (max-width: 1179px) { .route .t { margin-top: 6px; } }
+  .route .d { color: var(--on-dark-2); font-size: var(--fs-small); }
+</style>

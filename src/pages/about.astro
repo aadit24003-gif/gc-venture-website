@@ -13,7 +13,7 @@ const crumbs = [{ name: 'About', href: '/about/' }];
 const years = new Date().getFullYear() - SITE.founded;
 const strengths = [
   { icon: 'calendar-days', t: `${years}+ years of renting`, d: `Renting IT equipment to businesses since ${SITE.founded}, through hiring booms, office moves and every Windows upgrade in between.` },
-  { icon: 'layers', t: 'The whole setup, not just laptops', d: `${CATEGORIES.length} categories, from laptops and Macs to servers, firewalls and phones, quoted together.` },
+  { icon: 'layers', t: 'The whole setup, not just laptops', d: `${CATEGORIES.length} categories, from laptops and Macs to servers, routers and phones, quoted together.` },
   { icon: 'map-pinned', t: 'Pan-India reach', d: `Offices in ${OFFICES.map((o) => o.city).join(' and ')}, with delivery and support in ${CITIES.length}+ cities.` },
   { icon: 'headset', t: 'Support that stays', d: 'A replacement when something fails and a person to call while the devices are with you.' },
 ];
@@ -56,7 +56,7 @@ const schema = [{
       <div class="era now">
         <p class="year">Today</p>
         <ul role="list">
-          <li><strong>{CATEGORIES.length}</strong> equipment categories, including servers, networking, firewalls and phones</li>
+          <li><strong>{CATEGORIES.length}</strong> equipment categories, including servers, routers and phones</li>
           <li><strong>{OFFICES.length}</strong> offices, in {OFFICES.map((o) => o.city).join(' and ')}</li>
           <li><strong>{CITIES.length}+</strong> cities with delivery and support</li>
         </ul>

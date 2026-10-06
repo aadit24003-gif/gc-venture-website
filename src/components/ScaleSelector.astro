@@ -5,13 +5,8 @@ import { claim } from '../config/site';
 const fast = claim('fastDelivery');
 const steps = [
   {
-    n: 1, label: '1', title: 'One laptop, set up properly',
-    text: `For a new joiner or a replacement. It arrives charged, configured and asset-tagged${fast ? ', usually the same or next day' : ''}.`,
-    points: ['Your software pre-installed', 'Replacement if it fails', 'Return it whenever you like'],
-  },
-  {
     n: 10, label: '10', title: 'A team kit',
-    text: 'Matched machines with the same software image, so ten people start work on the same morning.',
+    text: `Matched machines with the same software image, so ten people start work on the same morning${fast ? ', usually delivered the same or next day' : ''}.`,
     points: ['Identical configuration', 'One invoice for the team', 'Add or return units any month'],
   },
   {
@@ -35,8 +30,8 @@ const initial = 50;
 <section class="section scale" aria-labelledby="scale-title" data-scale>
   <div class="wrap">
     <div class="section-head section-head--split">
-      <h2 id="scale-title" class="h2">From one device to enterprise scale</h2>
-      <p class="lead">The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
+      <h2 id="scale-title" class="h2">From ten laptops to enterprise scale</h2>
+      <p class="lead">Laptop rentals start at 10 units. The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
     </div>
 
     <div class="scale-board panel">
@@ -57,7 +52,7 @@ const initial = 50;
         <div class="scale-copy">
           {steps.map((s) => (
             <div class="step" data-step={s.n} hidden={s.n !== initial}>
-              <p class="count num">{s.label}<span>{s.n === 1 ? ' laptop' : ' laptops'}</span></p>
+              <p class="count num">{s.label}<span> laptops</span></p>
               <h3 class="h3">{s.title}</h3>
               <p class="muted">{s.text}</p>
               <ul role="list" class="points">
@@ -66,7 +61,7 @@ const initial = 50;
               {s.n === 500 && <p class="xs muted note">Grid shows 100 icons, each one is 5 laptops.</p>}
             </div>
           ))}
-          <a class="btn btn--primary btn--lg" href={`/request-a-quote/?qty=${initial}`} data-scale-cta>Get a quote for&nbsp;<span data-scale-cta-n>{initial} laptops</span></a>
+          <a class="btn btn--primary btn--lg" href={`/request-a-quote/?qty=${initial}`} data-scale-cta><span>Get a quote for <span data-scale-cta-n>{initial} laptops</span></span></a>
         </div>
       </div>
     </div>
@@ -118,7 +113,7 @@ const initial = 50;
         cells.forEach((c, i) => { c.classList.toggle('on', i < lit); });
         root.querySelectorAll<HTMLElement>('[data-step]').forEach((s) => { s.hidden = s.dataset.step !== String(n); });
         cta.href = `/request-a-quote/?qty=${n}`;
-        ctaN.textContent = `${n >= 500 ? '500+' : n} ${n === 1 ? 'laptop' : 'laptops'}`;
+        ctaN.textContent = `${n >= 500 ? '500+' : n} laptops`;
       }),
     );
   });

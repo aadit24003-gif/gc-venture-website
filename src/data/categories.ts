@@ -45,8 +45,8 @@ export const CATEGORIES: Category[] = [
     navBlurb: 'ThinkPad, Latitude, EliteBook. Core i3 to i9.',
     seoTitle: 'Laptop on Rent for Business | Laptop Rental India',
     seoDescription:
-      'Rent business laptops from Lenovo, Dell and HP for teams of 1 to 1,000+. Configured before delivery, supported until return. Get a quote.',
-    h1: 'Laptop rental for teams of one to a thousand',
+      'Rent business laptops from Lenovo, Dell and HP for teams of 10 to 1,000+. Configured before delivery, supported until return. Get a quote.',
+    h1: 'Laptop rental for teams of ten to a thousand',
     intro:
       'Business laptops from Lenovo ThinkPad, Dell Latitude and HP EliteBook ranges, with Intel Core i3 to i9 or AMD Ryzen processors. Every machine is checked, imaged with the software you specify and labelled before it leaves us, so your people log in on day one.',
     included: [
@@ -71,7 +71,7 @@ export const CATEGORIES: Category[] = [
       { q: 'Which laptop brands can I rent?', a: 'Mostly Lenovo ThinkPad, Dell Latitude and HP EliteBook business ranges, plus Apple MacBooks. Tell us the specification you need and we will confirm what is available for your dates.' },
       { q: 'Can you install our software before delivery?', a: 'Yes. Share your software list or a reference image and we set every machine up the same way before dispatch.' },
       { q: 'What happens if a laptop stops working?', a: 'Report it through support and we replace the device. Your team keeps working on a spare while we handle the faulty unit.' },
-      { q: 'Is there a minimum quantity?', a: 'No. We rent a single laptop as readily as a few hundred. Larger orders get tailored pricing.' },
+      { q: 'Is there a minimum quantity?', a: 'Laptop rentals start at 10 units. From there we handle orders of 50, 100 or several hundred, and larger orders get tailored pricing.' },
     ],
   },
   {
@@ -196,29 +196,6 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: 'switches',
-    slug: 'switch-rental',
-    name: 'Switch rental',
-    noun: 'network switches',
-    icon: 'network',
-    hue: 'green',
-    group: 'infrastructure',
-    hasCatalogue: false,
-    navBlurb: 'Managed and unmanaged switches for floors and events.',
-    seoTitle: 'Network Switch on Rent | Switch Rental',
-    seoDescription:
-      'Rent managed and unmanaged network switches for new floors, events and temporary offices. Delivered with your laptops and desktops. Get a quote.',
-    h1: 'Network switch rental for new floors and events',
-    intro:
-      'Switches to connect the seats you rent from us, or your own. Useful for temporary offices, training rooms and events where you need wired connectivity for a fixed period.',
-    included: ['Port count matched to your seat plan', 'Patch cables on request', 'Replacement if a unit fails'],
-    useCases: [
-      { title: 'Temporary offices', text: 'Wire up a project site for the months you occupy it.' },
-      { title: 'Events', text: 'Wired networks for registration, streaming and demo stations.' },
-    ],
-    faqs: [{ q: 'Do you rent managed switches?', a: 'Yes, managed and unmanaged. Tell us the port count and any VLAN or PoE needs.' }],
-  },
-  {
     id: 'routers',
     slug: 'router-rental',
     name: 'Router rental',
@@ -233,36 +210,13 @@ export const CATEGORIES: Category[] = [
       'Rent business routers and Wi-Fi equipment for temporary sites, events and new branches. Delivered and supported. Get a quote.',
     h1: 'Router and Wi-Fi rental for sites, branches and events',
     intro:
-      'Business routers and wireless equipment for the period you need them. Pair them with rented switches and firewalls to run a complete temporary network.',
+      'Business routers and wireless equipment for the period you need them. Pair them with rented laptops and desktops to set up a complete temporary site.',
     included: ['Configuration support', 'Replacement if a unit fails', 'Pickup at the end of the rental'],
     useCases: [
       { title: 'New branches', text: 'Connectivity while permanent infrastructure is procured.' },
       { title: 'Conferences', text: 'Wi-Fi coverage for delegates and exhibitors.' },
     ],
     faqs: [{ q: 'Do you provide the internet connection?', a: 'We rent the equipment. The internet line comes from your ISP; we help connect it.' }],
-  },
-  {
-    id: 'firewalls',
-    slug: 'firewall-rental',
-    name: 'Firewall rental',
-    noun: 'firewalls',
-    icon: 'brick-wall-shield',
-    hue: 'red',
-    group: 'infrastructure',
-    hasCatalogue: false,
-    navBlurb: 'Firewall appliances to secure temporary networks.',
-    seoTitle: 'Firewall on Rent | Firewall Rental for Business',
-    seoDescription:
-      'Rent firewall appliances to secure temporary offices, project sites and events. Configured to your policy. Get a quote.',
-    h1: 'Firewall rental to secure temporary networks',
-    intro:
-      'Firewall appliances for sites that need the same security posture as head office, for as long as the site exists. Common for project offices that handle client data.',
-    included: ['Appliance sized to your users and throughput', 'Configuration support for your policy', 'Replacement if a unit fails'],
-    useCases: [
-      { title: 'Client-audited projects', text: 'Meet a client’s network security requirement at a temporary site.' },
-      { title: 'Branch rollouts', text: 'Secure a new branch before permanent hardware arrives.' },
-    ],
-    faqs: [{ q: 'Can you configure the firewall?', a: 'Share your policy requirements and we help set it up; your IT team keeps control of the rules.' }],
   },
   {
     id: 'phones',
@@ -305,7 +259,7 @@ export const CATEGORIES: Category[] = [
       'Most customers rent more than one kind of device. Tell us the whole setup, from seats to servers to network, and we quote it as one order with one point of contact.',
     included: ['One quote and one invoice for the full setup', 'Delivery planned around your go-live date', 'Single support contact for every device'],
     useCases: [
-      { title: 'New office in a box', text: 'Laptops, desktops, network and firewall for a new site.' },
+      { title: 'New office in a box', text: 'Laptops, desktops, monitors and Wi-Fi for a new site.' },
       { title: 'Events', text: 'Registration laptops, displays, Wi-Fi and phones for the event days.' },
       { title: 'Emergency replacement', text: 'Cover for hardware lost to theft, damage or delayed procurement.' },
     ],
