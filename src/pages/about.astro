@@ -31,6 +31,7 @@ const team = [
 const leaders = [
   {
     initials: 'VG',
+    photo: { src: '/brand/vivek-garg-600.webp', srcset: '/brand/vivek-garg-400.webp 400w, /brand/vivek-garg-600.webp 600w' },
     name: 'Vivek Garg',
     role: 'Managing Director',
     bio: [
@@ -41,6 +42,7 @@ const leaders = [
   },
   {
     initials: 'LP',
+    photo: null,
     name: 'Lakhendra Prasad',
     role: 'Partner, Managing Lead for Operations',
     bio: [
@@ -87,9 +89,9 @@ const schema = [{
     <figure slot="aside" class="workplace">
       <img
         src="/brand/workplace-1200.webp"
-        srcset="/brand/workplace-800.webp 800w, /brand/workplace-1200.webp 1200w"
+        srcset="/brand/workplace-800.webp 800w, /brand/workplace-1200.webp 1200w, /brand/workplace-1600.webp 1600w"
         sizes="(min-width: 1000px) 40vw, 100vw"
-        width="1200" height="725"
+        width="1600" height="900"
         alt="Glass-walled meeting room in a modern office, with a long table, upholstered chairs and potted trees"
         fetchpriority="high"
       />
@@ -97,30 +99,14 @@ const schema = [{
     </figure>
   </PageHero>
 
-  <section class="section" aria-labelledby="then-title">
-    <div class="wrap then">
-      <h2 id="then-title" class="sr-only">Our story</h2>
-      <div class="era">
-        <p class="year num">{SITE.founded}</p>
-        <p class="era-t">Founded to rent business laptops and desktops to companies that needed equipment quickly, without buying it.</p>
-      </div>
-      <div class="arrow" aria-hidden="true"><Icon name="arrow-right" size={40} stroke={1.5} /></div>
-      <div class="era now">
-        <p class="year">Today</p>
-        <ul role="list">
-          <li><strong>{CATEGORIES.length}</strong> equipment categories, including servers, routers and phones</li>
-          <li><strong>{OFFICES.length}</strong> offices, in {OFFICES.map((o) => o.city).join(' and ')}</li>
-          <li><strong>{CITIES.length}+</strong> cities with delivery and support</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
   <section class="section section--sunk" aria-labelledby="str-title">
-    <div class="wrap">
-      <div class="section-head section-head--split">
+    <div class="wrap good">
+      <div class="good-intro">
         <h2 id="str-title" class="h2">What we are good at</h2>
-        <p class="lead">Renting a laptop is easy. Getting the right machines, set up the same way, to the right people on the right morning, and keeping them working for months, is the part we have spent {years} years getting good at.</p>
+        <p class="lead">Renting a laptop is easy. Getting the right machines, set up the same way, to the right people on the right morning, and keeping them working for months, is what we have spent {years} years getting good at.</p>
+        {claims.length > 0 && (
+          <ul role="list" class="claims">{claims.map((c) => <li><Icon name="check" size={18} stroke={2.5} />{c.short}</li>)}</ul>
+        )}
       </div>
       <ul role="list" class="strengths">
         {strengths.map((s, i) => (
@@ -131,9 +117,6 @@ const schema = [{
           </li>
         ))}
       </ul>
-      {claims.length > 0 && (
-        <ul role="list" class="claims">{claims.map((c) => <li><Icon name="check" size={18} stroke={2.5} />{c.short}</li>)}</ul>
-      )}
     </div>
   </section>
 
@@ -148,6 +131,15 @@ const schema = [{
           <p>When an order has a go-live date, the team works day and night until every device is ready.</p>
         </blockquote>
       </div>
+      <figure class="team-photo">
+        <img
+          src="/brand/team-1400.webp"
+          srcset="/brand/team-800.webp 800w, /brand/team-1400.webp 1400w, /brand/team-2000.webp 2000w"
+          sizes="(min-width: 1440px) 1240px, 100vw"
+          width="2000" height="857" loading="lazy" decoding="async"
+          alt={`The ${SITE.name} team together at a team dinner`}
+        />
+      </figure>
       <div class="team-copy">
         <p class="lead">Behind every delivery is a small, tight team that treats your start date as its own. Large orders often arrive with little notice: a new office opening on Monday, a batch of hires starting next week, an audit that cannot move. When that happens, our people stay late, come in early and work through weekends, imaging, testing, labelling and packing until the last unit is ready to go.</p>
         <p class="lead">It is the reason clients come back. Not because nothing ever goes wrong, but because when it does, someone picks up the phone and fixes it.</p>
@@ -166,14 +158,18 @@ const schema = [{
 
   <section class="section" aria-labelledby="lead-title">
     <div class="wrap">
-      <div class="section-head section-head--split">
+      <div class="section-head">
         <h2 id="lead-title" class="h2">Leadership</h2>
         <p class="lead">Two partners, one running the relationships and one running the operations, both close enough to the work to answer a customer’s call themselves.</p>
       </div>
       <div class="leaders">
         {leaders.map((l) => (
           <article class="leader" aria-labelledby={`ld-${l.initials}`}>
-            <div class="monogram" aria-hidden="true">{l.initials}</div>
+            {l.photo ? (
+              <img class="portrait" src={l.photo.src} srcset={l.photo.srcset} sizes="(min-width: 600px) 180px, 60vw" width="600" height="750" loading="lazy" decoding="async" alt={`Portrait of ${l.name}`} />
+            ) : (
+              <div class="portrait monogram" aria-hidden="true">{l.initials}</div>
+            )}
             <div class="leader-body">
               <h3 id={`ld-${l.initials}`} class="name">{l.name}</h3>
               <p class="role mono">{l.role}</p>
@@ -188,7 +184,26 @@ const schema = [{
     </div>
   </section>
 
-  <section class="section section--sunk" aria-labelledby="how-title">
+  <section class="section section--sunk" aria-labelledby="then-title">
+    <div class="wrap then">
+      <h2 id="then-title" class="sr-only">Our story</h2>
+      <div class="era">
+        <p class="year num">{SITE.founded}</p>
+        <p class="era-t">Founded to rent business laptops and desktops to companies that needed equipment quickly, without buying it.</p>
+      </div>
+      <div class="arrow" aria-hidden="true"><Icon name="arrow-right" size={40} stroke={1.5} /></div>
+      <div class="era now">
+        <p class="year">Today</p>
+        <ul role="list">
+          <li><strong>{CATEGORIES.length}</strong> equipment categories, including servers, routers and phones</li>
+          <li><strong>{OFFICES.length}</strong> offices, in {OFFICES.map((o) => o.city).join(' and ')}</li>
+          <li><strong>{CITIES.length}+</strong> cities with delivery and support</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how-title">
     <div class="wrap">
       <div class="section-head"><h2 id="how-title" class="h2">How we work</h2></div>
       <ol role="list" class="principles">
@@ -205,14 +220,14 @@ const schema = [{
     </div>
   </section>
 
-  <section class="section" aria-labelledby="trust-title">
+  <section class="section section--sunk" aria-labelledby="trust-title">
     <div class="wrap">
       <div class="section-head"><h2 id="trust-title" class="h2">Trusted by serious businesses</h2></div>
       <ClientWall />
     </div>
   </section>
 
-  <section class="section section--sunk" aria-labelledby="fp-title">
+  <section class="section" aria-labelledby="fp-title">
     <div class="wrap">
       <div class="section-head"><h2 id="fp-title" class="h2">Our footprint</h2></div>
       <IndiaMap />
@@ -225,7 +240,7 @@ const schema = [{
 <style>
   /* Hero photo */
   .workplace { margin: 0; position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--night); box-shadow: 0 40px 80px -40px rgba(23,19,15,.55), 0 0 0 1px rgba(23,19,15,.12); }
-  .workplace img { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 725; object-fit: cover; }
+  .workplace img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
   .workplace::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(18,14,13,.62) 0%, transparent 34%); }
   .workplace figcaption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; }
   .workplace figcaption .mono { color: rgba(243,238,229,.85); }
@@ -243,13 +258,15 @@ const schema = [{
   @media (max-width: 899px) { .arrow { transform: rotate(90deg); } }
 
   /* Strengths */
+  .good { display: grid; gap: var(--s-7); }
+  @media (min-width: 1100px) { .good { grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr); gap: var(--s-9); align-items: start; } .good-intro { position: sticky; top: 120px; } }
+  .good-intro .lead { margin-top: var(--s-5); }
   .strengths { display: grid; gap: var(--s-7) var(--s-6); list-style: none; }
   @media (min-width: 640px) { .strengths { grid-template-columns: 1fr 1fr; } }
-  @media (min-width: 1000px) { .strengths { grid-template-columns: repeat(3, 1fr); gap: var(--s-7); } }
   .strengths li { border-top: 1px solid var(--line-strong); padding-top: var(--s-4); }
   .s-top { display: flex; justify-content: space-between; align-items: flex-start; color: var(--red-ink); }
   .strengths h3 { margin: var(--s-3) 0 var(--s-2); }
-  .claims { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: var(--s-8); padding-top: var(--s-5); border-top: 1px solid var(--line); list-style: none; font-weight: 600; }
+  .claims { display: grid; gap: 10px; margin-top: var(--s-6); padding-top: var(--s-5); border-top: 1px solid var(--line-strong); list-style: none; font-weight: 600; }
   .claims li { display: inline-flex; gap: 6px; align-items: center; }
   .claims :global(svg) { color: var(--red-ink); }
 
@@ -259,6 +276,9 @@ const schema = [{
   .team-top .mono { margin-bottom: var(--s-4); }
   .pull { margin: 0; padding-left: var(--s-5); border-left: 2px solid var(--red); }
   .pull p { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: clamp(1.375rem, 1rem + 1.2vw, 2rem); line-height: 1.25; letter-spacing: -0.01em; color: var(--on-dark); }
+  .team-photo { margin: 0 0 var(--s-7); border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--hair-dark); box-shadow: 0 40px 80px -40px rgba(0,0,0,.7); }
+  .team-photo img { display: block; width: 100%; height: auto; aspect-ratio: 2000 / 857; object-fit: cover; }
+  @media (max-width: 640px) { .team-photo img { aspect-ratio: 4 / 3; object-position: 55% 40%; } }
   .team-copy { display: grid; gap: var(--s-5); padding-top: var(--s-6); border-top: 1px solid var(--hair-dark); }
   @media (min-width: 960px) { .team-copy { grid-template-columns: 1fr 1fr; gap: var(--s-8); } }
   .team-copy .lead { max-width: none; }
@@ -271,10 +291,12 @@ const schema = [{
   .leaders { display: grid; gap: var(--s-6); }
   @media (min-width: 1000px) { .leaders { grid-template-columns: 1fr 1fr; } }
   .leader { display: grid; gap: var(--s-5); align-content: start; padding: clamp(24px, 3vw, 40px); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--card); box-shadow: var(--shadow-block); }
-  @media (min-width: 600px) { .leader { grid-template-columns: 132px 1fr; gap: var(--s-6); } }
-  .monogram { aspect-ratio: 1; width: 100%; max-width: 132px; display: grid; place-items: center; border-radius: var(--r-lg); color: var(--paper); font-family: var(--font-display); font-weight: 400; font-size: 3.25rem; letter-spacing: -0.02em;
+  @media (min-width: 600px) { .leader { grid-template-columns: 180px 1fr; gap: var(--s-6); } }
+  .portrait { display: block; width: 100%; max-width: 180px; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--r-lg); box-shadow: 0 0 0 1px rgba(23,19,15,.1), 0 24px 48px -28px rgba(23,19,15,.6); }
+  .monogram { display: grid; place-items: center; border-radius: var(--r-lg); color: var(--paper); font-family: var(--font-display); font-weight: 400; font-size: 4rem; letter-spacing: -0.02em;
     background: radial-gradient(80% 80% at 80% 0%, rgba(185,41,30,.45) 0%, transparent 60%), var(--night);
     box-shadow: inset 0 0 0 1px rgba(243,238,229,.1), 0 24px 48px -28px rgba(23,19,15,.6); }
+  .leader-body { padding-top: 4px; }
   .name { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.75rem, 1.4rem + 1vw, 2.25rem); line-height: 1.05; letter-spacing: -0.015em; }
   .role { margin: var(--s-2) 0 var(--s-4); color: var(--red-ink); }
   .bio + .bio { margin-top: var(--s-3); }
