@@ -21,6 +21,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v12 | `665bf0c` | Larger About hero photo, aligned to the heading and buttons | https://claude.ai/artifact/RRPJ5BJBTNn9eBeVaDSmAF |
 | v13 | `8ca1468` | Bolder hero category pills with model counts and filtered links | https://claude.ai/artifact/31kq73CKsx1XqNZ4GS3m4s |
 | v14 | `de9b470` | Client names moved to a cream band between the dark hero and preparation sections | https://claude.ai/artifact/3j8Rzc9wuQdzc2nzsnFkKs |
+| v15 | `afaed00` | Bolder client names with red dot separators | https://claude.ai/artifact/NK2u6DT2aw2fcp99G317FW |
 
 ## Going back to a version
 
