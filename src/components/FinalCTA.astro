@@ -23,13 +23,25 @@ const {
 </section>
 
 <style>
-  .fcta { background: var(--red-ink); color: #fff; padding-block: clamp(64px, 8vw, 112px); border-top: 1.5px solid var(--ink); }
+  .fcta {
+    position: relative; color: var(--on-dark); padding-block: clamp(72px, 9vw, 128px);
+    background:
+      radial-gradient(70% 90% at 100% 0%, rgba(185, 41, 30, .35) 0%, transparent 60%),
+      radial-gradient(60% 80% at 0% 100%, rgba(58, 21, 18, .8) 0%, transparent 70%),
+      var(--night);
+    border-top: 1px solid var(--hair-dark);
+  }
   .fcta-inner { display: grid; gap: var(--s-7); align-items: center; }
   @media (min-width: 960px) { .fcta-inner { grid-template-columns: 1.6fr 1fr; } }
-  .fcta .h1 { color: #fff; }
-  .fcta .lead { color: #fff; opacity: 1; margin-top: var(--s-4); font-weight: 500; }
-  .fcta-actions { display: grid; gap: var(--s-4); }
-  .fcta .btn { box-shadow: 4px 4px 0 var(--ink); }
-  .fcta .btn--primary { --btn-bg: var(--ink); --btn-fg: #fff; }
-  .call { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; color: #fff; }
+  .fcta .h1 { color: var(--on-dark); }
+  .fcta .lead { color: var(--on-dark-2); margin-top: var(--s-5); }
+  .fcta-actions {
+    display: grid; gap: var(--s-3); padding: var(--s-6); border-radius: var(--r-lg);
+    border: 1px solid var(--hair-dark); background: rgba(243,238,229,.03);
+  }
+  .fcta .btn:not(.btn--primary) { --btn-fg: var(--on-dark); --btn-bd: var(--hair-dark-strong); }
+  .fcta .btn:not(.btn--primary):hover { --btn-bd: var(--on-dark); }
+  .fcta .btn--wa :global(svg) { color: #3BC47A; }
+  .call { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: var(--s-2); color: var(--on-dark-2); font-size: var(--fs-small); text-decoration: none; }
+  .call:hover { color: var(--on-dark); }
 </style>

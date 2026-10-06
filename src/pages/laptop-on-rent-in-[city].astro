@@ -165,7 +165,7 @@ const schema = [
 </Base>
 
 <style>
-  .local { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); display: grid; gap: var(--s-3); justify-items: start; }
+  .local { border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); display: grid; gap: var(--s-3); justify-items: start; }
   .local address { font-style: normal; font-weight: 600; line-height: 1.5; }
   .local p { margin: 0; }
   .areas { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; }
@@ -173,9 +173,9 @@ const schema = [
   .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
   .head-row .section-head { margin-bottom: 0; }
   .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
-  .tiers { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: var(--s-7); border-top: 1.5px solid var(--ink); padding-top: var(--s-5); }
+  .tiers { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: var(--s-7); border-top: 1px solid var(--line-strong); padding-top: var(--s-5); }
   .tiers p { margin: 0 0 4px; }
-  .tier { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.375rem; }
+  .tier { font-family: var(--font-display); font-weight: 400; font-size: 1.375rem; }
   .two { display: grid; gap: var(--s-7); align-items: start; }
   @media (min-width: 960px) { .two { grid-template-columns: 1fr 1.1fr; } }
   .two .lead { margin-top: var(--s-4); }
@@ -183,13 +183,13 @@ const schema = [
   .perks li { display: flex; gap: 12px; align-items: flex-start; color: var(--on-dark-2); }
   .perks strong { color: var(--paper); }
   .perks :global(svg) { color: var(--amber); flex: none; margin-top: 3px; }
-  .who { display: grid; gap: 0; list-style: none; border-top: 1.5px solid var(--ink); }
-  .who li { padding: 16px 0; border-bottom: 1px solid var(--line-strong); font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.75rem; line-height: 1; }
+  .who { display: grid; gap: 0; list-style: none; border-top: 1px solid var(--line-strong); }
+  .who li { padding: 16px 0; border-bottom: 1px solid var(--line-strong); font-family: var(--font-display); font-weight: 400; font-size: 1.75rem; line-height: 1; }
   .also { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; }
   .also a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px solid var(--line-strong); border-radius: var(--r-pill); text-decoration: none; font-weight: 600; background: var(--card); }
   .also a:hover { border-color: var(--ink); }
   .faq-h { margin: var(--s-7) 0 var(--s-3); }
-  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .form-panel { border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
   .others { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 4px 24px; margin-top: var(--s-7); list-style: none; }
   .others a { display: block; padding: 8px 0; font-weight: 600; }
 </style>

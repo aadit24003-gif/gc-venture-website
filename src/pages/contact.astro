@@ -74,7 +74,7 @@ const channels = [
 
 <style>
   .channels { display: grid; gap: var(--s-4); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); list-style: none; }
-  .ch { display: grid; gap: 4px; height: 100%; padding: var(--s-5); border: 1.5px solid var(--ink); border-radius: var(--r-md); background: var(--card); text-decoration: none; transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast); }
+  .ch { display: grid; gap: 4px; height: 100%; padding: var(--s-5); border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--card); text-decoration: none; transition: transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast); }
   .ch:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-block); text-decoration: none; }
   .ch-ic { margin-bottom: var(--s-3); color: var(--red-ink); }
   .ch-t { font-weight: 600; color: var(--ink-2); font-size: var(--fs-small); }
@@ -83,10 +83,10 @@ const channels = [
   .two { display: grid; gap: var(--s-7); align-items: start; }
   @media (min-width: 960px) { .two { grid-template-columns: 1fr 1fr; } }
   .offices { display: grid; gap: var(--s-6); margin-top: var(--s-6); }
-  .office { border-top: 1.5px solid var(--ink); padding-top: var(--s-4); display: grid; gap: var(--s-2); justify-items: start; }
+  .office { border-top: 1px solid var(--line-strong); padding-top: var(--s-4); display: grid; gap: var(--s-2); justify-items: start; }
   .office address { font-style: normal; color: var(--ink-2); }
   .map-embed { margin-top: var(--s-6); }
   .map-embed summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
-  .map-embed iframe { width: 100%; height: 320px; border: 1.5px solid var(--ink); border-radius: var(--r-md); margin-top: var(--s-3); }
-  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .map-embed iframe { width: 100%; height: 320px; border: 1px solid var(--line-strong); border-radius: var(--r-md); margin-top: var(--s-3); }
+  .form-panel { border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
 </style>

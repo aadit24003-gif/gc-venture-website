@@ -69,10 +69,10 @@ const initial = 50;
 </section>
 
 <style>
-  .scale-board { padding: clamp(20px, 3vw, 40px); border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .scale-board { padding: clamp(20px, 3vw, 40px); border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
   .scale-seg { gap: 10px; margin-bottom: var(--s-6); align-items: center; }
   .scale-seg legend { float: left; width: 100%; margin-bottom: var(--s-3); font-weight: 700; font-size: 1.125rem; }
-  .scale-seg label { min-width: 72px; justify-content: center; font-family: var(--font-display); font-weight: 800; font-size: 1.375rem; padding: 8px 18px; }
+  .scale-seg label { min-width: 72px; justify-content: center; font-family: var(--font-display); font-weight: 400; font-size: 1.375rem; padding: 8px 18px; }
   .scale-body { display: grid; gap: var(--s-6); align-items: center; }
   @media (min-width: 900px) { .scale-body { grid-template-columns: 1.15fr 1fr; gap: var(--s-8); } }
 
@@ -89,8 +89,8 @@ const initial = 50;
   .fleet[data-n='500'] i.on { background: var(--red-ink); }
   .fleet i.pop { transform: scale(1.2); }
 
-  .count { font-family: var(--font-display); font-weight: 800; font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem); line-height: .85; margin-bottom: var(--s-3); }
-  .count span { font-size: .4em; color: var(--ink-2); text-transform: uppercase; margin-left: 6px; }
+  .count { font-family: var(--font-display); font-weight: 400; font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem); line-height: .85; margin-bottom: var(--s-3); }
+  .count span { font-family: var(--font-text); font-size: .2em; color: var(--ink-3); margin-left: 10px; letter-spacing: 0; }
   .step .h3 { margin-bottom: var(--s-2); }
   .points { display: grid; gap: 8px; margin: var(--s-4) 0 0; list-style: none; font-weight: 600; }
   .points li { display: flex; gap: 8px; align-items: center; }

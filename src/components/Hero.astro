@@ -3,185 +3,195 @@ import Icon from './Icon.astro';
 import ClientMarquee from './ClientMarquee.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
 
-/** The pile: everything we rent, as physical-feeling chips. Hue = equipment family. */
-const pile: { label: string; icon: string; hue: string; r: number; href: string }[] = [
-  { label: 'Lenovo ThinkPads', icon: 'laptop', hue: 'ink', r: -6, href: '/laptop-rental/' },
-  { label: 'Asset-tagged and labelled', icon: 'tag', hue: 'paper', r: 4, href: '/laptop-rental/' },
-  { label: 'Rack servers', icon: 'server', hue: 'green', r: -3, href: '/server-rental/' },
-  { label: 'MacBook Air and Pro', icon: 'laptop-minimal', hue: 'paper', r: 7, href: '/macbook-rental/' },
-  { label: 'Desktops with monitors', icon: 'monitor', hue: 'blue', r: -9, href: '/desktop-rental/' },
-  { label: 'Apple iMac', icon: 'monitor', hue: 'red', r: 5, href: '/macbook-rental/' },
-  { label: 'Dell Latitudes', icon: 'laptop', hue: 'ink', r: 12, href: '/laptop-rental/' },
-  { label: 'Windows and Office pre-installed', icon: 'package-check', hue: 'paper', r: -4, href: '/laptop-rental/' },
-  { label: 'ThinkCentre desktops', icon: 'monitor-smartphone', hue: 'green', r: 8, href: '/desktop-rental/' },
-  { label: 'Android and iPhone', icon: 'smartphone', hue: 'amber', r: -11, href: '/mobile-phone-rental/' },
-  { label: 'HP EliteBooks', icon: 'laptop', hue: 'ink', r: 3, href: '/laptop-rental/' },
-  { label: 'Routers and Wi-Fi', icon: 'router', hue: 'green', r: -7, href: '/router-rental/' },
-  { label: 'Mini PCs', icon: 'cpu', hue: 'blue', r: 10, href: '/desktop-rental/' },
-  { label: 'Replacement if one fails', icon: 'refresh-ccw', hue: 'red', r: -2, href: '/support/' },
-  { label: '24" monitors', icon: 'monitor', hue: 'paper', r: 6, href: '/monitor-rental/' },
+/** What we rent, as a calm row of neutral pills. */
+const rentables: { label: string; icon: string; href: string }[] = [
+  { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/laptop-rental/' },
+  { label: 'Dell Latitude', icon: 'laptop', href: '/laptop-rental/' },
+  { label: 'HP EliteBook', icon: 'laptop', href: '/laptop-rental/' },
+  { label: 'MacBook Air and Pro', icon: 'laptop-minimal', href: '/macbook-rental/' },
+  { label: 'Desktops and mini PCs', icon: 'monitor-smartphone', href: '/desktop-rental/' },
+  { label: 'Monitors', icon: 'monitor', href: '/monitor-rental/' },
+  { label: 'Rack servers', icon: 'server', href: '/server-rental/' },
+  { label: 'Routers and Wi-Fi', icon: 'router', href: '/router-rental/' },
+  { label: 'Android and iPhone', icon: 'smartphone', href: '/mobile-phone-rental/' },
 ];
 
 /**
- * Decorative icons from the Visual Asset Library (laptop set + hardware set),
- * scattered around the laptop like objects on a desk. side: which edge they hug,
- * x: px beyond that edge, y: % of laptop height, s: icon size, t: tile or bare.
+ * A field of thin library icons (laptop set + hardware set) around the laptop.
+ * Positions come from a fixed seed so every build looks the same.
  */
-const floaters: { name: string; badge?: string; side: 'l' | 'r'; x: number; y: number; s: number; r: number; t?: boolean; d: number }[] = [
-  { name: 'laptop-minimal', side: 'l', x: 150, y: 2, s: 30, r: -8, t: true, d: 0 },
-  { name: 'wifi', side: 'l', x: 52, y: 17, s: 30, r: 6, d: 1.2 },
-  { name: 'laptop', badge: 'check', side: 'l', x: 128, y: 30, s: 28, r: 5, t: true, d: 2.1 },
-  { name: 'server', side: 'l', x: 48, y: 47, s: 32, r: -4, d: 0.6 },
-  { name: 'laptop', badge: 'lock', side: 'l', x: 158, y: 60, s: 30, r: -10, t: true, d: 1.7 },
-  { name: 'mouse', side: 'l', x: 62, y: 77, s: 26, r: 12, d: 2.6 },
-  { name: 'laptop', badge: 'chart-column', side: 'l', x: 120, y: 92, s: 28, r: 7, t: true, d: 0.9 },
-  { name: 'monitor', side: 'r', x: 140, y: 4, s: 30, r: 7, t: true, d: 0.4 },
-  { name: 'laptop', badge: 'refresh-cw', side: 'r', x: 50, y: 19, s: 30, r: -6, d: 2.3 },
-  { name: 'smartphone', side: 'r', x: 156, y: 33, s: 28, r: -9, t: true, d: 1.1 },
-  { name: 'router', side: 'r', x: 58, y: 49, s: 32, r: 4, d: 0.2 },
-  { name: 'laptop', badge: 'clock', side: 'r', x: 132, y: 62, s: 30, r: 8, t: true, d: 1.9 },
-  { name: 'cloud-upload', side: 'r', x: 46, y: 79, s: 30, r: -5, d: 2.8 },
-  { name: 'laptop', badge: 'map-pin', side: 'r', x: 150, y: 93, s: 28, r: -7, t: true, d: 0.7 },
+const pool: [string, string?][] = [
+  ['laptop'], ['laptop', 'check'], ['laptop', 'lock'], ['laptop', 'clock'], ['laptop', 'map-pin'], ['laptop', 'refresh-cw'],
+  ['laptop', 'shield'], ['laptop', 'zap'], ['laptop', 'calendar'], ['laptop', 'headphones'], ['laptop', 'briefcase'], ['laptop', 'chart-column'],
+  ['laptop-minimal'], ['monitor'], ['server'], ['smartphone'], ['tablet'], ['wifi'], ['router'], ['cloud-upload'], ['keyboard'],
+  ['mouse'], ['webcam'], ['printer'], ['hard-drive'], ['usb'], ['ethernet-port'], ['plug-zap'], ['battery'], ['power'], ['cpu'], ['projector'],
 ];
+let seed = 20130;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+const floaters: { name: string; badge?: string; side: 'l' | 'r'; x: number; y: number; s: number; r: number; o: number; d: number }[] = [];
+const cols = [34, 96, 158, 220]; // px out from the laptop edge
+const rows = 9;
+let k = 0;
+for (const side of ['l', 'r'] as const) {
+  for (let row = 0; row < rows; row++) {
+    for (let c = 0; c < cols.length; c++) {
+      if (rnd() < 0.28) continue; // gaps so it reads as scattered, not a grid
+      const [name, badge] = pool[(k++ * 7 + row * 3 + c) % pool.length];
+      floaters.push({
+        name, badge, side,
+        x: cols[c] + Math.round((rnd() - 0.5) * 30),
+        y: Math.round(((row + 0.5) / rows) * 100 + (rnd() - 0.5) * 7),
+        s: 20 + Math.round(rnd() * 12),
+        r: Math.round((rnd() - 0.5) * 18),
+        o: +(0.14 + rnd() * 0.2 - c * 0.02).toFixed(2),
+        d: +(rnd() * 6).toFixed(1),
+      });
+    }
+  }
+}
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
 <section class="hero" aria-labelledby="hero-title">
+  <div class="glow" aria-hidden="true"></div>
   <div class="wrap">
-  <div class="laptop">
-  <div class="floaters" aria-hidden="true">
-    {floaters.map((f) => (
-      <span
-        class:list={['fl', f.t ? 'fl--tile' : 'fl--bare']}
-        style={`${f.side === 'l' ? 'right' : 'left'}:calc(100% + ${f.x - (f.t ? 64 : f.s + 8)}px * var(--k)); top:${f.y}%; --r:${f.r}deg; --d:${f.d}s;${f.t ? '' : ` width:${f.s + 8}px; height:${f.s + 8}px;`}`}
-      >
-        <Icon name={f.name} badge={f.badge} size={f.t ? 34 : f.s + 8} stroke={1.5} />
-      </span>
-    ))}
-  </div>
-  <div class="lid">
-  <span class="cam" aria-hidden="true"></span>
-  <div class="screen grid-paper hero-inner">
-    <p class="since"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
-    <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
-    <p class="lead">
-      Laptops, desktops, MacBooks, servers, networking and phones on rent across India.
-      Configured before they ship. Supported until they come back.
-    </p>
-    <div class="ctas">
-      <a href="/request-a-quote/" class="btn btn--primary btn--lg" data-track-location="hero">Get a quote</a>
-      <a href={whatsappLink()} class="btn btn--lg btn--wa" target="_blank" rel="noopener" data-track-location="hero"><Icon name="whatsapp" />WhatsApp us</a>
-      <a href="/equipment/" class="link-arrow">Explore equipment <Icon name="arrow-right" /></a>
+    <div class="laptop">
+      <div class="floaters" aria-hidden="true">
+        {floaters.map((f) => (
+          <span
+            class="fl"
+            style={`${f.side === 'l' ? 'right' : 'left'}:calc(100% + ${f.x - f.s}px * var(--k)); top:${f.y}%; width:${f.s}px; height:${f.s}px; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s`}
+          >
+            <Icon name={f.name} badge={f.badge} size={f.s} stroke={1.25} />
+          </span>
+        ))}
+      </div>
+
+      <div class="lid">
+        <span class="cam" aria-hidden="true"></span>
+        <div class="screen hero-inner">
+          <p class="since mono"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
+          <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
+          <p class="lead">
+            Laptops, desktops, MacBooks, servers, networking and phones on rent across India.
+            Configured before they ship. Supported until they come back.
+          </p>
+          <div class="ctas">
+            <a href="/request-a-quote/" class="btn btn--primary btn--lg" data-track-location="hero">Get a quote</a>
+            <a href={whatsappLink()} class="btn btn--lg btn--wa" target="_blank" rel="noopener" data-track-location="hero"><Icon name="whatsapp" />WhatsApp us</a>
+          </div>
+          {trust.length > 0 && (
+            <ul class="trust" role="list">
+              {trust.map((t) => <li><Icon name="check" size={15} stroke={2} />{t.short}</li>)}
+            </ul>
+          )}
+        </div>
+      </div>
+      <div class="deck" aria-hidden="true"><span class="notch"></span></div>
     </div>
-    {trust.length > 0 && (
-      <ul class="trust" role="list">
-        {trust.map((t) => <li><Icon name="check" size={18} stroke={2.5} />{t.short}</li>)}
+
+    <nav class="rentables" aria-label="What you can rent">
+      <ul role="list">
+        {rentables.map((c) => <li><a href={c.href} class="pill"><Icon name={c.icon} size={15} />{c.label}</a></li>)}
       </ul>
-    )}
-  </div>
-  </div>
-  <div class="deck" aria-hidden="true"><span class="notch"></span></div>
-  </div>
+      <a class="link-arrow explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+    </nav>
   </div>
 
-  <div class="pile-wrap">
-    <ul class="pile" role="list" aria-label="What you can rent">
-      {pile.map((c, i) => (
-        <li style={`--r:${c.r}deg; --i:${i}`}>
-          <a href={c.href} class={`chip chip--${c.hue}`}><Icon name={c.icon} />{c.label}</a>
-        </li>
-      ))}
-    </ul>
-  </div>
-
-  <ClientMarquee />
+  <ClientMarquee tone="dark" />
 </section>
 
 <style>
-    .hero { position: relative; overflow: hidden; padding-top: clamp(24px, 4vw, 56px); border-bottom: 1.5px solid var(--ink); background: var(--paper-2); }
+  .hero {
+    position: relative; overflow: hidden; color: var(--on-dark);
+    /* extend up under the floating header */
+    margin-top: -80px;
+    padding-top: calc(80px + clamp(28px, 4vw, 56px));
+    background:
+      radial-gradient(60% 45% at 50% 38%, rgba(122, 32, 24, .38) 0%, transparent 70%),
+      radial-gradient(90% 60% at 50% 110%, rgba(58, 21, 18, .7) 0%, transparent 70%),
+      var(--night);
+  }
+  /* fine dot texture for depth */
+  .glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(rgba(243,238,229,.07) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(80% 70% at 50% 40%, #000 30%, transparent 85%);
+  }
   .hero-inner { display: grid; justify-items: center; text-align: center; }
 
   /* The laptop */
-  .laptop { position: relative; max-width: 1180px; margin: 0 auto; }
-  @media (min-width: 1280px) { .laptop { max-width: 1080px; } }
-
-  /* Library icons scattered around the laptop, behind everything */
-  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --icon-accent: var(--red-ink); --k: 1; }
-  @media (max-width: 1439px) { .floaters { --k: .35; } }
-  .fl :global(svg) { max-width: none; flex: none; }
-  .lid, .deck { z-index: 1; }
-  .fl { position: absolute; display: grid; place-items: center; transform: rotate(var(--r)); color: var(--ink-2); }
-  .fl--tile {
-    width: 64px; height: 64px; border-radius: 18px;
-    background: color-mix(in srgb, var(--card) 70%, transparent);
-    border: 1px solid var(--line-strong);
-    box-shadow: 0 10px 24px -16px rgba(23,20,15,.45);
-    opacity: .78;
+  .laptop { position: relative; max-width: 1160px; margin: 0 auto; }
+  @media (min-width: 1280px) { .laptop { max-width: 1040px; } }
+  .lid {
+    position: relative; z-index: 1; width: 94%; margin: 0 auto;
+    background: linear-gradient(180deg, #0c0a09, #050404);
+    border-radius: 22px 22px 6px 6px;
+    padding: clamp(8px, 1.4vw, 16px) clamp(8px, 1.4vw, 16px) clamp(10px, 1.8vw, 20px);
+    box-shadow:
+      inset 0 0 0 1px rgba(243,238,229,.10),
+      0 0 0 1px rgba(0,0,0,.6),
+      0 50px 120px -30px rgba(0,0,0,.9),
+      0 0 140px -20px rgba(185,41,30,.25);
   }
-  .fl--bare { opacity: .5; }
+  .cam { position: absolute; top: clamp(2px, .55vw, 6px); left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; }
+  .screen {
+    color: var(--ink);
+    border-radius: 10px 10px 2px 2px; overflow: hidden;
+    background: radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
+    padding: clamp(36px, 5.5vw, 76px) clamp(16px, 4vw, 56px) clamp(32px, 4.5vw, 56px);
+  }
+  .deck {
+    position: relative; z-index: 1; height: clamp(12px, 1.5vw, 18px); margin-top: -1px;
+    background: linear-gradient(180deg, #d6cfc3 0%, #b2aa9d 45%, #7d766c 100%);
+    border-radius: 2px 2px 20px 20px / 2px 2px 12px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 18px 30px -12px rgba(0,0,0,.8);
+  }
+  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #9d9588, #b9b1a4); border-radius: 0 0 9px 9px; }
+
+  .since {
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-6);
+    padding: 7px 14px; border-radius: var(--r-pill); border: 1px solid var(--line-strong);
+    color: var(--ink-2);
+  }
+  .since-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 3px rgba(224,51,40,.15); }
+  .display { max-width: 16ch; font-size: clamp(2.6rem, 1.1rem + 5.6vw, 6.25rem); }
+  .lead { margin: var(--s-5) auto 0; max-width: 52ch; }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-3); margin-top: var(--s-6); }
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: var(--s-6); list-style: none; font-size: var(--fs-xs); color: var(--ink-2); }
+  .trust li { display: inline-flex; align-items: center; gap: 6px; }
+  .trust :global(svg) { color: var(--red-ink); }
+
+  /* Icon field */
+  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --k: 1; --icon-accent: var(--red-soft); }
+  @media (max-width: 1439px) { .floaters { --k: .55; } }
+  .fl { position: absolute; display: grid; place-items: center; color: var(--on-dark); opacity: var(--o); transform: rotate(var(--r)); }
+  .fl :global(svg) { max-width: none; flex: none; }
   @media (prefers-reduced-motion: no-preference) {
-    .fl { animation: drift 9s ease-in-out infinite alternate; animation-delay: calc(var(--d) * -1); }
+    .fl { animation: drift 11s ease-in-out infinite alternate; animation-delay: calc(var(--d) * -1); }
     @keyframes drift {
-      from { transform: translateY(-5px) rotate(var(--r)); }
-      to { transform: translateY(6px) rotate(calc(var(--r) * -0.5)); }
+      from { transform: translateY(-4px) rotate(var(--r)); }
+      to { transform: translateY(5px) rotate(calc(var(--r) * -0.4)); }
     }
   }
   @media (max-width: 1099px) { .floaters { display: none; } }
-  .lid {
-    position: relative; width: 94%; margin: 0 auto;
-    background: var(--ink); border-radius: 26px 26px 6px 6px;
-    padding: clamp(8px, 1.6vw, 18px) clamp(8px, 1.6vw, 18px) clamp(10px, 2vw, 22px);
-    box-shadow: 0 0 0 1.5px var(--ink), 0 40px 60px -40px rgba(23,20,15,.6);
-  }
-  .cam { position: absolute; top: clamp(2px, .6vw, 7px); left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #3a352e; box-shadow: inset 0 0 0 1.5px #4d473f; }
-  .screen {
-    border-radius: 12px 12px 2px 2px; background-color: var(--paper); overflow: hidden;
-    padding: clamp(36px, 6vw, 80px) clamp(16px, 4vw, 56px) clamp(36px, 5vw, 64px);
-  }
-  .deck {
-    position: relative; height: clamp(14px, 1.8vw, 22px); margin-top: -1px;
-    background: linear-gradient(180deg, #E7DFD0 0%, #D3C8B5 55%, #B9AE9B 100%);
-    border: 1.5px solid var(--ink); border-radius: 2px 2px 22px 22px / 2px 2px 14px 14px;
-  }
-  .notch { position: absolute; top: -1.5px; left: 50%; width: 16%; height: 45%; transform: translateX(-50%); background: #C8BCA8; border: 1.5px solid var(--ink); border-top: 0; border-radius: 0 0 10px 10px; }
 
-  .since {
-    display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-5);
-    padding: 8px 16px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line);
-    box-shadow: var(--shadow-soft); font-weight: 600; font-size: var(--fs-small);
+  /* What we rent */
+  .rentables { display: grid; justify-items: center; gap: var(--s-4); padding: clamp(36px, 5vw, 56px) 0 clamp(40px, 5vw, 64px); position: relative; z-index: 1; }
+  .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; list-style: none; max-width: 980px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-pill);
+    border: 1px solid var(--hair-dark); background: rgba(243,238,229,.03);
+    color: var(--on-dark-2); font-size: .875rem; text-decoration: none; white-space: nowrap;
+    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
   }
-  .since-dot { width: 10px; height: 10px; border-radius: 3px; background: var(--red); box-shadow: 4px 4px 0 -1px var(--red-tint); }
-  .display { max-width: 16ch; font-size: clamp(2.75rem, 1.2rem + 6.6vw, 7.5rem); }
-  .lead { margin: var(--s-5) auto 0; color: var(--ink-2); max-width: 54ch; }
-  .ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-4) var(--s-5); margin-top: var(--s-6); }
-  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: var(--s-6); list-style: none; font-weight: 600; font-size: var(--fs-small); }
-  .trust li { display: inline-flex; align-items: center; gap: 6px; }
-  .trust :global(svg) { color: var(--green); }
+  .pill:hover { border-color: var(--hair-dark-strong); color: var(--on-dark); background: rgba(243,238,229,.06); }
+  .explore { color: var(--on-dark); font-size: var(--fs-small); }
 
-  .pile-wrap { position: relative; margin-top: clamp(14px, 2.2vw, 30px); padding-inline: var(--gutter); z-index: 1; }
-  .pile {
-    display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
-    max-width: 1180px; margin: 0 auto; list-style: none; padding: 0 0 var(--s-7);
-  }
-  .pile li { margin: 0 -2px; transform: rotate(var(--r)); }
-  .pile .chip {
-    font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1.0625rem); padding: 10px 18px 10px 14px;
-    text-decoration: none; box-shadow: 0 2px 0 rgba(23,20,15,.25), 0 10px 18px -12px rgba(23,20,15,.6);
-    transition: transform var(--t-fast) var(--ease-out);
-  }
-  .pile .chip:hover { transform: translateY(-4px) rotate(calc(var(--r) * -0.4)); text-decoration: none; }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .pile li { animation: drop 800ms var(--ease-spring) both; animation-delay: calc(200ms + var(--i) * 40ms); }
-    @keyframes drop {
-      0% { transform: translateY(-110vh) rotate(calc(var(--r) * 3)); }
-      100% { transform: translateY(0) rotate(var(--r)); }
-    }
-  }
   @media (max-width: 639px) {
-    .since { font-size: var(--fs-xs); padding: 6px 12px; }
+    .since { font-size: .6875rem; padding: 6px 12px; }
     .since-long { display: none; }
-    .pile li:nth-child(n + 11) { display: none; }
-    .pile li { margin: 0 -2px; }
+    .rentables li:nth-child(n + 7) { display: none; }
   }
 </style>

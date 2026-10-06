@@ -115,8 +115,8 @@ These are marked in the code or currently published at your request. Please revi
 ## Design system
 
 - **Colour:** paper `#F3EEE5`, ink `#17140F`, logo red `#E03328` (large shapes) and `#C42B1F` (text and buttons, 5.7:1 with white), plus green/blue/amber used only to tell equipment families apart. Tokens are in `src/styles/global.css`.
-- **Type:** Barlow Condensed 800 (uppercase display), Barlow 400–700 (text). Self-hosted, no Google Fonts request.
-- **Signature elements:** the chip pile in the hero (the one load animation, disabled under reduced motion), chunky offset-shadow buttons, the grid-paper background, spec-sheet product cards.
+- **Type:** Newsreader (display serif, optical sizing), Geist (text), Geist Mono (small labels). Self-hosted, no Google Fonts request.
+- **Signature elements:** the laptop hero on a wine-black stage with a field of faint library icons, serif headlines, hairline structure, spec-sheet product cards. One accent colour (logo red).
 - **Icons:** Lucide geometry with a corner "service-state" badge in the accent colour, following the Visual Asset Library (`src/components/Icon.astro`, e.g. `<Icon name="laptop" badge="clock" />`).
 - **Map:** official outline of India from `@svg-maps/india` (CC BY 4.0, credited on the map). Pins are projected from real coordinates in `src/data/geo.ts`.
 

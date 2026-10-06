@@ -82,7 +82,7 @@ const schema = [
       <div class="wrap">
         <div class="head-row">
           <div class="section-head">
-            <h2 id="models-title" class="h2">{cat.noun} in our range</h2>
+            <h2 id="models-title" class="h2">{cat.noun.charAt(0).toUpperCase() + cat.noun.slice(1)} in our range</h2>
             <p class="lead">Models we rent regularly. Ask for anything not shown.</p>
           </div>
           <a class="link-arrow" href={`/equipment/?category=${cat.id}`}>Filter in the catalogue <Icon name="arrow-right" /></a>
@@ -153,28 +153,28 @@ const schema = [
 </Base>
 
 <style>
-  .included { box-shadow: var(--shadow-block); border: 1.5px solid var(--ink); }
+  .included { box-shadow: var(--shadow-block); border: 1px solid var(--line-strong); }
   .inc-icon { display: inline-grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; background: var(--paper-2); margin-bottom: var(--s-4); }
   .included h2 { margin-bottom: var(--s-3); }
   .included ul { display: grid; gap: 10px; list-style: none; }
   .included li { display: flex; gap: 10px; align-items: flex-start; font-weight: 500; }
   .included li :global(svg) { color: var(--green); flex: none; margin-top: 3px; }
 
-  .tiers { border-top: 1.5px solid var(--ink); }
+  .tiers { border-top: 1px solid var(--line-strong); }
   .tr { display: grid; grid-template-columns: 1fr; gap: 4px 24px; padding: 18px 0; border-bottom: 1px solid var(--line-strong); align-items: center; }
   .th { display: none; }
   @media (min-width: 860px) {
     .tr { grid-template-columns: 1.1fr 1.6fr 1.6fr auto; }
     .th { display: grid; font-weight: 600; font-size: var(--fs-small); color: var(--ink-2); padding: 12px 0; }
   }
-  .tier-name { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.5rem; line-height: 1.05; }
+  .tier-name { font-family: var(--font-display); font-weight: 400; font-size: 1.5rem; line-height: 1.05; }
   .tier-spec { font-weight: 600; }
 
   .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
   .head-row .section-head { margin-bottom: 0; }
   .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
   .uses { display: grid; gap: var(--s-6) var(--s-7); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); list-style: none; }
-  .uses li { border-top: 1.5px solid var(--ink); padding-top: var(--s-4); }
+  .uses li { border-top: 1px solid var(--line-strong); padding-top: var(--s-4); }
   .uses h3 { margin-bottom: var(--s-2); }
   .city-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 4px 24px; list-style: none; }
   .city-links li { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
@@ -183,5 +183,5 @@ const schema = [
   @media (min-width: 1000px) { .qf-layout { grid-template-columns: 1fr 1fr; } }
   .qf-layout .lead { margin-top: var(--s-4); }
   .faq-h { margin: var(--s-7) 0 var(--s-3); }
-  .form-panel { border: 1.5px solid var(--ink); box-shadow: var(--shadow-block); }
+  .form-panel { border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
 </style>

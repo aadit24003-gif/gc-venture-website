@@ -22,7 +22,7 @@ const { waMessage } = Astro.props;
     position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar);
     display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px;
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-    background: var(--card); border-top: 1.5px solid var(--ink);
+    background: var(--card); border-top: 1px solid var(--line-strong);
   }
   .mb-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
@@ -30,11 +30,11 @@ const { waMessage } = Astro.props;
     border: 1.5px solid var(--line-strong);
   }
   .mb-item.wa :global(svg) { color: var(--whatsapp); }
-  .mb-item.quote { background: var(--red-ink); color: #fff; border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+  .mb-item.quote { background: var(--red-ink); color: #fff; border-color: var(--red-ink); }
   .wa-fab {
     display: none; position: fixed; right: 24px; bottom: 24px; z-index: var(--z-bar);
     width: 60px; height: 60px; place-items: center; border-radius: 50%;
-    background: var(--whatsapp); color: #fff; border: 2px solid var(--ink); box-shadow: var(--shadow-block-sm);
+    background: var(--whatsapp); color: #fff; border: 0; box-shadow: 0 12px 28px -10px rgba(18,140,74,.6);
     transition: transform var(--t-fast) var(--ease-out);
   }
   .wa-fab:hover { transform: translate(-1px, -1px) scale(1.04); }

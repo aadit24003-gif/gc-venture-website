@@ -22,7 +22,7 @@ const list = items.filter((c) => c.id !== exclude);
 </ul>
 
 <style>
-  .cat-index { display: grid; grid-template-columns: 1fr; border-top: 1.5px solid var(--ink); }
+  .cat-index { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--line-strong); }
   @media (min-width: 860px) { .cat-index { grid-template-columns: 1fr 1fr; column-gap: var(--s-7); } }
   .row {
     display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--s-4);
@@ -30,15 +30,11 @@ const list = items.filter((c) => c.id !== exclude);
     transition: background var(--t-fast), padding var(--t-med) var(--ease-out);
   }
   .row:hover { background: var(--card); padding-inline: 14px; text-decoration: none; }
-  .ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; border: 1.5px solid var(--ink); }
-  .hue-ink { background: var(--ink); color: var(--paper); }
-  .hue-red { background: var(--red-ink); color: #fff; }
-  .hue-green { background: var(--green); color: #fff; }
-  .hue-blue { background: var(--blue); color: #fff; }
-  .hue-amber { background: var(--amber); color: var(--ink); }
-  .hue-paper { background: var(--card); color: var(--ink); }
-  .name { display: block; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); line-height: 1; }
+  .ico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--line-strong); }
+  .ico { background: var(--card); color: var(--ink); transition: color var(--t-fast), border-color var(--t-fast); }
+  .row:hover .ico { color: var(--red-ink); border-color: var(--red-ink); }
+  .name { display: block; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 1.25rem + .8vw, 1.875rem); line-height: 1.1; letter-spacing: -0.015em; }
   .blurb { display: block; color: var(--ink-2); font-size: var(--fs-small); margin-top: 4px; }
-  .go { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--line-strong); transition: background var(--t-fast), color var(--t-fast), transform var(--t-med) var(--ease-out); }
+  .go { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-strong); transition: background var(--t-fast), color var(--t-fast), transform var(--t-med) var(--ease-out); }
   .row:hover .go { background: var(--ink); color: var(--paper); border-color: var(--ink); transform: rotate(45deg); }
 </style>
