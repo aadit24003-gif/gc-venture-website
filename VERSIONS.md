@@ -18,6 +18,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v9 | `29275ea` | Full laptop catalogue (100 laptops), configuration picker, MacBook Air/Pro 2019 to M5 | https://claude.ai/artifact/9sizkP5wqunBqaB3iGpmFm |
 | v10 | `de8abdf` | Supplied HP, Dell and Mac photos on every matching model | https://claude.ai/artifact/DXtfyuobPi1syq3ttZdtRr |
 | v11 | `3e2087a` | Paper grain and warm washes on the cream backgrounds | https://claude.ai/artifact/GC513KaKyyVwr9V17qvvYx |
+| v12 | `665bf0c` | Larger About hero photo, aligned to the heading and buttons | https://claude.ai/artifact/RRPJ5BJBTNn9eBeVaDSmAF |
 
 ## Going back to a version
 
