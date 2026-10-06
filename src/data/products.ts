@@ -74,17 +74,16 @@ export interface Product {
 }
 
 /**
- * Representative photos (Pexels licence: free for commercial use, no attribution required).
+ * Representative photos. HP, Dell and Mac photos were supplied by IT Rental Solutions;
+ * the rest are from Pexels (free for commercial use, no attribution required).
  * Replace with your own photos of actual stock when available.
  */
 const PHOTOS = {
   thinkpad: { file: 'lenovo-thinkpad', credit: 'https://www.pexels.com/photo/3550482/', what: 'Lenovo ThinkPad laptop' },
   lenovo: { file: 'lenovo-laptop', credit: 'https://www.pexels.com/photo/9229975/', what: 'Lenovo business laptop' },
-  dellSilver: { file: 'dell-laptop-silver', credit: 'https://www.pexels.com/photo/9474023/', what: 'Dell laptop' },
-  dellBlack: { file: 'dell-laptop-black', credit: 'https://www.pexels.com/photo/1466609/', what: 'Dell laptop on an office desk' },
-  hp: { file: 'hp-laptop', credit: 'https://www.pexels.com/photo/13823992/', what: 'HP business laptop' },
-  macAir: { file: 'apple-macbook-air', credit: 'https://www.pexels.com/photo/3693732/', what: 'Apple MacBook Air' },
-  macPro: { file: 'apple-macbook-pro', credit: 'https://www.pexels.com/photo/693859/', what: 'Apple MacBook Pro' },
+  dell: { file: 'dell-laptop-studio', credit: 'Supplied by IT Rental Solutions', what: 'Dell laptop' },
+  hp: { file: 'hp-laptop-studio', credit: 'Supplied by IT Rental Solutions', what: 'HP laptop' },
+  mac: { file: 'macbook-air-lifestyle', credit: 'Supplied by IT Rental Solutions', what: 'Apple MacBook' },
   imac: { file: 'apple-imac', credit: 'https://www.pexels.com/photo/41227/', what: 'Apple iMac on a desk' },
   desktops: { file: 'office-desktops', credit: 'https://www.pexels.com/photo/990423/', what: 'Row of office desktop computers' },
   seat: { file: 'monitor-keyboard-desk', credit: 'https://www.pexels.com/photo/1714341/', what: 'Desktop seat with monitor and keyboard' },
@@ -138,7 +137,7 @@ const BASE_PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['8th Gen'],
     ram: '16 GB', ram_gb: 16, storage: '512 GB SSD', storage_gb: 512, display_size: '14"',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Business', 'Project ready'], images: photo('dellSilver', 'Dell Latitude 7490'),
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Business', 'Project ready'], images: photo('dell', 'Dell Latitude 7490'),
     description: 'Dell’s premium 14-inch business laptop, available with up to 16 GB of memory for heavy multitasking and long working days.',
     use_cases: ['Analysts and consultants', 'Project teams', 'Managers'],
   },
@@ -147,7 +146,7 @@ const BASE_PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['6th Gen'],
     ram: '16 GB', ram_gb: 16, storage: '256 GB SSD', storage_gb: 256, display_size: '14"',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('dellBlack', 'Dell Latitude 7470'),
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('dell', 'Dell Latitude 7470'),
     description: 'A slim Latitude, available with up to 16 GB of memory at an accessible rental cost, for teams that keep many applications open.',
     use_cases: ['Operations teams', 'Back office', 'Training'],
   },
@@ -184,7 +183,7 @@ const BASE_PRODUCTS: Product[] = [
     category: 'macbooks', subcategory: 'MacBook Air',
     processor_brand: 'Apple', operating_system: 'macOS',
     configs: MACBOOK_AIR, defaultConfig: 2, configLabel: 'Generation',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac'], images: photo('macAir', 'Apple MacBook Air'),
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac'], images: photo('mac', 'Apple MacBook Air'),
     description: 'Silent, light and long-lasting on battery. The default Mac for product, marketing and leadership teams. Choose any generation from the 2019 Intel models to the latest M5, in 13 or 15 inches.',
     use_cases: ['Product and marketing teams', 'Leadership', 'Presentations and events'],
   },
@@ -193,7 +192,7 @@ const BASE_PRODUCTS: Product[] = [
     category: 'macbooks', subcategory: 'MacBook Pro',
     processor_brand: 'Apple', operating_system: 'macOS',
     configs: MACBOOK_PRO, defaultConfig: 5, configLabel: 'Generation',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac', 'High performance'], images: photo('macPro', 'Apple MacBook Pro'),
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac', 'High performance'], images: photo('mac', 'Apple MacBook Pro'),
     description: 'Sustained performance for builds, design tools and media work. Choose any generation from the 2019 Intel models to M5 Pro and M5 Max, in 13, 14 or 16 inches.',
     use_cases: ['iOS and macOS development', 'Design and video', 'Engineering contractors'],
   },
@@ -317,7 +316,7 @@ function eraCopy(rank: number, compact: boolean) {
 }
 
 const PHOTO_FOR = (brand: string, tier: string): keyof typeof PHOTOS =>
-  brand === 'HP' ? 'hp' : brand === 'Lenovo' ? (tier === 'value' ? 'lenovo' : 'thinkpad') : tier === 'premium' || tier === 'flagship' ? 'dellSilver' : 'dellBlack';
+  brand === 'HP' ? 'hp' : brand === 'Lenovo' ? (tier === 'value' ? 'lenovo' : 'thinkpad') : 'dell';
 
 /** Old-site names that match a catalogue model under a different spelling. */
 const ALIASES: Record<string, string> = { 'Dell Latitude E7470': 'dell-latitude-7470' };
