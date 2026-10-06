@@ -2,12 +2,15 @@
 import Icon from './Icon.astro';
 import ClientMarquee from './ClientMarquee.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
+import { PRODUCTS } from '../data/products';
 
-/** What we rent, as a calm row of neutral pills. */
-const rentables: { label: string; icon: string; href: string }[] = [
-  { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/laptop-rental/' },
-  { label: 'Dell Latitude', icon: 'laptop', href: '/laptop-rental/' },
-  { label: 'HP EliteBook', icon: 'laptop', href: '/laptop-rental/' },
+const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'laptops' && p.brand === brand).length;
+
+/** What we rent. Brand pills open the catalogue already filtered, with the number of models. */
+const rentables: { label: string; icon: string; href: string; count?: number }[] = [
+  { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/equipment/?category=laptops&brand=Lenovo', count: laptopsBy('Lenovo') },
+  { label: 'Dell Latitude', icon: 'laptop', href: '/equipment/?category=laptops&brand=Dell', count: laptopsBy('Dell') },
+  { label: 'HP EliteBook', icon: 'laptop', href: '/equipment/?category=laptops&brand=HP', count: laptopsBy('HP') },
   { label: 'MacBook Air and Pro', icon: 'laptop-minimal', href: '/macbook-rental/' },
   { label: 'Desktops and mini PCs', icon: 'monitor-smartphone', href: '/desktop-rental/' },
   { label: 'Monitors', icon: 'monitor', href: '/monitor-rental/' },
@@ -92,9 +95,18 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
     <nav class="rentables" aria-label="What you can rent">
       <ul role="list">
-        {rentables.map((c) => <li><a href={c.href} class="pill"><Icon name={c.icon} size={15} />{c.label}</a></li>)}
+        {rentables.map((c) => (
+          <li>
+            <a href={c.href} class="pill">
+              <Icon name={c.icon} size={18} stroke={1.75} />
+              <span>{c.label}</span>
+              {c.count ? <span class="count num">{c.count}<span class="sr-only"> models</span></span> : null}
+              <span class="go" aria-hidden="true"><Icon name="arrow-up-right" size={14} stroke={2} /></span>
+            </a>
+          </li>
+        ))}
       </ul>
-      <a class="link-arrow explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+      <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
     </nav>
   </div>
 
@@ -179,15 +191,24 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
   /* What we rent */
   .rentables { display: grid; justify-items: center; gap: var(--s-4); padding: clamp(36px, 5vw, 56px) 0 clamp(40px, 5vw, 64px); position: relative; z-index: 1; }
-  .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; list-style: none; max-width: 980px; }
+  .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; max-width: 880px; }
   .pill {
-    display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-pill);
-    border: 1px solid var(--hair-dark); background: rgba(243,238,229,.03);
-    color: var(--on-dark-2); font-size: .875rem; text-decoration: none; white-space: nowrap;
-    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px 10px 18px; border-radius: var(--r-pill);
+    border: 1px solid rgba(243,238,229,.28); background: rgba(243,238,229,.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px -16px rgba(0,0,0,.8);
+    color: var(--on-dark); font-size: 1rem; font-weight: 600; letter-spacing: -0.005em; text-decoration: none; white-space: nowrap;
+    transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease-out);
   }
-  .pill:hover { border-color: var(--hair-dark-strong); color: var(--on-dark); background: rgba(243,238,229,.06); }
-  .explore { color: var(--on-dark); font-size: var(--fs-small); }
+  .pill :global(svg) { color: var(--red-soft); flex: none; }
+  .pill .count { padding: 2px 8px; border-radius: var(--r-pill); background: rgba(243,238,229,.12); font-family: var(--font-mono); font-size: .75rem; font-weight: 500; color: var(--on-dark); }
+  .pill .go { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: rgba(243,238,229,.1); transition: background var(--t-fast), transform var(--t-fast) var(--ease-out); }
+  .pill .go :global(svg) { color: var(--on-dark); }
+  .pill:hover { border-color: var(--red-soft); background: rgba(224,51,40,.16); transform: translateY(-2px); }
+  .pill:hover .go { background: var(--red-ink); transform: rotate(45deg); }
+  .pill:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  .explore { margin-top: var(--s-2); --btn-bg: var(--paper); --btn-fg: var(--ink); --btn-bd: var(--paper); font-weight: 600; }
+  .explore:hover { --btn-bg: #fff; --btn-bd: #fff; }
+  @media (prefers-reduced-motion: reduce) { .pill, .pill .go { transition: none; } .pill:hover { transform: none; } .pill:hover .go { transform: none; } }
 
   @media (max-width: 639px) {
     .since { font-size: .6875rem; padding: 6px 12px; }
