@@ -15,7 +15,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v6 | `2f0b154` | Serif type, restrained palette, dark hero stage | (rebuild on request) |
 | v7 | `42dc259` | About page expanded (team, two partners, how we work) | (rebuild on request) |
 | v8 | `64e575c` | About with real photos, story below leadership | https://claude.ai/artifact/2phjS8Tk6wsS8wxbfMvFMi |
-| v9 | (this commit) | Full laptop catalogue (100 laptops), configuration picker, MacBook Air/Pro 2019 to M5 | (see below once published) |
+| v9 | `29275ea` | Full laptop catalogue (100 laptops), configuration picker, MacBook Air/Pro 2019 to M5 | https://claude.ai/artifact/9sizkP5wqunBqaB3iGpmFm |
 
 ## Going back to a version
 
