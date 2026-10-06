@@ -16,18 +16,26 @@ ErrorDocument 404 /404.html
   RewriteRule ^ https://itrentals.in%{REQUEST_URI} [L,R=301]
 
   # ── 301 redirects from the old WordPress site ─────────────
-  # Fill in from the old sitemap (itrentals.in/sitemap.xml) before launch.
-  # Map each old URL to the closest new page; never send everything to the home page.
-  # Examples (uncomment / edit once the old URLs are confirmed):
-  # RewriteRule ^raise-a-complaint/?$ /support/ [L,R=301]
-  # RewriteRule ^apple-laptop-rental/?$ /macbook-rental/ [L,R=301]
-  # RewriteRule ^laptop-on-rent/?$ /laptop-rental/ [L,R=301]
-  # RewriteRule ^desktop-on-rent/?$ /desktop-rental/ [L,R=301]
-  # RewriteRule ^about-us/?$ /about/ [L,R=301]
-  # RewriteRule ^contact-us/?$ /contact/ [L,R=301]
-  # RewriteRule ^laptop-on-rent-in-bengaluru/?$ /laptop-on-rent-in-bangalore/ [L,R=301]
-  # RewriteRule ^laptop-on-rent-in-gurugram/?$ /laptop-on-rent-in-gurgaon/ [L,R=301]
-  # RewriteRule ^laptop-on-rent-in-kochi/?$ /laptop-on-rent-in-kerala/ [L,R=301]
+  # Old pages found in Google's index (October 2026) and common WordPress addresses,
+  # each sent to the closest new page. The old city pages (/laptop-on-rent-in-pune/ etc.)
+  # and /about/ keep the same address, so they need no redirect.
+  # After launch, add any address that shows in Search Console > Pages > Not found (404).
+  RewriteRule ^services/?$ /equipment/ [L,R=301]
+  RewriteRule ^services/(laptop|desktop|macbook|monitor|server|router)-rental/?$ /$1-rental/ [L,R=301]
+  RewriteRule ^services/(apple|mac|macbook)[a-z-]*/?$ /macbook-rental/ [L,R=301]
+  RewriteRule ^services/(workstation|desktop|computer)[a-z-]*/?$ /desktop-rental/ [L,R=301]
+  RewriteRule ^services/(laptop|notebook)[a-z-]*/?$ /laptop-rental/ [L,R=301]
+  RewriteRule ^services/[a-z0-9-]+/?$ /it-equipment-rental/ [L,R=301]
+  RewriteRule ^why-should-you-laptop-on-rent/?$ /laptop-on-rent-in-bangalore/ [L,R=301]
+  RewriteRule ^laptop-on-rent/?$ /laptop-rental/ [L,R=301]
+  RewriteRule ^desktop-on-rent/?$ /desktop-rental/ [L,R=301]
+  RewriteRule ^apple-laptop-rental/?$ /macbook-rental/ [L,R=301]
+  RewriteRule ^about-us/?$ /about/ [L,R=301]
+  RewriteRule ^contact-us/?$ /contact/ [L,R=301]
+  RewriteRule ^raise-a-complaint/?$ /support/ [L,R=301]
+  RewriteRule ^laptop-on-rent-in-bengaluru/?$ /laptop-on-rent-in-bangalore/ [L,R=301]
+  RewriteRule ^laptop-on-rent-in-gurugram/?$ /laptop-on-rent-in-gurgaon/ [L,R=301]
+  RewriteRule ^laptop-on-rent-in-kochi/?$ /laptop-on-rent-in-kerala/ [L,R=301]
 
   # Old WordPress system paths
   RewriteRule ^wp-(admin|login\.php|content|includes)(/.*)?$ / [L,R=301]

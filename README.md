@@ -71,6 +71,8 @@ To test forms locally: `cd dist && php -S 127.0.0.1:8099` (add `127.0.0.1` to `a
 
 ## Deploying to the current hosting (cPanel)
 
+Step-by-step version for non-developers: see `LAUNCH-GUIDE.md`.
+
 1. **Back up the current WordPress site** (cPanel → Backup, or download `public_html` and export the database). Keep it until the new site has run cleanly for a few weeks.
 2. Run `npm run build`.
 3. In `public_html`, move the WordPress files into a backup folder, then upload **everything inside `dist/`**, including the hidden `.htaccess` files.
