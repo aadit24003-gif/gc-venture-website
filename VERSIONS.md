@@ -23,7 +23,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v14 | `de9b470` | Client names moved to a cream band between the dark hero and preparation sections | https://claude.ai/artifact/3j8Rzc9wuQdzc2nzsnFkKs |
 | v15 | `afaed00` | Bolder client names with red dot separators | https://claude.ai/artifact/NK2u6DT2aw2fcp99G317FW |
 | v16 | `ee3c059` | Review fixes: copy matches catalogue, new share image, schema and table tidy-up | https://claude.ai/artifact/H7w8mD3Q65EjfxRRsLpA5W |
-| v17 | (launch package) | Redirects for old itrentals.in addresses and LAUNCH-GUIDE.md; looks the same as v16 | same as v16 |
+| v17 | `fe0bd50` | Redirects for old itrentals.in addresses and LAUNCH-GUIDE.md; looks the same as v16 | same as v16 |
 
 ## Going back to a version
 
