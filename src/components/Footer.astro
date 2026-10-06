@@ -70,7 +70,10 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  .footer { background: var(--paper-2); border-top: 1px solid var(--line-strong); padding: var(--s-9) 0 calc(var(--s-6) + 76px); font-size: var(--fs-small); }
+  .footer {
+    background-color: var(--paper-2);
+    background-image: var(--grain), radial-gradient(50% 70% at 100% 0%, rgba(224, 51, 40, .05), transparent 70%), radial-gradient(50% 80% at 0% 100%, rgba(184, 138, 85, .12), transparent 70%);
+    background-size: 220px 220px, auto, auto; border-top: 1px solid var(--line-strong); padding: var(--s-9) 0 calc(var(--s-6) + 76px); font-size: var(--fs-small); }
   @media (min-width: 900px) { .footer { padding-bottom: var(--s-6); } }
   .top { display: grid; gap: var(--s-7); }
   @media (min-width: 1000px) { .top { grid-template-columns: 1fr 2fr; } }
