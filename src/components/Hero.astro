@@ -24,8 +24,12 @@ const pile: { label: string; icon: string; hue: string; r: number; href: string 
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
-<section class="hero grid-paper" aria-labelledby="hero-title">
-  <div class="wrap hero-inner">
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+  <div class="laptop">
+  <div class="lid">
+  <span class="cam" aria-hidden="true"></span>
+  <div class="screen grid-paper hero-inner">
     <p class="since"><span class="since-dot" aria-hidden="true"></span>Renting IT to Indian businesses since {SITE.founded}</p>
     <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
     <p class="lead">
@@ -43,6 +47,10 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
       </ul>
     )}
   </div>
+  </div>
+  <div class="deck" aria-hidden="true"><span class="notch"></span></div>
+  </div>
+  </div>
 
   <div class="pile-wrap">
     <ul class="pile" role="list" aria-label="What you can rent">
@@ -58,25 +66,46 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 </section>
 
 <style>
-  .hero { position: relative; overflow: hidden; padding-top: clamp(56px, 8vw, 104px); border-bottom: 1.5px solid var(--ink); }
+    .hero { position: relative; overflow: hidden; padding-top: clamp(24px, 4vw, 56px); border-bottom: 1.5px solid var(--ink); background: var(--paper-2); }
   .hero-inner { display: grid; justify-items: center; text-align: center; }
+
+  /* The laptop */
+  .laptop { position: relative; max-width: 1180px; margin: 0 auto; }
+  .lid {
+    position: relative; width: 94%; margin: 0 auto;
+    background: var(--ink); border-radius: 26px 26px 6px 6px;
+    padding: clamp(8px, 1.6vw, 18px) clamp(8px, 1.6vw, 18px) clamp(10px, 2vw, 22px);
+    box-shadow: 0 0 0 1.5px var(--ink), 0 40px 60px -40px rgba(23,20,15,.6);
+  }
+  .cam { position: absolute; top: clamp(2px, .6vw, 7px); left: 50%; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #3a352e; box-shadow: inset 0 0 0 1.5px #4d473f; }
+  .screen {
+    border-radius: 12px 12px 2px 2px; background-color: var(--paper); overflow: hidden;
+    padding: clamp(36px, 6vw, 80px) clamp(16px, 4vw, 56px) clamp(36px, 5vw, 64px);
+  }
+  .deck {
+    position: relative; height: clamp(14px, 1.8vw, 22px); margin-top: -1px;
+    background: linear-gradient(180deg, #E7DFD0 0%, #D3C8B5 55%, #B9AE9B 100%);
+    border: 1.5px solid var(--ink); border-radius: 2px 2px 22px 22px / 2px 2px 14px 14px;
+  }
+  .notch { position: absolute; top: -1.5px; left: 50%; width: 16%; height: 45%; transform: translateX(-50%); background: #C8BCA8; border: 1.5px solid var(--ink); border-top: 0; border-radius: 0 0 10px 10px; }
+
   .since {
     display: inline-flex; align-items: center; gap: 10px; margin-bottom: var(--s-5);
     padding: 8px 16px; border-radius: var(--r-pill); background: var(--card); border: 1px solid var(--line);
     box-shadow: var(--shadow-soft); font-weight: 600; font-size: var(--fs-small);
   }
   .since-dot { width: 10px; height: 10px; border-radius: 3px; background: var(--red); box-shadow: 4px 4px 0 -1px var(--red-tint); }
-  .display { max-width: 16ch; }
+  .display { max-width: 16ch; font-size: clamp(2.75rem, 1.2rem + 6.6vw, 7.5rem); }
   .lead { margin: var(--s-5) auto 0; color: var(--ink-2); max-width: 54ch; }
   .ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-4) var(--s-5); margin-top: var(--s-6); }
   .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: var(--s-6); list-style: none; font-weight: 600; font-size: var(--fs-small); }
   .trust li { display: inline-flex; align-items: center; gap: 6px; }
   .trust :global(svg) { color: var(--green); }
 
-  .pile-wrap { position: relative; margin-top: clamp(40px, 6vw, 72px); padding-inline: var(--gutter); }
+  .pile-wrap { position: relative; margin-top: clamp(14px, 2.2vw, 30px); padding-inline: var(--gutter); z-index: 1; }
   .pile {
     display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end;
-    max-width: 1180px; margin: 0 auto; list-style: none; padding: 0 0 var(--s-6);
+    max-width: 1180px; margin: 0 auto; list-style: none; padding: 0 0 var(--s-7);
   }
   .pile li { margin: 0 -2px; transform: rotate(var(--r)); }
   .pile .chip {
@@ -94,6 +123,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     }
   }
   @media (max-width: 639px) {
+    .since { font-size: var(--fs-xs); padding: 6px 12px; }
     .pile li:nth-child(n + 11) { display: none; }
     .pile li { margin: 0 -2px; }
   }

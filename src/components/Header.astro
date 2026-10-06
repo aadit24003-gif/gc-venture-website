@@ -26,19 +26,20 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
 
       <nav class="desk-nav" aria-label="Main">
         <ul role="list">
+          <li><a class="nav-link" href="/" aria-current={isActive('/') ? 'page' : undefined}>Home</a></li>
+          <li><a class="nav-link" href="/about/" aria-current={isActive('/about/') ? 'page' : undefined}>About</a></li>
           <li>
             <button class="nav-btn" aria-expanded="false" aria-controls="mega-equipment" data-menu-trigger aria-current={equipmentActive ? 'page' : undefined}>
-              Equipment <Icon name="chevron-down" size={16} />
+              Services <Icon name="chevron-down" size={16} />
             </button>
           </li>
-          <li><a class="nav-link" href="/industries/" aria-current={isActive('/industries/') ? 'page' : undefined}>Industries</a></li>
           <li>
             <button class="nav-btn" aria-expanded="false" aria-controls="mega-locations" data-menu-trigger aria-current={locationsActive ? 'page' : undefined}>
               Locations <Icon name="chevron-down" size={16} />
             </button>
           </li>
-          <li><a class="nav-link" href="/about/" aria-current={isActive('/about/') ? 'page' : undefined}>About</a></li>
-          <li><a class="nav-link" href="/contact/" aria-current={isActive('/contact/') ? 'page' : undefined}>Contact</a></li>
+          <li><a class="nav-link" href="/contact/" aria-current={isActive('/contact/') ? 'page' : undefined}>Contact Us</a></li>
+          <li><a class="nav-link" href="/support/" aria-current={isActive('/support/') ? 'page' : undefined}>Raise a Complaint</a></li>
         </ul>
       </nav>
 
@@ -76,6 +77,7 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
           <p class="small">Fifty seats or five hundred, configured and delivered on your schedule.</p>
           <a class="link-arrow" href="/request-a-quote/?type=enterprise">Get an enterprise quote <Icon name="arrow-right" /></a>
           <a class="link-arrow" href="/equipment/">Browse the catalogue <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href="/industries/">Industries we serve <Icon name="arrow-right" /></a>
         </aside>
       </div>
     </div>
@@ -108,8 +110,12 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
       <button class="icon-btn" aria-label="Close menu" data-burger-close><Icon name="x" size={24} /></button>
     </div>
     <nav class="mm-body wrap" aria-label="Mobile">
-      <details open>
-        <summary>Equipment <Icon name="chevron-down" size={20} /></summary>
+      <ul role="list" class="mm-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+      <details>
+        <summary>Services <Icon name="chevron-down" size={20} /></summary>
         <ul role="list" class="mm-list">
           {CATEGORIES.map((c) => <li><a href={`/${c.slug}/`}><Icon name={c.icon} size={20} />{c.name}</a></li>)}
           <li><a href="/equipment/"><Icon name="list-filter" size={20} />Browse the catalogue</a></li>
@@ -123,10 +129,9 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
         </ul>
       </details>
       <ul role="list" class="mm-links">
+        <li><a href="/contact/">Contact Us</a></li>
+        <li><a href="/support/">Raise a Complaint</a></li>
         <li><a href="/industries/">Industries</a></li>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        <li><a href="/support/">Support and complaints</a></li>
       </ul>
       <div class="mm-ctas">
         <a class="btn btn--primary btn--lg btn--block" href="/request-a-quote/">Get a quote</a>
@@ -154,7 +159,7 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
   .desk-nav { display: none; }
   .desk-nav ul { display: flex; gap: 4px; }
   .nav-link, .nav-btn {
-    display: inline-flex; align-items: center; gap: 4px; padding: 10px 14px; border-radius: var(--r-sm);
+    display: inline-flex; align-items: center; gap: 4px; padding: 10px 12px; border-radius: var(--r-sm);
     font-weight: 600; font-size: 1rem; text-decoration: none; background: none; border: 0; min-height: 44px;
   }
   .nav-link:hover, .nav-btn:hover, .nav-btn[aria-expanded='true'] { background: var(--paper-2); }
@@ -209,11 +214,11 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
   .mm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   @media (min-width: 640px) { .quote-btn { display: inline-flex; } }
-  @media (min-width: 1080px) {
+  @media (min-width: 1180px) {
     .desk-nav { display: block; }
     .burger { display: none; }
   }
-  @media (min-width: 1240px) { .phone-link { display: inline-flex; } }
+  @media (min-width: 1360px) { .phone-link { display: inline-flex; } }
 </style>
 
 <script>

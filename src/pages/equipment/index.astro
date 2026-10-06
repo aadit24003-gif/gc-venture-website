@@ -232,7 +232,7 @@ const schema = [{
       if (q) params.set('q', q);
       if (cityV) params.set('city', cityV);
       const qs = params.toString();
-      history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+      try { history.replaceState(null, '', qs ? `?${qs}` : location.pathname); } catch { /* URL sync is optional */ }
     }
   }
 

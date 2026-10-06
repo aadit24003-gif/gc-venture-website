@@ -10,7 +10,7 @@ Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one s
 
 | Area | URL | Notes |
 |---|---|---|
-| Home | `/` | Chip-pile hero, client marquee, "1 → 500+" scale selector, equipment index, why us, featured models, how it works, industries, India map, FAQ |
+| Home | `/` | Hero drawn as a laptop with the chip pile spilling onto the desk, client marquee, "1 → 500+" scale selector, equipment index, why us, featured models, how it works, industries, India map, FAQ |
 | Service pages (10) | `/laptop-rental/`, `/macbook-rental/`, `/desktop-rental/`, `/monitor-rental/`, `/server-rental/`, `/switch-rental/`, `/router-rental/`, `/firewall-rental/`, `/mobile-phone-rental/`, `/it-equipment-rental/` | Generated from `src/data/categories.ts` |
 | Catalogue | `/equipment/` | Search, filters (category, brand, processor, generation, RAM, storage, screen, city), shareable filter URLs, compare up to 3 |
 | Product pages (22) | `/equipment/<model>/` | Specs, rental terms, "Need 20 of these?" quote form, WhatsApp with product name |
@@ -18,6 +18,8 @@ Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one s
 | Company | `/about/`, `/industries/`, `/locations/`, `/contact/` | |
 | Conversion | `/request-a-quote/`, `/support/` | Quote form (supports `?qty=`, `?product=`, `?category=`, `?city=`, `?type=enterprise`) and support/complaint form with attachment |
 | Legal | `/privacy-policy/`, `/terms/` | Drafts with `[REQUIRES CONFIRMATION]` markers; `noindex` until finalised |
+
+Main navigation: Home, About, Services (dropdown), Locations (dropdown), Contact Us, Raise a Complaint.
 
 Mobile has a sticky **Call / WhatsApp / Get quote** bar; desktop has a floating WhatsApp button.
 
