@@ -4,8 +4,9 @@ import ProductCard from '../../components/ProductCard.astro';
 import QuoteForm from '../../components/QuoteForm.astro';
 import FAQ from '../../components/FAQ.astro';
 import Icon from '../../components/Icon.astro';
+import Configurator from '../../components/Configurator.astro';
 import FinalCTA from '../../components/FinalCTA.astro';
-import { PRODUCTS, AVAILABILITY_LABEL, isThin, type Product } from '../../data/products';
+import { PRODUCTS, AVAILABILITY_LABEL, isThin, formatGb, genOrder, type Product } from '../../data/products';
 import { categoryById } from '../../data/categories';
 import { pageCities, cityPath } from '../../data/cities';
 import { SITE, whatsappLink, productWhatsappMessage, enabledClaims, claim } from '../../config/site';
@@ -37,11 +38,25 @@ const specs = [
 /** Thin pages (few known specs) stay out of the index until real data is added. */
 const thin = isThin(p);
 const cities = p.city_availability?.length ? pageCities.filter((c) => p.city_availability!.includes(c.id)) : pageCities;
-const related = PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id).slice(0, 3);
+const genOf = (x: Product) => Math.max(0, ...(x.processor_generation ?? []).map(genOrder));
+const related = PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id)
+  .map((x) => ({ x, score: (x.brand === p.brand ? 0 : 100) + Math.abs(genOf(x) - genOf(p)) }))
+  .sort((a, b) => a.score - b.score).slice(0, 3).map((r) => r.x);
+const configurable = !!p.configs?.length;
+/** Short processor label for titles: "Core i5, 7th/8th Gen", "Core Ultra 7/9", "M1 to M5". */
+function procShort(x: Product) {
+  if (x.brand === 'Apple' && x.processor_generation?.length) return `${x.processor_generation[0]} to ${x.processor_generation[x.processor_generation.length - 1]}`;
+  const fams = x.processor_family ?? [];
+  if (fams.length && fams.every((f) => f.startsWith('Core Ultra'))) return `Core Ultra ${fams.map((f) => f.replace('Core Ultra ', '')).join('/')}`;
+  const gens = (x.processor_generation ?? []).filter((g) => g !== 'Core Ultra');
+  return [fams.join('/'), gens.length ? `${gens.map((g) => g.replace(' Gen', '')).join('/')} Gen` : ''].filter(Boolean).join(', ');
+}
 const perks = enabledClaims(['zeroDeposit', 'noLockIn', 'monthlyBilling', 'fastDelivery', 'preinstalled', 'support247']);
 const wa = productWhatsappMessage(p.name);
-const title = p.seo_title ?? `${p.name} on Rent${p.processor_family ? ` (${p.processor_family.join('/')}${p.ram ? `, ${p.ram}` : ''})` : ''}`;
-const description = p.seo_description ?? `Rent the ${p.name} for your business. ${specs.slice(0, 3).map(([, v]) => v).join(', ')}. Configured with your software, delivered across India. Request a quote.`;
+const title = p.seo_title ?? (configurable ? `${p.name} on Rent (${procShort(p)})` : `${p.name} on Rent${p.processor_family ? ` (${p.processor_family.join('/')}${p.ram ? `, ${p.ram}` : ''})` : ''}`);
+const description = p.seo_description ?? (configurable
+  ? `Rent the ${p.name}: ${procShort(p)}, ${p.ram} RAM, ${p.storage}. Pick your configuration; delivered across India.`
+  : `Rent the ${p.name} for your business. ${specs.slice(0, 3).map(([, v]) => v).join(', ')}. Configured with your software, delivered across India. Request a quote.`);
 const faqs = [
   { q: `Can I rent the ${p.name} in bulk?`, a: 'Yes. Tell us the quantity and city; larger orders are configured identically and get tailored pricing.' },
   { q: 'Is the exact configuration guaranteed?', a: 'We confirm the processor, memory and storage for your dates in the quote. If this exact configuration is short, we offer the closest equivalent for you to approve.' },
@@ -97,7 +112,7 @@ const schema = [
             <span class={`tag ${p.availability === 'in-stock' ? 'tag--ok' : p.availability === 'limited' ? 'tag--warn' : ''}`}>{AVAILABILITY_LABEL[p.availability]}</span>
             {p.tags.map((t) => <span class="tag">{t}</span>)}
           </div>
-          {specs.length > 0 && (
+          {configurable ? <Configurator p={p} /> : specs.length > 0 && (
             <dl class="specs">
               {specs.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
             </dl>
@@ -106,13 +121,50 @@ const schema = [
             {p.rental_price ? <>From <strong class="num">₹{p.rental_price.toLocaleString('en-IN')}</strong> per month</> : <>Pricing depends on quantity and term. <strong>Request a quote</strong> for monthly rates.</>}
           </p>
           <div class="ctas">
-            <a class="btn btn--primary btn--lg" href="#quote">Request a quote</a>
-            <a class="btn btn--lg btn--wa" href={whatsappLink(wa)} target="_blank" rel="noopener" data-track-location="product"><Icon name="whatsapp" />WhatsApp us</a>
+            <a class="btn btn--primary btn--lg" href="#quote">{configurable ? 'Request this configuration' : 'Request a quote'}</a>
+            <a class="btn btn--lg btn--wa" href={whatsappLink(wa)} target="_blank" rel="noopener" data-track-location="product" data-wa-config><Icon name="whatsapp" />WhatsApp us</a>
           </div>
         </div>
       </div>
     </div>
   </section>
+
+  {configurable && (
+    <section class="section section--sunk" aria-labelledby="cfgs-title">
+      <div class="wrap">
+        <div class="section-head">
+          <h2 id="cfgs-title" class="h2">Available configurations</h2>
+          <p class="lead">Every {p.configLabel === 'Generation' ? 'generation and chip' : 'processor option'} we rent for the {p.name}, with the memory and storage it can be supplied with. The first size listed is the standard build.</p>
+        </div>
+        <div class="cfg-table-wrap" tabindex="0" role="region" aria-label={`Configuration table for ${p.name}`}>
+          <table class="cfg-table">
+            <thead>
+              <tr>
+                <th scope="col">{p.configLabel ?? 'Processor'}</th>
+                <th scope="col">{p.brand === 'Apple' ? 'Chip' : 'Processor'}</th>
+                {p.configs!.some((c) => c.year) && <th scope="col">Year</th>}
+                <th scope="col">Screen</th>
+                <th scope="col">Memory</th>
+                <th scope="col">Storage</th>
+              </tr>
+            </thead>
+            <tbody>
+              {p.configs!.map((c) => (
+                <tr>
+                  <td>{c.group}</td>
+                  <th scope="row">{c.chip}</th>
+                  {p.configs!.some((x) => x.year) && <td class="num">{c.year}</td>}
+                  <td>{(c.screens ?? []).join(', ') || '—'}</td>
+                  <td class="num">{c.ram.map((r) => `${r} GB`).join(', ')}</td>
+                  <td class="num">{c.storage.map(formatGb).join(', ')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )}
 
   <section class="section">
     <div class="wrap two">
@@ -196,4 +248,10 @@ const schema = [
   .form-panel { border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
   .rel-h { margin-bottom: var(--s-6); }
   .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  .cfg-table-wrap { overflow-x: auto; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--card); }
+  .cfg-table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: var(--fs-small); }
+  .cfg-table th, .cfg-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .cfg-table thead th { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); font-weight: 600; background: var(--paper-2); }
+  .cfg-table tbody th { font-weight: 600; }
+  .cfg-table tbody tr:last-child > * { border-bottom: 0; }
 </style>

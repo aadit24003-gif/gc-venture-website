@@ -18,7 +18,9 @@ export function getStaticPaths() {
 }
 
 const { cat } = Astro.props as { cat: Category };
-const products = PRODUCTS.filter((p) => p.category === cat.id);
+const allProducts = PRODUCTS.filter((p) => p.category === cat.id);
+/** Large ranges show the newest models here; the catalogue has the full list with filters. */
+const products = allProducts.slice(0, 8);
 const related = CATEGORIES.filter((c) => c.id !== cat.id && (c.group === cat.group || c.id === 'laptops')).slice(0, 4);
 const perks = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 const waMessage = `Hi IT Rentals, I would like to enquire about ${cat.name.toLowerCase()}.`;
@@ -83,9 +85,9 @@ const schema = [
         <div class="head-row">
           <div class="section-head">
             <h2 id="models-title" class="h2">{cat.noun.charAt(0).toUpperCase() + cat.noun.slice(1)} in our range</h2>
-            <p class="lead">Models we rent regularly. Ask for anything not shown.</p>
+            <p class="lead">{allProducts.length > products.length ? `${allProducts.length} models in the catalogue, newest first. Choose the processor, memory and storage on each model.` : 'Models we rent regularly. Ask for anything not shown.'}</p>
           </div>
-          <a class="link-arrow" href={`/equipment/?category=${cat.id}`}>Filter in the catalogue <Icon name="arrow-right" /></a>
+          <a class="link-arrow" href={`/equipment/?category=${cat.id}`}>{allProducts.length > products.length ? `See all ${allProducts.length} ${cat.noun}` : 'Filter in the catalogue'} <Icon name="arrow-right" /></a>
         </div>
         <div class="pgrid">{products.map((p) => <ProductCard p={p} />)}</div>
       </div>

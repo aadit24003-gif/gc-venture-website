@@ -1,6 +1,6 @@
 ---
 import Icon from './Icon.astro';
-import { AVAILABILITY_LABEL, type Product } from '../data/products';
+import { AVAILABILITY_LABEL, ramList, storageList, screenList, type Product } from '../data/products';
 import { categoryById } from '../data/categories';
 
 interface Props { p: Product; headingLevel?: 'h2' | 'h3'; catalogue?: boolean }
@@ -9,8 +9,8 @@ const H = headingLevel;
 const cat = categoryById(p.category)!;
 const img = p.images[0];
 const rows = [
-  ['Processor', p.processor_family?.join(' / ') ?? p.processor],
-  ['Generation', p.processor_generation?.join(' / ')],
+  ['Processor', p.brand === 'Apple' && p.configs ? p.processor : p.processor_family?.join(' / ') ?? p.processor],
+  ['Generation', (p.brand === 'Apple' && p.configs) || p.processor_generation?.every((g) => g === 'Core Ultra') ? undefined : p.processor_generation?.join(' / ')],
   ['Memory', p.ram],
   ['Storage', p.storage],
   ['Display', p.display_size && `${p.display_size}${p.resolution ? ` ${p.resolution}` : ''}`],
@@ -23,9 +23,9 @@ const data = catalogue
       'data-brand': p.brand,
       'data-proc': (p.processor_family ?? []).join('|'),
       'data-gen': (p.processor_generation ?? []).join('|'),
-      'data-ram': p.ram_gb ?? '',
-      'data-storage': p.storage_gb ?? '',
-      'data-screen': p.display_size ?? '',
+      'data-ram': ramList(p).join('|'),
+      'data-storage': storageList(p).join('|'),
+      'data-screen': screenList(p).join('|'),
       'data-avail': p.availability,
       'data-cities': (p.city_availability ?? []).join('|'),
       'data-search': [p.name, p.brand, p.subcategory, p.processor, ...(p.processor_family ?? []), ...(p.tags ?? [])].join(' ').toLowerCase(),
@@ -55,6 +55,7 @@ const data = catalogue
     )}
     <div class="meta">
       <span class={`tag ${availClass}`}>{AVAILABILITY_LABEL[p.availability]}</span>
+      {p.configs && <span class="tag">{p.configs.length > 1 ? `${p.configs.length} configurations` : 'Configurable'}</span>}
       {p.tags.map((t) => <span class="tag">{t}</span>)}
     </div>
     <div class="actions">

@@ -33,7 +33,9 @@ All business data lives in a few files. Change it there and every page, form, sc
 |---|---|
 | Phone numbers, WhatsApp, emails, business hours, office addresses, service promises (deposit, lock-in, delivery, 24/7…), analytics ID | `src/config/site.ts` |
 | Services and their copy, configurations, FAQs | `src/data/categories.ts` |
-| Laptops, Macs, desktops, monitors (specs, availability, price, photos) | `src/data/products.ts` |
+| Laptop list (brand, model, processor, standard RAM and storage), one row per model and processor | `src/data/laptop-catalogue.ts` |
+| MacBook Air and MacBook Pro generations (2019 to M5) with their memory and storage options | `src/data/mac-lineup.ts` |
+| Laptops, Macs, desktops, monitors (descriptions, availability, price, photos, upgrade rules) | `src/data/products.ts` |
 | Cities (areas, intro, FAQs, office or service area) | `src/data/cities.ts` |
 | Industries | `src/data/industries.ts` |
 | Client names and logos, testimonials, case studies | `src/data/clients.ts` |
@@ -42,6 +44,7 @@ All business data lives in a few files. Change it there and every page, form, sc
 Common tasks:
 
 - **Turn a promise off** (e.g. if "zero deposit" changes): set `enabled: false` for it in `CLAIMS` in `site.ts`. It disappears everywhere, and FAQ answers adapt.
+- **Add a laptop model:** add a row to `src/data/laptop-catalogue.ts`. Rows with the same brand and model become one product; each row's processor becomes an option in its configuration picker. Memory and storage upgrades are offered from the standard size upward (`ramOptions` / `storageOptions` in `products.ts`).
 - **Add a product photo:** put the image in `public/products/` and add it to that product's `images` array with real `width`/`height` and alt text such as "Dell Latitude 7490 on rent".
 - **Minimum order:** laptop rentals start at 10 units; this is stated on the laptop page, the scale selector and the quote form.
 - **Show a price:** set `rental_price` (₹/month) on a product. Leave `null` for "Request a quote".
@@ -108,6 +111,8 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Privacy policy and terms**: legal entity details, grievance officer, retention, rental terms.
 - [ ] **Testimonials**: written approval to publish quotes from Balaji Viswanathan, Charandeep Dora and Manoj Chandran (with role and company).
 - [ ] **Old URL list** for the 301 redirect map.
+- [ ] **Upgrade options**: laptops offer RAM up to 16 GB (6th–8th Gen) or 32 GB (10th Gen and newer) and SSD up to 1 TB. Confirm these match what you can supply.
+- [ ] **Laptop list entries to double-check** (kept exactly as supplied): Dell Latitude 5280, 5380, 5480, 5580, 7280 and 7380 are listed with 8th Gen (these models shipped with 6th/7th Gen; the 8th Gen versions are 5290, 5390, 5490, 5590, 7290 and 7390), and Latitude 3420, 3520, 5420 and 5520 are listed with 12th Gen (these shipped with 11th Gen; the 12th Gen versions are 3430, 3530, 5430 and 5530).
 - [ ] **Google Analytics 4 ID** (`ANALYTICS.GA4_ID`). Phone, WhatsApp, email and form-submit events are already wired.
 
 ---

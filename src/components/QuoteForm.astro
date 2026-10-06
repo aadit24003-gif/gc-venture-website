@@ -54,6 +54,7 @@ const compact = variant === 'compact';
   {product && <input type="hidden" name="product" value={product} />}
   {compact && preEquip && <input type="hidden" name="equipment[]" value={preEquip} />}
   <input type="hidden" name="product_slug" value="" data-product-slug />
+  <input type="hidden" name="config_choice" value="" data-config-choice />
   <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="website" tabindex="-1" autocomplete="off" /></label></div>
 
   {!compact && (
@@ -71,7 +72,8 @@ const compact = variant === 'compact';
   )}
 
   <div class="form-grid form-grid--2 block">
-    {compact && product && <p class="span-2 ctx small">Enquiring about <strong>{product}</strong></p>}
+    {compact && product && <p class="span-2 ctx small" data-product-ctx>Enquiring about <strong>{product}</strong></p>}
+    <p class="span-2 ctx small" data-config-ctx hidden>Configuration: <strong></strong></p>
     <div class="field">
       <label for={`${formId}-qty`}>Quantity <span class="req" aria-hidden="true">*</span></label>
       <input class="input" type="number" inputmode="numeric" min="1" max="100000" id={`${formId}-qty`} name="quantity" required data-qty />

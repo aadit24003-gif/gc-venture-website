@@ -66,6 +66,11 @@ function prefill(form: HTMLFormElement) {
   const product = q.get('product');
   const ps = form.querySelector<HTMLInputElement>('[data-product-slug]');
   if (product && ps) ps.value = product;
+  const config = q.get('config');
+  if (config) {
+    form.querySelectorAll<HTMLInputElement>('[data-config-choice]').forEach((i) => (i.value = config.slice(0, 300)));
+    form.querySelectorAll<HTMLElement>('[data-config-ctx]').forEach((el) => { el.hidden = false; el.querySelector('strong')!.textContent = config.slice(0, 300); });
+  }
   const cat = q.get('category');
   if (cat) form.querySelectorAll<HTMLInputElement>(`input[name="equipment[]"][value="${CSS.escape(cat)}"]`).forEach((c) => (c.checked = true));
   const city = q.get('city');

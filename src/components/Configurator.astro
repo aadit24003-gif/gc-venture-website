@@ -1,0 +1,177 @@
+---
+/**
+ * Configuration picker for laptops and Macs. Steps: processor (or generation),
+ * chip when a generation has several, screen, memory, storage. The chosen
+ * configuration is written into the page's quote form, the "Request this
+ * configuration" link and every WhatsApp link marked data-wa-config.
+ */
+import { formatGb, type Product, type Config } from '../data/products';
+
+interface Props { p: Product }
+const { p } = Astro.props;
+const cfgs = p.configs as Config[];
+const def = cfgs[p.defaultConfig ?? 0];
+const id = `cfg-${p.slug}`;
+const groups = [...new Set(cfgs.map((c) => c.group))];
+const chips = cfgs.filter((c) => c.group === def.group);
+const screens = def.screens ?? [];
+const label = p.configLabel ?? 'Processor';
+const chipLabel = p.brand === 'Apple' ? 'Chip' : 'Variant';
+const summary = (c: Config, screen?: string, ram?: number, storage?: number) =>
+  [p.name, c.chip, c.year, screen, ram && `${ram} GB memory`, storage && `${formatGb(storage)} ${c.storageType ?? 'SSD'}`].filter(Boolean).join(', ');
+const initial = summary(def, screens[0], def.ram[0], def.storage[0]);
+const chipText = (c: Config) => c.chip.replace(/^Apple /, '').replace(/^Intel /, '');
+---
+<div class="cfg" data-cfg data-name={p.name} data-slug={p.slug} data-chip-label={chipLabel}>
+  <script type="application/json" is:inline data-cfg-data set:html={JSON.stringify({ configs: cfgs, def: p.defaultConfig ?? 0 })} />
+  <h2 class="cfg-title h4">Choose a configuration</h2>
+
+  <fieldset class="cfg-step" data-step="group" hidden={groups.length < 2}>
+    <legend>{label}</legend>
+    <div class="seg">
+      {groups.map((g, i) => (
+        <>
+          <input type="radio" name={`${id}-group`} id={`${id}-group-${i}`} value={g} checked={g === def.group} />
+          <label for={`${id}-group-${i}`}>{g}</label>
+        </>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="cfg-step" data-step="chip" hidden={chips.length < 2}>
+    <legend>{chipLabel}</legend>
+    <div class="seg" data-opts>
+      {chips.map((c, i) => (
+        <>
+          <input type="radio" name={`${id}-chip`} id={`${id}-chip-${i}`} value={c.chip} checked={c === def} />
+          <label for={`${id}-chip-${i}`}>{chipText(c)}</label>
+        </>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="cfg-step" data-step="screen" hidden={screens.length < 2}>
+    <legend>Screen</legend>
+    <div class="seg" data-opts>
+      {screens.map((s, i) => (
+        <>
+          <input type="radio" name={`${id}-screen`} id={`${id}-screen-${i}`} value={s} checked={i === 0} />
+          <label for={`${id}-screen-${i}`}>{s.replace('"', '-inch')}</label>
+        </>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="cfg-step" data-step="ram">
+    <legend>Memory</legend>
+    <div class="seg" data-opts>
+      {def.ram.map((r, i) => (
+        <>
+          <input type="radio" name={`${id}-ram`} id={`${id}-ram-${i}`} value={r} checked={i === 0} />
+          <label for={`${id}-ram-${i}`}>{r} GB</label>
+        </>
+      ))}
+    </div>
+  </fieldset>
+
+  <fieldset class="cfg-step" data-step="storage">
+    <legend>Storage</legend>
+    <div class="seg" data-opts>
+      {def.storage.map((s, i) => (
+        <>
+          <input type="radio" name={`${id}-storage`} id={`${id}-storage-${i}`} value={s} checked={i === 0} />
+          <label for={`${id}-storage-${i}`}>{formatGb(s)}</label>
+        </>
+      ))}
+    </div>
+  </fieldset>
+
+  <div class="cfg-out">
+    <p class="cfg-sum"><span class="mono">Your configuration</span><strong data-cfg-summary aria-live="polite">{initial}</strong></p>
+    <p class="xs muted">The first option in each row is the standard build. Upgrades and exact stock are confirmed in your quote.</p>
+  </div>
+</div>
+
+<style>
+  .cfg { display: grid; gap: var(--s-4); margin-top: var(--s-6); padding: var(--s-5); border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--card); }
+  .cfg-title { margin: 0; }
+  .cfg-step { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; min-width: 0; }
+  .cfg-step legend { float: left; width: 100%; padding: 0; margin-bottom: 8px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); }
+  .cfg .seg label { min-height: 40px; padding: 8px 14px; background: var(--paper); }
+  .cfg .seg input:checked + label { background: var(--ink); color: var(--paper); }
+  .cfg-out { display: grid; gap: 6px; padding-top: var(--s-4); border-top: 1px solid var(--line); }
+  .cfg-sum { display: grid; gap: 4px; margin: 0; }
+  .cfg-sum strong { font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; line-height: 1.3; }
+</style>
+
+<script>
+  type Cfg = { group: string; chip: string; year?: string; screens?: string[]; ram: number[]; storage: number[]; storageType?: string };
+  const fmt = (n: number) => (n >= 1024 ? `${n / 1024} TB` : `${n} GB`);
+  const tier = (chip: string) => chip.match(/ (Pro|Max)$/)?.[1] ?? '';
+
+  document.querySelectorAll<HTMLElement>('[data-cfg]').forEach((root) => {
+    const { configs } = JSON.parse(root.querySelector('[data-cfg-data]')!.textContent!) as { configs: Cfg[] };
+    const name = root.dataset.name!;
+    const slug = root.dataset.slug!;
+    const step = (k: string) => root.querySelector<HTMLFieldSetElement>(`[data-step="${k}"]`)!;
+    const val = (k: string) => step(k).querySelector<HTMLInputElement>('input:checked')?.value;
+    const base = `cfg-${slug}`;
+
+    function fill(k: string, values: (string | number)[], labels: string[], keep?: string) {
+      const fs = step(k);
+      const box = fs.querySelector<HTMLElement>('[data-opts]')!;
+      const pick = keep && values.map(String).includes(keep) ? keep : String(values[0]);
+      box.innerHTML = values.map((v, i) => {
+        const vid = `${base}-${k}-${i}`;
+        return `<input type="radio" name="${base}-${k}" id="${vid}" value="${String(v).replace(/"/g, '&quot;')}"${String(v) === pick ? ' checked' : ''} /><label for="${vid}">${labels[i]}</label>`;
+      }).join('');
+      fs.hidden = values.length < 2;
+    }
+    const current = (): Cfg => configs.find((c) => c.group === val('group') && c.chip === val('chip')) ?? configs.find((c) => c.group === val('group'))!;
+
+    function update() {
+      const c = current();
+      const screen = val('screen');
+      const ram = Number(val('ram'));
+      const storage = Number(val('storage'));
+      const text = [name, c.chip, c.year, screen, ram && `${ram} GB memory`, storage && `${fmt(storage)} ${c.storageType ?? 'SSD'}`].filter(Boolean).join(', ');
+      root.querySelector('[data-cfg-summary]')!.textContent = text;
+      document.querySelectorAll<HTMLInputElement>('[data-config-choice]').forEach((i) => (i.value = text));
+      document.querySelectorAll<HTMLElement>('[data-config-ctx]').forEach((el) => { el.hidden = false; el.querySelector('strong')!.textContent = text; });
+      document.querySelectorAll<HTMLElement>('[data-product-ctx]').forEach((el) => (el.hidden = true));
+      document.querySelectorAll<HTMLAnchorElement>('[data-cfg-quote]').forEach((a) => {
+        a.href = `/request-a-quote/?product=${encodeURIComponent(slug)}&config=${encodeURIComponent(text)}`;
+      });
+      document.querySelectorAll<HTMLAnchorElement>('a[data-wa-config]').forEach((a) => {
+        try {
+          const u = new URL(a.href);
+          a.href = `${u.origin}${u.pathname}?text=${encodeURIComponent(`Hi IT Rentals, I am interested in renting ${text}.`)}`;
+        } catch { /* leave the default message */ }
+      });
+    }
+
+    function onChip() {
+      const c = current();
+      fill('screen', c.screens ?? [], (c.screens ?? []).map((s) => s.replace('"', '-inch')), val('screen'));
+      fill('ram', c.ram, c.ram.map((r) => `${r} GB`), val('ram'));
+      fill('storage', c.storage, c.storage.map(fmt), val('storage'));
+      update();
+    }
+    function onGroup() {
+      const prevTier = tier(val('chip') ?? '');
+      const inGroup = configs.filter((c) => c.group === val('group'));
+      const keep = inGroup.find((c) => tier(c.chip) === prevTier) ?? inGroup[0];
+      fill('chip', inGroup.map((c) => c.chip), inGroup.map((c) => c.chip.replace(/^Apple /, '').replace(/^Intel /, '')), keep.chip);
+      onChip();
+    }
+
+    root.addEventListener('change', (e) => {
+      const fs = (e.target as HTMLElement).closest<HTMLElement>('[data-step]');
+      const k = fs?.dataset.step;
+      if (k === 'group') onGroup();
+      else if (k === 'chip') onChip();
+      else update();
+    });
+    update();
+  });
+</script>

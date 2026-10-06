@@ -6,13 +6,13 @@ const { waMessage } = Astro.props;
 ---
 <nav class="mbar" aria-label="Quick contact" data-track-zone="mobile-bar">
   <a href={telLink()} class="mb-item"><Icon name="phone" size={22} /><span>Call</span></a>
-  <a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="mb-item wa"><Icon name="whatsapp" size={22} /><span>WhatsApp</span></a>
+  <a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="mb-item wa" data-wa-config><Icon name="whatsapp" size={22} /><span>WhatsApp</span></a>
   <a href="/request-a-quote/" class="mb-item quote"><Icon name="clipboard-list" size={22} /><span>Get quote</span></a>
 </nav>
 
 <!-- Floating WhatsApp on larger screens -->
 <aside aria-label="WhatsApp chat">
-<a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="wa-fab" aria-label="Chat with us on WhatsApp" data-track-location="floating">
+<a href={whatsappLink(waMessage)} target="_blank" rel="noopener" class="wa-fab" aria-label="Chat with us on WhatsApp" data-track-location="floating" data-wa-config>
   <Icon name="whatsapp" size={28} />
 </a>
 </aside>

@@ -16,7 +16,7 @@ const {
     </div>
     <div class="fcta-actions">
       <a class="btn btn--primary btn--lg btn--block" href="/request-a-quote/?type=enterprise">Get an enterprise quote</a>
-      <a class="btn btn--lg btn--block btn--wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener"><Icon name="whatsapp" />WhatsApp us</a>
+      <a class="btn btn--lg btn--block btn--wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener" data-wa-config><Icon name="whatsapp" />WhatsApp us</a>
       <a class="call" href={telLink()}><Icon name="phone" size={20} />Or call <span class="num">{formatPhone(CONTACT.PRIMARY_PHONE)}</span></a>
     </div>
   </div>

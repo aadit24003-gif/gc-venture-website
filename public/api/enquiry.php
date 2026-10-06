@@ -107,6 +107,7 @@ if ($type === 'quote') {
         'Enquiry type'  => field('enquiry_type', 20) === 'enterprise' ? 'Enterprise / bulk' : 'Standard',
         'Equipment'     => implode(', ', $equipment),
         'Product'       => oneLine(field('product', 160)) ?: oneLine(field('product_slug', 160)),
+        'Chosen configuration' => oneLine(field('config_choice', 300)),
         'Quantity'      => $data['quantity'],
         'City'          => $data['city'],
         'Duration'      => oneLine(field('duration', 60)),
