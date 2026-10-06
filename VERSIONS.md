@@ -24,6 +24,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v15 | `afaed00` | Bolder client names with red dot separators | https://claude.ai/artifact/NK2u6DT2aw2fcp99G317FW |
 | v16 | `ee3c059` | Review fixes: copy matches catalogue, new share image, schema and table tidy-up | https://claude.ai/artifact/H7w8mD3Q65EjfxRRsLpA5W |
 | v17 | `fe0bd50` | Redirects for old itrentals.in addresses and LAUNCH-GUIDE.md; looks the same as v16 | same as v16 |
+| v18 | `a70e2ea` | Popular models moved directly below the scale selector on the home page | https://claude.ai/artifact/4HbpSdoEzRqVF47a41DPYT |
 
 ## Going back to a version
 
