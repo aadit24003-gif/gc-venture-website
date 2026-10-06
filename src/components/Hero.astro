@@ -30,7 +30,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   <div class="lid">
   <span class="cam" aria-hidden="true"></span>
   <div class="screen grid-paper hero-inner">
-    <p class="since"><span class="since-dot" aria-hidden="true"></span>Renting IT to Indian businesses since {SITE.founded}</p>
+    <p class="since"><span class="since-dot" aria-hidden="true"></span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</p>
     <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
     <p class="lead">
       Laptops, desktops, MacBooks, servers, networking and phones on rent across India.
@@ -124,6 +124,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   }
   @media (max-width: 639px) {
     .since { font-size: var(--fs-xs); padding: 6px 12px; }
+    .since-long { display: none; }
     .pile li:nth-child(n + 11) { display: none; }
     .pile li { margin: 0 -2px; }
   }
