@@ -75,7 +75,12 @@ const schema = [
       <div class="pd-grid">
         <div class="gallery">
           {p.images.length ? (
-            p.images.map((img, i) => <img src={img.src} alt={img.alt} width={img.width} height={img.height} loading={i ? 'lazy' : 'eager'} />)
+            p.images.map((img, i) => (
+              <figure class="photo">
+                <img src={img.src} alt={img.alt} width={img.width} height={img.height} loading={i ? 'lazy' : 'eager'} fetchpriority={i ? undefined : 'high'} />
+                <figcaption class="xs">Representative photo of the {p.brand} range. Units are confirmed with your quote.</figcaption>
+              </figure>
+            ))
           ) : (
             <div class="ph" role="img" aria-label={`${p.name} illustration`}>
               <Icon name={cat.icon} size={160} stroke={0.9} />
@@ -165,7 +170,9 @@ const schema = [
   .pd { padding: var(--s-6) 0 var(--s-8); border-bottom: 1.5px solid var(--ink); }
   .pd-grid { display: grid; gap: var(--s-7); align-items: start; }
   @media (min-width: 960px) { .pd-grid { grid-template-columns: 1.05fr 1fr; } }
-  .gallery img { width: 100%; border-radius: var(--r-lg); border: 1.5px solid var(--ink); background: var(--card); }
+  .photo { margin: 0; }
+  .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-lg); border: 1.5px solid var(--ink); background: var(--card); box-shadow: var(--shadow-block); }
+  .photo figcaption { margin-top: var(--s-3); color: var(--ink-2); }
   .ph { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: var(--r-lg); border: 1.5px solid var(--ink); background: var(--card); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 16px 16px; box-shadow: var(--shadow-block); }
   .ph-brand { position: absolute; left: 20px; bottom: 14px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 2rem; color: var(--ink-3); }
   .ph-note { position: absolute; right: 20px; bottom: 20px; color: var(--ink-2); }

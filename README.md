@@ -98,7 +98,7 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Bangalore address**: profile says **HN 49, Royal Placid Layout, HSR Layout, 560102**; brief says **KNA Complex, First Floor, Haralur Main Road, HSR Layout, 560068**. Currently the profile version.
 - [ ] **Service promises** (all currently published, please confirm the wording): zero security deposit, no lock-in, same/next-day delivery, 24/7 support, no advance payment, software pre-installed, monthly billing, up to 50% lower cost.
 - [ ] **Preparation steps** on the home page (inspection, testing, diagnostics, cleaning, configuration, security check, packaging, scheduled delivery): confirm these match how devices are actually prepared.
-- [ ] **Product photos**: add real or licensed photos to `public/products/` (see "Add a product photo").
+- [ ] **Product photos**: every model now shows a representative brand photo from Pexels (free commercial licence; sources listed in `PHOTOS` in `src/data/products.ts`). Swap in your own photos of actual stock when you can.
 - [ ] **Business hours** (`CONTACT.BUSINESS_HOURS`).
 - [ ] **Client list**: 17 names shown. Ericsson, Samsung, Tower and Xceed are hidden until confirmed.
 - [ ] **Leadership copy** on About (Vivek Garg, Managing Director, 20+ years), and a photo if you'd like one instead of the monogram.

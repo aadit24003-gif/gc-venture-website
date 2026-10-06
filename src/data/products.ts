@@ -39,17 +39,52 @@ export interface Product {
   city_availability?: string[];  // city ids; empty = all served cities
   featured?: boolean;
   tags: string[];
-  images: { src: string; alt: string; width: number; height: number }[];
+  /** src: 1200×900 (product page), card: 800×500 (cards). Photos are representative of the model family. */
+  images: { src: string; card?: string; alt: string; width: number; height: number; credit?: string }[];
   description: string;
   use_cases: string[];
   seo_title?: string;
   seo_description?: string;
 }
 
+/**
+ * Representative photos (Pexels licence: free for commercial use, no attribution required).
+ * Replace with your own photos of actual stock when available.
+ */
+const PHOTOS = {
+  thinkpad: { file: 'lenovo-thinkpad', credit: 'https://www.pexels.com/photo/3550482/', what: 'Lenovo ThinkPad laptop' },
+  lenovo: { file: 'lenovo-laptop', credit: 'https://www.pexels.com/photo/9229975/', what: 'Lenovo business laptop' },
+  dellSilver: { file: 'dell-laptop-silver', credit: 'https://www.pexels.com/photo/9474023/', what: 'Dell laptop' },
+  dellBlack: { file: 'dell-laptop-black', credit: 'https://www.pexels.com/photo/1466609/', what: 'Dell laptop on an office desk' },
+  hp: { file: 'hp-laptop', credit: 'https://www.pexels.com/photo/13823992/', what: 'HP business laptop' },
+  macAir: { file: 'apple-macbook-air', credit: 'https://www.pexels.com/photo/3693732/', what: 'Apple MacBook Air' },
+  macPro: { file: 'apple-macbook-pro', credit: 'https://www.pexels.com/photo/693859/', what: 'Apple MacBook Pro' },
+  imac: { file: 'apple-imac', credit: 'https://www.pexels.com/photo/41227/', what: 'Apple iMac on a desk' },
+  desktops: { file: 'office-desktops', credit: 'https://www.pexels.com/photo/990423/', what: 'Row of office desktop computers' },
+  seat: { file: 'monitor-keyboard-desk', credit: 'https://www.pexels.com/photo/1714341/', what: 'Desktop seat with monitor and keyboard' },
+  monitor: { file: 'monitor-office', credit: 'https://www.pexels.com/photo/8297860/', what: 'Office monitor on a desk' },
+  monitorDual: { file: 'monitor-dual', credit: 'https://www.pexels.com/photo/1714208/', what: 'Dual monitor setup' },
+  monitorDesk: { file: 'monitor-desk', credit: 'https://www.pexels.com/photo/196658/', what: 'Monitor on a home office desk' },
+} as const;
+
+function photo(key: keyof typeof PHOTOS, productName: string) {
+  const ph = PHOTOS[key];
+  return [{
+    src: `/products/${ph.file}-1200.webp`,
+    card: `/products/${ph.file}-800.webp`,
+    alt: `${productName} on rent: ${ph.what} (representative photo)`,
+    width: 1200, height: 900, credit: ph.credit,
+  }];
+}
+
 export const AVAILABILITY_LABEL: Record<Availability, string> = {
   'in-stock': 'Available now',
   limited: 'Limited stock',
   'on-request': 'Confirm availability',
+};
+
+const MONITOR_PHOTO: Record<string, keyof typeof PHOTOS> = {
+  'hp-22-monitor': 'monitor', 'hp-22f-fhd': 'monitor', 'dell-se2216h': 'monitorDual', 'lenovo-thinkvision-s22e': 'monitorDesk', 'ips-24-monitor': 'monitorDual',
 };
 
 export const PRODUCTS: Product[] = [
@@ -59,7 +94,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['8th Gen'],
     ram: '8 GB', ram_gb: 8, storage: '256 GB SSD', storage_gb: 256, display_size: '14"',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Business'], images: photo('thinkpad', 'Lenovo ThinkPad L490'),
     description: 'A dependable 14-inch ThinkPad with the keyboard and build quality Lenovo’s business line is known for. Suited to everyday office work at scale.',
     use_cases: ['BPO and support seats', 'Office productivity', 'Training batches'],
   },
@@ -68,7 +103,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['6th Gen'],
     ram: '8 GB', ram_gb: 8, storage: '256 GB SSD', storage_gb: 256, display_size: '14"',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('lenovo', 'Lenovo ThinkPad L460'),
     description: 'A cost-effective ThinkPad for browser-based work, email and data entry, where many identical machines are needed.',
     use_cases: ['High-volume seats', 'Exam and assessment labs', 'Temporary staff'],
   },
@@ -77,7 +112,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['8th Gen'],
     ram: '16 GB', ram_gb: 16, storage: '512 GB SSD', storage_gb: 512, display_size: '14"',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Business', 'Project ready'], images: [],
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Business', 'Project ready'], images: photo('dellSilver', 'Dell Latitude 7490'),
     description: 'Dell’s premium 14-inch business laptop with 16 GB of memory, comfortable for heavy multitasking and long working days.',
     use_cases: ['Analysts and consultants', 'Project teams', 'Managers'],
   },
@@ -86,7 +121,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['6th Gen'],
     ram: '16 GB', ram_gb: 16, storage: '256 GB SSD', storage_gb: 256, display_size: '14"',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('dellBlack', 'Dell Latitude 7470'),
     description: 'A slim Latitude with 16 GB of memory at an accessible rental cost, for teams that keep many applications open.',
     use_cases: ['Operations teams', 'Back office', 'Training'],
   },
@@ -95,7 +130,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['8th Gen'],
     ram: '8 GB', ram_gb: 8, storage: '512 GB SSD', storage_gb: 512, display_size: '14"',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Business'], images: photo('hp', 'HP EliteBook 840 G6'),
     description: 'HP’s 14-inch business flagship with 512 GB of storage, a sound choice for client-facing staff.',
     use_cases: ['Sales teams', 'Consultants', 'Office productivity'],
   },
@@ -104,7 +139,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['6th Gen'],
     ram: '8 GB', ram_gb: 8, storage: '256 GB SSD', storage_gb: 256, display_size: '14"',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('hp', 'HP EliteBook 840 G3'),
     description: 'A sturdy EliteBook for standard office work and large, uniform deployments.',
     use_cases: ['BPO seats', 'Data entry', 'Training batches'],
   },
@@ -113,7 +148,7 @@ export const PRODUCTS: Product[] = [
     category: 'laptops', subcategory: 'Compact business laptop',
     processor: 'Intel Core i5 / i7', processor_brand: 'Intel', processor_family: ['Core i5', 'Core i7'], processor_generation: ['8th Gen'],
     ram: '8 GB', ram_gb: 8, storage: '512 GB SSD', storage_gb: 512, display_size: '13.3"',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo('hp', 'HP EliteBook 830 G6'),
     description: 'The compact 13.3-inch EliteBook, light enough for people who travel between sites.',
     use_cases: ['Field and travelling staff', 'Leadership', 'Events'],
   },
@@ -123,7 +158,7 @@ export const PRODUCTS: Product[] = [
     category: 'macbooks', subcategory: 'MacBook Air',
     processor: 'Apple M1 / M2', processor_brand: 'Apple', processor_family: ['Apple silicon'], processor_generation: ['M1', 'M2'],
     ram: '8 GB', ram_gb: 8, storage: '256 GB SSD', storage_gb: 256, display_size: '13.3"', operating_system: 'macOS',
-    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac'], images: [],
+    availability: 'on-request', rental_price: null, featured: true, tags: ['Mac'], images: photo('macAir', 'Apple MacBook Air'),
     description: 'Silent, light and long-lasting on battery. The default Mac for product, marketing and leadership teams.',
     use_cases: ['Product and marketing teams', 'Leadership', 'Presentations and events'],
   },
@@ -132,7 +167,7 @@ export const PRODUCTS: Product[] = [
     category: 'macbooks', subcategory: 'MacBook Pro',
     processor: 'Apple M1 / M2', processor_brand: 'Apple', processor_family: ['Apple silicon'], processor_generation: ['M1', 'M2'],
     ram: '8 GB', ram_gb: 8, storage: '256 GB SSD', storage_gb: 256, display_size: '13.3"', operating_system: 'macOS',
-    availability: 'on-request', rental_price: null, tags: ['Mac', 'High performance'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Mac', 'High performance'], images: photo('macPro', 'Apple MacBook Pro'),
     description: 'Sustained performance for builds, design tools and media work. Ask about higher-memory configurations.',
     use_cases: ['iOS and macOS development', 'Design and video', 'Engineering contractors'],
   },
@@ -140,7 +175,7 @@ export const PRODUCTS: Product[] = [
     id: 'imac', slug: 'apple-imac', name: 'Apple iMac', brand: 'Apple',
     category: 'macbooks', subcategory: 'iMac',
     processor_brand: 'Apple', processor_family: ['Apple silicon'], operating_system: 'macOS',
-    availability: 'on-request', rental_price: null, tags: ['Mac'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Mac'], images: photo('imac', 'Apple iMac'),
     description: 'An all-in-one Mac for fixed desks, studios and reception areas. Configuration confirmed at quote.',
     use_cases: ['Design studios', 'Reception and front desk', 'Editing suites'],
   },
@@ -156,7 +191,7 @@ export const PRODUCTS: Product[] = [
   ] as const).map(([id, name, brand, sub]): Product => ({
     id, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''), name, brand,
     category: 'desktops', subcategory: sub, processor_brand: 'Intel',
-    availability: 'on-request', rental_price: null, tags: ['Business'], images: [],
+    availability: 'on-request', rental_price: null, tags: ['Business'], images: photo(sub === 'Mini PC' ? 'seat' : 'desktops', name),
     description: sub === 'Mini PC'
       ? `A compact ${brand} mini PC that mounts behind a monitor and frees up desk space. Rented as a full seat with monitor, keyboard and mouse. Exact processor and memory confirmed at quote.`
       : `A ${brand} business desktop for fixed workstations. Rented as a full seat with monitor, keyboard and mouse. Exact processor and memory confirmed at quote.`,
@@ -172,7 +207,7 @@ export const PRODUCTS: Product[] = [
   ] as const).map(([id, name, brand, size]): Product => ({
     id, slug: id, name, brand, category: 'monitors', subcategory: 'Monitor',
     display_size: size, resolution: '1920 × 1080',
-    availability: 'on-request', rental_price: null, tags: [], images: [],
+    availability: 'on-request', rental_price: null, tags: [], images: photo(MONITOR_PHOTO[id] ?? 'monitorDesk', name),
     description: `A ${size} full-HD display for desks, dual-screen setups and events.`,
     use_cases: ['Dual-screen desks', 'Desktop seats', 'Events and training rooms'],
   })),
