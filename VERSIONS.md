@@ -26,6 +26,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v17 | `fe0bd50` | Redirects for old itrentals.in addresses and LAUNCH-GUIDE.md; looks the same as v16 | same as v16 |
 | v18 | `a70e2ea` | Popular models moved directly below the scale selector on the home page | https://claude.ai/artifact/4HbpSdoEzRqVF47a41DPYT |
 | v19 | `7b45e89` | Lakhendra Prasad's photo on the About page | https://claude.ai/artifact/FzvuVSEbswWNtTPP9ZF66K |
+| v20 | `54471fe` | 'Need 25 or more devices?' section removed from every page | https://claude.ai/artifact/PevpeAvLUfkruFwz6GVJVX |
 
 ## Going back to a version
 
