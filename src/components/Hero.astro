@@ -22,15 +22,47 @@ const pile: { label: string; icon: string; hue: string; r: number; href: string 
   { label: '24" monitors', icon: 'monitor', hue: 'paper', r: 6, href: '/monitor-rental/' },
 ];
 
+/**
+ * Decorative icons from the Visual Asset Library (laptop set + hardware set),
+ * scattered around the laptop like objects on a desk. side: which edge they hug,
+ * x: px beyond that edge, y: % of laptop height, s: icon size, t: tile or bare.
+ */
+const floaters: { name: string; badge?: string; side: 'l' | 'r'; x: number; y: number; s: number; r: number; t?: boolean; d: number }[] = [
+  { name: 'laptop-minimal', side: 'l', x: 150, y: 2, s: 30, r: -8, t: true, d: 0 },
+  { name: 'wifi', side: 'l', x: 52, y: 17, s: 30, r: 6, d: 1.2 },
+  { name: 'laptop', badge: 'check', side: 'l', x: 128, y: 30, s: 28, r: 5, t: true, d: 2.1 },
+  { name: 'server', side: 'l', x: 48, y: 47, s: 32, r: -4, d: 0.6 },
+  { name: 'laptop', badge: 'lock', side: 'l', x: 158, y: 60, s: 30, r: -10, t: true, d: 1.7 },
+  { name: 'mouse', side: 'l', x: 62, y: 77, s: 26, r: 12, d: 2.6 },
+  { name: 'laptop', badge: 'chart-column', side: 'l', x: 120, y: 92, s: 28, r: 7, t: true, d: 0.9 },
+  { name: 'monitor', side: 'r', x: 140, y: 4, s: 30, r: 7, t: true, d: 0.4 },
+  { name: 'laptop', badge: 'refresh-cw', side: 'r', x: 50, y: 19, s: 30, r: -6, d: 2.3 },
+  { name: 'smartphone', side: 'r', x: 156, y: 33, s: 28, r: -9, t: true, d: 1.1 },
+  { name: 'router', side: 'r', x: 58, y: 49, s: 32, r: 4, d: 0.2 },
+  { name: 'laptop', badge: 'clock', side: 'r', x: 132, y: 62, s: 30, r: 8, t: true, d: 1.9 },
+  { name: 'cloud-upload', side: 'r', x: 46, y: 79, s: 30, r: -5, d: 2.8 },
+  { name: 'laptop', badge: 'map-pin', side: 'r', x: 150, y: 93, s: 28, r: -7, t: true, d: 0.7 },
+];
+
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
 <section class="hero" aria-labelledby="hero-title">
   <div class="wrap">
   <div class="laptop">
+  <div class="floaters" aria-hidden="true">
+    {floaters.map((f) => (
+      <span
+        class:list={['fl', f.t ? 'fl--tile' : 'fl--bare']}
+        style={`${f.side === 'l' ? 'right' : 'left'}:calc(100% + ${f.x - (f.t ? 64 : f.s + 8)}px * var(--k)); top:${f.y}%; --r:${f.r}deg; --d:${f.d}s;${f.t ? '' : ` width:${f.s + 8}px; height:${f.s + 8}px;`}`}
+      >
+        <Icon name={f.name} badge={f.badge} size={f.t ? 34 : f.s + 8} stroke={1.5} />
+      </span>
+    ))}
+  </div>
   <div class="lid">
   <span class="cam" aria-hidden="true"></span>
   <div class="screen grid-paper hero-inner">
-    <p class="since"><span class="since-dot" aria-hidden="true"></span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</p>
+    <p class="since"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
     <h1 id="hero-title" class="display">Equip ten people<br /> or a thousand.</h1>
     <p class="lead">
       Laptops, desktops, MacBooks, servers, networking and phones on rent across India.
@@ -71,6 +103,30 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
   /* The laptop */
   .laptop { position: relative; max-width: 1180px; margin: 0 auto; }
+  @media (min-width: 1280px) { .laptop { max-width: 1080px; } }
+
+  /* Library icons scattered around the laptop, behind everything */
+  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --icon-accent: var(--red-ink); --k: 1; }
+  @media (max-width: 1439px) { .floaters { --k: .35; } }
+  .fl :global(svg) { max-width: none; flex: none; }
+  .lid, .deck { z-index: 1; }
+  .fl { position: absolute; display: grid; place-items: center; transform: rotate(var(--r)); color: var(--ink-2); }
+  .fl--tile {
+    width: 64px; height: 64px; border-radius: 18px;
+    background: color-mix(in srgb, var(--card) 70%, transparent);
+    border: 1px solid var(--line-strong);
+    box-shadow: 0 10px 24px -16px rgba(23,20,15,.45);
+    opacity: .78;
+  }
+  .fl--bare { opacity: .5; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fl { animation: drift 9s ease-in-out infinite alternate; animation-delay: calc(var(--d) * -1); }
+    @keyframes drift {
+      from { transform: translateY(-5px) rotate(var(--r)); }
+      to { transform: translateY(6px) rotate(calc(var(--r) * -0.5)); }
+    }
+  }
+  @media (max-width: 1099px) { .floaters { display: none; } }
   .lid {
     position: relative; width: 94%; margin: 0 auto;
     background: var(--ink); border-radius: 26px 26px 6px 6px;
