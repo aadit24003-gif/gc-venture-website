@@ -106,7 +106,7 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Product photos**: HP, Dell and Mac models use the photos you supplied (the Mac lock-screen name and picture were removed); Lenovo, desktop and monitor photos are from Pexels (free commercial licence; see `PHOTOS` in `src/data/products.ts`). Confirm you may use the supplied photos commercially, and swap in photos of your own stock when you can.
 - [ ] **Business hours** (`CONTACT.BUSINESS_HOURS`).
 - [ ] **Client list**: 17 names shown. Ericsson, Samsung, Tower and Xceed are hidden until confirmed.
-- [ ] **About page copy**: leadership bios (Vivek Garg, Managing Director, 20+ years; Lakhendra Prasad, Partner and Managing Lead for Operations), the team section, the "How we work" principles and the focus tags. Vivek's photo is in; Lakhendra still shows a monogram until his photo is added (set `photo` for him in `src/pages/about.astro`).
+- [ ] **About page copy**: leadership bios (Vivek Garg, Managing Director, 20+ years; Lakhendra Prasad, Partner and Managing Lead for Operations), the team section, the "How we work" principles and the focus tags. Both leadership photos are in (`public/brand/vivek-garg-*.webp`, `public/brand/lakhendra-prasad-*.webp`).
 - [ ] **Current inventory**: models are from the old site with "Confirm availability". Add newer models, specs, photos and prices when ready.
 - [ ] **Desktop and monitor specs** (processor/RAM per model) so those pages can be indexed.
 - [ ] **Surat and Patna**: shown on the map as service areas (from the company profile) without their own pages.
