@@ -241,6 +241,12 @@ const schema = [{
   /* Hero photo */
   .workplace { margin: 0; position: relative; border-radius: var(--r-lg); overflow: hidden; background: var(--night); box-shadow: 0 40px 80px -40px rgba(23,19,15,.55), 0 0 0 1px rgba(23,19,15,.12); }
   .workplace img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+  /* Desktop: a wider photo that spans the full height of the heading block, top and bottom aligned */
+  @media (min-width: 1000px) {
+    :global(.phero .phero-grid.phero-grid:has(> figure.workplace)) { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: stretch; }
+    .workplace { height: 100%; }
+    .workplace img { height: 100%; aspect-ratio: auto; object-position: 50% 55%; }
+  }
   .workplace::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to top, rgba(18,14,13,.62) 0%, transparent 34%); }
   .workplace figcaption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; justify-content: space-between; gap: 12px; padding: 14px 18px; }
   .workplace figcaption .mono { color: rgba(243,238,229,.85); }
