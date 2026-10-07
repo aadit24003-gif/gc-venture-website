@@ -1,11 +1,16 @@
 ---
 import Icon from './Icon.astro';
 import { INDUSTRIES, type Industry } from '../data/industries';
-interface Props { items?: Industry[]; headingLevel?: 'h2' | 'h3' }
-const { items = INDUSTRIES, headingLevel = 'h3' } = Astro.props;
+interface Props {
+  items?: Industry[];
+  headingLevel?: 'h2' | 'h3';
+  /** On phones, a row of cards to swipe through instead of a long list. */
+  swipe?: boolean;
+}
+const { items = INDUSTRIES, headingLevel = 'h3', swipe = false } = Astro.props;
 const H = headingLevel;
 ---
-<ul role="list" class="ind">
+<ul role="list" class:list={['ind', { 'ind--swipe': swipe }]} tabindex={swipe ? 0 : undefined} aria-label={swipe ? 'Sectors we equip' : undefined}>
   {items.map((it) => (
     <li id={`industry-${it.id}`}>
       <span class="ic"><Icon name={it.icon} size={30} stroke={1.5} /></span>
@@ -26,4 +31,16 @@ const H = headingLevel;
   .ic { color: var(--red-ink); margin-bottom: var(--s-2); }
   .need { color: var(--ink-2); font-size: var(--fs-small); margin: 0; }
   .kit { display: flex; flex-wrap: wrap; gap: 6px; margin: var(--s-2) 0 0; }
+
+  /* Phones: swipe through the sectors */
+  @media (max-width: 639px) {
+    .ind--swipe {
+      grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 80%; gap: 12px;
+      overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none;
+      border: 0; margin-inline: calc(var(--gutter) * -1); padding: 2px var(--gutter) 8px; scroll-padding-inline: var(--gutter);
+    }
+    .ind--swipe::-webkit-scrollbar { display: none; }
+    .ind--swipe:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+    .ind--swipe li { scroll-snap-align: start; border: 1px solid var(--line-strong); border-radius: var(--r-lg); background: var(--card); }
+  }
 </style>

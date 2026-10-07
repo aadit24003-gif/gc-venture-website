@@ -31,6 +31,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v22 | `5d9b8c0` | Scroll-driven home page: cream hero laptop that boots as Apple, HP, Dell, Lenovo then IT Rentals; stacking 'How renting works' cards; office video that opens to full screen; ticking preparation checks | https://claude.ai/artifact/PAjP7KW3EqiZsbBdTWG6xY |
 | v23 | `012535c` | Sharper 4K office video (full office floor, 10-second loop, size chosen per screen); fuller icon field around the hero laptop; 'Popular models' became 'Build your team's laptop': brand, processor, memory and storage boxes wired to a laptop that shows the logo and spec, with matching models and a quote link; 'How renting works' moved directly below it | https://claude.ai/artifact/SVtRER7haKRsnx4tJrYAq6 |
 | v24 | `f8c7134` | 'Build your team's laptop' and the office video ('A full floor, working on day one') swapped places: the builder now follows the preparation section, the video follows the scale section | https://claude.ai/artifact/BWBKno11NZzN1q7bu1S1YE |
+| v25 | (this commit) | Polish pass: sentence-case labels instead of mono capitals; HP/Dell product shots on warm panels; calmer product cards; header tucks away on scroll down; closing 'Tell us what your team needs' band and large IT Rentals wordmark in the footer; smooth page-to-page transitions; phone layouts for industries (swipe), benefits (two columns) and footer cities | (snapshot link added next) |
 
 ## Going back to a version
 

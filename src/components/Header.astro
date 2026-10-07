@@ -145,7 +145,10 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
 </header>
 
 <style>
-  .site-header { position: sticky; top: 0; z-index: var(--z-header); padding-top: 12px; }
+  .site-header { position: sticky; top: 0; z-index: var(--z-header); padding-top: 12px; transition: transform .38s var(--ease-out); }
+  /* Tucked away while reading down the page; back as soon as the visitor scrolls up */
+  .site-header:global(.is-tucked) { transform: translateY(calc(-100% - 8px)); }
+  @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
   .bar { position: relative; }
   .bar-inner {
     display: flex; align-items: center; gap: var(--s-5); justify-content: space-between;
@@ -257,11 +260,35 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
     }),
   );
 
+  // Tuck the header away on the way down, bring it back on the way up.
+  // Never while a menu is open or the header has keyboard focus.
+  const header = document.querySelector<HTMLElement>('.site-header')!;
+  let lastY = scrollY;
+  let travel = 0;
+  let queued = false;
+  const busy = () =>
+    document.documentElement.classList.contains('menu-open') ||
+    triggers.some((t) => t.getAttribute('aria-expanded') === 'true') ||
+    header.contains(document.activeElement);
+  const onScroll = () => {
+    queued = false;
+    const y = scrollY;
+    const dy = y - lastY;
+    lastY = y;
+    travel = Math.sign(dy) === Math.sign(travel) ? travel + dy : dy;
+    if (y < 160 || busy()) header.classList.remove('is-tucked');
+    else if (travel > 28) header.classList.add('is-tucked');
+    else if (travel < -10) header.classList.remove('is-tucked');
+  };
+  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  header.addEventListener('focusin', () => header.classList.remove('is-tucked'));
+
   // Mobile menu
   const burger = document.querySelector<HTMLButtonElement>('[data-burger]')!;
   const menu = document.querySelector<HTMLElement>('[data-mobile-menu]')!;
   const closeBtn = menu.querySelector<HTMLButtonElement>('[data-burger-close]')!;
   const setMenu = (on: boolean) => {
+    if (on) header.classList.remove('is-tucked');
     menu.hidden = !on;
     burger.setAttribute('aria-expanded', String(on));
     document.documentElement.style.overflow = on ? 'hidden' : '';

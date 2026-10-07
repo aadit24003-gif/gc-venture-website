@@ -71,7 +71,7 @@ const schema = [
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
 ];
 ---
-<Base title={title} description={description} path={path} crumbs={crumbs} schema={schema} noindex={thin} waMessage={wa}>
+<Base title={title} description={description} path={path} crumbs={crumbs} schema={schema} noindex={thin} waMessage={wa} closingCta={false}>
   <section class="pd grid-paper">
     <div class="wrap">
       <nav aria-label="Breadcrumb">
@@ -84,8 +84,8 @@ const schema = [
         <div class="gallery">
           {p.images.length ? (
             p.images.map((img, i) => (
-              <figure class="photo">
-                <img src={img.src} alt={img.alt} width={img.width} height={img.height} loading={i ? 'lazy' : 'eager'} fetchpriority={i ? undefined : 'high'} />
+              <figure class:list={['photo', { 'photo--studio': /-studio-/.test(img.src) }]}>
+                <div class="shot"><img src={img.src} alt={img.alt} width={img.width} height={img.height} loading={i ? 'lazy' : 'eager'} fetchpriority={i ? undefined : 'high'} /></div>
                 <figcaption class="xs">Representative photo of the {p.brand} range. Units are confirmed with your quote.</figcaption>
               </figure>
             ))
@@ -215,8 +215,12 @@ const schema = [
   .pd-grid { display: grid; gap: var(--s-7); align-items: start; }
   @media (min-width: 960px) { .pd-grid { grid-template-columns: 1.05fr 1fr; } }
   .photo { margin: 0; }
-  .gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-lg); border: 1px solid var(--line-strong); background: var(--card); box-shadow: var(--shadow-block); }
+  .shot { overflow: hidden; border-radius: var(--r-lg); border: 1px solid var(--line-strong); background: var(--card); box-shadow: var(--shadow-block); }
+  .gallery img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
   .photo figcaption { margin-top: var(--s-3); color: var(--ink-2); }
+  /* white-background product shots sit on a warm panel */
+  .photo--studio .shot { background: radial-gradient(70% 80% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
+  .photo--studio img { object-fit: contain; padding: 6% 8% 4%; mix-blend-mode: multiply; }
   .ph { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 3; border-radius: var(--r-lg); border: 1px solid var(--line-strong); background: var(--card); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 16px 16px; box-shadow: var(--shadow-block); }
   .ph-brand { position: absolute; left: 20px; bottom: 14px; font-family: var(--font-display); font-weight: 400; font-size: 2rem; color: var(--ink-3); }
   .ph-note { position: absolute; right: 20px; bottom: 20px; color: var(--ink-2); }
@@ -243,7 +247,7 @@ const schema = [
   .cfg-table-wrap { overflow-x: auto; border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--card); }
   .cfg-table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: var(--fs-small); }
   .cfg-table th, .cfg-table td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  .cfg-table thead th { font-size: var(--fs-xs); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); font-weight: 600; background: var(--paper-2); }
+  .cfg-table thead th { font-size: var(--fs-xs); color: var(--ink-2); font-weight: 600; background: var(--paper-2); }
   .cfg-table tbody th { font-weight: 600; }
   .cfg-table tbody tr:last-child > * { border-bottom: 0; }
 </style>

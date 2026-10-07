@@ -194,7 +194,7 @@ const cardSpec = (p: Product) => {
       <div class="matches" data-matches>
         {popular.map((p) => (
           <article class="mcard">
-            <a class="mcard-img" href={`/equipment/${p.slug}/`} tabindex="-1" aria-hidden="true"><img src={p.images[0].card ?? p.images[0].src} alt="" width="800" height="500" loading="lazy" decoding="async" /></a>
+            <a class:list={['mcard-img', { 'mcard-img--studio': /-studio-/.test(p.images[0].card ?? p.images[0].src) }]} href={`/equipment/${p.slug}/`} tabindex="-1" aria-hidden="true"><img src={p.images[0].card ?? p.images[0].src} alt="" width="800" height="500" loading="lazy" decoding="async" /></a>
             <div class="mcard-body">
               <p class="mcard-sub">{p.subcategory}</p>
               <h4 class="mcard-name"><a href={`/equipment/${p.slug}/`}>{p.name}</a></h4>
@@ -406,8 +406,14 @@ const cardSpec = (p: Product) => {
   .matches :global(.mcard) {
     display: grid; grid-template-rows: auto 1fr; overflow: hidden; border-radius: var(--r-lg);
     background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-soft);
+    transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
   }
-  .matches :global(.mcard-img img) { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; background: var(--paper-3); }
+  .matches :global(.mcard:hover) { transform: translateY(-3px); box-shadow: var(--shadow-block); }
+  .matches :global(.mcard-img) { display: block; overflow: hidden; background: var(--paper-3); }
+  .matches :global(.mcard-img img) { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 600ms var(--ease-out); }
+  .matches :global(.mcard:hover .mcard-img img) { transform: scale(1.035); }
+  .matches :global(.mcard-img--studio) { background: radial-gradient(70% 85% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
+  .matches :global(.mcard-img--studio img) { object-fit: cover; mix-blend-mode: multiply; }
   .matches :global(.mcard-body) { display: grid; align-content: start; gap: 6px; padding: 14px 16px 18px; }
   .matches :global(.mcard-sub) { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
   .matches :global(.mcard-name) { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; line-height: 1.15; letter-spacing: -0.01em; }
@@ -557,7 +563,8 @@ const cardSpec = (p: Product) => {
       const config = `${m.n}, ${proc}, ${mem}, ${sto}`;
       const href = `/equipment/${m.s}/`;
       const q = `/request-a-quote/?product=${encodeURIComponent(m.s)}&qty=${n}&config=${encodeURIComponent(config)}`;
-      return `<article class="mcard"><a class="mcard-img" href="${href}" tabindex="-1" aria-hidden="true"><img src="${esc(m.img)}" alt="" width="800" height="500" loading="lazy" decoding="async"></a>`
+      const studio = /-studio-/.test(m.img) ? ' mcard-img--studio' : '';
+      return `<article class="mcard"><a class="mcard-img${studio}" href="${href}" tabindex="-1" aria-hidden="true"><img src="${esc(m.img)}" alt="" width="800" height="500" loading="lazy" decoding="async"></a>`
         + `<div class="mcard-body"><p class="mcard-sub">${esc(m.sub)}</p><h4 class="mcard-name"><a href="${href}">${esc(m.n)}</a></h4>`
         + `<p class="mcard-spec">${esc(`${proc}, ${mem}, ${sto}`)}</p>`
         + `<a class="mcard-quote" href="${q}">Quote ${n} of this model</a></div></article>`;

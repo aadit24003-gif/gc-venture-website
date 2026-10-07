@@ -19,9 +19,11 @@ interface Props {
   crumbs?: Crumb[];
   /** Pre-filled WhatsApp text for this page's CTAs */
   waMessage?: string;
+  /** Closing call to action in the footer. Turn off on pages that end with a quote form. */
+  closingCta?: boolean;
 }
 
-const { title, description, path, ogImage = SITE.ogImage, noindex = false, schema = [], crumbs, waMessage } = Astro.props;
+const { title, description, path, ogImage = SITE.ogImage, noindex = false, schema = [], crumbs, waMessage, closingCta = true } = Astro.props;
 const canonical = new URL(path ?? Astro.url.pathname, SITE.url).href;
 const withSuffix = `${title} | ${SITE.shortName}`;
 const fullTitle = title.includes(SITE.shortName) || title.includes(SITE.name) || withSuffix.length > 62 ? title : withSuffix;
@@ -121,7 +123,7 @@ const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : [])
     <main id="main" tabindex="-1">
       <slot />
     </main>
-    <Footer />
+    <Footer cta={closingCta} />
     <MobileBar waMessage={waMessage} />
     <script>
       import '../scripts/track';

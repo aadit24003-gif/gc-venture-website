@@ -17,6 +17,8 @@ const rows = [
 ].filter(([, v]) => v) as [string, string][];
 const availClass = p.availability === 'in-stock' ? 'tag--ok' : p.availability === 'limited' ? 'tag--warn' : '';
 const href = `/equipment/${p.slug}/`;
+/** White-background product shots sit on a warm panel instead of a white box. */
+const studio = !!img && /-studio-/.test(img.card ?? img.src);
 const data = catalogue
   ? {
       'data-category': p.category,
@@ -35,7 +37,7 @@ const data = catalogue
   : {};
 ---
 <article class="pcard" data-product {...data}>
-  <a href={href} class="frame" tabindex="-1" aria-hidden="true">
+  <a href={href} class:list={['frame', { 'frame--studio': studio }]} tabindex="-1" aria-hidden="true">
     {img ? (
       <img src={img.card ?? img.src} alt="" width={img.card ? 800 : img.width} height={img.card ? 500 : img.height} loading="lazy" decoding="async" />
       <span class="brand-chip">{p.brand}</span>
@@ -53,11 +55,13 @@ const data = catalogue
     ) : (
       <p class="small muted">Configuration confirmed with your quote.</p>
     )}
-    <div class="meta">
-      <span class={`tag ${availClass}`}>{AVAILABILITY_LABEL[p.availability]}</span>
-      {p.configs && <span class="tag">{p.configs.length > 1 ? `${p.configs.length} configurations` : 'Configurable'}</span>}
-      {p.tags.map((t) => <span class="tag">{t}</span>)}
-    </div>
+    {(p.availability !== 'on-request' || (p.configs?.length ?? 0) > 1 || p.tags.length > 0) && (
+      <div class="meta">
+        {p.availability !== 'on-request' && <span class={`tag ${availClass}`}>{AVAILABILITY_LABEL[p.availability]}</span>}
+        {p.configs && p.configs.length > 1 && <span class="tag">{p.configs.length} configurations</span>}
+        {p.tags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+    )}
     <div class="actions">
       <a class="btn btn--primary btn--sm" href={`/request-a-quote/?product=${encodeURIComponent(p.slug)}`}>Request quote</a>
       <a class="link-arrow small" href={href}>Details <Icon name="arrow-right" /></a>
@@ -69,13 +73,14 @@ const data = catalogue
 </article>
 
 <style>
-  .pcard { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line-strong); border-radius: var(--r-md); overflow: hidden; transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out); }
-  .pcard:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-block); }
-  .frame { display: block; aspect-ratio: 16 / 10; background: var(--paper-2); border-bottom: 1px solid var(--line-strong); }
-  .frame { position: relative; overflow: hidden; }
-  .frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 500ms var(--ease-out); }
-  .pcard:hover .frame img { transform: scale(1.04); }
-  .brand-chip { position: absolute; left: 10px; bottom: 10px; padding: 3px 10px; border-radius: var(--r-pill); background: rgba(23,20,15,.78); color: var(--paper); font-family: var(--font-display); font-weight: 400; font-size: .9375rem; letter-spacing: .02em; }
+  .pcard { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-soft); transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out), border-color var(--t-med); }
+  .pcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-block); border-color: var(--line-strong); }
+  .frame { position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 10; background: var(--paper-2); }
+  .frame img { width: 100%; height: 100%; object-fit: cover; transition: transform 600ms var(--ease-out); }
+  .pcard:hover .frame img { transform: scale(1.035); }
+  .frame--studio { background: radial-gradient(70% 85% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
+  .frame--studio img { object-fit: cover; mix-blend-mode: multiply; }
+  .brand-chip { position: absolute; left: 10px; top: 10px; padding: 3px 10px; border-radius: var(--r-pill); background: rgba(250,247,241,.88); color: var(--ink); font-size: .75rem; font-weight: 600; backdrop-filter: blur(6px); box-shadow: 0 1px 0 rgba(23,19,15,.06); }
   .ph { position: relative; display: grid; place-items: center; height: 100%; color: var(--ink); background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 14px 14px; }
   .ph-brand { position: absolute; left: 14px; bottom: 10px; font-family: var(--font-display); font-weight: 400; font-size: 1.25rem; color: var(--ink-3); }
   .body { display: flex; flex-direction: column; gap: var(--s-3); padding: var(--s-5); flex: 1; }
