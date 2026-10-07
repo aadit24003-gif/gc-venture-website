@@ -10,7 +10,7 @@ Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one s
 
 | Area | URL | Notes |
 |---|---|---|
-| Home | `/` | Scroll-driven: a laptop boots as Apple, HP, Dell and Lenovo, then as IT Rentals with the headline and quote buttons; client names; preparation checks that tick and a parcel that travels the delivery route as you scroll; an office video that opens to full screen; scale selector; a laptop "build" tool (choose brand, processor, memory and storage on boxes wired to a laptop; matching models and a quote link appear); "How renting works" cards that stack as you scroll; equipment; why us; industries; India map; FAQ |
+| Home | `/` | Scroll-driven: a laptop boots as Apple, HP, Dell and Lenovo, then as IT Rentals with the headline and quote buttons; client names; preparation checks that tick and a parcel that travels the delivery route as you scroll; a laptop "build" tool (choose brand, processor, memory and storage on boxes wired to a laptop; matching models and a quote link appear); scale selector; an office video that opens to full screen; "How renting works" cards that stack as you scroll; equipment; why us; industries; India map; FAQ |
 | Service pages (8) | `/laptop-rental/`, `/macbook-rental/`, `/desktop-rental/`, `/monitor-rental/`, `/server-rental/`, `/router-rental/`, `/mobile-phone-rental/`, `/it-equipment-rental/` | Generated from `src/data/categories.ts` |
 | Catalogue | `/equipment/` | Search, filters (category, brand, processor, generation, RAM, storage, screen, city), shareable filter URLs, compare up to 3 |
 | Product pages (22) | `/equipment/<model>/` | Specs, rental terms, "Need 20 of these?" quote form, WhatsApp with product name |
