@@ -28,6 +28,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v19 | `7b45e89` | Lakhendra Prasad's photo on the About page | https://claude.ai/artifact/FzvuVSEbswWNtTPP9ZF66K |
 | v20 | `54471fe` | 'Need 25 or more devices?' section removed from every page | https://claude.ai/artifact/PevpeAvLUfkruFwz6GVJVX |
 | v21 | `d6cd7fa` | About: Our footprint moved directly below Leadership | https://claude.ai/artifact/4GiREPGdefbcSx4jHUkYkS |
+| v22 | `5d9b8c0` | Scroll-driven home page: cream hero laptop that boots as Apple, HP, Dell, Lenovo then IT Rentals; stacking 'How renting works' cards; office video that opens to full screen; ticking preparation checks | https://claude.ai/artifact/PAjP7KW3EqiZsbBdTWG6xY |
 
 ## Going back to a version
 
