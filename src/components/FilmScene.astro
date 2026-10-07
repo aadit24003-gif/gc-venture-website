@@ -4,7 +4,8 @@
  * src/scripts/scenes.ts). The video loads only when the section is near,
  * plays only while visible, and has a pause button. With reduced motion it
  * stays a still card until the visitor presses play.
- * Video: RDNE Stock project on Pexels (free to use), re-encoded as a seamless loop.
+ * Video: "Open office space" from Mixkit (Mixkit Stock Video Free License), graded
+ * and re-encoded from the 4K original as a ten-second seamless loop in three sizes.
  */
 import Icon from './Icon.astro';
 import { SITE } from '../config/site';
@@ -15,11 +16,13 @@ import { CITIES } from '../data/cities';
     <div class="frame">
       <video
         id="film-video" class="vid" muted playsinline loop preload="none" tabindex="-1" aria-hidden="true"
-        poster="/media/office-floor-poster-1600.webp"
-        data-src-lg="/media/office-floor-1920.mp4"
-        data-src-sm="/media/office-floor-1280.mp4"
-        data-webm-lg="/media/office-floor-1920.webm"
-        data-webm-sm="/media/office-floor-1280.webm"
+        poster="/media/open-office-poster-1920.webp"
+        data-src-xl="/media/open-office-2560.mp4"
+        data-src-lg="/media/open-office-1920.mp4"
+        data-src-sm="/media/open-office-1280.mp4"
+        data-webm-xl="/media/open-office-2560.webm"
+        data-webm-lg="/media/open-office-1920.webm"
+        data-webm-sm="/media/open-office-1280.webm"
         width="1920" height="1080"
       ></video>
       <div class="scrim" aria-hidden="true"></div>
@@ -33,7 +36,7 @@ import { CITIES } from '../data/cities';
         </ul>
       </div>
       <div class="controls">
-        <p class="credit">Video: RDNE Stock project, Pexels</p>
+        <p class="credit">Video: Mixkit</p>
         <button class="vid-toggle" type="button" data-video-toggle data-state="paused" aria-controls="film-video">
           <span class="i-pause" aria-hidden="true"><Icon name="pause" size={16} stroke={2} /></span>
           <span class="i-play" aria-hidden="true"><Icon name="play" size={16} stroke={2} /></span>
@@ -55,10 +58,12 @@ import { CITIES } from '../data/cities';
   .vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .scrim {
     position: absolute; inset: 0; pointer-events: none;
+    /* the footage is bright, so the copy side gets a deep, even shade */
     background:
-      linear-gradient(to top, rgba(18,14,13,.86) 0%, rgba(18,14,13,.45) 38%, rgba(18,14,13,0) 70%),
-      linear-gradient(to right, rgba(18,14,13,.5) 0%, rgba(18,14,13,0) 55%);
+      linear-gradient(to top, rgba(18,14,13,.9) 0%, rgba(18,14,13,.74) 32%, rgba(18,14,13,.36) 56%, rgba(18,14,13,0) 80%),
+      linear-gradient(to right, rgba(18,14,13,.62) 0%, rgba(18,14,13,.28) 42%, rgba(18,14,13,0) 64%);
   }
+  .copy { text-shadow: 0 1px 24px rgba(18,14,13,.45); }
   .copy { position: absolute; left: clamp(20px, 4vw, 64px); right: clamp(20px, 4vw, 64px); bottom: clamp(64px, 8vh, 96px); max-width: 720px; }
   .copy .h2 { color: var(--on-dark); }
   .copy .lead { margin-top: var(--s-4); color: rgba(243,238,229,.82); max-width: 52ch; }
@@ -81,6 +86,7 @@ import { CITIES } from '../data/cities';
 
   @media (max-width: 760px) {
     .frame { aspect-ratio: auto; min-height: 560px; }
+    .scrim { background: linear-gradient(to top, rgba(18,14,13,.93) 0%, rgba(18,14,13,.8) 42%, rgba(18,14,13,.42) 64%, rgba(18,14,13,0) 84%); }
     .copy { bottom: 84px; }
     .controls { left: 20px; right: 20px; justify-content: space-between; }
   }

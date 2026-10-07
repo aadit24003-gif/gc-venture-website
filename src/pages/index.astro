@@ -6,19 +6,16 @@ import ScaleSelector from '../components/ScaleSelector.astro';
 import Preparation from '../components/Preparation.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
 import WhyUs from '../components/WhyUs.astro';
-import ProductCard from '../components/ProductCard.astro';
+import LaptopCurator from '../components/LaptopCurator.astro';
 import StepsScene from '../components/StepsScene.astro';
 import FilmScene from '../components/FilmScene.astro';
 import IndustryGrid from '../components/IndustryGrid.astro';
 import IndiaMap from '../components/IndiaMap.astro';
 import FAQ from '../components/FAQ.astro';
-import Icon from '../components/Icon.astro';
-import { PRODUCTS } from '../data/products';
 import { GENERAL_FAQS } from '../data/faqs';
 import { TESTIMONIALS } from '../data/clients';
 import { SITE } from '../config/site';
 
-const featured = PRODUCTS.filter((p) => p.featured).slice(0, 4);
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -41,22 +38,11 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
 
   <ScaleSelector />
 
-  <section class="section section--sunk" aria-labelledby="cat-title">
-    <div class="wrap">
-      <div class="head-row">
-        <div class="section-head">
-          <h2 id="cat-title" class="h2">Popular models</h2>
-          <p class="lead">Popular models from the ThinkPad, Latitude, EliteBook and MacBook ranges. Filter by processor, memory and screen size in the full catalogue.</p>
-        </div>
-        <a class="link-arrow" href="/equipment/">Open the catalogue <Icon name="arrow-right" /></a>
-      </div>
-      <div class="pgrid">
-        {featured.map((p) => <ProductCard p={p} />)}
-      </div>
-    </div>
-  </section>
+  <LaptopCurator />
 
-  <section class="section" aria-labelledby="equip-title">
+  <StepsScene />
+
+  <section class="section section--sunk" aria-labelledby="equip-title">
     <div class="wrap">
       <div class="section-head section-head--split">
         <h2 id="equip-title" class="h2">More than laptops</h2>
@@ -67,8 +53,6 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
   </section>
 
   <WhyUs />
-
-  <StepsScene />
 
   <section class="section" aria-labelledby="ind-title">
     <div class="wrap">
@@ -123,9 +107,6 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
 </script>
 
 <style>
-  .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }
-  .head-row .section-head { margin-bottom: 0; }
-  .pgrid { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
   .faq-layout { display: grid; gap: var(--s-7); }
   .faq-lead { margin-top: var(--s-5); }
   @media (min-width: 960px) { .faq-layout { grid-template-columns: 1fr 1.4fr; } }

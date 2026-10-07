@@ -10,6 +10,7 @@ import Icon from './Icon.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
 import { PRODUCTS } from '../data/products';
 import { BRAND_MARKS } from '../data/brand-marks';
+import iconNodes from 'lucide-static/icon-nodes.json';
 
 const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'laptops' && p.brand === brand).length;
 
@@ -36,8 +37,12 @@ const brands = [
 const railItems = [...brands, { id: 'itr', name: 'IT Rentals', caption: `Every brand from one rental partner, since ${SITE.founded}` }];
 
 /**
- * A field of thin library icons (laptop set + hardware set) around the laptop.
- * Positions come from a fixed seed so every build looks the same.
+ * A field of thin library icons (laptop set + hardware set) on both sides of
+ * the laptop. Each side is a container as wide as the space beside the laptop;
+ * columns that would not fit are hidden by container queries, so wide screens
+ * get a fuller field and narrow ones stay tidy. Icons are drawn from one SVG
+ * sprite to keep the page light. Positions come from a fixed seed so every
+ * build looks the same.
  */
 const pool: [string, string?][] = [
   ['laptop'], ['laptop', 'check'], ['laptop', 'lock'], ['laptop', 'clock'], ['laptop', 'map-pin'], ['laptop', 'refresh-cw'],
@@ -45,26 +50,32 @@ const pool: [string, string?][] = [
   ['laptop-minimal'], ['monitor'], ['server'], ['smartphone'], ['tablet'], ['wifi'], ['router'], ['cloud-upload'], ['keyboard'],
   ['mouse'], ['webcam'], ['printer'], ['hard-drive'], ['usb'], ['ethernet-port'], ['plug-zap'], ['battery'], ['power'], ['cpu'], ['projector'],
 ];
+const nodes = iconNodes as unknown as Record<string, [string, Record<string, string>][]>;
+const draw = (n: string) => nodes[n].map(([tag, a]) => `<${tag} ${Object.entries(a).map(([k, v]) => `${k}="${v}"`).join(' ')}/>`).join('');
+const sprite = pool.map(([name, badge], i) => `<symbol id="hf-${i}" viewBox="0 0 24 24">${badge
+  ? `<g mask="url(#hf-cut)">${draw(name)}</g><svg x="13" y="13" width="11" height="11" viewBox="0 0 24 24" style="stroke:var(--icon-accent)" stroke-width="2.6">${draw(badge)}</svg>`
+  : draw(name)}</symbol>`).join('');
+
 let seed = 20130;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-const floaters: { name: string; badge?: string; side: 'l' | 'r'; x: number; y: number; s: number; r: number; o: number; d: number; z: number }[] = [];
-const cols = [34, 96, 158, 220]; // px out from the laptop edge
-const rows = 9;
+type Floater = { icon: number; c: number; x: number; y: number; s: number; r: number; o: number; d: number; z: number };
+const sides: Record<'l' | 'r', Floater[]> = { l: [], r: [] };
+const COLS = 10; // at most; see the container queries in the styles
+const ROWS = 12;
 let k = 0;
 for (const side of ['l', 'r'] as const) {
-  for (let row = 0; row < rows; row++) {
-    for (let c = 0; c < cols.length; c++) {
-      if (rnd() < 0.28) continue; // gaps so it reads as scattered, not a grid
-      const [name, badge] = pool[(k++ * 7 + row * 3 + c) % pool.length];
-      floaters.push({
-        name, badge, side,
-        x: cols[c] + Math.round((rnd() - 0.5) * 30),
-        y: Math.round(((row + 0.5) / rows) * 100 + (rnd() - 0.5) * 7),
-        s: 20 + Math.round(rnd() * 12),
+  for (let row = 0; row < ROWS; row++) {
+    for (let c = 0; c < COLS; c++) {
+      if (rnd() < 0.24) continue; // gaps so it reads as scattered, not a grid
+      sides[side].push({
+        icon: (k++ * 7 + row * 3 + c) % pool.length, c,
+        x: 24 + Math.round((rnd() - 0.5) * 24),
+        y: +(-6 + ((row + 0.5) / ROWS) * 112 + (rnd() - 0.5) * 5).toFixed(1),
+        s: 18 + Math.round(rnd() * 12),
         r: Math.round((rnd() - 0.5) * 18),
-        o: +(0.14 + rnd() * 0.2 - c * 0.02).toFixed(2),
+        o: +(0.15 + rnd() * 0.19 - Math.min(c, 6) * 0.01).toFixed(2),
         d: +(rnd() * 6).toFixed(1),
-        z: +(0.35 + c * 0.2 + rnd() * 0.2).toFixed(2),
+        z: +(0.35 + c * 0.1 + rnd() * 0.25).toFixed(2),
       });
     }
   }
@@ -79,13 +90,23 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
     <div class="device-wrap">
       <div class="floaters" aria-hidden="true">
-        {floaters.map((f) => (
-          <span
-            class="fl"
-            style={`${f.side === 'l' ? 'right' : 'left'}:calc(100% + ${f.x - f.s}px * var(--k)); top:${f.y}%; width:${f.s}px; height:${f.s}px; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s; --z:${f.z}`}
-          >
-            <Icon name={f.name} badge={f.badge} size={f.s} stroke={1.25} />
-          </span>
+        <svg class="sprite" width="0" height="0" focusable="false">
+          <defs>
+            <mask id="hf-cut"><rect width="24" height="24" fill="#fff" /><circle cx="18.5" cy="18.5" r="6.4" fill="#000" /></mask>
+            <Fragment set:html={sprite} />
+          </defs>
+        </svg>
+        {(['l', 'r'] as const).map((side) => (
+          <div class={`fl-side fl-side--${side}`}>
+            {sides[side].map((f) => (
+              <span
+                class={`fl c${f.c}`}
+                style={`${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s; --z:${f.z}`}
+              >
+                <svg width={f.s} height={f.s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><use href={`#hf-${f.icon}`} /></svg>
+              </span>
+            ))}
+          </div>
         ))}
       </div>
 
@@ -253,10 +274,30 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .trust :global(svg) { color: var(--red-ink); }
 
   /* Icon field */
-  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --k: 1; --icon-accent: var(--red); }
-  @media (max-width: 1439px) { .floaters { --k: .55; } }
-  .fl { position: absolute; display: grid; place-items: center; color: var(--ink); opacity: calc(var(--o) * .85); transform: rotate(var(--r)); translate: 0 calc(var(--p, 0) * var(--z) * -110px); }
-  .fl :global(svg) { max-width: none; flex: none; }
+  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --icon-accent: var(--red); }
+  .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+  /* Each side is exactly the free space beside the laptop (less a small margin). */
+  .fl-side { position: absolute; top: 0; bottom: 0; width: max(0px, calc((100vw - 100%) / 2 - 12px)); container-type: inline-size; }
+  .fl-side--l { right: 100%; }
+  .fl-side--r { left: 100%; }
+  .fl {
+    position: absolute; display: none; color: var(--ink); opacity: calc(var(--o) * .9);
+    /* columns sit 46px apart, spreading out when the space is wider than ten of them */
+    --sp: max(46px, (100cqi - 40px) / 10);
+    transform: rotate(var(--r)); translate: 0 calc(var(--p, 0) * var(--z) * -110px);
+  }
+  .fl svg { display: block; max-width: none; flex: none; }
+  /* A column shows only when its icons fit in full: 74px for the first, 46px more for each next one. */
+  @container (min-width: 74px) { .c0 { display: block; } }
+  @container (min-width: 120px) { .c1 { display: block; } }
+  @container (min-width: 166px) { .c2 { display: block; } }
+  @container (min-width: 212px) { .c3 { display: block; } }
+  @container (min-width: 258px) { .c4 { display: block; } }
+  @container (min-width: 304px) { .c5 { display: block; } }
+  @container (min-width: 350px) { .c6 { display: block; } }
+  @container (min-width: 396px) { .c7 { display: block; } }
+  @container (min-width: 442px) { .c8 { display: block; } }
+  @container (min-width: 488px) { .c9 { display: block; } }
   @media (prefers-reduced-motion: no-preference) {
     .fl { animation: drift 11s ease-in-out infinite alternate; animation-delay: calc(var(--d) * -1); }
     @keyframes drift {

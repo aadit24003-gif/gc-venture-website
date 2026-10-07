@@ -203,12 +203,23 @@ function init() {
   };
 }
 
-/* WebM (VP9) where supported, MP4 (H.264) otherwise; the smaller file on smaller screens. */
+/**
+ * WebM (VP9) where supported, MP4 (H.264) otherwise. The size is the smallest
+ * that covers the screen's pixels: 2560 on large high-density screens, 1920 on
+ * other desktops and on high-density phones, 1280 otherwise or on slow or
+ * data-saving connections.
+ */
 function videoSource(v: HTMLVideoElement) {
-  const big = innerWidth >= 1100;
-  const webm = v.canPlayType('video/webm; codecs="vp9"') !== '' && v.dataset.webmLg;
-  if (webm) return (big ? v.dataset.webmLg : v.dataset.webmSm) ?? '';
-  return (big ? v.dataset.srcLg : v.dataset.srcSm) ?? '';
+  const d = v.dataset;
+  const conn = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
+  const slow = !!conn?.effectiveType && /(^|-)2g$|^3g$/.test(conn.effectiveType);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const need = Math.max(innerWidth, innerHeight * 16 / 9) * dpr; // covering pixels across
+  const phone = innerWidth < 760;
+  const size = slow ? 'sm' : !phone && need > 2200 && d.srcXl ? 'xl' : need > 1500 || innerWidth >= 1100 ? 'lg' : 'sm';
+  const webm = v.canPlayType('video/webm; codecs="vp9"') !== '';
+  const pick = (kind: 'webm' | 'src') => d[`${kind}${size[0].toUpperCase()}${size.slice(1)}`] ?? d[`${kind}Lg`];
+  return (webm && d.webmLg ? pick('webm') : pick('src')) ?? '';
 }
 
 /* Pause / play buttons for background videos (work with or without scenes). */

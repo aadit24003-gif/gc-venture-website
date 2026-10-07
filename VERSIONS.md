@@ -29,6 +29,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v20 | `54471fe` | 'Need 25 or more devices?' section removed from every page | https://claude.ai/artifact/PevpeAvLUfkruFwz6GVJVX |
 | v21 | `d6cd7fa` | About: Our footprint moved directly below Leadership | https://claude.ai/artifact/4GiREPGdefbcSx4jHUkYkS |
 | v22 | `5d9b8c0` | Scroll-driven home page: cream hero laptop that boots as Apple, HP, Dell, Lenovo then IT Rentals; stacking 'How renting works' cards; office video that opens to full screen; ticking preparation checks | https://claude.ai/artifact/PAjP7KW3EqiZsbBdTWG6xY |
+| v23 | (this commit) | Sharper 4K office video (full office floor, 10-second loop, size chosen per screen); fuller icon field around the hero laptop; 'Popular models' became 'Build your team's laptop': brand, processor, memory and storage boxes wired to a laptop that shows the logo and spec, with matching models and a quote link; 'How renting works' moved directly below it | (snapshot link added next) |
 
 ## Going back to a version
 
