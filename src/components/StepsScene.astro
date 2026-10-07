@@ -1,0 +1,219 @@
+---
+/**
+ * "How renting works" for the home page. While pinned, the four step cards
+ * fly in one by one and stack over the title as you scroll (see
+ * src/scripts/scenes.ts). Without scroll scenes it is a plain grid of cards.
+ * The small screens inside each card are examples of a typical order.
+ */
+import Icon from './Icon.astro';
+import { enabledClaims } from '../config/site';
+
+const chips = enabledClaims(['zeroDeposit', 'monthlyBilling', 'noLockIn']).slice(0, 2);
+const steps = [
+  { t: 'Tell us what you need', d: 'Devices, quantity, city, dates and any software. A form, a call or a WhatsApp message all work.' },
+  { t: 'Get a tailored quote', d: 'We confirm configurations, availability and a monthly price for your exact requirement.' },
+  { t: 'We prepare every device', d: 'Each machine is checked, imaged with your software, asset-tagged and packed per user or desk.' },
+  { t: 'Delivered, set up, supported', d: 'Delivered to your office, replaced if anything fails, and collected when you are done.' },
+];
+---
+<section class="howto" data-scene="steps" data-step="0" aria-labelledby="how-title">
+  <div class="stage">
+    <div class="howto-head">
+      <h2 id="how-title" class="howto-title">How renting works</h2>
+      <p class="howto-sub">Four steps from your first message to devices on desks.</p>
+    </div>
+
+    <ol class="cards" role="list">
+      {steps.map((s, i) => (
+        <li class="card" style={`--i:${i}`}>
+          <div class="card-top">
+            <span class="card-n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="card-t">{s.t}</h3>
+            <p class="card-d">{s.d}</p>
+          </div>
+
+          <div class:list={['vg', `vg--${i + 1}`]} aria-hidden="true">
+            {i === 0 && (
+              <div class="chat">
+                <p class="chat-h"><span class="av">IT</span><span><b>IT Rentals</b><small>WhatsApp</small></span></p>
+                <p class="bub out" style="--r:0">Need 40 laptops in Pune from Monday, with Office and our VPN installed.<time>10:42</time></p>
+                <p class="bub in" style="--r:1">Noted. Core i5 with 16 GB suits most teams. Sending options now.<time>10:44</time></p>
+              </div>
+            )}
+            {i === 1 && (
+              <div class="doc">
+                <p class="doc-h" style="--r:0"><b>Quote</b><span>40 laptops, Pune</span></p>
+                <dl>
+                  <div style="--r:1"><dt>Model</dt><dd>Lenovo ThinkPad T14 Gen 3</dd></div>
+                  <div style="--r:2"><dt>Spec</dt><dd>Core i5 12th Gen, 16 GB, 512 GB SSD</dd></div>
+                  <div style="--r:3"><dt>Software</dt><dd>Windows 11 Pro, Office, your VPN</dd></div>
+                  <div style="--r:4"><dt>Delivery</dt><dd>Monday, 9:30 am</dd></div>
+                </dl>
+                {chips.length > 0 && <p class="doc-f" style="--r:5">{chips.map((c) => <span>{c.short}</span>)}</p>}
+              </div>
+            )}
+            {i === 2 && (
+              <div class="checks">
+                <ul role="list">
+                  {['Hardware diagnostics', 'Windows and Office imaged', 'Your VPN and apps installed', 'Asset tag and charger'].map((c, r) => (
+                    <li style={`--r:${r}`}><Icon name="check" size={14} stroke={3} />{c}</li>
+                  ))}
+                </ul>
+                <p class="meter" style="--r:4"><span>Ready to ship</span><b class="num">40 / 40</b></p>
+                <span class="bar" style="--r:4"><i></i></span>
+              </div>
+            )}
+            {i === 3 && (
+              <ol class="track" role="list">
+                {[['Dispatched', '7:10 am'], ['At your office', '9:05 am'], ['Set up at every desk', '9:40 am'], ['Support line open', 'For the whole rental']].map(([a, b], r) => (
+                  <li class:list={{ live: r === 3 }} style={`--r:${r}`}><b>{a}</b><span>{b}</span></li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <ol class="dots" role="list" aria-hidden="true">
+      {steps.map((_, i) => <li style={`--i:${i}`}>{i + 1}</li>)}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .howto {
+    position: relative;
+    background-color: var(--paper-2);
+    background-image:
+      var(--grain),
+      radial-gradient(60% 80% at 100% 0%, rgba(224, 51, 40, .06), transparent 70%),
+      radial-gradient(55% 70% at 0% 100%, rgba(184, 138, 85, .12), transparent 70%);
+    background-size: 220px 220px, auto, auto;
+  }
+  .stage { padding: var(--section) var(--gutter); max-width: calc(var(--max) + 2 * var(--gutter)); margin: 0 auto; }
+  .howto-head { margin-bottom: var(--s-7); }
+  .howto-title { font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h2); line-height: 1.02; letter-spacing: -0.022em; }
+  .howto-sub { margin-top: var(--s-4); font-size: var(--fs-lead); color: var(--ink-2); }
+  .dots { display: none; }
+
+  .cards { display: grid; gap: var(--s-5); grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); list-style: none; }
+  .card {
+    display: grid; grid-template-rows: auto 1fr; gap: 16px; min-width: 0;
+    padding: 22px; border-radius: 20px; background: var(--card); color: var(--ink);
+    border: 1px solid rgba(23,19,15,.14);
+    box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 30px 60px -34px rgba(23,19,15,.45), 0 8px 18px -12px rgba(23,19,15,.25);
+  }
+  .card-n { display: block; font-family: var(--font-display); font-size: 3rem; line-height: .9; letter-spacing: -0.03em; color: var(--red-ink); }
+  .card-t { margin-top: 12px; font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; line-height: 1.08; letter-spacing: -0.015em; }
+  .card-d { margin-top: 8px; font-size: .9375rem; line-height: 1.5; color: var(--ink-2); }
+
+  /* The example screen inside each card */
+  .vg { display: grid; align-content: center; min-height: 170px; padding: 16px; border-radius: 14px; font-size: .8125rem; line-height: 1.4; overflow: hidden; }
+  .vg--1 { background: #EFE3DC; }
+  .vg--2 { background: #E9E1D2; }
+  .vg--3 { background: #E5DFD4; }
+  .vg--4 { background: #EEDDD8; }
+  .vg [style*='--r'] { --show: 1; opacity: var(--show); translate: 0 calc((1 - var(--show)) * 8px); }
+
+  .chat { display: grid; gap: 8px; }
+  .chat-h { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(23,19,15,.1); }
+  .chat-h b { display: block; font-size: .8125rem; }
+  .chat-h small { display: block; font-size: .6875rem; color: var(--ink-2); }
+  .av { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--red-ink); color: #fff; font-size: .6875rem; font-weight: 700; }
+  .bub { position: relative; max-width: 86%; padding: 8px 10px 16px; border-radius: 12px; }
+  .bub time { position: absolute; right: 8px; bottom: 3px; font-size: .625rem; color: var(--ink-2); }
+  .bub.out { justify-self: end; background: #DDF1E3; border-bottom-right-radius: 4px; }
+  .bub.in { justify-self: start; background: #fff; border-bottom-left-radius: 4px; }
+
+  .doc { display: grid; gap: 8px; padding: 12px 14px; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -18px rgba(23,19,15,.5); }
+  .doc-h { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .doc-h b { font-family: var(--font-display); font-weight: 500; font-size: 1.05rem; }
+  .doc-h span { font-size: .6875rem; color: var(--ink-2); }
+  .doc dl { display: grid; gap: 4px; margin: 0; }
+  .doc dl div { display: grid; grid-template-columns: 64px 1fr; gap: 8px; }
+  .doc dt { color: var(--ink-2); font-size: .6875rem; padding-top: 1px; }
+  .doc dd { margin: 0; font-weight: 600; font-size: .75rem; }
+  .doc-f { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 6px; border-top: 1px dashed var(--line-strong); }
+  .doc-f span { padding: 2px 8px; border-radius: var(--r-pill); background: var(--paper-2); font-size: .6875rem; font-weight: 600; }
+
+  .checks ul { display: grid; gap: 7px; list-style: none; }
+  .checks li { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .checks li :global(svg) { flex: none; width: 20px; height: 20px; padding: 3px; border-radius: 50%; background: var(--ink); color: var(--paper); }
+  .meter { display: flex; justify-content: space-between; margin-top: 14px; font-size: .75rem; color: var(--ink-2); }
+  .meter b { color: var(--ink); }
+  .bar { display: block; height: 6px; margin-top: 6px; border-radius: 6px; background: rgba(23,19,15,.12); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: calc(var(--show) * 100%); border-radius: inherit; background: var(--red-ink); }
+
+  .track { position: relative; display: grid; gap: 12px; list-style: none; padding-left: 22px; }
+  .track::before { content: ''; position: absolute; left: 6px; top: 6px; bottom: 6px; border-left: 2px solid rgba(23,19,15,.18); }
+  .track li { position: relative; display: grid; }
+  .track li::before { content: ''; position: absolute; left: -21px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 3px #EEDDD8; }
+  .track li.live::before { background: var(--red); box-shadow: 0 0 0 3px #EEDDD8, 0 0 0 7px rgba(224,51,40,.2); }
+  .track b { font-size: .8125rem; }
+  .track span { font-size: .6875rem; color: var(--ink-2); }
+
+  /* ── Scroll scene: cards fly in and stack over the title ── */
+  @media (min-height: 560px) {
+    :global(html.scenes) .howto { height: 400vh; height: 400svh; }
+    :global(html.scenes) .howto .stage {
+      position: sticky; top: 0; height: 100vh; height: 100svh; max-width: none; padding: 0; overflow: hidden;
+      --cw: clamp(270px, 24.5vw, 380px);
+      --ch: min(560px, calc(100svh - 200px));
+    }
+    :global(html.scenes) .howto-head {
+      position: absolute; left: 0; right: 0; top: 47%; margin: 0; text-align: center;
+      transform: translateY(-50%) scale(calc(1.03 - .06 * var(--p, 0)));
+      opacity: calc(1 - .35 * var(--p, 0));
+    }
+    :global(html.scenes) .howto-title { font-size: clamp(3.4rem, 1rem + 8.6vw, 10.5rem); line-height: .9; letter-spacing: -0.035em; }
+    :global(html.scenes) .howto-sub { margin-top: clamp(12px, 2vh, 24px); }
+    :global(html.scenes) .cards { display: block; position: absolute; inset: 0; }
+    :global(html.scenes) .card {
+      position: absolute; left: 50%; top: 54%; width: var(--cw); height: var(--ch);
+      --start: calc(.04 + var(--i) * .21);
+      --t: clamp(0, calc((var(--p, 0) - var(--start)) / .17), 1);
+      --e: calc(1 - (1 - var(--t)) * (1 - var(--t)) * (1 - var(--t)));
+      --x: calc((var(--i) - 1.5) * var(--cw) * .8);
+      transform:
+        translate(-50%, -50%)
+        translate(calc(var(--x) + (1 - var(--e)) * var(--fx)), calc(var(--y) + (1 - var(--e)) * 85vh))
+        rotate(calc(var(--rot) + (1 - var(--e)) * var(--fr)));
+      opacity: clamp(0, calc(var(--t) * 8), 1);
+      will-change: transform;
+    }
+    :global(html.scenes) .card:nth-child(1) { --y: 6px; --rot: -4deg; --fx: -10vw; --fr: -9deg; }
+    :global(html.scenes) .card:nth-child(2) { --y: -18px; --rot: 2.5deg; --fx: -4vw; --fr: 8deg; }
+    :global(html.scenes) .card:nth-child(3) { --y: 14px; --rot: -2deg; --fx: 4vw; --fr: -8deg; }
+    :global(html.scenes) .card:nth-child(4) { --y: -8px; --rot: 3.5deg; --fx: 10vw; --fr: 9deg; }
+    :global(html.scenes) .card .vg [style*='--r'] { --show: clamp(0, calc((var(--t) - .55 - var(--r) * .07) * 6), 1); }
+    :global(html.scenes) .vg { min-height: 0; }
+
+    :global(html.scenes) .dots { display: flex; gap: 10px; position: absolute; left: 50%; bottom: clamp(16px, 3vh, 30px); translate: -50% 0; list-style: none; }
+    .dots li {
+      display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,.6); border: 1px solid var(--line-strong); color: var(--ink-2);
+      font-size: .8125rem; font-weight: 600; transition: background .3s ease, color .3s ease, border-color .3s ease;
+    }
+    :global(html.scenes) .howto[data-step='1'] .dots li:nth-child(-n + 1),
+    :global(html.scenes) .howto[data-step='2'] .dots li:nth-child(-n + 2),
+    :global(html.scenes) .howto[data-step='3'] .dots li:nth-child(-n + 3),
+    :global(html.scenes) .howto[data-step='4'] .dots li:nth-child(-n + 4) { background: var(--red-ink); border-color: var(--red-ink); color: #fff; }
+  }
+
+  /* Narrower screens: one deck of cards under the title */
+  @media (min-height: 560px) and (max-width: 999px) {
+    :global(html.scenes) .howto .stage { --cw: min(86vw, 400px); --ch: min(500px, calc(100svh - 300px)); }
+    :global(html.scenes) .howto-head { top: 88px; transform: none; opacity: 1; padding: 0 var(--gutter); }
+    :global(html.scenes) .howto-title { font-size: clamp(2.4rem, 1.4rem + 4vw, 3.6rem); }
+    :global(html.scenes) .howto-sub { font-size: var(--fs-small); margin-top: 8px; }
+    :global(html.scenes) .card { top: calc(196px + var(--ch) / 2); --x: calc((var(--i) - 1.5) * 6px); }
+    :global(html.scenes) .card:nth-child(1) { --y: -15px; --rot: -2.5deg; --fx: -14vw; }
+    :global(html.scenes) .card:nth-child(2) { --y: -5px; --rot: 1.5deg; --fx: 12vw; }
+    :global(html.scenes) .card:nth-child(3) { --y: 5px; --rot: -1deg; --fx: -12vw; }
+    :global(html.scenes) .card:nth-child(4) { --y: 15px; --rot: 2deg; --fx: 14vw; }
+    :global(html.scenes) .dots { display: none; }
+    :global(html.scenes) .card-n { font-size: 2.4rem; }
+    :global(html.scenes) .card-t { font-size: 1.4rem; }
+  }
+</style>

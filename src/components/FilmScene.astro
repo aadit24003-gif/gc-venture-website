@@ -1,0 +1,115 @@
+---
+/**
+ * Office video that opens from a card to full screen as you scroll (see
+ * src/scripts/scenes.ts). The video loads only when the section is near,
+ * plays only while visible, and has a pause button. With reduced motion it
+ * stays a still card until the visitor presses play.
+ * Video: RDNE Stock project on Pexels (free to use), re-encoded as a seamless loop.
+ */
+import Icon from './Icon.astro';
+import { SITE } from '../config/site';
+import { CITIES } from '../data/cities';
+---
+<section class="film" data-scene="film" aria-labelledby="film-title">
+  <div class="stage">
+    <div class="frame">
+      <video
+        id="film-video" class="vid" muted playsinline loop preload="none" tabindex="-1" aria-hidden="true"
+        poster="/media/office-floor-poster-1600.webp"
+        data-src-lg="/media/office-floor-1920.mp4"
+        data-src-sm="/media/office-floor-1280.mp4"
+        data-webm-lg="/media/office-floor-1920.webm"
+        data-webm-sm="/media/office-floor-1280.webm"
+        width="1920" height="1080"
+      ></video>
+      <div class="scrim" aria-hidden="true"></div>
+      <div class="copy">
+        <h2 id="film-title" class="h2">A full floor, working on day one.</h2>
+        <p class="lead">Machines arrive imaged with your software and labelled for each desk, so your team logs in on the first morning.</p>
+        <ul class="facts" role="list">
+          <li><b class="num">{SITE.founded}</b><span>Renting since</span></li>
+          <li><b class="num">{CITIES.length}+</b><span>Cities served</span></li>
+          <li><b class="num">10 to 1,000+</b><span>Devices per order</span></li>
+        </ul>
+      </div>
+      <div class="controls">
+        <p class="credit">Video: RDNE Stock project, Pexels</p>
+        <button class="vid-toggle" type="button" data-video-toggle data-state="paused" aria-controls="film-video">
+          <span class="i-pause" aria-hidden="true"><Icon name="pause" size={16} stroke={2} /></span>
+          <span class="i-play" aria-hidden="true"><Icon name="play" size={16} stroke={2} /></span>
+          <span data-label>Play video</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .film { position: relative; }
+  .stage { padding: var(--section) var(--gutter) 0; max-width: calc(var(--max) + 2 * var(--gutter)); margin: 0 auto; }
+  .frame {
+    position: relative; overflow: hidden; border-radius: 24px; background: var(--night); color: var(--on-dark);
+    aspect-ratio: 16 / 9; min-height: 420px;
+    box-shadow: 0 40px 80px -50px rgba(23,19,15,.7);
+  }
+  .vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(to top, rgba(18,14,13,.86) 0%, rgba(18,14,13,.45) 38%, rgba(18,14,13,0) 70%),
+      linear-gradient(to right, rgba(18,14,13,.5) 0%, rgba(18,14,13,0) 55%);
+  }
+  .copy { position: absolute; left: clamp(20px, 4vw, 64px); right: clamp(20px, 4vw, 64px); bottom: clamp(64px, 8vh, 96px); max-width: 720px; }
+  .copy .h2 { color: var(--on-dark); }
+  .copy .lead { margin-top: var(--s-4); color: rgba(243,238,229,.82); max-width: 52ch; }
+  .facts { display: flex; flex-wrap: wrap; gap: 14px 40px; margin-top: var(--s-6); list-style: none; }
+  .facts li { display: grid; gap: 2px; }
+  .facts b { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.4rem); line-height: 1; letter-spacing: -0.02em; }
+  .facts span { font-size: var(--fs-xs); color: rgba(243,238,229,.7); }
+  .controls { position: absolute; right: clamp(16px, 2.4vw, 32px); bottom: clamp(16px, 2.4vw, 28px); display: flex; align-items: center; gap: 14px; }
+  @media (min-width: 900px) { .controls { right: 108px; } }
+  .credit { font-size: .6875rem; color: rgba(243,238,229,.6); }
+  .vid-toggle {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 14px; border-radius: var(--r-pill);
+    border: 1px solid rgba(243,238,229,.35); background: rgba(18,14,13,.45); color: var(--on-dark);
+    font-size: var(--fs-xs); font-weight: 600; backdrop-filter: blur(6px);
+  }
+  .vid-toggle:hover { border-color: var(--on-dark); }
+  .vid-toggle:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  .vid-toggle span { display: inline-flex; }
+  .vid-toggle[data-state='paused'] .i-pause, .vid-toggle[data-state='playing'] .i-play { display: none; }
+
+  @media (max-width: 760px) {
+    .frame { aspect-ratio: auto; min-height: 560px; }
+    .copy { bottom: 84px; }
+    .controls { left: 20px; right: 20px; justify-content: space-between; }
+  }
+
+  /* ── Scroll scene: the card opens to full screen ── */
+  @media (min-height: 560px) {
+    :global(html.scenes) .film { height: 230vh; height: 230svh; }
+    :global(html.scenes) .film .stage {
+      position: sticky; top: 0; height: 100vh; height: 100svh; max-width: none; padding: 0; overflow: hidden;
+      --k: clamp(0, calc(var(--p, 0) / .5), 1);
+      --e: calc(1 - (1 - var(--k)) * (1 - var(--k)) * (1 - var(--k)));
+      --ix: 15vw; --iy: 17vh;
+    }
+    :global(html.scenes) .film .frame {
+      position: absolute; inset: 0; aspect-ratio: auto; min-height: 0; border-radius: 0; box-shadow: none;
+      clip-path: inset(calc((1 - var(--e)) * var(--iy)) calc((1 - var(--e)) * var(--ix)) round calc((1 - var(--e)) * 28px));
+    }
+    :global(html.scenes) .film .vid { transform: scale(calc(1.16 - .16 * var(--e))); }
+    :global(html.scenes) .film .copy {
+      left: clamp(20px, 6vw, 96px); bottom: clamp(84px, 13vh, 140px);
+      opacity: clamp(0, calc((var(--p, 0) - .42) / .14), 1);
+      translate: 0 calc((1 - clamp(0, calc((var(--p, 0) - .42) / .14), 1)) * 24px);
+    }
+    :global(html.scenes) .film .controls { bottom: clamp(24px, 4vh, 40px); opacity: clamp(0, calc((var(--p, 0) - .3) / .15), 1); }
+    :global(html.scenes) .film .scrim { opacity: clamp(.35, calc(.35 + (var(--p, 0) - .3) * 3), 1); }
+  }
+  @media (min-height: 560px) and (max-width: 760px) {
+    :global(html.scenes) .film .stage { --ix: 5vw; --iy: 20vh; }
+    :global(html.scenes) .film .copy { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
+    :global(html.scenes) .film .controls { left: 20px; right: 20px; bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>

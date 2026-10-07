@@ -7,7 +7,8 @@ import Preparation from '../components/Preparation.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
 import WhyUs from '../components/WhyUs.astro';
 import ProductCard from '../components/ProductCard.astro';
-import Steps from '../components/Steps.astro';
+import StepsScene from '../components/StepsScene.astro';
+import FilmScene from '../components/FilmScene.astro';
 import IndustryGrid from '../components/IndustryGrid.astro';
 import IndiaMap from '../components/IndiaMap.astro';
 import FAQ from '../components/FAQ.astro';
@@ -35,6 +36,8 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
   <ClientMarquee />
 
   <Preparation />
+
+  <FilmScene />
 
   <ScaleSelector />
 
@@ -65,15 +68,7 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
 
   <WhyUs />
 
-  <section class="section section--sunk" aria-labelledby="how-title">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="how-title" class="h2">How renting works</h2>
-        <p class="lead">Four steps from first message to devices on desks.</p>
-      </div>
-      <Steps />
-    </div>
-  </section>
+  <StepsScene />
 
   <section class="section" aria-labelledby="ind-title">
     <div class="wrap">
@@ -122,6 +117,10 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
   </section>
 
 </Base>
+
+<script>
+  import '../scripts/scenes';
+</script>
 
 <style>
   .head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-5); margin-bottom: var(--s-7); }

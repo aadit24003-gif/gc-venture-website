@@ -34,11 +34,15 @@ const delivery: { t: string; d: string; icon: string; badge?: string }[] = [
     </div>
 
     <div class="track">
-      <h3 class="track-title">Quality and testing</h3>
-      <ol class="qa" role="list">
+      <div class="track-head">
+        <h3 class="track-title">Quality and testing</h3>
+        <p class="qa-meter" aria-hidden="true"><span><b class="num" data-qa-n>0</b> of {quality.length} checks passed</span><span class="qa-bar"><i></i></span></p>
+      </div>
+      <ol class="qa" role="list" data-scene="qa" data-start="0.88" data-end="0.5">
         {quality.map((q, i) => (
           <li>
             <span class="n num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="tick" aria-hidden="true"><Icon name="check" size={13} stroke={3} /></span>
             <span class="ic"><Icon name={q.icon} badge={q.badge} size={28} stroke={1.5} /></span>
             <span class="t">{q.t}</span>
           </li>
@@ -48,7 +52,8 @@ const delivery: { t: string; d: string; icon: string; badge?: string }[] = [
 
     <div class="track">
       <h3 class="track-title">Delivery and deployment</h3>
-      <ol class="route" role="list">
+      <ol class="route" role="list" data-scene="route" data-start="0.86" data-end="0.42">
+        <li class="route-run" aria-hidden="true"><span class="route-fill"></span><span class="parcel"><Icon name="package" size={16} stroke={2} /></span></li>
         {delivery.map((d, i) => (
           <li class:list={{ last: i === delivery.length - 1 }}>
             <span class="node"><Icon name={d.icon} badge={d.badge} size={30} stroke={1.5} /></span>
@@ -105,4 +110,38 @@ const delivery: { t: string; d: string; icon: string; badge?: string }[] = [
   .route .t { font-weight: 700; margin-top: 8px; }
   @media (max-width: 1179px) { .route .t { margin-top: 6px; } }
   .route .d { color: var(--on-dark-2); font-size: var(--fs-small); }
+
+  /* ── Scroll progress: checks tick and the parcel travels the route ── */
+  .track-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; margin-bottom: var(--s-4); }
+  .track-head .track-title { margin-bottom: 0; }
+  .qa-meter, .tick, .route > .route-run { display: none; }
+  :global(html.scenes) .qa-meter { display: flex; align-items: center; gap: 14px; font-size: var(--fs-xs); color: var(--on-dark-2); }
+  :global(html.scenes) .qa-meter b { color: var(--on-dark); font-size: .875rem; }
+  .qa-bar { position: relative; width: 140px; height: 3px; border-radius: 3px; background: rgba(243,238,229,.14); overflow: hidden; }
+  .qa-bar i { position: absolute; inset: 0; transform-origin: 0 50%; background: var(--red-soft); }
+    :global(html.scenes) .qa-bar i { transform: scaleX(var(--qa, 0)); }
+  :global(html.scenes) .qa li { opacity: .5; transition: opacity .35s ease, background .35s ease, border-color .35s ease; }
+  :global(html.scenes) .qa li .ic { transition: color .35s ease; }
+  :global(html.scenes) .qa li:global(.done) { opacity: 1; border-color: rgba(230,133,122,.55); background: rgba(224,51,40,.08); }
+  :global(html.scenes) .qa li:global(.done) .ic { color: var(--red-soft); }
+  :global(html.scenes) .tick {
+    display: grid; place-items: center; position: absolute; top: 8px; right: 10px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--red-ink); color: #fff; opacity: 0; transform: scale(.4); transition: opacity .3s ease, transform .45s var(--ease-spring);
+  }
+  :global(html.scenes) .qa li:global(.done) .tick { opacity: 1; transform: none; }
+  :global(html.scenes) .qa li:global(.done) .n { opacity: 0; }
+  :global(html.scenes) .route > li .node { transition: border-color .35s ease, background .35s ease, color .35s ease; }
+  :global(html.scenes) .route > li:not(.route-run):not(:global(.reached)) { opacity: .55; }
+  :global(html.scenes) .route > li:not(.route-run) { transition: opacity .35s ease; }
+  :global(html.scenes) .route > li:global(.reached) .node { border-color: var(--red-soft); color: var(--red-soft); }
+  :global(html.scenes) .route > li.last:global(.reached) .node { color: #fff; box-shadow: 0 0 0 6px rgba(224,51,40,.22); }
+  @media (min-width: 1180px) {
+    :global(html.scenes) .route > .route-run { display: block; position: absolute; left: 32px; top: 31px; width: calc((100% - 80px) * 5 / 6 + 80px); height: 2px; padding: 0; pointer-events: none; z-index: 1; }
+    .route-fill { position: absolute; left: 0; top: 0; height: 2px; width: 100%; transform-origin: 0 50%; transform: scaleX(var(--p, 0)); background: var(--red-soft); }
+    .parcel {
+      position: absolute; top: -15px; left: calc(var(--p, 0) * 100%); width: 32px; height: 32px; margin-left: -16px;
+      display: grid; place-items: center; border-radius: 10px; background: var(--paper); color: var(--red-ink);
+      box-shadow: 0 8px 18px -8px rgba(0,0,0,.8); opacity: clamp(0, calc(var(--p, 0) * 20), 1);
+    }
+  }
 </style>

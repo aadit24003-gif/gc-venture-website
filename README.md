@@ -10,7 +10,7 @@ Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one s
 
 | Area | URL | Notes |
 |---|---|---|
-| Home | `/` | Hero drawn as a laptop with the chip pile spilling onto the desk, client marquee, quality/testing/delivery steps, "10 → 500+" scale selector, equipment index, why us, featured models, how it works, industries, India map, FAQ |
+| Home | `/` | Scroll-driven: a laptop boots as Apple, HP, Dell and Lenovo, then as IT Rentals with the headline and quote buttons; client names; preparation checks that tick and a parcel that travels the delivery route as you scroll; an office video that opens to full screen; scale selector; popular models; equipment; why us; "How renting works" cards that stack as you scroll; industries; India map; FAQ |
 | Service pages (8) | `/laptop-rental/`, `/macbook-rental/`, `/desktop-rental/`, `/monitor-rental/`, `/server-rental/`, `/router-rental/`, `/mobile-phone-rental/`, `/it-equipment-rental/` | Generated from `src/data/categories.ts` |
 | Catalogue | `/equipment/` | Search, filters (category, brand, processor, generation, RAM, storage, screen, city), shareable filter URLs, compare up to 3 |
 | Product pages (22) | `/equipment/<model>/` | Specs, rental terms, "Need 20 of these?" quote form, WhatsApp with product name |
@@ -40,6 +40,8 @@ All business data lives in a few files. Change it there and every page, form, sc
 | Industries | `src/data/industries.ts` |
 | Client names and logos, testimonials, case studies | `src/data/clients.ts` |
 | Home/quote FAQs | `src/data/faqs.ts` |
+
+Home page motion: the scroll scenes live in `src/scripts/scenes.ts` with the layouts in `Hero.astro`, `FilmScene.astro`, `StepsScene.astro` and `Preparation.astro`. Visitors who ask their device for reduced motion, or whose browser blocks scripts, get a static version of the same page.
 
 Common tasks:
 
@@ -113,6 +115,8 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Privacy policy and terms**: legal entity details, grievance officer, retention, rental terms.
 - [ ] **Testimonials**: written approval to publish quotes from Balaji Viswanathan, Charandeep Dora and Manoj Chandran (with role and company).
 - [ ] **Old URL list** for the 301 redirect map.
+- [ ] **Brand logos on the home page**: the laptop shows the Apple, HP, Dell and Lenovo logos to name the brands you rent (common practice for resellers and rental firms; a trademark line is in the footer). Confirm you are comfortable with this, or switch to brand names only.
+- [ ] **Office video** (`public/media/`): "People working on office using computer" by RDNE Stock project, Pexels licence (free for commercial use; credit shown on the video). Replace with footage of your own team or deliveries when you have it.
 - [ ] **Upgrade options**: laptops offer RAM up to 16 GB (6th–8th Gen) or 32 GB (10th Gen and newer) and SSD up to 1 TB. Confirm these match what you can supply.
 - [ ] **Laptop list entries to double-check** (kept exactly as supplied): Dell Latitude 5280, 5380, 5480, 5580, 7280 and 7380 are listed with 8th Gen (these models shipped with 6th/7th Gen; the 8th Gen versions are 5290, 5390, 5490, 5590, 7290 and 7390), and Latitude 3420, 3520, 5420 and 5520 are listed with 12th Gen (these shipped with 11th Gen; the 12th Gen versions are 3430, 3530, 5430 and 5530).
 - [ ] **Google Analytics 4 ID** (`ANALYTICS.GA4_ID`). Phone, WhatsApp, email and form-submit events are already wired.

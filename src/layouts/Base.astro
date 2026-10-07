@@ -93,6 +93,16 @@ const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : [])
     <meta name="twitter:image" content={new URL(ogImage, SITE.url).href} />
 
     {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    <script is:inline>
+      // Scroll scenes (home page): switch them on before first paint unless the visitor prefers
+      // reduced motion. If the scene script never starts, fall back to the static layout.
+      (function () {
+        var d = document.documentElement;
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('scenes');
+        addEventListener('load', function () { setTimeout(function () { if (!window.__scenes && document.querySelector('[data-scene]')) d.classList.remove('scenes'); }, 600); });
+      })();
+    </script>
 
     {ANALYTICS.GA4_ID && (
       <>
