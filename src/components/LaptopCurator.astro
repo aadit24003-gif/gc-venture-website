@@ -740,10 +740,13 @@ const cardSpec = (p: Product) => {
       render();
       form.querySelector<HTMLInputElement>('input[name="brand"]')?.focus();
     });
+    // "See matches" follows the catalogue link, so it opens exactly what that link shows.
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      location.href = catalogueUrl(get());
+      allEl.href = catalogueUrl(get());
+      allEl.click();
     });
+    qty.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); render(); } });
 
     let raf = 0;
     const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(geometry); };
