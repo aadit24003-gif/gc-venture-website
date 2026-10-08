@@ -1,10 +1,19 @@
 ---
 /**
- * Home page opening scene. While the stage is pinned, scrolling boots the
- * laptop as Apple, HP, Dell and Lenovo, then as IT Rentals with the headline
- * and calls to action (see src/scripts/scenes.ts). Without scroll scenes
- * (reduced motion, no JavaScript, very short screens) the laptop simply shows
- * the IT Rentals screen.
+ * Home page opening scene: one laptop, every brand.
+ *
+ * The page opens on the laptop showing the IT Rentals screen. While the stage
+ * is pinned, scrolling turns the laptop around, 180 degrees at a time, to show
+ * the back of the lid of each brand we rent (Apple, Dell, HP, Lenovo) with a
+ * link to that brand's catalogue underneath, then turns it once more to a
+ * closing screen where the visitor can describe what their team needs.
+ *
+ * The laptop is two faces on one slab (see src/scripts/scenes.ts): face A holds
+ * stops 0, 2 and 4, face B stops 1, 3 and 5, and a face only changes stop while
+ * it points away from the visitor. At every stop the laptop rests dead straight.
+ *
+ * Without scroll scenes (reduced motion, no JavaScript, very short screens) the
+ * laptop shows the IT Rentals screen and the four brands sit underneath as links.
  */
 import Icon from './Icon.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
@@ -27,22 +36,27 @@ const rentables: { label: string; icon: string; href: string; count?: number }[]
   { label: 'Android and iPhone', icon: 'smartphone', href: '/mobile-phone-rental/' },
 ];
 
-/** The brands the laptop boots as, in scroll order, then IT Rentals. */
-const brands = [
-  { id: 'apple', name: 'Apple', caption: 'MacBook Air and MacBook Pro, from the 2019 Intel models to M5' },
-  { id: 'hp', name: 'HP', caption: `${laptopsBy('HP')} HP EliteBook and ProBook models` },
-  { id: 'dell', name: 'Dell', caption: `${laptopsBy('Dell')} Dell Latitude models` },
-  { id: 'lenovo', name: 'Lenovo', caption: `${laptopsBy('Lenovo')} Lenovo ThinkPad models` },
-] as const;
-const railItems = [...brands, { id: 'itr', name: 'IT Rentals', caption: `Every brand from one rental partner, since ${SITE.founded}` }];
+/**
+ * The tour, in scroll order. `at` is where each stop rests (scroll progress
+ * 0 to 1); keep in step with STOP_AT and FLIPS in src/scripts/scenes.ts.
+ */
+type Stop = { id: string; name: string; at: number; caption: string; cta?: string; href?: string; mark?: 'apple' | 'dell' | 'hp' | 'lenovo' };
+const range = `6th Gen Core i5 to Core Ultra 9`;
+const stops: Stop[] = [
+  { id: 'itr', name: 'IT Rentals', at: 0, caption: 'Scroll to turn the laptop and see the brands we rent' },
+  { id: 'apple', name: 'Apple', at: 0.175, mark: 'apple', caption: 'MacBook Air and MacBook Pro, from the 2019 Intel models to M5', cta: 'Browse MacBooks', href: '/equipment/?category=macbooks&brand=Apple' },
+  { id: 'dell', name: 'Dell', at: 0.375, mark: 'dell', caption: `${laptopsBy('Dell')} Dell Latitude models, ${range}`, cta: `Browse ${laptopsBy('Dell')} Dell laptops`, href: '/equipment/?category=laptops&brand=Dell' },
+  { id: 'hp', name: 'HP', at: 0.575, mark: 'hp', caption: `${laptopsBy('HP')} HP EliteBook and ProBook models, ${range}`, cta: `Browse ${laptopsBy('HP')} HP laptops`, href: '/equipment/?category=laptops&brand=HP' },
+  { id: 'lenovo', name: 'Lenovo', at: 0.775, mark: 'lenovo', caption: `${laptopsBy('Lenovo')} Lenovo ThinkPad models, ${range}`, cta: `Browse ${laptopsBy('Lenovo')} ThinkPads`, href: '/equipment/?category=laptops&brand=Lenovo' },
+  { id: 'need', name: 'Your need', at: 1, caption: `Every brand from one rental partner, since ${SITE.founded}` },
+];
 
 /**
- * A field of thin library icons (laptop set + hardware set) on both sides of
- * the laptop. Each side is a container as wide as the space beside the laptop;
- * columns that would not fit are hidden by container queries, so wide screens
- * get a fuller field and narrow ones stay tidy. Icons are drawn from one SVG
- * sprite to keep the page light. Positions come from a fixed seed so every
- * build looks the same.
+ * Thin library icons (laptop set + hardware set) around the laptop and around
+ * the line above it. Each field is a container as wide as the free space;
+ * columns that would not fit are hidden by container queries. Icons are drawn
+ * from one SVG sprite to keep the page light; positions come from a fixed seed
+ * so every build looks the same.
  */
 const pool: [string, string?][] = [
   ['laptop'], ['laptop', 'check'], ['laptop', 'lock'], ['laptop', 'clock'], ['laptop', 'map-pin'], ['laptop', 'refresh-cw'],
@@ -59,18 +73,17 @@ const sprite = pool.map(([name, badge], i) => `<symbol id="hf-${i}" viewBox="0 0
 let seed = 20130;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 type Floater = { icon: number; c: number; x: number; y: number; s: number; r: number; o: number; d: number; z: number };
-const sides: Record<'l' | 'r', Floater[]> = { l: [], r: [] };
-const COLS = 10; // at most; see the container queries in the styles
-const ROWS = 12;
 let k = 0;
-for (const side of ['l', 'r'] as const) {
-  for (let row = 0; row < ROWS; row++) {
-    for (let c = 0; c < COLS; c++) {
-      if (rnd() < 0.24) continue; // gaps so it reads as scattered, not a grid
-      sides[side].push({
+/** One field of icons: `rows` x up to `cols` columns, `gap` chance of leaving a cell empty. */
+function field(rows: number, cols: number, yFrom: number, ySpan: number, gap: number) {
+  const out: Floater[] = [];
+  for (let row = 0; row < rows; row++) {
+    for (let c = 0; c < cols; c++) {
+      if (rnd() < gap) continue; // gaps so it reads as scattered, not a grid
+      out.push({
         icon: (k++ * 7 + row * 3 + c) % pool.length, c,
         x: 24 + Math.round((rnd() - 0.5) * 24),
-        y: +(-6 + ((row + 0.5) / ROWS) * 112 + (rnd() - 0.5) * 5).toFixed(1),
+        y: +(yFrom + ((row + 0.5) / rows) * ySpan + (rnd() - 0.5) * (ySpan / rows) * 0.35).toFixed(1),
         s: 18 + Math.round(rnd() * 12),
         r: Math.round((rnd() - 0.5) * 18),
         o: +(0.15 + rnd() * 0.19 - Math.min(c, 6) * 0.01).toFixed(2),
@@ -79,30 +92,55 @@ for (const side of ['l', 'r'] as const) {
       });
     }
   }
+  return out;
 }
+/** Beside the laptop (12 rows) and beside the line above it (2 rows). */
+const sides = { l: field(12, 10, 2, 104, 0.24), r: field(12, 10, 2, 104, 0.24) };
+const pockets = { l: field(2, 10, 8, 84, 0.2), r: field(2, 10, 8, 84, 0.2) };
+const flStyle = (side: 'l' | 'r', f: Floater) =>
+  `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s; --z:${f.z}`;
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
+const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
+
+/** Brand mark as inline SVG, filled with a gradient id or a colour. */
+const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '0 8 24 8.01' : '0 0 24 24');
 ---
-<section class="hero" data-scene="hero" data-brand="apple" aria-labelledby="hero-title">
+<section class="hero" data-scene="hero" data-stop="0" aria-labelledby="hero-title">
   <div class="stage">
     <div class="glow" aria-hidden="true"></div>
-    <p class="kicker" aria-hidden="true">Rent the laptops your team already knows.</p>
+
+    <!-- The line above the laptop, with icons on either side -->
+    <div class="topline" aria-hidden="true">
+      {(['l', 'r'] as const).map((side) => (
+        <span class={`pocket pocket--${side}`}>
+          {pockets[side].map((f) => (
+            <span class={`fl c${f.c}`} style={flStyle(side, f)}>
+              <svg width={f.s} height={f.s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><use href={`#hf-${f.icon}`} /></svg>
+            </span>
+          ))}
+        </span>
+      ))}
+      <p class="k-txt k-txt--a">Rent the laptops your team already knows.</p>
+      <p class="k-txt k-txt--b"><b>IT Rentals:</b> one-stop solution for all your renting needs</p>
+    </div>
 
     <div class="device-wrap">
+      <!-- shared icons and logo fills; kept outside .floaters, which phones hide (fills inside a hidden svg do not paint) -->
+      <svg class="sprite" width="0" height="0" focusable="false" aria-hidden="true">
+        <defs>
+          <mask id="hf-cut"><rect width="24" height="24" fill="#fff" /><circle cx="18.5" cy="18.5" r="6.4" fill="#000" /></mask>
+          <linearGradient id="lg-apple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f5f6" /><stop offset=".42" stop-color="#a9adb3" /><stop offset=".55" stop-color="#fff" /><stop offset=".8" stop-color="#7c8188" /><stop offset="1" stop-color="#d7dade" /></linearGradient>
+          <linearGradient id="lg-dell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f3" /><stop offset=".45" stop-color="#9aa1a9" /><stop offset=".56" stop-color="#f7f8f9" /><stop offset="1" stop-color="#c9cdd2" /></linearGradient>
+          <linearGradient id="lg-hp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6e7378" /><stop offset=".4" stop-color="#b8bcc1" /><stop offset=".52" stop-color="#f7f8f9" /><stop offset=".78" stop-color="#5c6166" /><stop offset="1" stop-color="#9ea3a8" /></linearGradient>
+          <Fragment set:html={sprite} />
+        </defs>
+      </svg>
       <div class="floaters" aria-hidden="true">
-        <svg class="sprite" width="0" height="0" focusable="false">
-          <defs>
-            <mask id="hf-cut"><rect width="24" height="24" fill="#fff" /><circle cx="18.5" cy="18.5" r="6.4" fill="#000" /></mask>
-            <Fragment set:html={sprite} />
-          </defs>
-        </svg>
         {(['l', 'r'] as const).map((side) => (
           <div class={`fl-side fl-side--${side}`}>
             {sides[side].map((f) => (
-              <span
-                class={`fl c${f.c}`}
-                style={`${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s; --z:${f.z}`}
-              >
+              <span class={`fl c${f.c}`} style={flStyle(side, f)}>
                 <svg width={f.s} height={f.s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><use href={`#hf-${f.icon}`} /></svg>
               </span>
             ))}
@@ -110,73 +148,132 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
         ))}
       </div>
 
-      <div class="device">
-        <div class="lid">
-          <span class="cam" aria-hidden="true"></span>
-          <div class="screen">
-            <div class="boots" aria-hidden="true">
-              {brands.map((b) => (
-                <div class:list={['boot', `boot--${b.id}`, { on: b.id === 'apple' }]} data-b={b.id}>
-                  {b.id === 'lenovo' ? (
-                    <svg class="mark" viewBox="0 8 24 8.01" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
-                  ) : (
-                    <svg class="mark" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS[b.id]} fill="currentColor" /></svg>
-                  )}
-                  {b.id === 'apple' ? (
-                    <span class="bootbar"><i></i></span>
-                  ) : (
-                    <span class="spinner">{[0, 1, 2, 3, 4].map(() => <i></i>)}</span>
-                  )}
+      <div class="flip">
+        <div class="floor" aria-hidden="true" data-floor></div>
+        <div class="slab" data-slab data-front="a">
+          <!-- Face A: stops 0 (IT Rentals screen), 2 (Dell), 4 (Lenovo) -->
+          <div class="face face--a">
+            <div class="slot slot--screen on" data-slot="0" data-at="0">
+              <div class="lid">
+                <span class="cam" aria-hidden="true"></span>
+                <div class="screen">
+                  <div class="desk">
+                    <p class="since mono"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
+                    <h1 id="hero-title" class="headline">
+                      <span class="hl-brand">IT Rentals</span><span class="sr-only">: </span>
+                      <span class="hl-line">One-stop solution for all your renting needs</span>
+                    </h1>
+                    <p class="lead">
+                      Laptops, MacBooks, desktops, servers, networking and phones for teams of ten or a thousand.
+                      Configured before they ship, supported until they come back.
+                    </p>
+                    <div class="ctas">
+                      <a href="/request-a-quote/" class="btn btn--primary btn--lg" data-track-location="hero">Get a quote</a>
+                      <a href={whatsappLink()} class="btn btn--lg btn--wa" target="_blank" rel="noopener" data-track-location="hero"><Icon name="whatsapp" />WhatsApp us</a>
+                    </div>
+                    {trust.length > 0 && (
+                      <ul class="trust" role="list">
+                        {trust.map((t) => <li><Icon name="check" size={15} stroke={2} />{t.short}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                  <span class="sheen sheen--glass" aria-hidden="true"></span>
                 </div>
-              ))}
+              </div>
+              <div class="deck" aria-hidden="true"><span class="notch"></span></div>
             </div>
 
-            <div class="desk" data-at="0.86">
-              <p class="since mono"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
-              <h1 id="hero-title" class="headline">
-                <span class="hl-brand">IT Rentals</span><span class="sr-only">: </span>
-                <span class="hl-line">One-stop solution for all your renting needs</span>
-              </h1>
-              <p class="lead">
-                Laptops, MacBooks, desktops, servers, networking and phones for teams of ten or a thousand.
-                Configured before they ship, supported until they come back.
-              </p>
-              <div class="ctas">
-                <a href="/request-a-quote/" class="btn btn--primary btn--lg" data-track-location="hero">Get a quote</a>
-                <a href={whatsappLink()} class="btn btn--lg btn--wa" target="_blank" rel="noopener" data-track-location="hero"><Icon name="whatsapp" />WhatsApp us</a>
+            {(['dell', 'lenovo'] as const).map((id) => (
+              <div class={`slot slot--back back--${id}`} data-slot={id === 'dell' ? 2 : 4} aria-hidden="true">
+                <div class="lid lid--back">
+                  <span class="sizer"></span>
+                  {id === 'lenovo' ? (
+                    <svg class="logo logo--lenovo" viewBox={markBox(id)} focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
+                  ) : (
+                    <svg class={`logo logo--${id}`} viewBox={markBox(id)} focusable="false"><path d={BRAND_MARKS[id]} fill={`url(#lg-${id})`} /></svg>
+                  )}
+                  <span class="asset"><b><span class="asset-sq"></span>IT Rentals</b><i></i><small>itrentals.in</small></span>
+                  <span class="sheen"></span>
+                </div>
+                <div class="deck deck--rear"><span class="hinge"></span></div>
               </div>
-              {trust.length > 0 && (
-                <ul class="trust" role="list">
-                  {trust.map((t) => <li><Icon name="check" size={15} stroke={2} />{t.short}</li>)}
-                </ul>
-              )}
+            ))}
+          </div>
+
+          <!-- Face B: stops 1 (Apple), 3 (HP), 5 (describe your need) -->
+          <div class="face face--b">
+            {(['apple', 'hp'] as const).map((id) => (
+              <div class:list={['slot', 'slot--back', `back--${id}`, { on: id === 'apple' }]} data-slot={id === 'apple' ? 1 : 3} aria-hidden="true">
+                <div class="lid lid--back">
+                  <span class="sizer"></span>
+                  <svg class={`logo logo--${id}`} viewBox={markBox(id)} focusable="false"><path d={BRAND_MARKS[id]} fill={`url(#lg-${id})`} /></svg>
+                  <span class="asset"><b><span class="asset-sq"></span>IT Rentals</b><i></i><small>itrentals.in</small></span>
+                  <span class="sheen"></span>
+                </div>
+                <div class="deck deck--rear"><span class="hinge"></span></div>
+              </div>
+            ))}
+
+            <div class="slot slot--screen slot--need" data-slot="5" data-at="1">
+              <div class="lid">
+                <span class="cam" aria-hidden="true"></span>
+                <div class="screen">
+                  <div class="desk desk--need">
+                    <p class="since"><span class="since-dot" aria-hidden="true"></span><span>IT Rentals, every brand from one partner</span></p>
+                    <h2 class="need-title">Describe what your team needs</h2>
+                    <p class="need-sub">How many machines, which city, from when, and any software. We reply with configurations and monthly pricing.</p>
+                    <form class="need" action="/request-a-quote/" method="get" data-need>
+                      <label for="hero-need" class="sr-only">Describe what your team needs</label>
+                      <input id="hero-need" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="e.g. 40 laptops in Pune from Monday" />
+                      <button class="btn btn--primary need-go" type="submit">Get a quote</button>
+                    </form>
+                    <p class="need-alt">Prefer chat? <a href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need">Send it on WhatsApp</a></p>
+                  </div>
+                  <span class="sheen sheen--glass" aria-hidden="true"></span>
+                </div>
+              </div>
+              <div class="deck" aria-hidden="true"><span class="notch"></span></div>
             </div>
           </div>
-          <span class="chin" aria-hidden="true">
-            {(['hp', 'dell', 'lenovo'] as const).map((id) => (
-              <svg class="chin-mark" data-b={id} viewBox={id === 'lenovo' ? '0 8 24 8.01' : '0 0 24 24'} focusable="false"><path d={BRAND_MARKS[id]} fill="currentColor" /></svg>
-            ))}
-          </span>
+
+          <i class="edge edge--l" aria-hidden="true"></i>
+          <i class="edge edge--r" aria-hidden="true"></i>
         </div>
-        <div class="deck" aria-hidden="true"><span class="notch"></span></div>
       </div>
     </div>
 
-    <div class="rail" aria-hidden="true">
-      <ol class="rail-names" role="list">
-        {railItems.map((b) => <li class:list={{ on: b.id === 'apple' }} data-b={b.id}>{b.name}</li>)}
-      </ol>
-      <span class="rail-track"><i></i></span>
-      <div class="rail-caps">
-        {railItems.map((b) => <p class:list={{ on: b.id === 'apple' }} data-b={b.id}>{b.caption}</p>)}
-      </div>
+    <!-- Under the laptop: the stops, and what each one offers -->
+    <div class="tour">
+      <nav class="tour-nav" aria-label="Brand tour">
+        <ol role="list">
+          {stops.map((st, i) => (
+            <li><button type="button" class:list={['stop', { on: i === 0 }]} data-goto={i} data-s={i} aria-current={i === 0 ? 'step' : undefined}><span>{st.name}</span></button></li>
+          ))}
+        </ol>
+        <span class="tour-track" aria-hidden="true"><i></i></span>
+      </nav>
+      <ul class="tour-ctas" role="list">
+        {stops.map((st, i) => (
+          <li class:list={['tc', `tc--${st.id}`, { on: i === 0 }]} data-s={i} data-at={st.at}>
+            {st.mark && (
+              <svg class="tc-mark" viewBox={markBox(st.mark)} aria-hidden="true" focusable="false">
+                {st.mark === 'lenovo' ? <><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></> : <path d={BRAND_MARKS[st.mark]} fill="currentColor" />}
+              </svg>
+            )}
+            <p class="tc-cap">{st.caption}</p>
+            {st.href && <a class="tc-go" href={st.href} data-track-location={`hero-${st.id}`}>{st.cta}<Icon name="arrow-right" size={16} /></a>}
+          </li>
+        ))}
+      </ul>
     </div>
+
     <p class="cue" aria-hidden="true"><span>Scroll</span><i></i></p>
+    <a class="skip" href="#rent">Skip the brand tour<Icon name="arrow-down" size={15} /></a>
   </div>
 </section>
 
 <div class="hero-tail">
-  <nav class="wrap rentables" aria-label="What you can rent">
+  <nav class="wrap rentables" id="rent" aria-label="What you can rent">
     <ul role="list">
       {rentables.map((c) => (
         <li>
@@ -194,11 +291,6 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 </div>
 
 <style>
-  /* Deck colours change with the brand on screen */
-  @property --dk1 { syntax: '<color>'; inherits: true; initial-value: #d6cfc3; }
-  @property --dk2 { syntax: '<color>'; inherits: true; initial-value: #b2aa9d; }
-  @property --dk3 { syntax: '<color>'; inherits: true; initial-value: #7d766c; }
-
   .hero {
     position: relative; color: var(--ink); background: var(--paper);
     /* extend up under the floating header */
@@ -222,11 +314,13 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     background-size: 22px 22px;
     mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 85%);
   }
-  .kicker, .boots, .rail, .cue, .chin { display: none; }
+  /* Parts that only exist while the scene runs */
+  .topline, .face--b, .slot--back, .edge, .floor, .sheen, .tour-nav, .cue, .skip, .tc--itr, .tc--need { display: none; }
 
-  /* The laptop */
+  /* ── The laptop (static layout: the IT Rentals screen) ── */
   .device-wrap { position: relative; width: 100%; max-width: 1040px; margin: 0 auto; }
-  .device { position: relative; --lw: 100%; }
+  .flip { position: relative; }
+  .slab, .face { position: relative; }
   .lid {
     position: relative; z-index: 1; width: 94%; margin: 0 auto;
     background: linear-gradient(180deg, #0c0a09, #050404);
@@ -246,12 +340,11 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   }
   .deck {
     position: relative; z-index: 1; height: clamp(12px, 1.5vw, 18px); margin-top: -1px;
-    background: linear-gradient(180deg, var(--dk1) 0%, var(--dk2) 45%, var(--dk3) 100%);
+    background: linear-gradient(180deg, #d6cfc3 0%, #b2aa9d 45%, #7d766c 100%);
     border-radius: 2px 2px 20px 20px / 2px 2px 12px 12px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 18px 28px -14px rgba(23,19,15,.55);
-    transition: --dk1 .6s ease, --dk2 .6s ease, --dk3 .6s ease;
   }
-  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, var(--dk3), var(--dk2)); border-radius: 0 0 9px 9px; opacity: .7; }
+  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #7d766c, #b2aa9d); border-radius: 0 0 9px 9px; opacity: .7; }
 
   /* The IT Rentals screen */
   .desk {
@@ -272,6 +365,33 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin-top: clamp(12px, 2.4cqi, 26px); list-style: none; font-size: var(--fs-xs); color: var(--ink-2); }
   .trust li { display: inline-flex; align-items: center; gap: 6px; }
   .trust :global(svg) { color: var(--red-ink); }
+
+  /* The closing screen: describe what your team needs */
+  .need-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 6.2cqi, 4.1rem); line-height: 1; letter-spacing: -0.03em; max-width: 14ch; }
+  .need-sub { margin: clamp(10px, 1.8cqi, 20px) auto 0; max-width: 50ch; font-size: clamp(.8125rem, 1.6cqi, 1.0625rem); line-height: 1.5; color: var(--ink-2); }
+  .need {
+    display: flex; align-items: stretch; gap: 8px; width: min(100%, 64cqi); margin-top: clamp(14px, 2.6cqi, 28px);
+    padding: 6px; border-radius: 16px; background: #fff; border: 1.5px solid var(--line-strong);
+    box-shadow: 0 14px 30px -20px rgba(23,19,15,.45);
+  }
+  .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .18), 0 14px 30px -20px rgba(23,19,15,.45); }
+  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: clamp(.875rem, 1.6cqi, 1rem); color: var(--ink); }
+  .need-in:focus { outline: none; }
+  .need-in::placeholder { color: var(--ink-3); }
+  .need-go { flex: none; }
+  .need-alt { margin: clamp(10px, 1.8cqi, 18px) 0 0; font-size: var(--fs-xs); color: var(--ink-2); }
+  .need-alt a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+
+  /* Static layout: the four brands as links under the laptop */
+  .tour { width: 100%; }
+  .tour-ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 14px; list-style: none; margin: var(--s-6) auto 0; max-width: 1040px; }
+  .tc { display: flex; align-items: center; gap: 10px; }
+  .tc-mark { flex: none; width: 20px; height: 20px; color: var(--ink); }
+  .tc--lenovo .tc-mark { width: 46px; height: 16px; }
+  .tc-cap { display: none; margin: 0; }
+  .tc-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+  .tc-go :global(svg) { transition: transform var(--t-fast) var(--ease-out); }
+  .tc-go:hover :global(svg) { transform: translateX(3px); }
 
   /* Icon field */
   .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; --icon-accent: var(--red); }
@@ -305,135 +425,235 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
       to { transform: translateY(5px) rotate(calc(var(--r) * -0.4)); }
     }
   }
-  @media (max-width: 1099px) { .floaters { display: none; } }
+  @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
 
   /* ── Scroll scene (only when scenes run and the screen is tall enough) ── */
   @media (min-height: 560px) {
-    :global(html.scenes) .hero { height: 300vh; height: 300svh; }
+    :global(html.scenes) .hero { height: 500vh; height: 500svh; }
     :global(html.scenes) .stage {
       position: sticky; top: 0; height: 100vh; height: 100svh;
-      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; justify-items: center; align-items: center; gap: clamp(8px, 1.6vh, 18px);
-      padding: clamp(100px, 13vh, 116px) var(--gutter) clamp(18px, 3.2vh, 34px);
-      --q: clamp(0, calc((var(--p, 0) - .68) / .1), 1);
+      display: grid; grid-template-rows: auto minmax(0, 1fr) auto; justify-items: center; align-items: center; gap: clamp(8px, 1.6vh, 16px);
+      padding: clamp(96px, 12.5vh, 112px) var(--gutter) clamp(16px, 3vh, 30px);
+      --lw: min(980px, 84vw, calc((100svh - 330px) * 1.52));
     }
-    :global(html.scenes) .kicker {
-      display: block; font-family: var(--font-display); font-size: clamp(1.25rem, .9rem + 1.3vw, 2rem); line-height: 1.15; letter-spacing: -0.015em;
-      color: var(--ink); text-align: center; opacity: calc(1 - var(--q));
-      translate: 0 calc(var(--q) * -12px);
+
+    /* The line above the laptop: the kicker, then the IT Rentals line once the tour starts */
+    :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; }
+    .k-txt {
+      grid-area: 1 / 1; margin: 0; text-align: center; font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.2rem, .9rem + 1.2vw, 1.9rem); line-height: 1.15; letter-spacing: -0.015em; color: var(--ink);
+      transition: opacity .45s ease, translate .6s var(--ease-out);
     }
+    .k-txt b { font-weight: 500; }
+    .k-txt--b { opacity: 0; translate: 0 8px; }
+    :global(html.scenes) .hero:not([data-stop='0']) .k-txt--a { opacity: 0; translate: 0 -8px; }
+    :global(html.scenes) .hero:not([data-stop='0']) .k-txt--b { opacity: 1; translate: 0 0; }
+    /* icons either side of the line: from its edge to the edge of the screen */
+    :global(html.scenes) .pocket { display: block; position: absolute; top: -34px; bottom: -14px; width: max(0px, calc((100vw - 100%) / 2 - 16px)); container-type: inline-size; pointer-events: none; --icon-accent: var(--red); }
+    .pocket--l { right: calc(100% - 6px); }
+    .pocket--r { left: calc(100% - 6px); }
+
+    /* The flipping laptop */
     :global(html.scenes) .device-wrap { width: auto; max-width: none; align-self: center; }
-    :global(html.scenes) .device {
-      --lw: min(1000px, 86vw, calc((100svh - 290px) * 1.52));
-      width: var(--lw);
-      transform: scale(calc(.965 + .035 * var(--q)));
-      transform-origin: 50% 85%;
-    }
+    :global(html.scenes) .flip { width: var(--lw); perspective: calc(var(--lw) * 2.4); perspective-origin: 50% 45%; }
+    :global(html.scenes) .slab { transform-style: preserve-3d; -webkit-transform-style: preserve-3d; will-change: transform; }
+    :global(html.scenes) .face { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+    :global(html.scenes) .face--b { display: block; position: absolute; inset: 0; transform: rotateY(180deg); }
+    /* the face turned away is hidden outright as well (Safari draws some layers through backface-visibility) */
+    :global(html.scenes) .slab[data-front='a'] .face--b,
+    :global(html.scenes) .slab[data-front='b'] .face--a { opacity: 0; pointer-events: none; }
+    :global(html.scenes) .slot { opacity: 0; pointer-events: none; }
+    :global(html.scenes) .slot:global(.on) { opacity: 1; pointer-events: auto; }
+    :global(html.scenes) .slot--back, :global(html.scenes) .face--b > .slot { display: block; position: absolute; inset: 0; }
     :global(html.scenes) .lid {
       padding: calc(var(--lw) * .013) calc(var(--lw) * .013) calc(var(--lw) * .022);
-      transform-origin: 50% 100%;
+      box-shadow: inset 0 0 0 1px rgba(243,238,229,.10), 0 0 0 1px rgba(0,0,0,.6);
     }
-    :global(html.scenes) .screen { aspect-ratio: 16 / 10.4; }
-    :global(html.scenes) .screen { background: #000; }
-    :global(html.scenes) .desk {
-      position: absolute; inset: 0; z-index: 1;
-      background: radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
-      opacity: 0; transform: translateY(2cqi) scale(.985); pointer-events: none;
-      transition: opacity .5s ease .12s, transform .8s var(--ease-out) .12s;
+    :global(html.scenes) .screen, .sizer { aspect-ratio: 16 / 10.4; }
+    .sizer { display: block; }
+    :global(html.scenes) .deck { box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
+
+    /* Contact shadow on the floor, narrowing as the laptop turns edge-on */
+    :global(html.scenes) .floor {
+      display: block; position: absolute; left: 4%; right: 4%; bottom: calc(var(--lw) * -.035); height: calc(var(--lw) * .07);
+      border-radius: 50%; background: radial-gradient(closest-side, rgba(23,19,15,.42), rgba(23,19,15,0));
+      transform-origin: 50% 50%; pointer-events: none;
     }
-    :global(html.scenes) .hero[data-brand='itr'] .desk { opacity: 1; transform: none; pointer-events: auto; }
-
-    /* Boot screens */
-    :global(html.scenes) .boots { display: block; position: absolute; inset: 0; z-index: 2; background: #000; transition: opacity .55s ease; }
-    :global(html.scenes) .hero[data-brand='itr'] .boots { opacity: 0; pointer-events: none; }
-    .boot {
-      position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6.5cqi;
-      color: #fff; opacity: 0; transform: scale(.93); filter: blur(8px);
-      transition: opacity .42s ease, transform .7s var(--ease-out), filter .42s ease;
+    /* Thickness: the two sides of the slab, seen only while it turns */
+    :global(html.scenes) .edge {
+      display: block; position: absolute; top: 1.5%; bottom: 3%; left: 50%;
+      width: calc(var(--lw) * .012); margin-left: calc(var(--lw) * -.006); border-radius: 4px;
+      background: linear-gradient(90deg, #26221f, #8f877d 45%, #b9b1a6 55%, #26221f);
+      -webkit-backface-visibility: hidden; backface-visibility: hidden;
     }
-    .boot:global(.on) { opacity: 1; transform: none; filter: none; }
-    .mark { display: block; width: 11.5cqi; height: 11.5cqi; }
-    .boot--apple .mark { width: 9.5cqi; height: 11.6cqi; }
-    .boot--lenovo .mark { width: 26cqi; height: 8.7cqi; }
-    .bootbar { width: 20cqi; height: max(3px, .42cqi); border-radius: 99px; background: rgba(255,255,255,.22); overflow: hidden; }
-    .bootbar i { display: block; height: 100%; width: calc(var(--seg, 0) * 100%); background: #fff; border-radius: inherit; }
-    .spinner { position: relative; width: 4.4cqi; height: 4.4cqi; }
-    .spinner i { position: absolute; inset: 0; animation: orbit 2.4s cubic-bezier(.55, .1, .45, .9) infinite; }
-    .spinner i::before { content: ''; position: absolute; top: 0; left: 50%; width: .62cqi; height: .62cqi; margin-left: -.31cqi; border-radius: 50%; background: #fff; }
-    .spinner i:nth-child(2) { animation-delay: -.12s; }
-    .spinner i:nth-child(3) { animation-delay: -.24s; }
-    .spinner i:nth-child(4) { animation-delay: -.36s; }
-    .spinner i:nth-child(5) { animation-delay: -.48s; }
-    @keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .edge--l { transform: rotateY(-90deg) translateZ(calc(var(--lw) * .47)); }
+    .edge--r { transform: rotateY(90deg) translateZ(calc(var(--lw) * .47)); }
 
-    /* Brand mark on the bezel below the screen */
-    :global(html.scenes) .chin { display: block; position: absolute; left: 50%; bottom: calc(var(--lw) * .005); width: calc(var(--lw) * .1); height: calc(var(--lw) * .012); transform: translateX(-50%); color: #7d776f; }
-    .chin-mark { position: absolute; inset: 0; margin: auto; height: 100%; width: auto; max-width: 100%; opacity: 0; transition: opacity .4s ease; }
-    .chin-mark:global(.on) { opacity: 1; }
+    /* A soft highlight that sweeps across while turning */
+    :global(html.scenes) .sheen {
+      display: block; position: absolute; inset: 0 -60%; pointer-events: none; z-index: 3;
+      background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.34) 50%, transparent 60%);
+      transform: translateX(var(--sx, -60%)); opacity: var(--so, 0);
+    }
+    .sheen--glass { inset: 0 -60%; background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.22) 50%, transparent 58%); }
 
-    /* Body colour follows the brand */
-    :global(html.scenes) .hero[data-brand='apple'] .device { --dk1: #e6e6e9; --dk2: #bcbcc1; --dk3: #8d8d93; }
-    :global(html.scenes) .hero[data-brand='hp'] .device { --dk1: #dedfe2; --dk2: #b3b4b8; --dk3: #85868b; }
-    :global(html.scenes) .hero[data-brand='dell'] .device { --dk1: #73767c; --dk2: #4a4d52; --dk3: #2c2e32; }
-    :global(html.scenes) .hero[data-brand='lenovo'] .device { --dk1: #404042; --dk2: #252527; --dk3: #131314; }
+    /* ── Lid backs ──
+       Apple space grey, HP silver, Dell charcoal, Lenovo matte black: four clearly
+       different tones against the cream page. Each lid has a soft light from the top,
+       the metal ones a faint brushed grain, and the logos a polished-metal fill with
+       a pressed-in edge. */
+    .lid--back { container-type: inline-size; overflow: hidden; --top-light: radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,.12), transparent 60%); --brushed: repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px); }
+    .lid--back .sizer { visibility: hidden; }
+    .logo { position: absolute; left: 50%; top: 47%; translate: -50% -50%; filter: drop-shadow(0 .08cqi 0 rgba(0,0,0,.35)) drop-shadow(0 -.06cqi 0 rgba(255,255,255,.25)); }
+    .logo--apple { width: 11.5cqi; height: 14cqi; }
+    .logo--dell { width: 13cqi; height: 13cqi; }
+    .logo--hp { width: 13cqi; height: 13cqi; filter: drop-shadow(0 .08cqi 0 rgba(255,255,255,.7)) drop-shadow(0 -.06cqi 0 rgba(0,0,0,.25)); }
+    .logo--lenovo { width: 26cqi; height: 8.7cqi; border-radius: .4cqi; filter: none; box-shadow: 0 .2cqi .6cqi rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.2); }
 
-    /* Brand rail and caption */
-    :global(html.scenes) .rail { display: grid; justify-items: center; gap: 10px; width: min(560px, 100%); }
-    .rail-names { display: flex; justify-content: space-between; width: 100%; list-style: none; font-size: .875rem; font-weight: 600; color: var(--ink-3); }
-    .rail-names li { opacity: .5; transition: color .3s ease, opacity .3s ease; }
-    .rail-names li:global(.on) { opacity: 1; color: var(--ink); }
-    .rail-track { position: relative; width: 100%; height: 2px; border-radius: 2px; background: rgba(23,19,15,.12); overflow: hidden; }
-    .rail-track i { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(var(--p, 0)); background: var(--red-ink); }
-    .rail-caps { position: relative; width: 100%; height: 1.5em; font-size: var(--fs-small); color: var(--ink-2); }
-    .rail-caps p { position: absolute; inset: 0; margin: 0; text-align: center; white-space: nowrap; opacity: 0; translate: 0 6px; transition: opacity .35s ease, translate .45s var(--ease-out); }
-    .rail-caps p:global(.on) { opacity: 1; translate: 0 0; }
+    /* IT Rentals asset tag, stuck on slightly crooked, lower left */
+    .asset {
+      position: absolute; left: 5cqi; bottom: 5cqi; display: grid; gap: .45cqi; width: 16cqi; padding: .8cqi 1cqi .75cqi;
+      border-radius: .5cqi; background: #faf7f1; rotate: -1.5deg;
+      box-shadow: 0 .15cqi .35cqi rgba(0,0,0,.3), inset 0 0 0 1px rgba(23,19,15,.08);
+    }
+    .asset b { display: flex; align-items: center; gap: .55cqi; font-size: 1.2cqi; line-height: 1; font-weight: 700; letter-spacing: .02em; color: var(--ink); }
+    .asset-sq { width: 1cqi; height: 1cqi; border-radius: .15cqi; background: var(--red); }
+    .asset i { display: block; height: 2.2cqi; background: repeating-linear-gradient(90deg, #17130f 0 .12cqi, transparent .12cqi .32cqi), repeating-linear-gradient(90deg, #17130f 0 .24cqi, transparent .24cqi .78cqi); }
+    .asset small { font-size: .95cqi; line-height: 1; color: var(--ink-2); }
 
-    /* Scroll cue */
+    :global(html.scenes) .back--apple .lid--back {
+      border-radius: 2.8cqi 2.8cqi .8cqi .8cqi;
+      background: var(--top-light), var(--brushed), linear-gradient(180deg, #86878b 0%, #6f7074 55%, #5e5f63 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 0 0 1px rgba(23,19,15,.3);
+    }
+    :global(html.scenes) .back--hp .lid--back {
+      border-radius: 1.9cqi 1.9cqi .6cqi .6cqi;
+      background: var(--top-light), var(--brushed), linear-gradient(180deg, #e4e5e7 0%, #d2d4d7 50%, #bfc1c5 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 1px rgba(23,19,15,.16);
+    }
+    :global(html.scenes) .back--dell .lid--back {
+      border-radius: 1.6cqi 1.6cqi .5cqi .5cqi;
+      background: var(--top-light), linear-gradient(180deg, #4a4c51 0%, #3a3c40 55%, #2e3034 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 0 0 1px rgba(0,0,0,.5);
+    }
+    :global(html.scenes) .back--lenovo .lid--back {
+      border-radius: 1.1cqi 1.1cqi .4cqi .4cqi;
+      background: var(--top-light), linear-gradient(180deg, #1e1e20 0%, #19191b 60%, #141415 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 0 1px rgba(0,0,0,.6);
+    }
+    .back--lenovo .sheen { opacity: calc(var(--so, 0) * .45); }
+
+    /* The base seen from behind: one hinge band (Apple, HP) or two hinge barrels and a vent (Dell, Lenovo) */
+    .deck--rear { height: clamp(12px, 1.5vw, 18px); border-radius: 2px 2px 14px 14px / 2px 2px 9px 9px; }
+    .hinge { position: absolute; left: 11%; right: 11%; top: 0; height: max(4px, 30%); border-radius: 0 0 6px 6px; background: linear-gradient(180deg, #121214, #2a2b2e 55%, #0e0e10); }
+    .back--apple .deck--rear { background: linear-gradient(180deg, #9a9ba0, #6e6f74 60%, #47484c); }
+    .back--hp .deck--rear { background: linear-gradient(180deg, #c9ccd1, #9a9ea4); }
+    .back--dell .deck--rear { background: linear-gradient(180deg, #44474d, #222428); }
+    .back--lenovo .deck--rear { background: linear-gradient(180deg, #2a2a2c, #0e0e10); }
+    .back--dell .deck--rear::before, .back--dell .deck--rear::after,
+    .back--lenovo .deck--rear::before, .back--lenovo .deck--rear::after {
+      content: ''; position: absolute; top: -45%; width: 9%; height: 95%; border-radius: 99px;
+      background: linear-gradient(180deg, #3a3c40, #151618); box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+    }
+    .back--dell .deck--rear::before, .back--lenovo .deck--rear::before { left: 12%; }
+    .back--dell .deck--rear::after, .back--lenovo .deck--rear::after { right: 12%; }
+    .back--dell .hinge, .back--lenovo .hinge { left: 30%; right: 30%; top: 30%; height: 35%; border-radius: 1px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.5) 0 2px, transparent 2px 5px); }
+
+    /* ── Under the laptop: stops and the offer for each ── */
+    :global(html.scenes) .tour { display: grid; justify-items: center; gap: 10px; width: min(760px, 100%); }
+    :global(html.scenes) .tour-nav { display: grid; gap: 6px; width: 100%; }
+    .tour-nav ol { display: flex; justify-content: space-between; list-style: none; margin: 0; padding: 0; }
+    .stop {
+      min-height: 32px; padding: 4px 6px; border: 0; background: none; cursor: pointer;
+      font: inherit; font-size: .875rem; font-weight: 600; color: var(--ink-3); transition: color .3s ease;
+    }
+    .stop:hover { color: var(--ink); }
+    .stop:global(.on) { color: var(--ink); }
+    .stop:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+    .tour-track { position: relative; height: 2px; border-radius: 2px; background: rgba(23,19,15,.12); overflow: hidden; }
+    .tour-track i { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(var(--p, 0)); background: var(--red-ink); }
+    :global(html.scenes) .tour-ctas { display: grid; width: 100%; min-height: 2.75rem; margin: 0; }
+    :global(html.scenes) .tc {
+      grid-area: 1 / 1; display: flex; justify-content: center; align-items: center; gap: 10px 16px; flex-wrap: wrap;
+      opacity: 0; translate: 0 6px; pointer-events: none; transition: opacity .35s ease, translate .45s var(--ease-out);
+    }
+    :global(html.scenes) .tc:global(.on) { opacity: 1; translate: 0 0; pointer-events: auto; }
+    :global(html.scenes) .tc--itr, :global(html.scenes) .tc--need { display: flex; }
+    :global(html.scenes) .tc .tc-mark { display: none; }
+    :global(html.scenes) .tc-cap { display: block; font-size: var(--fs-small); color: var(--ink-2); text-align: center; }
+    :global(html.scenes) .tc-go {
+      padding: 7px 14px; border: 0; border-radius: var(--r-pill); background: var(--ink); color: var(--paper);
+      font-size: .875rem; white-space: nowrap;
+    }
+    :global(html.scenes) .tc-go:hover { background: var(--red-ink); }
+    :global(html.scenes) .tc-go:focus-visible { outline: 3px solid var(--red-ink); outline-offset: 3px; }
+
+    /* Scroll cue at the start; a way out during the tour */
     :global(html.scenes) .cue {
       display: flex; align-items: center; gap: 10px; position: absolute; left: var(--gutter); bottom: clamp(18px, 3.2vh, 34px);
-      font-size: var(--fs-xs); color: var(--ink-2); opacity: clamp(0, calc(1 - var(--p, 0) * 30), 1);
+      font-size: var(--fs-xs); color: var(--ink-2); transition: opacity .3s ease;
     }
     .cue i { position: relative; width: 1px; height: 34px; background: rgba(23,19,15,.2); overflow: hidden; }
     .cue i::after { content: ''; position: absolute; left: 0; top: -40%; width: 1px; height: 40%; background: var(--ink); animation: cue 1.8s ease-in-out infinite; }
     @keyframes cue { to { top: 100%; } }
+    :global(html.scenes) .hero:not([data-stop='0']) .cue { opacity: 0; }
+    :global(html.scenes) .skip {
+      display: inline-flex; align-items: center; gap: 6px; position: absolute; left: var(--gutter); bottom: clamp(18px, 3.2vh, 34px);
+      font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); text-underline-offset: 3px; visibility: hidden; opacity: 0;
+      transition: opacity .3s ease, visibility 0s linear .3s;
+    }
+    :global(html.scenes) .hero:not([data-stop='0']):not([data-stop='5']) .skip,
+    :global(html.scenes) .skip:focus-visible { visibility: visible; opacity: 1; transition: opacity .3s ease; }
 
-    /* Lid opens and the screen powers on when the page loads */
-    :global(html.scenes) .lid { animation: lid-open 1.25s cubic-bezier(.2, .75, .2, 1) .1s both; }
-    :global(html.scenes) .boots { animation: power-on .7s ease 1.05s both; }
+    /* The lid opens and the screen comes on when the page loads */
+    :global(html.scenes) .slot--screen[data-slot='0'] .lid { animation: lid-open .85s cubic-bezier(.2, .75, .2, 1) .05s backwards; transform-origin: 50% 100%; }
+    :global(html.scenes) .slot--screen[data-slot='0'] .desk { animation: power-on .35s ease .5s backwards; }
     @keyframes lid-open { from { transform: perspective(1500px) rotateX(-76deg); } to { transform: perspective(1500px) rotateX(0deg); } }
-    @keyframes power-on { from { filter: brightness(0); } to { filter: none; } }
+    @keyframes power-on { from { opacity: 0; } to { opacity: 1; } }
 
-    /* Final screen is laid out for the screen size */
     :global(html.scenes) .hero .since-long { display: none; }
     @media (min-width: 1100px) { :global(html.scenes) .hero .since-long { display: inline; } }
   }
 
-  /* Phones and narrow tablets: taller screen, simpler rail */
+  /* Phones and narrow tablets: taller screen, compact tour */
   @media (min-height: 560px) and (max-width: 760px) {
-    :global(html.scenes) .stage { padding: 98px var(--gutter) calc(92px + env(safe-area-inset-bottom, 0px)); gap: 10px; }
-    :global(html.scenes) .device { --lw: min(92vw, calc((100svh - 300px) * .74)); }
-    :global(html.scenes) .screen { aspect-ratio: 3 / 4; }
+    :global(html.scenes) .hero { height: 420vh; height: 420svh; }
+    :global(html.scenes) .stage { padding: 96px var(--gutter) calc(88px + env(safe-area-inset-bottom, 0px)); gap: 10px; --lw: min(92vw, calc((100svh - 330px) * .74)); }
+    :global(html.scenes) .screen, .sizer { aspect-ratio: 3 / 4; }
     :global(html.scenes) .desk { padding: 6cqi 5cqi; }
     .hl-brand { font-size: clamp(2.4rem, 14cqi, 4rem); }
     .hl-line { font-size: clamp(1.15rem, 6.6cqi, 1.75rem); }
     .lead { font-size: .875rem; }
-    .mark { width: 22cqi; height: 22cqi; }
-    .boot--apple .mark { width: 18cqi; height: 22cqi; }
-    .boot--lenovo .mark { width: 46cqi; height: 15.3cqi; }
-    .bootbar { width: 38cqi; }
-    .spinner { width: 8cqi; height: 8cqi; }
-    .spinner i::before { width: 1.1cqi; height: 1.1cqi; margin-left: -.55cqi; }
+    .need-title { font-size: clamp(1.5rem, 9cqi, 2.2rem); }
+    .need-sub { font-size: .8125rem; }
+    .need { flex-direction: column; width: 100%; padding: 6px; }
+    .need-go { width: 100%; }
+    .logo--apple { width: 20cqi; height: 24.4cqi; }
+    .logo--dell, .logo--hp { width: 22cqi; height: 22cqi; }
+    .logo--lenovo { width: 44cqi; height: 14.7cqi; }
+    .asset { width: 30cqi; left: 7cqi; bottom: 7cqi; padding: 1.6cqi 2cqi; gap: .9cqi; }
+    .asset b { font-size: 2.3cqi; gap: 1cqi; }
+    .asset-sq { width: 1.9cqi; height: 1.9cqi; }
+    .asset i { height: 4cqi; }
+    .asset small { font-size: 1.8cqi; }
     :global(html.scenes) .hero .ctas .btn { min-height: 44px; padding: 10px 16px; font-size: .9375rem; }
     :global(html.scenes) .hero .trust { gap: 4px 14px; }
-    .rail-names { display: none; }
-    .rail-caps p { white-space: normal; line-height: 1.35; }
-    .rail-caps { height: 2.8em; }
-    :global(html.scenes) .kicker { font-size: 1.125rem; }
-    :global(html.scenes) .cue { display: none; }
+    .stop span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .stop { position: relative; min-width: 24px; min-height: 24px; }
+    .stop::before { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgba(23,19,15,.22); transition: background .3s ease, width .3s ease, margin .3s ease; }
+    .stop:global(.on)::before { width: 18px; margin-left: -9px; border-radius: 4px; background: var(--red-ink); }
+    .tour-nav ol { justify-content: center; gap: 6px; }
+    .tour-track { display: none; }
+    :global(html.scenes) .tour-ctas { min-height: 4.6rem; }
+    :global(html.scenes) .tc { flex-direction: column; gap: 6px; }
+    :global(html.scenes) .tc-cap { font-size: var(--fs-xs); line-height: 1.35; }
+    :global(html.scenes) .k-txt { font-size: 1.0625rem; }
+    :global(html.scenes) .cue, :global(html.scenes) .skip { display: none; }
   }
 
   /* What we rent */
   .hero-tail { position: relative; color: var(--ink); }
-  .rentables { display: grid; justify-items: center; gap: var(--s-4); padding-block: clamp(36px, 5vw, 56px) clamp(40px, 5vw, 64px); }
+  .rentables { display: grid; justify-items: center; gap: var(--s-4); padding-block: clamp(36px, 5vw, 56px) clamp(40px, 5vw, 64px); scroll-margin-top: 20px; }
   .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; max-width: 880px; }
   .pill {
     display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px 10px 18px; border-radius: var(--r-pill);
@@ -443,7 +663,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease-out);
   }
   .pill :global(svg) { color: var(--red-ink); flex: none; }
-  .pill .count { padding: 2px 8px; border-radius: var(--r-pill); background: var(--paper-2); font-family: var(--font-mono); font-size: .75rem; font-weight: 500; color: var(--ink); }
+  .pill .count { padding: 2px 8px; border-radius: var(--r-pill); background: var(--paper-2); font-size: .75rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
   .pill .go { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); transition: background var(--t-fast), transform var(--t-fast) var(--ease-out); }
   .pill .go :global(svg) { color: var(--paper); }
   .pill:hover { border-color: var(--red-ink); background: #fff; transform: translateY(-2px); }
@@ -459,3 +679,30 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     .rentables li:nth-child(n + 7) { display: none; }
   }
 </style>
+
+<script>
+  // "Describe what your team needs": send it to the quote form, or as a WhatsApp message.
+  // Navigation goes through a link click so it also works inside the site preview.
+  const form = document.querySelector<HTMLFormElement>('[data-need]');
+  const wa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
+  if (form) {
+    const input = form.querySelector<HTMLInputElement>('input[name="need"]')!;
+    const base = wa ? new URL(wa.href) : null;
+    const prefix = base?.searchParams.get('text') ?? '';
+    input.addEventListener('input', () => {
+      if (!wa || !base) return;
+      const u = new URL(base.href);
+      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
+      wa.href = u.href;
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const need = input.value.trim();
+      const a = document.createElement('a');
+      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
+      document.body.append(a);
+      a.click();
+      a.remove();
+    });
+  }
+</script>

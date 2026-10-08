@@ -71,6 +71,13 @@ function prefill(form: HTMLFormElement) {
     form.querySelectorAll<HTMLInputElement>('[data-config-choice]').forEach((i) => (i.value = config.slice(0, 300)));
     form.querySelectorAll<HTMLElement>('[data-config-ctx]').forEach((el) => { el.hidden = false; el.querySelector('strong')!.textContent = config.slice(0, 300); });
   }
+  // "Describe what you need" from the home page lands in the message box.
+  const need = q.get('need');
+  const needEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+  if (need && needEl && !needEl.value) {
+    needEl.value = need.slice(0, 600);
+    needEl.closest('details')?.setAttribute('open', '');
+  }
   const cat = q.get('category');
   if (cat) form.querySelectorAll<HTMLInputElement>(`input[name="equipment[]"][value="${CSS.escape(cat)}"]`).forEach((c) => (c.checked = true));
   const city = q.get('city');

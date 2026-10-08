@@ -21,6 +21,8 @@ type Scene = {
   pinned: boolean;
   top: number;
   height: number;
+  /** Scroll distance over which a pinned scene runs (its height less the pinned stage's). */
+  span: number;
   start: number;
   end: number;
   cur: number;
@@ -34,21 +36,83 @@ declare global {
 const root = document.documentElement;
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
-/* Hero: the laptop boots as each brand, then as IT Rentals (keep in step with Hero.astro). */
-const BRANDS = ['apple', 'hp', 'dell', 'lenovo', 'itr'] as const;
-const BRAND_STOPS = [0.17, 0.34, 0.51, 0.68];
+/*
+ * Hero: the laptop turns 180 degrees per stop, always the same way, and rests
+ * dead straight between turns. Stops: 0 IT Rentals screen, 1 Apple, 2 Dell,
+ * 3 HP, 4 Lenovo, 5 "describe what your team needs" (keep in step with Hero.astro).
+ * Face A shows the even stops and face B the odd ones; a face only changes stop
+ * while it points away from the visitor.
+ */
+const FLIPS: readonly (readonly [number, number])[] = [[0.02, 0.13], [0.22, 0.33], [0.42, 0.53], [0.62, 0.73], [0.82, 0.93]];
+const STOP_AT = [0, 0.175, 0.375, 0.575, 0.775, 1];
+const smoother = (t: number) => t * t * t * (t * (6 * t - 15) + 10);
+
+/** Stops passed (k) and progress through the current turn (t). */
+function heroTurn(p: number) {
+  let k = 0;
+  let t = 0;
+  for (const [a, b] of FLIPS) {
+    if (p >= b) k++;
+    else { if (p > a) t = (p - a) / (b - a); break; }
+  }
+  return { k, t };
+}
+
+type HeroParts = { slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[]; front: string; a: number; b: number; stop: number };
+const heroParts = new WeakMap<HTMLElement, HeroParts>();
 
 function hero(s: Scene, p: number) {
-  let i = BRAND_STOPS.findIndex((stop) => p < stop);
-  if (i === -1) i = BRANDS.length - 1;
-  const brand = BRANDS[i];
-  if (s.el.dataset.brand !== brand) {
-    s.el.dataset.brand = brand;
-    s.el.querySelectorAll<HTMLElement>('[data-b]').forEach((n) => n.classList.toggle('on', n.dataset.b === brand));
+  let h = heroParts.get(s.el);
+  if (!h) {
+    const slab = s.el.querySelector<HTMLElement>('[data-slab]');
+    if (!slab) return;
+    h = {
+      slab, width: slab.offsetWidth, floor: s.el.querySelector<HTMLElement>('[data-floor]'),
+      slots: [...s.el.querySelectorAll<HTMLElement>('[data-slot]')],
+      marks: [...s.el.querySelectorAll<HTMLElement>('[data-s]')],
+      front: '', a: -1, b: -1, stop: -1,
+    };
+    heroParts.set(s.el, h);
+    // the slab's width only changes on resize; observing it keeps layout reads out of the scroll frame
+    const parts = h;
+    new ResizeObserver(([entry]) => { parts.width = entry.contentRect.width; }).observe(slab);
   }
-  const from = i === 0 ? 0 : BRAND_STOPS[i - 1];
-  const to = BRAND_STOPS[i] ?? 1;
-  s.el.style.setProperty('--seg', clamp((p - from) / (to - from)).toFixed(3));
+  const { k, t } = heroTurn(p);
+  const e = smoother(t);
+  const deg = (k + e) * 180;
+  const rad = (deg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const mid = Math.abs(Math.sin(rad));
+  // Mid-turn the laptop lifts a little and moves back by half its width, so the
+  // edge swinging towards the visitor stays the laptop's height. At rest it is
+  // exactly flat and straight.
+  h.slab.style.transform = mid < 0.0005
+    ? `rotateY(${Math.round(deg)}deg)`
+    : `translate3d(0, ${(-mid * 12).toFixed(2)}px, ${(-mid * h.width * 0.5).toFixed(1)}px) rotateY(${deg.toFixed(2)}deg)`;
+  h.slab.style.setProperty('--sx', `${(e * 120 - 60).toFixed(1)}%`);
+  h.slab.style.setProperty('--so', (mid * 0.9).toFixed(3));
+  if (h.floor) {
+    h.floor.style.transform = `scaleX(${(0.22 + 0.78 * Math.abs(cos)).toFixed(3)})`;
+    h.floor.style.opacity = (0.45 + 0.55 * Math.abs(cos)).toFixed(3);
+  }
+  const front = cos >= 0 ? 'a' : 'b';
+  if (front !== h.front) { h.front = front; h.slab.dataset.front = front; }
+  const a = Math.min(2 * Math.round(deg / 360), 4);
+  const b = Math.min(2 * Math.floor(deg / 360) + 1, 5);
+  if (a !== h.a || b !== h.b) {
+    h.a = a; h.b = b;
+    h.slots.forEach((el) => { const n = Number(el.dataset.slot); el.classList.toggle('on', n === a || n === b); });
+  }
+  const stop = t < 0.5 ? k : k + 1;
+  if (stop !== h.stop) {
+    h.stop = stop;
+    s.el.dataset.stop = String(stop);
+    h.marks.forEach((el) => {
+      const on = el.dataset.s === String(stop);
+      el.classList.toggle('on', on);
+      if (el.tagName === 'BUTTON') { if (on) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); }
+    });
+  }
 }
 
 /* How renting works: which cards have landed, for the step dots. */
@@ -94,6 +158,7 @@ function init() {
     pinned: false,
     top: 0,
     height: 0,
+    span: 0,
     start: parseFloat(el.dataset.start ?? '0.9'),
     end: parseFloat(el.dataset.end ?? '0.4'),
     cur: -1,
@@ -111,25 +176,32 @@ function init() {
       s.top = r.top + scrollY;
       s.height = r.height;
       s.pinned = !!s.stage && getComputedStyle(s.stage).position === 'sticky' && r.height > vh * 1.2;
+      // The pinned stage is 100svh: measuring it (not innerHeight) keeps progress steady
+      // while a phone's address bar slides in and out.
+      s.span = s.pinned ? Math.max(1, s.height - s.stage!.offsetHeight) : 0;
     }
   };
 
   const target = (s: Scene) => {
-    if (s.pinned) return clamp((scrollY - s.top) / (s.height - vh));
+    if (s.pinned) return clamp((scrollY - s.top) / s.span);
     const top = s.top - scrollY;
     const startY = vh * s.start;
     const endY = vh * s.end;
     return clamp((startY - top) / (startY - endY + s.height));
   };
 
-  const frame = () => {
+  let lastFrame = 0;
+  const frame = (now = performance.now()) => {
     raf = 0;
     let moving = false;
+    // Same feel at 60 and 120 frames a second: 20% of the gap per 60th of a second.
+    const dt = lastFrame ? Math.min(64, now - lastFrame) : 16.7;
+    const ease = 1 - Math.pow(0.8, dt / 16.7);
     for (const s of scenes) {
       const t = target(s);
       if (s.cur < 0) s.cur = t;
       const d = t - s.cur;
-      s.cur = Math.abs(d) < 0.0004 ? t : s.cur + d * 0.2;
+      s.cur = Math.abs(d) < 0.0004 ? t : s.cur + d * ease;
       if (s.cur !== t) moving = true;
       if (Math.abs(s.cur - s.shown) > 0.0002 || s.shown < 0) {
         s.shown = s.cur;
@@ -137,7 +209,7 @@ function init() {
         handlers[s.name]?.(s, s.cur);
       }
     }
-    if (moving) raf = requestAnimationFrame(frame);
+    if (moving) { lastFrame = now; raf = requestAnimationFrame(frame); } else lastFrame = 0;
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
 
@@ -155,7 +227,7 @@ function init() {
       if (!s.pinned || !s.el.contains(t)) continue;
       const at = t.closest<HTMLElement>('[data-at]')?.dataset.at;
       if (at == null) continue;
-      const want = s.top + parseFloat(at) * (s.height - vh);
+      const want = s.top + parseFloat(at) * s.span;
       if (Math.abs(scrollY - want) > 4) {
         window.scrollTo({ top: want, behavior: 'instant' as ScrollBehavior });
         s.cur = parseFloat(at);
@@ -164,9 +236,61 @@ function init() {
     }
   };
 
+  // Hero: a visitor who stops partway through a turn is eased to the nearer stop,
+  // leaning the way they were scrolling. Never while a finger is on the screen.
+  const heroScene = scenes.find((s) => s.name === 'hero');
+  let settleTimer = 0;
+  let touching = false;
+  let dir = 1;
+  let lastY = scrollY;
+  const settle = () => {
+    const s = heroScene;
+    if (!s || !s.pinned || touching) return;
+    const p = target(s);
+    const f = FLIPS.find(([a, b]) => p > a + 0.006 && p < b - 0.006);
+    if (!f) return;
+    const t = (p - f[0]) / (f[1] - f[0]);
+    const forward = dir > 0 ? t > 0.3 : t > 0.7;
+    const to = forward ? f[1] + 0.012 : f[0] - 0.012;
+    window.scrollTo({ top: s.top + to * s.span, behavior: 'smooth' });
+  };
+  const onScrollSettle = () => {
+    const y = scrollY;
+    if (y !== lastY) dir = Math.sign(y - lastY);
+    lastY = y;
+    clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(settle, 240);
+  };
+  const onTouchStart = () => { touching = true; clearTimeout(settleTimer); };
+  const onTouchEnd = () => { touching = false; clearTimeout(settleTimer); settleTimer = window.setTimeout(settle, 240); };
+
+  // Hero stop buttons: go to a stop. Further than one stop away, jump to the turn
+  // just before it first, so the visitor sees one turn rather than a long spin.
+  const onClick = (e: MouseEvent) => {
+    const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]');
+    const s = heroScene;
+    if (!btn || !s || !s.pinned || !s.el.contains(btn)) return;
+    e.preventDefault();
+    const i = Number(btn.dataset.goto);
+    const from = heroParts.get(s.el)?.stop ?? 0;
+    if (Math.abs(i - from) > 1) {
+      const pre = i > from ? FLIPS[i - 1][0] - 0.004 : FLIPS[i][1] + 0.004;
+      window.scrollTo({ top: s.top + pre * s.span, behavior: 'instant' as ScrollBehavior });
+      s.cur = pre;
+      kick();
+    }
+    requestAnimationFrame(() => window.scrollTo({ top: s.top + STOP_AT[i] * s.span, behavior: 'smooth' }));
+  };
+
   measure();
   frame();
   addEventListener('scroll', kick, { passive: true });
+  if (heroScene) {
+    addEventListener('scroll', onScrollSettle, { passive: true });
+    addEventListener('touchstart', onTouchStart, { passive: true });
+    addEventListener('touchend', onTouchEnd, { passive: true });
+    heroScene.el.addEventListener('click', onClick);
+  }
   addEventListener('resize', relayout);
   addEventListener('load', relayout);
   document.fonts?.ready.then(relayout);
@@ -193,6 +317,11 @@ function init() {
   window.__scenes = {
     destroy() {
       removeEventListener('scroll', kick);
+      removeEventListener('scroll', onScrollSettle);
+      removeEventListener('touchstart', onTouchStart);
+      removeEventListener('touchend', onTouchEnd);
+      heroScene?.el.removeEventListener('click', onClick);
+      clearTimeout(settleTimer);
       removeEventListener('resize', relayout);
       removeEventListener('load', relayout);
       document.removeEventListener('focusin', onFocus);

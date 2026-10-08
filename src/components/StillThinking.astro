@@ -1,0 +1,178 @@
+---
+/**
+ * "Still thinking it over?" prompt. After a visitor has spent a minute on the
+ * site (visible time, counted across pages in this tab) and at least a few
+ * seconds on the current page, a small card appears beside the WhatsApp button
+ * (desktop) or just above the call / WhatsApp / quote bar (phones).
+ *
+ * - Never takes focus or blocks the page; Escape or the close button hide it,
+ *   and it moves out of the way of anything that gets keyboard focus.
+ * - Shown at most once per visit; closing it keeps it away for a week, and
+ *   using one of its links keeps it away for a month.
+ * - Waits while the visitor is typing, a menu or the compare tray is open, or
+ *   the window is very short (phone held sideways, high zoom).
+ * - Pages that are themselves contact or quote forms turn it off (Base: nudge={false}).
+ */
+import Icon from './Icon.astro';
+import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
+---
+<aside class="nudge" data-nudge hidden aria-labelledby="nudge-title">
+  <button type="button" class="nudge-x" data-nudge-close aria-label="Close this message"><Icon name="x" size={18} stroke={2} /></button>
+  <span class="nudge-ic" aria-hidden="true"><Icon name="message-circle-question-mark" size={22} stroke={1.75} /></span>
+  <h2 id="nudge-title" class="nudge-title">Still thinking<span class="nudge-long"> it over</span>?</h2>
+  <p class="nudge-text">Get quick answers about models, quantities and delivery. WhatsApp us or call, whichever suits you.</p>
+  <p class="nudge-short">Quick answers on WhatsApp.</p>
+  <div class="nudge-actions">
+    <a class="btn btn--sm nudge-wa" href={whatsappLink('Hi IT Rentals, I have a question about renting laptops.')} target="_blank" rel="noopener" data-nudge-cta data-track-location="nudge"><Icon name="whatsapp" />WhatsApp us</a>
+    <a class="btn btn--sm nudge-call" href={telLink(CONTACT.PRIMARY_PHONE)} data-nudge-cta data-track-location="nudge"><Icon name="phone" />{formatPhone(CONTACT.PRIMARY_PHONE)}</a>
+  </div>
+  <a class="nudge-link" href="/request-a-quote/" data-nudge-cta>Or send us your requirement</a>
+</aside>
+<p class="sr-only" role="status" aria-live="polite" data-nudge-status></p>
+
+<style>
+  .nudge {
+    position: fixed; z-index: calc(var(--z-bar) + 1);
+    right: 24px; bottom: 100px; width: min(360px, calc(100vw - 48px));
+    display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start;
+    padding: 20px 20px 18px; border-radius: 20px;
+    background: var(--card); color: var(--ink); border: 1px solid var(--line-strong);
+    box-shadow: 0 1px 0 rgba(23,19,15,.04), 0 28px 60px -24px rgba(23,19,15,.5), 0 10px 22px -14px rgba(23,19,15,.35);
+    opacity: 0; transform: translateY(14px) scale(.98); transform-origin: calc(100% - 30px) 100%;
+    transition: opacity .35s ease, transform .5s var(--ease-out);
+  }
+  /* a small tail pointing at the WhatsApp button below */
+  .nudge::after {
+    content: ''; position: absolute; right: 24px; bottom: -8px; width: 14px; height: 14px; rotate: 45deg;
+    background: var(--card); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong);
+  }
+  .nudge:global(.in) { opacity: 1; transform: none; }
+  .nudge-ic {
+    grid-row: 1 / 3; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
+    background: var(--red-tint); color: var(--red-ink);
+  }
+  .nudge-title { margin: 0; padding-right: 28px; font-family: var(--font-display); font-weight: 400; font-size: 1.375rem; line-height: 1.15; letter-spacing: -0.01em; }
+  .nudge-text { margin: 6px 0 0; font-size: var(--fs-small); line-height: 1.5; color: var(--ink-2); }
+  .nudge-short { display: none; }
+  .nudge-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  /* darker than the brand green so white text passes 4.5:1 */
+  .nudge-wa { --btn-bg: #0F7A40; --btn-fg: #fff; --btn-bd: #0F7A40; }
+  .nudge-wa:hover { --btn-bg: #0B6233; --btn-bd: #0B6233; }
+  .nudge-wa :global(svg) { color: #fff; }
+  .nudge-link { grid-column: 1 / -1; justify-self: start; margin-top: 12px; font-size: var(--fs-small); font-weight: 500; color: var(--ink); text-underline-offset: 3px; }
+  .nudge-x {
+    position: absolute; top: 10px; right: 10px; display: grid; place-items: center; width: 36px; height: 36px;
+    border: 0; border-radius: 50%; background: transparent; color: var(--ink-2); cursor: pointer;
+  }
+  .nudge-x:hover { background: var(--paper-2); color: var(--ink); }
+  .nudge-x:focus-visible, .nudge-link:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  /* Phones: one compact row just above the call / WhatsApp / quote bar (which already has call and quote) */
+  @media (max-width: 899px) {
+    .nudge {
+      left: 12px; right: 12px; width: auto; bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+      grid-template-columns: 1fr auto; column-gap: 12px; align-items: center;
+      padding: 12px 52px 12px 16px; border-radius: 16px; transform-origin: 50% 100%;
+    }
+    .nudge::after, .nudge-ic, .nudge-call, .nudge-link, .nudge-text, .nudge-long { display: none; }
+    .nudge-title { grid-column: 1; padding: 0; font-size: 1.1875rem; }
+    .nudge-short { display: block; grid-column: 1; margin: 2px 0 0; font-size: var(--fs-xs); line-height: 1.35; color: var(--ink-2); }
+    .nudge-actions { grid-column: 2; grid-row: 1 / 3; margin: 0; }
+    .nudge-x { top: 50%; right: 8px; translate: 0 -50%; }
+  }
+  :global(html.menu-open) .nudge { display: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .nudge { transform: none; transition: opacity .2s ease; }
+  }
+</style>
+
+<script>
+  /* Visible time is summed across pages of this visit (sessionStorage). Storage can
+     be unavailable (private modes, sandboxed previews), so every access is guarded
+     and the prompt still works for the current page. */
+  const DELAY = 60_000;
+  const MIN_ON_PAGE = 8_000;
+  const SNOOZE_DAYS = { dismiss: 7, used: 30 };
+  const K_TIME = 'itr-nudge-ms';
+  const K_SHOWN = 'itr-nudge-shown';
+  const K_SNOOZE = 'itr-nudge-until';
+
+  const get = (s: () => Storage, k: string) => { try { return s().getItem(k); } catch { return null; } };
+  const set = (s: () => Storage, k: string, v: string) => { try { s().setItem(k, v); } catch { /* storage off */ } };
+  const ss = () => sessionStorage;
+  const ls = () => localStorage;
+
+  const el = document.querySelector<HTMLElement>('[data-nudge]');
+  const status = document.querySelector<HTMLElement>('[data-nudge-status]');
+  const root = document.documentElement;
+  const snoozedUntil = Number(get(ls, K_SNOOZE) ?? 0);
+
+  if (el && !get(ss, K_SHOWN) && !(snoozedUntil > Date.now())) {
+    const pageStart = performance.now();
+    const tooShort = matchMedia('(max-height: 520px)');
+    let spent = Number(get(ss, K_TIME) ?? 0) || 0;
+    let last = performance.now();
+    let lastTyped = -Infinity;
+    let open = false;
+
+    const save = () => set(ss, K_TIME, String(Math.round(spent)));
+    const otherLayerOpen = () =>
+      root.classList.contains('menu-open') ||
+      !!document.querySelector('[data-menu-trigger][aria-expanded="true"], dialog[open], [data-tray]:not([hidden])');
+    const typing = () => {
+      const a = document.activeElement as HTMLElement | null;
+      return !!a && (a.matches('input, textarea, select, [contenteditable="true"]') || performance.now() - lastTyped < 8000);
+    };
+
+    // Keep whatever has keyboard focus visible (WCAG 2.4.11).
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (!open || el.contains(t)) return;
+      const r = t.getBoundingClientRect();
+      const n = el.getBoundingClientRect();
+      if (r.bottom > n.top && r.top < n.bottom && r.right > n.left && r.left < n.right) t.scrollIntoView({ block: 'center' });
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (open && e.key === 'Escape' && !e.defaultPrevented && !otherLayerOpen()) close('dismiss');
+    };
+
+    const close = (why: keyof typeof SNOOZE_DAYS) => {
+      if (!open) return;
+      open = false;
+      el.classList.remove('in');
+      window.setTimeout(() => { el.hidden = true; }, 450);
+      root.style.scrollPaddingBottom = '';
+      set(ls, K_SNOOZE, String(Date.now() + SNOOZE_DAYS[why] * 864e5));
+      removeEventListener('keydown', onKey, true);
+      document.removeEventListener('focusin', onFocusIn);
+    };
+
+    const show = () => {
+      open = true;
+      set(ss, K_SHOWN, '1');
+      el.hidden = false;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.classList.add('in');
+        root.style.scrollPaddingBottom = `${el.offsetHeight + 32}px`;
+      }));
+      if (status) status.textContent = 'Still thinking it over? You can message us on WhatsApp or call. Press Escape to close this message.';
+      addEventListener('keydown', onKey, true);
+      document.addEventListener('focusin', onFocusIn);
+      window.clearInterval(timer);
+    };
+
+    const tick = () => {
+      const now = performance.now();
+      if (document.visibilityState === 'visible') spent += Math.min(now - last, 2000);
+      last = now;
+      if (spent >= DELAY && now - pageStart >= MIN_ON_PAGE && !tooShort.matches && !typing() && !otherLayerOpen()) show();
+    };
+    const timer = window.setInterval(() => { tick(); if (Math.round(spent / 1000) % 5 === 0) save(); }, 1000);
+
+    document.addEventListener('visibilitychange', () => { last = performance.now(); save(); });
+    addEventListener('pagehide', save);
+    document.addEventListener('input', () => { lastTyped = performance.now(); }, true);
+    el.querySelector('[data-nudge-close]')?.addEventListener('click', () => close('dismiss'));
+    el.querySelectorAll('[data-nudge-cta]').forEach((a) => a.addEventListener('click', () => close('used')));
+  }
+</script>
