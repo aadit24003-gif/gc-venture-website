@@ -46,6 +46,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v37 | `ecc2b63` | A very light circuit-board texture (faint traces and solder points) behind the cream describe/build page | https://claude.ai/artifact/P7b5GTzFn3DrtSb3U86idY |
 | v38 | `ecc2b63` (site unchanged) | Preview only: the About page's team photo and workplace photo are embedded at full size (2000 and 1600 px) instead of small 720 px copies, so they are sharp | https://claude.ai/artifact/9fwHNX1DYdpWAqZh3btu56 |
 | v39 | `07a819c` | First screen: a ThinkPad and a MacBook either side of the main laptop, a gap away and cut off by the window (they fade as the zoom starts); the zoom and glide are unchanged | https://claude.ai/artifact/EeXZy3f5jkbSi4CxxrSdWo |
+| v40 | `2057311` | Side laptops on the first screen trimmed to about a sixth showing at each edge, and the device icons beside the main laptop back between them | https://claude.ai/artifact/M8cFmqn1orsAbeV8CS7Wia |
 
 ## Going back to a version
 
