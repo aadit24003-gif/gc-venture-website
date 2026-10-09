@@ -52,6 +52,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v43 | `50c75f9` | Capsules now read 'Rent laptops / MacBooks / monitors / desktops / servers / mobile phones', in the page's own dark colour with a hairline edge and a soft clearing in the icons, arranged in a gentle curve either side | https://claude.ai/artifact/FXWhN4Mnc6DDG2aFvMB6St |
 | v44 | `3dcf690` | The 'Rent …' capsules replace the brand links under the first screen's laptop, in one straight row; the laptop is a little bigger; a band split into four with faint Lenovo, Dell, HP and Apple logos sits between the describe box and the builder | https://claude.ai/artifact/3a2vhg5jCdJUegwQtWKYVd |
 | v45 | `cabd793` | The first screen's laptop is 7–9% bigger, with its headline, buttons and words a little larger still; every seventh icon around it is left out; the four logos before the builder are in soft brand colours | https://claude.ai/artifact/A6dDaA3mzYkcLsJHDvUWYZ |
+| v46 | `1722c47` | Nationwide SEO pass: one linked structured-data graph per page, offices marked up only once confirmed, cleaner titles and descriptions, city pages without unverified claims, Kerala page named correctly, form-start, quote-click and catalogue events; SEO.md documents the audit, keyword map and setup steps | https://claude.ai/artifact/Ecx1FCPGggcG6UEBr2Aq8N |
 
 ## Going back to a version
 
