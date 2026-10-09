@@ -40,15 +40,15 @@ function smoother(t: number) { return t * t * t * (t * (6 * t - 15) + 10); }
 
 /*
  * Hero: the first screen stays put while the visitor scrolls, and the laptop
- * grows until its screen fills the window; the screen's words fade, the screen
- * becomes plain page, and the describe-your-need page fades in on it
- * (Hero.astro). Written straight onto those few elements, not as an inherited
+ * grows until its screen fills the window while the screen's words fade; the
+ * next section (LaptopCurator.astro, pulled up over the end of the hero) then
+ * rises over it. Written straight onto those few elements, not as an inherited
  * custom property (which would restyle every icon in the section each frame).
  */
 type HeroParts = {
   stage: HTMLElement; device: HTMLElement; screen: HTMLElement; desk: HTMLElement | null;
-  fades: HTMLElement[]; fill: HTMLElement | null; inner: HTMLElement | null;
-  geo: { dx: number; dy: number; s: number } | null; on: boolean; still: boolean;
+  fades: HTMLElement[];
+  geo: { dx: number; dy: number; s: number } | null; still: boolean;
 };
 const heroParts = new WeakMap<HTMLElement, HeroParts>();
 
@@ -71,8 +71,7 @@ function hero(s: Scene, p: number) {
     h = {
       stage, device, screen, desk: s.el.querySelector<HTMLElement>('[data-desk]'),
       fades: [...s.el.querySelectorAll<HTMLElement>('[data-fade]')],
-      fill: s.el.querySelector<HTMLElement>('[data-p2-fill]'), inner: s.el.querySelector<HTMLElement>('[data-p2-in]'),
-      geo: null, on: false, still: false,
+      geo: null, still: false,
     };
     heroParts.set(s.el, h);
   }
@@ -82,9 +81,7 @@ function hero(s: Scene, p: number) {
     h.still = true;
     h.device.style.transform = '';
     h.device.style.transformOrigin = '';
-    for (const el of [...h.fades, h.desk, h.fill, h.inner]) if (el) { el.style.opacity = ''; el.style.transform = ''; }
-    h.stage.removeAttribute('data-p2-on');
-    h.on = false;
+    for (const el of [...h.fades, h.desk]) if (el) el.style.opacity = '';
     return;
   }
   h.still = false;
@@ -104,19 +101,11 @@ function hero(s: Scene, p: number) {
     };
   }
   const g = h.geo;
-  const z = smoother(clamp((p - 0.02) / 0.5));
+  const z = smoother(clamp((p - 0.02) / 0.46));
   h.device.style.transform = z === 0 ? '' : `translate3d(${(g.dx * z).toFixed(1)}px, ${(g.dy * z).toFixed(1)}px, 0) scale(${(1 + (g.s - 1) * z).toFixed(4)})`;
   const out = (1 - clamp(p / 0.14)).toFixed(3);
   h.fades.forEach((el) => { el.style.opacity = out; });
-  if (h.desk) h.desk.style.opacity = (1 - clamp((p - 0.08) / 0.2)).toFixed(3);
-  if (h.fill) h.fill.style.opacity = clamp((p - 0.3) / 0.16).toFixed(3);
-  const q = smoother(clamp((p - 0.33) / 0.22));
-  if (h.inner) {
-    h.inner.style.opacity = q.toFixed(3);
-    h.inner.style.transform = q >= 1 ? '' : `translate3d(0, ${((1 - q) * 28).toFixed(1)}px, 0)`;
-  }
-  const on = q > 0.5;
-  if (on !== h.on) { h.on = on; h.stage.toggleAttribute('data-p2-on', on); }
+  if (h.desk) h.desk.style.opacity = (1 - clamp((p - 0.2) / 0.24)).toFixed(3);
 }
 
 /* How renting works: which cards have landed, for the step dots. */
@@ -261,21 +250,9 @@ function init() {
     }
   };
 
-  // Hero: "Describe your need" scrolls on to the point where that page is in place
-  // (an anchor link would land on the first screen, which stays put while it plays).
-  const heroScene = scenes.find((s) => s.name === 'hero');
-  const onClick = (e: MouseEvent) => {
-    const a = (e.target as HTMLElement).closest<HTMLElement>('[data-to-describe]');
-    const s = heroScene;
-    if (!a || !s || !s.pinned) return;
-    e.preventDefault();
-    window.scrollTo({ top: s.top + 0.84 * s.span, behavior: 'smooth' });
-  };
-
   measure();
   frame();
   addEventListener('scroll', kick, { passive: true });
-  heroScene?.el.addEventListener('click', onClick);
   addEventListener('resize', relayout);
   addEventListener('load', relayout);
   document.fonts?.ready.then(relayout);
@@ -302,7 +279,6 @@ function init() {
   window.__scenes = {
     destroy() {
       removeEventListener('scroll', kick);
-      heroScene?.el.removeEventListener('click', onClick);
       removeEventListener('resize', relayout);
       removeEventListener('load', relayout);
       document.removeEventListener('focusin', onFocus);
