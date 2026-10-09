@@ -54,6 +54,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v45 | `cabd793` | The first screen's laptop is 7–9% bigger, with its headline, buttons and words a little larger still; every seventh icon around it is left out; the four logos before the builder are in soft brand colours | https://claude.ai/artifact/A6dDaA3mzYkcLsJHDvUWYZ |
 | v46 | `1722c47` | Nationwide SEO pass: one linked structured-data graph per page, offices marked up only once confirmed, cleaner titles and descriptions, city pages without unverified claims, Kerala page named correctly, form-start, quote-click and catalogue events; SEO.md documents the audit, keyword map and setup steps | https://claude.ai/artifact/Ecx1FCPGggcG6UEBr2Aq8N |
 | v47 | `5ed88c2` | Describe box on dark wine, typing out example requests while empty; 'From ten laptops to enterprise scale' on dark wine with a filling track, laptops lighting in a wave and a counting number, walked from 10 to 500+ by scrolling on larger screens | https://claude.ai/artifact/F4SfGwKMVDa2AzgEqC444L |
+| v48 | `a6d8f39` | The first screen's laptop gets a wallpaper: a small plant on a shelf against a warm wall (your photo, wall extended and warmed), kept clear of the words at every screen size; phones show only the wall and shelf | https://claude.ai/artifact/B9t8xCzRZhy9j4BAqUFwSM |
 
 ## Going back to a version
 
