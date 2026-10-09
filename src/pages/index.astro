@@ -7,6 +7,7 @@ import Preparation from '../components/Preparation.astro';
 import CategoryIndex from '../components/CategoryIndex.astro';
 import WhyUs from '../components/WhyUs.astro';
 import LaptopCurator from '../components/LaptopCurator.astro';
+import Rentables from '../components/Rentables.astro';
 import StepsScene from '../components/StepsScene.astro';
 import FilmScene from '../components/FilmScene.astro';
 import IndustryGrid from '../components/IndustryGrid.astro';
@@ -30,11 +31,11 @@ const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', na
   schema={[websiteSchema, faqSchema]}
 >
   <Hero />
+  <LaptopCurator />
+  <Rentables />
   <ClientMarquee />
 
   <Preparation />
-
-  <LaptopCurator />
 
   <ScaleSelector />
 

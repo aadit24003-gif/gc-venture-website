@@ -139,9 +139,10 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       const a = document.activeElement as HTMLElement | null;
       return (!!a && a.matches(TEXT)) || performance.now() - lastTyped < 8000;
     };
-    // The laptop tour fills the screen until most of it has scrolled away (its last
-    // stop, the describe-your-need form, still counts as the tour).
-    const inTour = () => !!tour && root.classList.contains('scenes') && tour.getBoundingClientRect().bottom > root.clientHeight * 0.4;
+    // The laptop tour fills the screen until most of it has scrolled away
+    // (and the builder that follows it, where the laptop comes to rest on the right)
+    const build = document.querySelector<HTMLElement>('#build [data-dock2]')?.parentElement ?? null;
+    const inTour = () => root.classList.contains('scenes') && [tour, build].some((el) => !!el && el.getBoundingClientRect().bottom > root.clientHeight * 0.4);
     const covers = (t: Element) => {
       const r = t.getBoundingClientRect();
       const n = el.getBoundingClientRect();

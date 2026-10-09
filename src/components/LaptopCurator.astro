@@ -1,9 +1,12 @@
 ---
 /**
- * Laptop curator (home page). A laptop sits in the middle, wired to four option
- * boxes: brand, processor, memory and storage. Choosing an option plugs its
- * cable into the laptop, the screen shows the brand and the specification, and
- * the models that match are listed with a quote link for the chosen quantity.
+ * Describe your need, or build your own (home page, right after the hero).
+ * The hero's laptop is carried down to the empty space on the right ([data-dock2])
+ * and stays beside the builder while it scrolls; its screen ([data-lap], in
+ * Hero.astro) shows the brand and specification chosen here. On the left: a box
+ * to describe the need in words (opens the quote form filled in), then four option
+ * boxes (brand, processor, memory, storage); the models that match are listed
+ * below with a quote link for the chosen quantity.
  *
  * Options come from the catalogue data (src/data/products.ts), so the curator
  * never offers a combination that does not exist. Without JavaScript it is a
@@ -12,6 +15,7 @@
 import Icon from './Icon.astro';
 import { PRODUCTS, formatGb, genOrder, type Product } from '../data/products';
 import { BRAND_MARKS } from '../data/brand-marks';
+import { whatsappLink } from '../config/site';
 
 const isMac = (p: Product) => p.brand === 'Apple';
 const models = PRODUCTS.filter((p) => p.configs?.length && (p.category === 'laptops' || p.category === 'macbooks'));
@@ -54,6 +58,8 @@ const macModels = macs.map((p) => p.name.replace(/^Apple /, ''));
 const ram = uniq(models.flatMap((p) => p.configs!.flatMap((c) => c.ram))).sort((a, b) => a - b);
 const storage = uniq(models.flatMap((p) => p.configs!.flatMap((c) => c.storage))).sort((a, b) => a - b);
 
+const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
+
 const short = (f: string) => f.replace(/^Core Ultra /, 'Ultra ');
 
 /** Rows of options inside each box. `for` limits a row to PCs or Macs. */
@@ -83,20 +89,31 @@ const cardSpec = (p: Product) => {
   return [proc, `${span(uniq(c.flatMap((x) => x.ram)))} memory`, `${span(uniq(c.flatMap((x) => x.storage)))} storage`].join(', ');
 };
 ---
-<section class="section section--sunk cur" id="build" aria-labelledby="cur-title">
+<section class="section cur" id="build" aria-labelledby="cur-title">
   <div class="wrap cur-wrap">
-    <div class="section-head section-head--split">
-      <h2 id="cur-title" class="h2">Build your team’s laptop</h2>
-      <p class="lead">Choose a brand, then the processor, memory and storage. The models that match appear below, ready to quote for as many as you need.</p>
-    </div>
+    <div class="p2">
+      <div class="p2-main">
+        <h2 id="cur-title" class="p2-title">Describe your need,<span> or build your own.</span></h2>
+
+        <form class="need" action="/request-a-quote/" method="get" data-need>
+          <label class="need-label" for="need-text">Tell us what your team needs</label>
+          <textarea id="need-text" class="need-in" name="need" rows="3" maxlength="600" placeholder="e.g. 40 laptops in Pune from Monday, Core i5 with 16 GB, Office installed"></textarea>
+          <div class="need-row">
+            <button class="btn btn--primary" type="submit">Get a quote</button>
+            <a class="need-wa" href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="build-need">Send it on WhatsApp</a>
+          </div>
+        </form>
+
+        <div class="p2-or">
+          <h3 class="p2-or-title">Or build your own</h3>
+          <p class="p2-or-text">Choose a brand, then the processor, memory and storage. The models that match appear below, ready to quote for as many as you need.</p>
+        </div>
 
     <form class="cur-form" action="/equipment/" method="get" data-cur>
       <script type="application/json" is:inline data-cur-data set:html={JSON.stringify(data)} />
       <div class="stage" data-cur-stage>
-        <svg class="cables" aria-hidden="true" focusable="false" data-cables></svg>
-
         <!-- 1 Brand -->
-        <fieldset class="box box--brand" style="grid-area: b1" data-box="brand" data-state="open">
+        <fieldset class="box box--brand" data-box="brand" data-state="open">
           <legend class="box-legend"><span class="step" aria-hidden="true">1</span>Brand</legend>
           <p class="box-note" data-note>Start here.</p>
           <div class="tiles">
@@ -119,32 +136,8 @@ const cardSpec = (p: Product) => {
           </div>
         </fieldset>
 
-        <!-- The laptop -->
-        <div class="lap" style="grid-area: lap" data-brand="" aria-hidden="true" data-lap>
-          <div class="lap-lid" data-port-lid>
-            <span class="lap-cam"></span>
-            <div class="lap-screen">
-              <div class="scr-marks" data-port="brand">
-                <span class="scr-mark scr-mark--itr on" data-mark="">IT Rentals</span>
-                <svg class="scr-mark scr-mark--lenovo" data-mark="Lenovo" viewBox="0 8 24 8.01" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
-                <svg class="scr-mark scr-mark--dell" data-mark="Dell" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg>
-                <svg class="scr-mark scr-mark--hp" data-mark="HP" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg>
-                <svg class="scr-mark scr-mark--apple" data-mark="Apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="currentColor" /></svg>
-                <span class="scr-mark scr-mark--itr" data-mark="any">IT Rentals</span>
-              </div>
-              <dl class="scr-spec">
-                <div data-port="proc" data-row="proc"><dt>Processor</dt><dd data-val="proc">Any</dd></div>
-                <div data-port="ram" data-row="ram"><dt>Memory</dt><dd data-val="ram">Any</dd></div>
-                <div data-port="storage" data-row="storage"><dt>Storage</dt><dd data-val="storage">Any</dd></div>
-              </dl>
-              <p class="scr-foot" data-scr-foot>Choose a brand to start</p>
-            </div>
-          </div>
-          <div class="lap-deck"><span class="lap-notch"></span></div>
-        </div>
-
         {boxes.map((b) => (
-          <fieldset class="box" style={`grid-area: ${b.area}`} data-box={b.id} data-state="open">
+          <fieldset class="box" data-box={b.id} data-state="open">
             <legend class="box-legend"><span class="step" aria-hidden="true">{b.n}</span>{b.title}</legend>
             <p class="box-note" data-note hidden></p>
             {b.rows.map((r) => (
@@ -185,6 +178,10 @@ const cardSpec = (p: Product) => {
         </div>
       </div>
     </form>
+      </div>
+      <!-- where the hero's laptop comes to rest (it stays in view while the builder scrolls) -->
+      <div class="p2-dock" aria-hidden="true"><div class="dock2" data-dock2></div></div>
+    </div>
 
     <div class="results">
       <div class="results-head">
@@ -209,14 +206,53 @@ const cardSpec = (p: Product) => {
 </section>
 
 <style>
-  /* deck colour follows the brand on screen */
-  @property --cd1 { syntax: '<color>'; inherits: true; initial-value: #d6cfc3; }
-  @property --cd2 { syntax: '<color>'; inherits: true; initial-value: #b2aa9d; }
-  @property --cd3 { syntax: '<color>'; inherits: true; initial-value: #7d766c; }
-
+  .cur { padding-top: clamp(48px, 7vw, 104px); }
   .cur-wrap { max-width: calc(1380px + 2 * var(--gutter)); }
-  .cur .section-head { max-width: 1240px; }
-  .stage { position: relative; display: grid; gap: 16px; }
+  .stage { position: relative; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr)); align-items: start; }
+
+  /* ── Page 2: the words on the left, the laptop on the right ── */
+  .p2 { display: grid; gap: clamp(28px, 4vw, 56px); }
+  .p2-main { min-width: 0; }
+  .p2-title {
+    margin: 0; font-family: var(--font-display); font-weight: 400; font-optical-sizing: auto;
+    font-size: clamp(2.7rem, 1.2rem + 4.6vw, 5.75rem); line-height: .94; letter-spacing: -0.035em; text-wrap: balance;
+  }
+  .p2-title span { display: block; font-style: italic; color: var(--ink-2); }
+  .p2-dock { position: relative; min-width: 0; }
+  /* its height and resting place are set by scenes.ts to fit the laptop it carries here */
+  .dock2 { width: min(100%, 620px); margin-inline: auto; }
+  @media (min-width: 1000px) {
+    .p2 { grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: stretch; }
+    .dock2 { position: sticky; top: var(--land, 120px); }
+  }
+  @media (max-width: 999px) {
+    .p2-dock { order: -1; }
+    .dock2 { width: min(72vw, 420px); }
+  }
+  /* without the scroll tour the laptop stays on the first screen */
+  :global(html:not(.scenes)) .p2-dock { display: none; }
+  :global(html:not(.scenes)) .p2 { grid-template-columns: minmax(0, 1fr); }
+  @media (max-height: 559px) { .p2-dock { display: none; } .p2 { grid-template-columns: minmax(0, 1fr); } }
+
+  /* Describe it in words */
+  .need {
+    display: grid; gap: 10px; margin-top: clamp(24px, 3vw, 36px); padding: 16px 16px 14px; max-width: 640px;
+    border-radius: var(--r-xl); background: var(--card); border: 1px solid var(--line-strong); box-shadow: var(--shadow-soft);
+  }
+  .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .16), var(--shadow-soft); }
+  .need-label { font-size: var(--fs-small); font-weight: 600; color: var(--ink); }
+  .need-in {
+    width: 100%; min-height: 84px; resize: vertical; border: 0; padding: 0; background: transparent;
+    font: inherit; font-size: 1rem; line-height: 1.55; color: var(--ink);
+  }
+  .need-in:focus { outline: none; }
+  .need-in::placeholder { color: var(--ink-3); }
+  .need-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .need-wa { font-size: var(--fs-small); font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
+
+  .p2-or { margin: clamp(40px, 5vw, 64px) 0 20px; max-width: 640px; }
+  .p2-or-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); letter-spacing: -0.015em; }
+  .p2-or-text { margin: 8px 0 0; color: var(--ink-2); }
 
   /* ── Option boxes ── */
   .box {
@@ -272,104 +308,6 @@ const cardSpec = (p: Product) => {
   .tile-sub { font-size: .75rem; line-height: 1.3; color: var(--ink-2); }
   .tile input:checked + .tile-face .tile-sub { color: rgba(243, 238, 229, .78); }
 
-  /* ── The laptop ── */
-  .lap { position: relative; z-index: 1; width: 100%; max-width: 560px; margin: 8px auto; container-type: inline-size; }
-  .lap-lid {
-    position: relative; width: 94%; margin: 0 auto; padding: 2.2cqi 2.2cqi 3.4cqi;
-    background: linear-gradient(180deg, #0c0a09, #050404); border-radius: 3.6cqi 3.6cqi 1cqi 1cqi;
-    box-shadow: inset 0 0 0 1px rgba(243,238,229,.10), 0 0 0 1px rgba(0,0,0,.6), 0 40px 70px -40px rgba(23,19,15,.6), 0 18px 34px -24px rgba(23,19,15,.45);
-  }
-  .lap-cam { position: absolute; top: 1cqi; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; }
-  .lap-screen {
-    position: relative; aspect-ratio: 16 / 10.6; overflow: hidden; border-radius: 1.4cqi 1.4cqi .4cqi .4cqi;
-    display: grid; grid-template-rows: 1fr auto auto; padding: 4cqi 6cqi 3.4cqi; gap: 2.4cqi;
-    color: #F3EEE5;
-    background: radial-gradient(90% 70% at 50% 18%, #2b2220 0%, #141010 55%, #0b0908 100%);
-  }
-  .scr-marks { position: relative; display: grid; place-items: center; min-height: 0; }
-  .scr-mark {
-    grid-area: 1 / 1; display: block; opacity: 0; transform: scale(.92); filter: blur(6px); color: #fff;
-    transition: opacity .4s ease, transform .6s var(--ease-out), filter .4s ease;
-  }
-  .scr-mark.on { opacity: 1; transform: none; filter: none; }
-  .scr-mark--apple { width: 9cqi; height: 11cqi; }
-  .scr-mark--hp, .scr-mark--dell { width: 12cqi; height: 12cqi; }
-  .scr-mark--lenovo { width: 27cqi; height: 9cqi; }
-  .scr-mark--itr { font-family: var(--font-display); font-size: 9.5cqi; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; }
-  .scr-spec { display: grid; gap: .6cqi; margin: 0; padding: 2.2cqi 0 0; border-top: 1px solid rgba(243,238,229,.14); }
-  .scr-spec div {
-    display: grid; grid-template-columns: 26cqi 1fr; align-items: baseline; padding: 1cqi 1.6cqi; border-radius: 1cqi;
-    transition: background-color .5s ease;
-  }
-  .scr-spec div.flash { background-color: rgba(224, 51, 40, .22); transition: none; }
-  .scr-spec dt { font-size: 3cqi; color: rgba(243,238,229,.6); }
-  .scr-spec dd { margin: 0; font-size: 3.6cqi; font-weight: 600; color: rgba(243,238,229,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .scr-spec dd.set { color: #fff; }
-  .scr-foot { margin: 0; display: flex; align-items: center; gap: 1.6cqi; font-size: 3cqi; color: rgba(243,238,229,.75); }
-  .scr-foot::before { content: ''; width: 1.6cqi; height: 1.6cqi; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 .8cqi rgba(224,51,40,.22); }
-  .lap-deck {
-    position: relative; height: 3cqi; margin-top: -1px;
-    background: linear-gradient(180deg, var(--cd1) 0%, var(--cd2) 45%, var(--cd3) 100%);
-    border-radius: 2px 2px 3.4cqi 3.4cqi / 2px 2px 2cqi 2cqi;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 14px 22px -12px rgba(23,19,15,.55);
-    transition: --cd1 .6s ease, --cd2 .6s ease, --cd3 .6s ease;
-  }
-  .lap-notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, var(--cd3), var(--cd2)); border-radius: 0 0 9px 9px; opacity: .7; }
-  .lap[data-brand='Apple'] { --cd1: #e6e6e9; --cd2: #bcbcc1; --cd3: #8d8d93; }
-  .lap[data-brand='HP'] { --cd1: #dedfe2; --cd2: #b3b4b8; --cd3: #85868b; }
-  .lap[data-brand='Dell'] { --cd1: #73767c; --cd2: #4a4d52; --cd3: #2c2e32; }
-  .lap[data-brand='Lenovo'] { --cd1: #404042; --cd2: #252527; --cd3: #131314; }
-
-  /* ── Cables (drawn by the script on wide screens) ── */
-  .cables { display: none; }
-  .cables :global(.cable) { fill: none; stroke: rgba(23,19,15,.3); stroke-width: 1.5; stroke-dasharray: 3 5; stroke-linecap: round; transition: stroke .3s ease; }
-  .cables :global(.cable.locked) { stroke: rgba(23,19,15,.16); }
-  .cables :global(.cable.done) { stroke: var(--red-ink); stroke-dasharray: none; stroke-width: 2; }
-  .cables :global(.spark) { fill: none; stroke: #ff6a5c; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0 100; opacity: 0; }
-  .cables :global(.spark.run) { animation: spark .75s cubic-bezier(.45, 0, .2, 1) both; }
-  @keyframes spark {
-    0% { stroke-dasharray: 0 100; stroke-dashoffset: 0; opacity: 1; }
-    20% { stroke-dasharray: 10 100; }
-    100% { stroke-dasharray: 10 100; stroke-dashoffset: -100; opacity: 0; }
-  }
-  .cables :global(.sock) { fill: var(--card); stroke: rgba(23,19,15,.35); stroke-width: 1.5; transition: fill .3s ease, stroke .3s ease; }
-  .cables :global(.sock.done) { fill: var(--red-ink); stroke: var(--red-ink); }
-  .cables :global(.port) { fill: #2a2622; stroke: rgba(243,238,229,.25); stroke-width: 1; transition: fill .3s ease; }
-  .cables :global(.port.done) { fill: var(--red); stroke: rgba(255,255,255,.5); }
-
-  @media (min-width: 1100px) {
-    .stage {
-      grid-template-columns: minmax(250px, 300px) minmax(0, 1fr) minmax(250px, 300px);
-      grid-template-areas: 'b1 lap b3' 'b2 lap b4';
-      column-gap: clamp(64px, 6vw, 112px); row-gap: 24px; align-items: center;
-    }
-    .lap { max-width: 600px; margin: 0 auto; }
-    .cables { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
-  }
-
-  /* Narrower screens: a chain of boxes, each linked to the next */
-  @media (max-width: 1099px) {
-    .box::before {
-      content: ''; position: absolute; left: 30px; top: -23px; width: 2px; height: 22px;
-      background: repeating-linear-gradient(to bottom, rgba(23,19,15,.3) 0 3px, transparent 3px 7px);
-    }
-    .box[data-state='done']::before { background: var(--red-ink); }
-  }
-  /* Phones: the laptop on top, the chain below it */
-  @media (max-width: 759px) {
-    .stage { grid-template-areas: 'lap' 'b1' 'b2' 'b3' 'b4'; gap: 22px; }
-    .lap { max-width: 460px; margin-bottom: 4px; }
-  }
-  /* Tablets: the laptop stays in view on the left while the boxes scroll past */
-  @media (min-width: 760px) and (max-width: 1099px) {
-    .stage {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: 'lap b1' 'lap b2' 'lap b3' 'lap b4';
-      column-gap: clamp(24px, 4vw, 40px); row-gap: 22px; align-items: start;
-    }
-    .lap { position: sticky; top: 112px; align-self: start; max-width: none; margin: 0; }
-    .box--brand::before { display: none; }
-  }
-
   /* ── Your setup ── */
   .setup {
     display: grid; gap: 18px 32px; margin-top: 28px; padding: 22px 24px; border-radius: var(--r-xl);
@@ -395,7 +333,7 @@ const cardSpec = (p: Product) => {
   .setup .btn:focus-visible { outline-color: var(--red-soft); }
   .reset { margin-left: 10px; border: 0; background: none; padding: 4px 2px; color: var(--on-dark); font: inherit; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
   .reset:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
-  @media (min-width: 1100px) { .setup { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+
 
   /* ── Matching models ── */
   .results { margin-top: var(--s-7); }
@@ -434,8 +372,7 @@ const cardSpec = (p: Product) => {
   .matches :global(.empty) { grid-column: 1 / -1; margin: 0; padding: 22px; border: 1px dashed var(--line-strong); border-radius: var(--r-lg); color: var(--ink-2); }
 
   @media (prefers-reduced-motion: reduce) {
-    .scr-mark, .box, .pick span, .tile-face, .lap-deck, .scr-spec div { transition: none; }
-    .cables :global(.spark.run) { animation: none; }
+    .box, .pick span, .tile-face { transition: none; }
   }
 </style>
 
@@ -454,13 +391,36 @@ const cardSpec = (p: Product) => {
   const chipName = (c: string) => c.replace(/^Intel /, '').replace(/^Apple /, '').replace(/ \((\d+\w\w Gen)\)/, ' $1');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
+  // "Describe your need": send it to the quote form, or as a WhatsApp message.
+  // Navigation goes through a link click so it also works inside the site preview.
+  const needForm = document.querySelector<HTMLFormElement>('[data-need]');
+  const needWa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
+  if (needForm) {
+    const input = needForm.querySelector<HTMLTextAreaElement>('[name="need"]')!;
+    const base = needWa ? new URL(needWa.href) : null;
+    const prefix = base?.searchParams.get('text') ?? '';
+    input.addEventListener('input', () => {
+      if (!needWa || !base) return;
+      const u = new URL(base.href);
+      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
+      needWa.href = u.href;
+    });
+    needForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const need = input.value.trim();
+      const a = document.createElement('a');
+      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
+      document.body.append(a);
+      a.click();
+      a.remove();
+    });
+  }
+
   document.querySelectorAll<HTMLFormElement>('[data-cur]').forEach((form) => {
     const section = form.closest('section')!;
     const models = JSON.parse(form.querySelector('[data-cur-data]')!.textContent!) as Model[];
-    const stage = form.querySelector<HTMLElement>('[data-cur-stage]')!;
-    const svg = form.querySelector<SVGSVGElement>('[data-cables]')!;
-    const lap = form.querySelector<HTMLElement>('[data-lap]')!;
-    const lid = lap.querySelector<HTMLElement>('[data-port-lid]')!;
+    // the hero's laptop, which comes to rest beside the builder (absent without the hero)
+    const lap = document.querySelector<HTMLElement>('[data-lap]');
     const qty = form.querySelector<HTMLInputElement>('[data-qty]')!;
     const quote = form.querySelector<HTMLAnchorElement>('[data-quote]')!;
     const reset = form.querySelector<HTMLButtonElement>('[data-reset]')!;
@@ -612,21 +572,23 @@ const cardSpec = (p: Product) => {
       });
       box('brand').querySelector<HTMLElement>('[data-note]')!.hidden = !!s.brand;
 
-      // Screen
-      lap.dataset.brand = s.brand;
-      lap.querySelectorAll<Element>('[data-mark]').forEach((el) => el.classList.toggle('on', (el as HTMLElement).dataset.mark === s.brand));
-      const vals: Record<string, string> = { proc: proc || 'Any', ram: mem || 'Any', storage: sto || 'Any' };
-      (['proc', 'ram', 'storage'] as const).forEach((k) => {
-        const dd = lap.querySelector<HTMLElement>(`[data-val="${k}"]`)!;
-        if (dd.textContent !== vals[k]) {
-          dd.textContent = vals[k];
-          const row = dd.parentElement!;
-          if (last && !reduced.matches) { row.classList.add('flash'); requestAnimationFrame(() => requestAnimationFrame(() => row.classList.remove('flash'))); }
-        }
-        dd.classList.toggle('set', vals[k] !== 'Any');
-      });
+      // The laptop's screen
       const countTxt = !s.brand ? `${models.length} models to choose from` : list.length ? `${list.length} ${list.length === 1 ? 'model matches' : 'models match'}` : 'No exact match: ask us and we will source it';
-      lap.querySelector('[data-scr-foot]')!.textContent = s.brand ? countTxt : 'Choose a brand to start';
+      if (lap) {
+        lap.dataset.brand = s.brand;
+        lap.querySelectorAll<Element>('[data-mark]').forEach((el) => el.classList.toggle('on', (el as HTMLElement).dataset.mark === s.brand));
+        const vals: Record<string, string> = { proc: proc || 'Any', ram: mem || 'Any', storage: sto || 'Any' };
+        (['proc', 'ram', 'storage'] as const).forEach((k) => {
+          const dd = lap.querySelector<HTMLElement>(`[data-val="${k}"]`)!;
+          if (dd.textContent !== vals[k]) {
+            dd.textContent = vals[k];
+            const row = dd.parentElement!;
+            if (last && !reduced.matches) { row.classList.add('flash'); requestAnimationFrame(() => requestAnimationFrame(() => row.classList.remove('flash'))); }
+          }
+          dd.classList.toggle('set', vals[k] !== 'Any');
+        });
+        lap.querySelector('[data-scr-foot]')!.textContent = s.brand ? countTxt : 'Choose a brand to start';
+      }
 
       // Setup summary and links
       const parts = [
@@ -663,68 +625,7 @@ const cardSpec = (p: Product) => {
         allEl.firstChild!.textContent = list.length > 4 ? `See all ${list.length} in the catalogue ` : 'Open in the catalogue ';
       }
 
-      const prev = last;
       last = s;
-      draw(prev, s, picked);
-    }
-
-    // ── Cables ──
-    const NS = 'http://www.w3.org/2000/svg';
-    const wide = matchMedia('(min-width: 1100px)');
-    const cable: Record<string, { path: SVGPathElement; spark: SVGPathElement; sock: SVGCircleElement; port: SVGRectElement }> = {};
-    BOXES.forEach((id) => {
-      const g = document.createElementNS(NS, 'g');
-      const path = document.createElementNS(NS, 'path'); path.setAttribute('class', 'cable');
-      const spark = document.createElementNS(NS, 'path'); spark.setAttribute('class', 'spark'); spark.setAttribute('pathLength', '100');
-      const sock = document.createElementNS(NS, 'circle'); sock.setAttribute('class', 'sock'); sock.setAttribute('r', '5');
-      const port = document.createElementNS(NS, 'rect'); port.setAttribute('class', 'port'); port.setAttribute('width', '6'); port.setAttribute('height', '14'); port.setAttribute('rx', '2');
-      spark.addEventListener('animationend', () => spark.classList.remove('run'));
-      g.append(path, spark, sock, port);
-      svg.append(g);
-      cable[id] = { path, spark, sock, port };
-    });
-
-    function geometry() {
-      if (!wide.matches) return;
-      const o = stage.getBoundingClientRect();
-      const L = lid.getBoundingClientRect();
-      svg.setAttribute('viewBox', `0 0 ${o.width} ${o.height}`);
-      BOXES.forEach((id) => {
-        const b = box(id).getBoundingClientRect();
-        const left = b.right <= L.left;
-        const target = lap.querySelector<HTMLElement>(`[data-port="${id}"]`)!.getBoundingClientRect();
-        const ax = (left ? b.right : b.left) - o.left;
-        const ay = b.top + Math.min(b.height / 2, 120) - o.top;
-        const px = (left ? L.left : L.right) - o.left;
-        const py = target.top + target.height / 2 - o.top;
-        const mx = (ax + px) / 2;
-        const d = `M${ax.toFixed(1)} ${ay.toFixed(1)} C${mx.toFixed(1)} ${ay.toFixed(1)} ${mx.toFixed(1)} ${py.toFixed(1)} ${(px + (left ? -3 : 3)).toFixed(1)} ${py.toFixed(1)}`;
-        const c = cable[id];
-        c.path.setAttribute('d', d);
-        c.spark.setAttribute('d', d);
-        c.sock.setAttribute('cx', ax.toFixed(1)); c.sock.setAttribute('cy', ay.toFixed(1));
-        c.port.setAttribute('x', (px - 3).toFixed(1)); c.port.setAttribute('y', (py - 7).toFixed(1));
-      });
-    }
-
-    function draw(prev: Sel | null, s: Sel, picked: Record<string, boolean>) {
-      geometry();
-      BOXES.forEach((id) => {
-        const c = cable[id];
-        const locked = id !== 'brand' && !s.brand;
-        c.path.classList.toggle('locked', locked);
-        c.path.classList.toggle('done', picked[id]);
-        c.sock.classList.toggle('done', picked[id]);
-        c.port.classList.toggle('done', picked[id]);
-        // A spark runs to the laptop when a box's choice changes to something specific.
-        const was = prev && (id === 'proc' ? [prev.proc, prev.gen, prev.model, prev.chip].join('|') : prev[id as Key]);
-        const now = id === 'proc' ? [s.proc, s.gen, s.model, s.chip].join('|') : s[id as Key];
-        if (prev && picked[id] && was !== now && wide.matches && !reduced.matches) {
-          c.spark.classList.remove('run');
-          void c.spark.getBoundingClientRect();
-          c.spark.classList.add('run');
-        }
-      });
     }
 
     form.addEventListener('change', (e) => {
@@ -754,12 +655,6 @@ const cardSpec = (p: Product) => {
       allEl.click();
     });
     qty.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); render(); } });
-
-    let raf = 0;
-    const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(geometry); };
-    new ResizeObserver(relayout).observe(stage);
-    wide.addEventListener('change', relayout);
-    document.fonts?.ready.then(relayout);
 
     syncOptions(get());
     render();

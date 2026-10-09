@@ -1,0 +1,63 @@
+---
+/**
+ * What we rent: quick links under the laptop builder. Brand pills open the
+ * catalogue already filtered, with the number of models.
+ */
+import Icon from './Icon.astro';
+import { PRODUCTS } from '../data/products';
+
+const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'laptops' && p.brand === brand).length;
+
+const rentables: { label: string; icon: string; href: string; count?: number }[] = [
+  { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/equipment/?category=laptops&brand=Lenovo', count: laptopsBy('Lenovo') },
+  { label: 'Dell Latitude', icon: 'laptop', href: '/equipment/?category=laptops&brand=Dell', count: laptopsBy('Dell') },
+  { label: 'HP EliteBook and ProBook', icon: 'laptop', href: '/equipment/?category=laptops&brand=HP', count: laptopsBy('HP') },
+  { label: 'MacBook Air and Pro', icon: 'laptop-minimal', href: '/macbook-rental/' },
+  { label: 'Desktops and mini PCs', icon: 'monitor-smartphone', href: '/desktop-rental/' },
+  { label: 'Monitors', icon: 'monitor', href: '/monitor-rental/' },
+  { label: 'Rack servers', icon: 'server', href: '/server-rental/' },
+  { label: 'Routers and Wi-Fi', icon: 'router', href: '/router-rental/' },
+  { label: 'Android and iPhone', icon: 'smartphone', href: '/mobile-phone-rental/' },
+];
+---
+<nav class="wrap rentables" id="rent" aria-label="What you can rent">
+  <ul role="list">
+    {rentables.map((c) => (
+      <li>
+        <a href={c.href} class="pill">
+          <Icon name={c.icon} size={18} stroke={1.75} />
+          <span>{c.label}</span>
+          {c.count ? <span class="count num">{c.count}<span class="sr-only"> models</span></span> : null}
+          <span class="go" aria-hidden="true"><Icon name="arrow-up-right" size={14} stroke={2} /></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+</nav>
+
+<style>
+  .rentables { display: grid; justify-items: center; gap: var(--s-4); padding-block: clamp(36px, 5vw, 56px) clamp(40px, 5vw, 64px); scroll-margin-top: 20px; color: var(--ink); }
+  .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; max-width: 880px; margin: 0; padding: 0; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px 10px 18px; border-radius: var(--r-pill);
+    border: 1.5px solid rgba(23,19,15,.2); background: rgba(255,255,255,.72);
+    box-shadow: inset 0 1px 0 #fff, 0 12px 24px -18px rgba(23,19,15,.55);
+    color: var(--ink); font-size: 1rem; font-weight: 600; letter-spacing: -0.005em; text-decoration: none; white-space: nowrap;
+    transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease-out);
+  }
+  .pill :global(svg) { color: var(--red-ink); flex: none; }
+  .pill .count { padding: 2px 8px; border-radius: var(--r-pill); background: var(--paper-2); font-size: .75rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .pill .go { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); transition: background var(--t-fast), transform var(--t-fast) var(--ease-out); }
+  .pill .go :global(svg) { color: var(--paper); }
+  .pill:hover { border-color: var(--red-ink); background: #fff; transform: translateY(-2px); }
+  .pill:hover .go { background: var(--red-ink); transform: rotate(45deg); }
+  .pill:focus-visible { outline: 3px solid var(--red-ink); outline-offset: 3px; }
+  .explore { margin-top: var(--s-2); --btn-bg: var(--ink); --btn-fg: var(--paper); --btn-bd: var(--ink); font-weight: 600; }
+  .explore:hover { --btn-bg: var(--red-ink); --btn-bd: var(--red-ink); }
+  @media (prefers-reduced-motion: reduce) { .pill, .pill .go { transition: none; } .pill:hover { transform: none; } .pill:hover .go { transform: none; } }
+  @media (max-width: 639px) {
+    .pill { max-width: 100%; white-space: normal; }
+    .rentables li:nth-child(n + 7) { display: none; }
+  }
+</style>

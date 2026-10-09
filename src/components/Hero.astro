@@ -6,7 +6,9 @@
  * is pinned, scrolling turns the laptop around, 180 degrees at a time, to show
  * the back of the lid of each brand we rent (Apple, Dell, HP, Lenovo) with a
  * link to that brand's catalogue underneath, then turns it once more to a
- * closing screen where the visitor can describe what their team needs.
+ * then carries it, still turning, down to its place beside the builder on the
+ * next part of the page (LaptopCurator, #build), where its screen shows the
+ * choices made there.
  *
  * The laptop is two faces on one slab (see src/scripts/scenes.ts): face A holds
  * stops 0, 2 and 4, face B stops 1, 3 and 5, and a face only changes stop while
@@ -23,19 +25,6 @@ import iconNodes from 'lucide-static/icon-nodes.json';
 
 const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'laptops' && p.brand === brand).length;
 
-/** What we rent. Brand pills open the catalogue already filtered, with the number of models. */
-const rentables: { label: string; icon: string; href: string; count?: number }[] = [
-  { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/equipment/?category=laptops&brand=Lenovo', count: laptopsBy('Lenovo') },
-  { label: 'Dell Latitude', icon: 'laptop', href: '/equipment/?category=laptops&brand=Dell', count: laptopsBy('Dell') },
-  { label: 'HP EliteBook and ProBook', icon: 'laptop', href: '/equipment/?category=laptops&brand=HP', count: laptopsBy('HP') },
-  { label: 'MacBook Air and Pro', icon: 'laptop-minimal', href: '/macbook-rental/' },
-  { label: 'Desktops and mini PCs', icon: 'monitor-smartphone', href: '/desktop-rental/' },
-  { label: 'Monitors', icon: 'monitor', href: '/monitor-rental/' },
-  { label: 'Rack servers', icon: 'server', href: '/server-rental/' },
-  { label: 'Routers and Wi-Fi', icon: 'router', href: '/router-rental/' },
-  { label: 'Android and iPhone', icon: 'smartphone', href: '/mobile-phone-rental/' },
-];
-
 /**
  * The tour, in scroll order. `at` is where each stop rests (scroll progress
  * 0 to 1); keep in step with STOP_AT and FLIPS in src/scripts/scenes.ts.
@@ -48,7 +37,7 @@ const stops: Stop[] = [
   { id: 'dell', name: 'Dell', at: 0.375, mark: 'dell', caption: `${laptopsBy('Dell')} Dell Latitude models, ${range}`, cta: `Browse ${laptopsBy('Dell')} Dell laptops`, href: '/equipment/?category=laptops&brand=Dell' },
   { id: 'hp', name: 'HP', at: 0.575, mark: 'hp', caption: `${laptopsBy('HP')} HP EliteBook and ProBook models, ${range}`, cta: `Browse ${laptopsBy('HP')} HP laptops`, href: '/equipment/?category=laptops&brand=HP' },
   { id: 'lenovo', name: 'Lenovo', at: 0.775, mark: 'lenovo', caption: `${laptopsBy('Lenovo')} Lenovo ThinkPad models, ${range}`, cta: `Browse ${laptopsBy('Lenovo')} ThinkPads`, href: '/equipment/?category=laptops&brand=Lenovo' },
-  { id: 'need', name: 'Your need', at: 1, caption: `Apple, Dell, HP and Lenovo from one rental partner, since ${SITE.founded}` },
+  { id: 'build', name: 'Build your own', at: 1, caption: `Apple, Dell, HP and Lenovo from one rental partner, since ${SITE.founded}` },
 ];
 
 /**
@@ -102,11 +91,6 @@ const flStyle = (side: 'l' | 'r', f: Floater) =>
   `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
-const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
-/** The closing screen's words, shared by its picture on the laptop and its working form. */
-const needTitle = 'Describe what your team needs';
-const needSub = 'How many machines, which city, from when, and any software. We reply with configurations and monthly pricing.';
-const needPlaceholder = 'e.g. 40 laptops in Pune';
 
 /** Brand mark as inline SVG, filled with a gradient id or a colour. */
 const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '0 8 24 8.01' : '0 0 24 24');
@@ -153,12 +137,15 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         ))}
       </div>
 
+      <!-- In the tour the laptop is lifted out of the page (position: fixed) and carried from
+           here to its place beside the builder (#build); see scenes.ts. -->
+      <div class="fly" data-fly>
       <div class="flip">
         <div class="floor" aria-hidden="true" data-floor></div>
         <div class="slab" data-slab data-front="a">
           <!-- Face A: stops 0 (IT Rentals screen), 2 (Dell), 4 (Lenovo) -->
           <div class="face face--a">
-            <div class="slot slot--screen on" data-slot="0" data-at="0">
+            <div class="slot slot--screen on" data-slot="0" data-at-stop="0">
               <div class="lid">
                 <span class="cam" aria-hidden="true"></span>
                 <div class="screen">
@@ -205,13 +192,13 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
             ))}
           </div>
 
-          <!-- Face B: stops 1 (Apple), 3 (HP), 5 (describe your need) -->
+          <!-- Face B: stops 1 (Apple), 3 (HP), 5 (the builder's screen) -->
           <div class="face face--b">
             {(['apple', 'hp'] as const).map((id) => (
               <div class:list={['slot', 'slot--back', `back--${id}`, { on: id === 'apple' }]} data-slot={id === 'apple' ? 1 : 3} aria-hidden="true">
                 <div class="lid lid--back">
                   <span class="sizer"></span>
-                  <svg class={`logo logo--${id}`} viewBox={markBox(id)} focusable="false"><path d={BRAND_MARKS[id]} fill={`url(#lg-${id})`} /></svg>
+                  <svg class={`logo logo--${id}`} viewBox={markBox(id)} focusable="false"><path d={BRAND_MARKS[id]} fill={id === 'hp' ? 'url(#lg-dell)' : `url(#lg-${id})`} /></svg>
                   <span class="asset"><b><span class="asset-sq"></span>IT Rentals</b><i></i><small>itrentals.in</small></span>
                   <span class="sheen"></span>
                 </div>
@@ -219,17 +206,26 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
               </div>
             ))}
 
-            <!-- the closing screen as it looks while turning; the working form is .need-live below -->
-            <div class="slot slot--screen slot--need" data-slot="5" aria-hidden="true" inert>
+            <!-- Stop 5: the laptop beside the builder. Its screen mirrors the choices made there
+                 (LaptopCurator.astro writes to [data-lap]); the same words are in the builder's summary. -->
+            <div class="slot slot--screen slot--pc" data-slot="5" aria-hidden="true">
               <div class="lid">
                 <span class="cam"></span>
-                <div class="screen">
-                  <div class="desk desk--need" data-fit-desk>
-                    <p class="need-title">{needTitle}</p>
-                    <p class="need-sub">{needSub}</p>
-                    <div class="need"><span class="need-in need-ph">{needPlaceholder}</span><span class="btn btn--primary need-go">Get a quote</span></div>
-                    <p class="need-alt">Prefer chat? <span class="need-alt-a">Send it on WhatsApp</span></p>
+                <div class="screen screen--pc" data-lap data-brand="">
+                  <div class="pc-marks">
+                    <span class="pc-mark pc-mark--itr on" data-mark="">IT Rentals</span>
+                    <svg class="pc-mark pc-mark--lenovo" data-mark="Lenovo" viewBox="0 8 24 8.01" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
+                    <svg class="pc-mark pc-mark--dell" data-mark="Dell" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="url(#lg-dell)" /></svg>
+                    <svg class="pc-mark pc-mark--hp" data-mark="HP" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="url(#lg-dell)" /></svg>
+                    <svg class="pc-mark pc-mark--apple" data-mark="Apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="url(#lg-apple)" /></svg>
+                    <span class="pc-mark pc-mark--itr" data-mark="any">IT Rentals</span>
                   </div>
+                  <dl class="pc-spec">
+                    <div><dt>Processor</dt><dd data-val="proc">Any</dd></div>
+                    <div><dt>Memory</dt><dd data-val="ram">Any</dd></div>
+                    <div><dt>Storage</dt><dd data-val="storage">Any</dd></div>
+                  </dl>
+                  <p class="pc-foot" data-scr-foot>Choose a brand to start</p>
                   <span class="sheen sheen--glass"></span>
                 </div>
               </div>
@@ -241,9 +237,10 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
           <i class="edge edge--r" aria-hidden="true"></i>
         </div>
       </div>
+      </div>
     </div>
 
-    <a class="skip" href="#rent">Skip the brand tour<Icon name="arrow-down" size={15} /></a>
+    <a class="skip" href="#build">Skip the brand tour<Icon name="arrow-down" size={15} /></a>
 
     <!-- Under the laptop: the stops, and what each one offers -->
     <div class="tour">
@@ -257,7 +254,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       </nav>
       <ul class="tour-ctas" role="list">
         {stops.map((st, i) => (
-          <li class:list={['tc', `tc--${st.id}`, { on: i === 0 }]} data-s={i} data-at={st.at}>
+          <li class:list={['tc', `tc--${st.id}`, { on: i === 0 }]} data-s={i} data-at-stop={i}>
             {st.mark && (
               <svg class="tc-mark" viewBox={markBox(st.mark)} aria-hidden="true" focusable="false">
                 {st.mark === 'lenovo' ? <><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></> : <path d={BRAND_MARKS[st.mark]} fill="currentColor" />}
@@ -270,47 +267,10 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       </ul>
     </div>
 
-    <!-- The closing screen's working form. It sits flat exactly over the laptop once the
-         last turn has finished, and comes after the tour in reading and tab order. -->
-    <div class="need-live" data-at="1">
-      <div class="lid">
-        <span class="cam" aria-hidden="true"></span>
-        <div class="screen">
-          <div class="desk desk--need" data-fit-desk>
-            <h2 class="need-title" id="hero-need-title">{needTitle}</h2>
-            <p class="need-sub">{needSub}</p>
-            <form class="need" action="/request-a-quote/" method="get" data-need>
-              <input id="hero-need" aria-labelledby="hero-need-title" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder={needPlaceholder} />
-              <button class="btn btn--primary need-go" type="submit">Get a quote</button>
-            </form>
-            <p class="need-alt">Prefer chat? <a href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need">Send it on WhatsApp</a></p>
-          </div>
-        </div>
-      </div>
-      <div class="deck" aria-hidden="true"><span class="notch"></span></div>
-    </div>
-
     <p class="cue" aria-hidden="true"><span>Scroll</span><i></i></p>
   </div>
 </section>
 
-<div class="hero-tail">
-  <nav class="wrap rentables" id="rent" aria-label="What you can rent">
-    <ul role="list">
-      {rentables.map((c) => (
-        <li>
-          <a href={c.href} class="pill">
-            <Icon name={c.icon} size={18} stroke={1.75} />
-            <span>{c.label}</span>
-            {c.count ? <span class="count num">{c.count}<span class="sr-only"> models</span></span> : null}
-            <span class="go" aria-hidden="true"><Icon name="arrow-up-right" size={14} stroke={2} /></span>
-          </a>
-        </li>
-      ))}
-    </ul>
-    <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
-  </nav>
-</div>
 
 <style>
   .hero {
@@ -337,7 +297,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 85%);
   }
   /* Parts that only exist while the scene runs */
-  .face--b, .slot--back, .edge, .floor, .sheen, .tour-nav, .cue, .skip, .tc--itr, .tc--need, .k-txt--b { display: none; }
+  .face--b, .slot--back, .edge, .floor, .sheen, .tour-nav, .cue, .skip, .tc--itr, .tc--build, .k-txt--b { display: none; }
   .topline { position: relative; margin: 0 auto clamp(18px, 2.6vw, 30px); text-align: center; }
   .k-txt { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.2rem, .9rem + 1.2vw, 1.9rem); line-height: 1.15; letter-spacing: -0.015em; color: var(--ink); }
 
@@ -364,11 +324,11 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   }
   .deck {
     position: relative; z-index: 1; height: clamp(12px, 1.5vw, 18px); margin-top: -1px;
-    background: linear-gradient(180deg, #d6cfc3 0%, #b2aa9d 45%, #7d766c 100%);
+    background: linear-gradient(180deg, #3a3a3e 0%, #1c1c1f 40%, #0b0b0c 100%);
     border-radius: 2px 2px 20px 20px / 2px 2px 12px 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 18px 28px -14px rgba(23,19,15,.55);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 18px 28px -14px rgba(23,19,15,.55);
   }
-  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #7d766c, #b2aa9d); border-radius: 0 0 9px 9px; opacity: .7; }
+  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #050506, #2a2a2e); border-radius: 0 0 9px 9px; }
 
   /* The IT Rentals screen */
   .desk {
@@ -390,40 +350,32 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   .trust li { display: inline-flex; align-items: center; gap: 6px; }
   .trust :global(svg) { color: var(--red-ink); }
 
-  /* The closing screen: describe what your team needs */
-  .need-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 6.2cqi, 4.1rem); line-height: 1; letter-spacing: -0.03em; max-width: 14ch; text-wrap: balance; }
-  .need-sub { margin: clamp(10px, 1.8cqi, 20px) auto 0; max-width: 50ch; font-size: clamp(.8125rem, 1.6cqi, 1.0625rem); line-height: 1.5; color: var(--ink-2); }
-  .need {
-    display: flex; align-items: stretch; gap: 8px; width: min(100%, 64cqi); margin-top: clamp(14px, 2.6cqi, 28px);
-    padding: 6px; border-radius: 16px; background: #fff; border: 1.5px solid var(--line-strong);
-    box-shadow: 0 14px 30px -20px rgba(23,19,15,.45);
+  /* The builder's screen (stop 5): dark, with the chosen brand and specification */
+  .screen--pc {
+    display: grid; grid-template-rows: 1fr auto auto; gap: 2.4cqi; padding: 4cqi 6cqi 3.4cqi; color: #f3eee5;
+    background: #0b0908 radial-gradient(90% 70% at 50% 18%, #2b2220 0%, #141010 55%, #0b0908 100%);
   }
-  .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .18), 0 14px 30px -20px rgba(23,19,15,.45); }
-  /* 16px stops iPhones zooming in when the field is tapped */
-  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: 1rem; line-height: 1.5; color: var(--ink); text-overflow: ellipsis; }
-  .need-ph { display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; color: var(--ink-3); }
-  .need-in:focus { outline: none; }
-  .need-in::placeholder { color: var(--ink-3); }
-  .need-go { flex: none; }
-  .need-alt { margin: clamp(10px, 1.8cqi, 18px) 0 0; font-size: var(--fs-xs); color: var(--ink-2); }
-  .need-alt a, .need-alt-a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-  /* Without the tour, the closing screen's form is a plain block under the brand links */
-  :global(html:not(.scenes)) .need-live { max-width: 640px; margin: clamp(32px, 4vw, 48px) auto 0; }
-  :global(html:not(.scenes)) .need-live :is(.cam, .deck) { display: none; }
-  :global(html:not(.scenes)) .need-live :is(.lid, .screen) { width: auto; padding: 0; background: none; box-shadow: none; border-radius: 0; }
-  :global(html:not(.scenes)) .need-live .desk { padding: 0; }
-  @media (max-height: 559px) {
-    .need-live { max-width: 640px; margin: clamp(32px, 4vw, 48px) auto 0; }
-    .need-live :is(.cam, .deck) { display: none; }
-    .need-live :is(.lid, .screen) { width: auto; padding: 0; background: none; box-shadow: none; border-radius: 0; }
-    .need-live .desk { padding: 0; }
-  }
+  .pc-marks { position: relative; display: grid; place-items: center; min-height: 0; }
+  .pc-mark { grid-area: 1 / 1; display: block; opacity: 0; transform: scale(.92); color: #fff; transition: opacity .4s ease, transform .6s var(--ease-out); }
+  .pc-mark:global(.on) { opacity: 1; transform: none; }
+  .pc-mark--apple { width: 9cqi; height: 11cqi; }
+  .pc-mark--hp, .pc-mark--dell { width: 12cqi; height: 12cqi; }
+  .pc-mark--lenovo { width: 27cqi; height: 9cqi; }
+  .pc-mark--itr { font-family: var(--font-display); font-size: 9.5cqi; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; }
+  .pc-spec { display: grid; gap: .6cqi; margin: 0; padding: 2.2cqi 0 0; border-top: 1px solid rgba(243,238,229,.14); }
+  .pc-spec div { display: grid; grid-template-columns: 26cqi 1fr; align-items: baseline; padding: 1cqi 1.6cqi; border-radius: 1cqi; transition: background-color .5s ease; }
+  .pc-spec div:global(.flash) { background-color: rgba(224, 51, 40, .22); transition: none; }
+  .pc-spec dt { font-size: 3cqi; color: rgba(243,238,229,.6); }
+  .pc-spec dd { margin: 0; font-size: 3.6cqi; font-weight: 600; color: rgba(243,238,229,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pc-spec dd:global(.set) { color: #fff; }
+  .pc-foot { margin: 0; display: flex; align-items: center; gap: 1.6cqi; font-size: 3cqi; color: rgba(243,238,229,.75); }
+  .pc-foot::before { content: ''; flex: none; width: 1.6cqi; height: 1.6cqi; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 .8cqi rgba(224,51,40,.22); }
 
   /* When a screen's words do not fit (short phones, small tablets), drop the extras in turn */
-  .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.lead, .need-sub) { display: none; }
-  .desk:is([data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.trust, .need-alt) { display: none; }
+  .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3'], [data-fit='4']) .lead { display: none; }
+  .desk:is([data-fit='2'], [data-fit='3'], [data-fit='4']) .trust { display: none; }
   .desk:is([data-fit='3'], [data-fit='4']) :is(.since, .btn--wa) { display: none; }
-  :is(.slot--screen[data-slot='0'], .need-live) .screen:has(> .desk[data-fit='4']) { overflow-y: auto; }
+  .slot--screen[data-slot='0'] .screen:has(> .desk[data-fit='4']) { overflow-y: auto; }
 
   /* Static layout: the four brands as links under the laptop */
   .tour { width: 100%; }
@@ -475,11 +427,15 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
     /* Rows: the line above, the laptop (with the closing screen's form over it), the tour */
     :global(html.scenes) .topline { grid-area: 1 / 1; }
-    :global(html.scenes) .device-wrap, :global(html.scenes) .need-live { grid-area: 2 / 1; }
+    :global(html.scenes) .device-wrap { grid-area: 2 / 1; }
     :global(html.scenes) .tour { grid-area: 3 / 1; position: relative; z-index: 3; }
-    :global(html.scenes) .need-live { display: block; position: relative; z-index: 2; width: var(--lw); align-self: center; opacity: 0; pointer-events: none; }
-    :global(html.scenes) .hero[data-stop='5'][data-rest] .need-live { opacity: 1; pointer-events: auto; }
-    :global(html.scenes) .hero[data-stop='5'][data-rest] .slot--need { visibility: hidden; }
+    /* the page keeps the laptop's space (its height is measured, as the laptop itself is lifted out) */
+    :global(html.scenes) .device-wrap { width: var(--lw); height: var(--fly-h, calc(var(--lw) * .66)); }
+    /* The laptop is fixed to the window and placed by scenes.ts: over that space on this
+       page, then carried down to its place beside the builder. Above the page that follows. */
+    :global(html.scenes) .stage { z-index: 3; }
+    :global(html.scenes) .fly { position: fixed; left: 0; top: 0; z-index: 4; width: var(--lw); transform-origin: 0 0; will-change: transform; pointer-events: none; }
+    :global(html.scenes) .fly .slot:global(.on) { pointer-events: auto; }
 
     /* The line above the laptop: the kicker, then the IT Rentals line once the tour starts */
     :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; margin: 0; }
@@ -500,7 +456,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .pocket--r { left: calc(100% - 6px); }
 
     /* The flipping laptop */
-    :global(html.scenes) .device-wrap { width: auto; max-width: none; align-self: center; }
+    :global(html.scenes) .device-wrap { max-width: none; align-self: center; }
     :global(html.scenes) .flip { width: var(--lw); perspective: calc(var(--lw) * 2.4); perspective-origin: 50% 45%; }
     :global(html.scenes) .slab { transform-style: preserve-3d; -webkit-transform-style: preserve-3d; will-change: transform; }
     :global(html.scenes) .fl-side, :global(html.scenes) .pocket, :global(html.scenes) .floor { will-change: transform; }
@@ -521,7 +477,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     /* the words sit in the middle of the screen (top-aligned if they ever overflow) */
     :global(html.scenes) .screen { display: grid; align-content: safe center; }
     :global(html.scenes) .cam { top: calc(var(--lw) * .0065); width: max(3px, calc(var(--lw) * .006)); height: max(3px, calc(var(--lw) * .006)); margin-left: 0; translate: -50% -50%; }
-    :global(html.scenes) .deck { box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
+    :global(html.scenes) .deck { box-shadow: inset 0 1px 0 rgba(255,255,255,.22); }
 
     /* Contact shadow on the floor, narrowing as the laptop turns edge-on */
     :global(html.scenes) .floor {
@@ -533,7 +489,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .edge {
       display: block; position: absolute; top: 1.5%; bottom: 3%; left: 50%;
       width: calc(var(--lw) * .012); margin-left: calc(var(--lw) * -.006); border-radius: 4px;
-      background: linear-gradient(90deg, #26221f, #8f877d 45%, #b9b1a6 55%, #26221f);
+      background: linear-gradient(90deg, #0a0a0b, #3d3d42 45%, #55555b 55%, #0a0a0b);
       -webkit-backface-visibility: hidden; backface-visibility: hidden;
     }
     .edge--l { transform: rotateY(-90deg) translateZ(calc(var(--lw) * .47)); }
@@ -548,16 +504,16 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .sheen--glass { inset: 0 -60%; background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.22) 50%, transparent 58%); }
 
     /* ── Lid backs ──
-       Apple space grey, HP silver, Dell charcoal, Lenovo matte black: four clearly
-       different tones against the cream page. Each lid has a soft light from the top,
-       the metal ones a faint brushed grain, and the logos a polished-metal fill with
-       a pressed-in edge. */
+       All four in black finishes, told apart by their tone and grain: Apple space black,
+       Dell graphite, HP deep midnight, Lenovo matte black. Each lid has a soft light from
+       the top, the metal ones a faint brushed grain, and the logos polished chrome with a
+       pressed-in edge. */
     .lid--back { container-type: inline-size; overflow: hidden; --top-light: radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,.12), transparent 60%); --brushed: repeating-linear-gradient(90deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px); }
     .lid--back .sizer { visibility: hidden; }
     .logo { position: absolute; left: 50%; top: 47%; translate: -50% -50%; filter: drop-shadow(0 .08cqi 0 rgba(0,0,0,.35)) drop-shadow(0 -.06cqi 0 rgba(255,255,255,.25)); }
     .logo--apple { width: 11.5cqi; height: 14cqi; }
     .logo--dell { width: 13cqi; height: 13cqi; }
-    .logo--hp { width: 13cqi; height: 13cqi; filter: drop-shadow(0 .08cqi 0 rgba(255,255,255,.7)) drop-shadow(0 -.06cqi 0 rgba(0,0,0,.25)); }
+    .logo--hp { width: 13cqi; height: 13cqi; }
     .logo--lenovo { width: 26cqi; height: 8.7cqi; border-radius: .4cqi; filter: none; box-shadow: 0 .2cqi .6cqi rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.2); }
 
     /* IT Rentals asset tag, stuck on slightly crooked, lower left */
@@ -573,17 +529,17 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
     :global(html.scenes) .back--apple .lid--back {
       border-radius: 2.8cqi 2.8cqi .8cqi .8cqi;
-      background: var(--top-light), var(--brushed), linear-gradient(180deg, #86878b 0%, #6f7074 55%, #5e5f63 100%);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.22), 0 0 0 1px rgba(23,19,15,.3);
+      background: var(--top-light), var(--brushed), linear-gradient(180deg, #3b3c40 0%, #2c2d31 55%, #212225 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), 0 0 0 1px rgba(0,0,0,.55);
     }
     :global(html.scenes) .back--hp .lid--back {
       border-radius: 1.9cqi 1.9cqi .6cqi .6cqi;
-      background: var(--top-light), var(--brushed), linear-gradient(180deg, #e4e5e7 0%, #d2d4d7 50%, #bfc1c5 100%);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.7), 0 0 0 1px rgba(23,19,15,.16);
+      background: var(--top-light), var(--brushed), linear-gradient(180deg, #2c3240 0%, #1f2430 55%, #161a23 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 0 0 1px rgba(0,0,0,.55);
     }
     :global(html.scenes) .back--dell .lid--back {
       border-radius: 1.6cqi 1.6cqi .5cqi .5cqi;
-      background: var(--top-light), linear-gradient(180deg, #4a4c51 0%, #3a3c40 55%, #2e3034 100%);
+      background: var(--top-light), var(--brushed), linear-gradient(180deg, #36383c 0%, #2a2c30 55%, #202225 100%);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.1), 0 0 0 1px rgba(0,0,0,.5);
     }
     :global(html.scenes) .back--lenovo .lid--back {
@@ -595,9 +551,9 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     /* The base seen from behind: one hinge band (Apple, HP) or two hinge barrels and a vent (Dell, Lenovo) */
     .deck--rear { height: clamp(12px, 1.5vw, 18px); border-radius: 2px 2px 14px 14px / 2px 2px 9px 9px; }
     .hinge { position: absolute; left: 11%; right: 11%; top: 0; height: max(4px, 30%); border-radius: 0 0 6px 6px; background: linear-gradient(180deg, #121214, #2a2b2e 55%, #0e0e10); }
-    .back--apple .deck--rear { background: linear-gradient(180deg, #9a9ba0, #6e6f74 60%, #47484c); }
-    .back--hp .deck--rear { background: linear-gradient(180deg, #c9ccd1, #9a9ea4); }
-    .back--dell .deck--rear { background: linear-gradient(180deg, #44474d, #222428); }
+    .back--apple .deck--rear { background: linear-gradient(180deg, #3a3b3f, #1e1f22 60%, #111214); }
+    .back--hp .deck--rear { background: linear-gradient(180deg, #2a2f3b, #161a22); }
+    .back--dell .deck--rear { background: linear-gradient(180deg, #34363a, #1a1b1e); }
     .back--lenovo .deck--rear { background: linear-gradient(180deg, #2a2a2c, #0e0e10); }
     .back--dell .deck--rear::before, .back--dell .deck--rear::after,
     .back--lenovo .deck--rear::before, .back--lenovo .deck--rear::after {
@@ -627,7 +583,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       opacity: 0; translate: 0 6px; pointer-events: none; transition: opacity .35s ease, translate .45s var(--ease-out);
     }
     :global(html.scenes) .tc:global(.on) { opacity: 1; translate: 0 0; pointer-events: auto; }
-    :global(html.scenes) .tc--itr, :global(html.scenes) .tc--need { display: flex; }
+    :global(html.scenes) .tc--itr, :global(html.scenes) .tc--build { display: flex; }
     :global(html.scenes) .tc .tc-mark { display: none; }
     :global(html.scenes) .tc-cap { display: block; font-size: var(--fs-small); color: var(--ink-2); text-align: center; }
     :global(html.scenes) .tc-go {
@@ -686,10 +642,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .hl-brand { font-size: clamp(2.4rem, 14cqi, 4rem); }
     .hl-line { font-size: clamp(1.15rem, 6.6cqi, 1.75rem); }
     .lead { font-size: .875rem; }
-    .need-title { font-size: clamp(1.5rem, 9cqi, 2.2rem); }
-    .need-sub { font-size: .8125rem; }
-    .need { flex-direction: column; width: 100%; padding: 6px; }
-    .need-go { width: 100%; }
     .logo--apple { width: 20cqi; height: 24.4cqi; }
     .logo--dell, .logo--hp { width: 22cqi; height: 22cqi; }
     .logo--lenovo { width: 44cqi; height: 14.7cqi; }
@@ -718,33 +670,9 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .stop:global(.on)::before { background: Highlight !important; }
   }
 
-  /* What we rent */
-  .hero-tail { position: relative; color: var(--ink); }
-  .rentables { display: grid; justify-items: center; gap: var(--s-4); padding-block: clamp(36px, 5vw, 56px) clamp(40px, 5vw, 64px); scroll-margin-top: 20px; }
-  .rentables ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; list-style: none; max-width: 880px; }
-  .pill {
-    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px 10px 18px; border-radius: var(--r-pill);
-    border: 1.5px solid rgba(23,19,15,.2); background: rgba(255,255,255,.72);
-    box-shadow: inset 0 1px 0 #fff, 0 12px 24px -18px rgba(23,19,15,.55);
-    color: var(--ink); font-size: 1rem; font-weight: 600; letter-spacing: -0.005em; text-decoration: none; white-space: nowrap;
-    transition: border-color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease-out);
-  }
-  .pill :global(svg) { color: var(--red-ink); flex: none; }
-  .pill .count { padding: 2px 8px; border-radius: var(--r-pill); background: var(--paper-2); font-size: .75rem; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .pill .go { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); transition: background var(--t-fast), transform var(--t-fast) var(--ease-out); }
-  .pill .go :global(svg) { color: var(--paper); }
-  .pill:hover { border-color: var(--red-ink); background: #fff; transform: translateY(-2px); }
-  .pill:hover .go { background: var(--red-ink); transform: rotate(45deg); }
-  .pill:focus-visible { outline: 3px solid var(--red-ink); outline-offset: 3px; }
-  .explore { margin-top: var(--s-2); --btn-bg: var(--ink); --btn-fg: var(--paper); --btn-bd: var(--ink); font-weight: 600; }
-  .explore:hover { --btn-bg: var(--red-ink); --btn-bd: var(--red-ink); }
-  @media (prefers-reduced-motion: reduce) { .pill, .pill .go { transition: none; } .pill:hover { transform: none; } .pill:hover .go { transform: none; } }
-
   @media (max-width: 639px) {
-    .pill { max-width: 100%; white-space: normal; }
     .since { font-size: .6875rem; padding: 6px 12px; }
     .since-long { display: none; }
-    .rentables li:nth-child(n + 7) { display: none; }
   }
 </style>
 
@@ -796,28 +724,4 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     if (header) ro2.observe(header);
   }
 
-  // "Describe what your team needs": send it to the quote form, or as a WhatsApp message.
-  // Navigation goes through a link click so it also works inside the site preview.
-  const form = document.querySelector<HTMLFormElement>('[data-need]');
-  const wa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
-  if (form) {
-    const input = form.querySelector<HTMLInputElement>('input[name="need"]')!;
-    const base = wa ? new URL(wa.href) : null;
-    const prefix = base?.searchParams.get('text') ?? '';
-    input.addEventListener('input', () => {
-      if (!wa || !base) return;
-      const u = new URL(base.href);
-      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
-      wa.href = u.href;
-    });
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const need = input.value.trim();
-      const a = document.createElement('a');
-      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
-      document.body.append(a);
-      a.click();
-      a.remove();
-    });
-  }
 </script>

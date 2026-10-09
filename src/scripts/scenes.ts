@@ -39,13 +39,37 @@ const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 /*
  * Hero: the laptop turns 180 degrees per stop, always the same way, and rests
  * dead straight between turns. Stops: 0 IT Rentals screen, 1 Apple, 2 Dell,
- * 3 HP, 4 Lenovo, 5 "describe what your team needs" (keep in step with Hero.astro).
+ * 3 HP, 4 Lenovo, 5 the builder's screen (keep in step with Hero.astro).
  * Face A shows the even stops and face B the odd ones; a face only changes stop
  * while it points away from the visitor.
+ *
+ * Stops 0 to 4 turn while the first screen is pinned. The last turn happens on
+ * the way down: the laptop (lifted out of the page, position: fixed) is carried
+ * from its place on the first screen to its place beside the builder
+ * ([data-dock2], LaptopCurator.astro) as that part of the page scrolls up, and
+ * then stays with it. Progress runs from the top of the page to the point where
+ * the laptop lands, so the stop positions are worked out from the layout.
  */
-const FLIPS: readonly (readonly [number, number])[] = [[0.02, 0.13], [0.22, 0.33], [0.42, 0.53], [0.62, 0.73], [0.82, 0.93]];
-const STOP_AT = [0, 0.175, 0.375, 0.575, 0.775, 1];
-const smoother = (t: number) => t * t * t * (t * (6 * t - 15) + 10);
+let FLIPS: [number, number][] = [[0.02, 0.13], [0.22, 0.33], [0.42, 0.53], [0.62, 0.73], [0.82, 0.93]];
+let STOP_AT = [0, 0.175, 0.375, 0.575, 0.775, 1];
+/** Share of the progress spent on the first screen (the rest carries the laptop down). */
+let PIN = 1;
+function layoutTour(pin: number) {
+  PIN = pin;
+  if (pin >= 1) {
+    FLIPS = [[0.02, 0.13], [0.22, 0.33], [0.42, 0.53], [0.62, 0.73], [0.82, 0.93]];
+    STOP_AT = [0, 0.175, 0.375, 0.575, 0.775, 1];
+    return;
+  }
+  const r = 1 - pin;
+  FLIPS = [[0.03, 0.19], [0.28, 0.44], [0.53, 0.69], [0.78, 0.94]].map(([a, b]) => [a * pin, b * pin] as [number, number]);
+  FLIPS.push([pin + 0.12 * r, pin + 0.8 * r]);
+  STOP_AT = [0, 0.235, 0.485, 0.735, 0.97].map((u) => u * pin);
+  STOP_AT.push(1);
+}
+/** How far the laptop has been carried from the first screen to the builder (0 to 1). */
+const carried = (p: number) => (PIN >= 1 ? 0 : smoother(clamp((p - PIN) / (1 - PIN))));
+function smoother(t: number) { return t * t * t * (t * (6 * t - 15) + 10); }
 
 /** Stops passed (k) and progress through the current turn (t). */
 function heroTurn(p: number) {
@@ -90,6 +114,7 @@ function hero(s: Scene, p: number) {
   if (!s.pinned) {
     if (h.front === 'static') return;
     h.slab.style.transform = '';
+    if (journey) { journey.fly.style.transform = ''; journey.last = ''; }
     h.sheens.forEach(({ el }) => { el.style.transform = ''; el.style.opacity = ''; });
     if (h.floor) { h.floor.style.transform = ''; h.floor.style.opacity = ''; }
     if (h.track) h.track.style.transform = '';
@@ -104,7 +129,7 @@ function hero(s: Scene, p: number) {
   // Progress line under the stops, and the icon fields drifting up with the scroll.
   // Written straight onto those few elements: an inherited custom property on the
   // section would restyle every icon in it on every frame.
-  if (h.track) h.track.style.transform = `scaleX(${p.toFixed(4)})`;
+  if (h.track) h.track.style.transform = `scaleX(${Math.min(1, p / PIN).toFixed(4)})`;
   const lift = `translate3d(0, ${(-p * 70).toFixed(1)}px, 0)`;
   h.drift.forEach((el) => { el.style.transform = lift; });
 
@@ -157,6 +182,28 @@ function showStop(s: Scene, h: HeroParts, stop: number) {
     el.classList.toggle('on', on);
     if (el.tagName === 'BUTTON') { if (on) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); }
   });
+}
+
+/** The flying laptop, its place on the first screen and its place beside the builder. */
+type Journey = {
+  fly: HTMLElement; dock1: HTMLElement; dock2: HTMLElement; stage: HTMLElement;
+  active: boolean; x1: number; y1: number; scale: number; last: string;
+};
+let journey: Journey | null = null;
+
+/** Place the laptop between its two docks; runs every frame while scrolling. */
+function carry(p: number, r2: DOMRect | null) {
+  const j = journey;
+  if (!j || !j.active || !r2) return;
+  const e = carried(p);
+  const x = j.x1 + (r2.left - j.x1) * e;
+  const y = j.y1 + (r2.top - j.y1) * e;
+  const sc = 1 + (j.scale - 1) * e;
+  // (once off screen it is not painted; it stays in the page for screen readers: the h1 is on it)
+  const tf = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) scale(${sc.toFixed(4)})`;
+  if (tf === j.last) return;
+  j.last = tf;
+  j.fly.style.transform = tf;
 }
 
 /* How renting works: which cards have landed, for the step dots. */
@@ -226,7 +273,49 @@ function init() {
       // The pinned stage is 100svh: measuring it (not innerHeight) keeps progress steady
       // while a phone's address bar slides in and out.
       s.span = s.pinned ? Math.max(1, s.height - s.stage!.offsetHeight) : 0;
+      if (s.name === 'hero') measureJourney(s);
     }
+  };
+
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const measureJourney = (s: Scene) => {
+    const fly = s.el.querySelector<HTMLElement>('[data-fly]');
+    const dock1 = fly?.parentElement ?? null;
+    const dock2 = document.querySelector<HTMLElement>('[data-dock2]');
+    if (!fly || !dock1 || !dock2 || !s.stage) { layoutTour(1); return; }
+    journey ??= { fly, dock1, dock2, stage: s.stage, active: false, x1: 0, y1: 0, scale: 1, last: '' };
+    const j = journey;
+    j.last = '';
+    // the laptop's own size (transforms do not change it); the first screen keeps that much room
+    const w1 = fly.offsetWidth;
+    const h1 = fly.offsetHeight;
+    dock1.style.setProperty('--fly-h', `${h1}px`);
+    if (!s.pinned || !w1 || dock2.offsetParent === null) {
+      j.active = false;
+      layoutTour(1);
+      return;
+    }
+    const w2 = dock2.offsetWidth;
+    const h2 = (h1 * w2) / w1;
+    dock2.style.height = `${h2.toFixed(1)}px`;
+    // Where it comes to rest: in the middle of the window beside the builder (where it
+    // then stays while the builder scrolls), or under the header on narrow screens.
+    const headH = header?.offsetHeight ?? 80;
+    const sticky = getComputedStyle(dock2).position === 'sticky';
+    const land = sticky ? Math.max(headH + 24, (vh - h2) / 2) : headH + 20;
+    dock2.style.top = `${land.toFixed(1)}px`;
+    // its place in the page, measured from its column (a stuck element reports where it is stuck)
+    const col = dock2.parentElement!;
+    const landsAt = col.getBoundingClientRect().top + scrollY - land;
+    const P = s.span;
+    s.span = Math.max(P + 1, landsAt - s.top);
+    j.scale = w2 / w1;
+    const r1 = dock1.getBoundingClientRect();
+    const rs = s.stage.getBoundingClientRect();
+    j.x1 = r1.left - rs.left;
+    j.y1 = r1.top - rs.top;
+    j.active = true;
+    layoutTour(P / s.span);
   };
 
   const target = (s: Scene, y = scrollY) => {
@@ -253,6 +342,7 @@ function init() {
     if (y !== lastY) { dir = Math.sign(y - lastY); lastY = y; }
     // where the visitor is in the tour, measured against the current layout (for relayout)
     if (heroScene?.pinned && viewH() === vh) heroRaw = (y - heroScene.top) / heroScene.span;
+    const dockRect = journey?.active ? journey.dock2.getBoundingClientRect() : null;
     for (const s of scenes) {
       const t = target(s, y);
       if (s.cur < 0) s.cur = t;
@@ -265,6 +355,7 @@ function init() {
         handlers[s.name]?.(s, s.cur);
       }
     }
+    if (heroScene?.pinned) carry(heroScene.cur, dockRect);
     if (moving) { lastFrame = now; raf = requestAnimationFrame(frame); } else lastFrame = 0;
   };
   const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
@@ -305,12 +396,14 @@ function init() {
     const t = e.target as HTMLElement;
     for (const s of scenes) {
       if (!s.pinned || !s.el.contains(t)) continue;
-      const at = t.closest<HTMLElement>('[data-at]')?.dataset.at;
-      if (at == null) continue;
-      const want = s.top + parseFloat(at) * s.span;
+      const anchor = t.closest<HTMLElement>('[data-at], [data-at-stop]');
+      if (!anchor) continue;
+      const at = anchor.dataset.atStop != null ? STOP_AT[Number(anchor.dataset.atStop)] : parseFloat(anchor.dataset.at!);
+      if (at == null || Number.isNaN(at)) continue;
+      const want = s.top + at * s.span;
       if (Math.abs(scrollY - want) > 4) {
         window.scrollTo({ top: want, behavior: 'instant' as ScrollBehavior });
-        s.cur = parseFloat(at);
+        s.cur = at;
         kick();
       }
     }
@@ -363,7 +456,7 @@ function init() {
       // From the keyboard, carry focus on to what that stop offers (its catalogue link,
       // or the describe-your-need field), so the next Tab does not turn the laptop back.
       if (e.detail !== 0 || i === 0) return;
-      const to = i === STOP_AT.length - 1 ? s.el.querySelector<HTMLElement>('[data-need] input') : s.el.querySelector<HTMLElement>(`.tc[data-s="${i}"] a`);
+      const to = i === STOP_AT.length - 1 ? document.querySelector<HTMLElement>('[data-need] [name="need"]') : s.el.querySelector<HTMLElement>(`.tc[data-s="${i}"] a`);
       if (!to) return;
       // only if the visitor has not moved on in the meantime (Tab, the skip link, a click)
       let timer = 0;
@@ -392,6 +485,8 @@ function init() {
   document.fonts?.ready.then(relayout);
   const ro = new ResizeObserver(relayout);
   ro.observe(document.body);
+  // the flying laptop is out of the page flow: watch it and its landing place directly
+  if (journey) { ro.observe(journey.fly); ro.observe(journey.dock2.parentElement!); }
   document.addEventListener('focusin', onFocus);
 
   // Background video: load when near, play while visible, respect the pause button.
