@@ -128,7 +128,7 @@ const cardSpec = (p: Product) => {
 
     <div class="bench">
       <!-- Left: the laptop, whose screen is the configurator, and the setup under it -->
-      <form class="cur-form" id="cur-form" action="/equipment/" method="get" data-cur aria-label="Build your laptop">
+      <form class="cur-form" id="cur-form" action="/equipment/" method="get" data-cur data-track-catalogue="home-builder" aria-label="Build your laptop">
         <script type="application/json" is:inline data-cur-data set:html={JSON.stringify(data)} />
         <div class="lap" data-brand="" data-lap>
           <div class="lap-lid">

@@ -59,19 +59,12 @@ const principles = [
   { t: 'We’re still here after delivery', d: 'Faults are fixed or swapped quickly, for the whole rental period.' },
 ];
 
-const schema = [{
-  '@context': 'https://schema.org',
-  '@type': 'AboutPage',
-  name: `About ${SITE.name}`,
-  url: new URL('/about/', SITE.url).href,
-  about: { '@id': `${SITE.url}/#organization` },
-}, ...leaders.map((l) => ({
-  '@context': 'https://schema.org',
+const schema = leaders.map((l) => ({
   '@type': 'Person',
   name: l.name,
   jobTitle: l.role,
   worksFor: { '@id': `${SITE.url}/#organization` },
-}))];
+}));
 ---
 <Base
   title={`About ${SITE.name}: IT Equipment Rental Since ${SITE.founded}`}
@@ -79,6 +72,7 @@ const schema = [{
   path="/about/"
   crumbs={crumbs}
   schema={schema}
+  pageType="AboutPage"
 >
   <PageHero
     title={`Renting IT to Indian businesses since ${SITE.founded}`}

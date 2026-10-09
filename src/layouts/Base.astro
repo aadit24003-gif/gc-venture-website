@@ -5,7 +5,6 @@ import Footer from '../components/Footer.astro';
 import MobileBar from '../components/MobileBar.astro';
 import StillThinking from '../components/StillThinking.astro';
 import { SITE, CONTACT, OFFICES, ANALYTICS } from '../config/site';
-import { CITIES } from '../data/cities';
 
 export interface Crumb { name: string; href: string }
 
@@ -15,8 +14,19 @@ interface Props {
   /** Absolute path, e.g. "/laptop-rental/". Defaults to current URL. */
   path?: string;
   ogImage?: string;
+  /** Required with a custom ogImage: what the image shows. */
+  ogImageAlt?: string;
   noindex?: boolean;
+  /**
+   * Page-specific structured data. Each node joins one @graph with the site's Organization,
+   * WebSite, WebPage and BreadcrumbList, so nothing is repeated or contradicts itself.
+   * Give a node `'@id': '#main'`-style ids relative to the page with `pageId()` when it needs linking.
+   */
   schema?: Record<string, unknown>[];
+  /** Schema.org type of the page itself: WebPage, AboutPage, ContactPage, CollectionPage… */
+  pageType?: string;
+  /** @id of the node this page is mainly about (e.g. its Service), for WebPage.mainEntity. */
+  mainEntity?: string;
   crumbs?: Crumb[];
   /** Pre-filled WhatsApp text for this page's CTAs */
   waMessage?: string;
@@ -26,49 +36,86 @@ interface Props {
   nudge?: boolean;
 }
 
-const { title, description, path, ogImage = SITE.ogImage, noindex = false, schema = [], crumbs, waMessage, closingCta = true, nudge = true } = Astro.props;
+const {
+  title, description, path, ogImage = SITE.ogImage, ogImageAlt, noindex = false, schema = [], pageType = 'WebPage', mainEntity,
+  crumbs, waMessage, closingCta = true, nudge = true,
+} = Astro.props;
 const canonical = new URL(path ?? Astro.url.pathname, SITE.url).href;
 const withSuffix = `${title} | ${SITE.shortName}`;
 const fullTitle = title.includes(SITE.shortName) || title.includes(SITE.name) || withSuffix.length > 62 ? title : withSuffix;
+const ogImageUrl = new URL(ogImage, SITE.url).href;
+const ogIsDefault = ogImage === SITE.ogImage;
 
+/*
+ * Structured data: one @graph per page.
+ * - Organization (stable @id) on every page: the company, its verified contact details and
+ *   nationwide service area. Offices are added as LocalBusiness branches only once their
+ *   address is confirmed (OFFICES[].confirmed), so no unverified address is published.
+ * - WebSite and the page itself (WebPage or a subtype) linked to it.
+ * - BreadcrumbList only where breadcrumbs are visible on the page.
+ * Noindex pages (404, thank-you, legal drafts, thin models) carry only the Organization.
+ */
 const orgId = `${SITE.url}/#organization`;
+const siteId = `${SITE.url}/#website`;
+const pageId = `${canonical}#webpage`;
+const crumbId = `${canonical}#breadcrumb`;
+const logo = new URL(SITE.logo, SITE.url).href;
+const confirmedOffices = OFFICES.filter((o) => o.confirmed);
 const organization = {
-  '@context': 'https://schema.org',
   '@type': 'Organization',
   '@id': orgId,
   name: SITE.name,
   alternateName: SITE.shortName,
-  url: SITE.url,
-  logo: new URL(SITE.logo, SITE.url).href,
+  url: `${SITE.url}/`,
+  logo: { '@type': 'ImageObject', '@id': `${SITE.url}/#logo`, url: logo, contentUrl: logo },
+  image: { '@id': `${SITE.url}/#logo` },
+  description: SITE.description,
   foundingDate: String(SITE.founded),
   email: CONTACT.PRIMARY_EMAIL,
   telephone: CONTACT.PRIMARY_PHONE,
   areaServed: { '@type': 'Country', name: 'India' },
-  contactPoint: [{ '@type': 'ContactPoint', telephone: CONTACT.PRIMARY_PHONE, contactType: 'sales', areaServed: 'IN', availableLanguage: ['en', 'hi'] }],
-  subOrganization: OFFICES.map((o) => ({
-    '@type': 'LocalBusiness',
-    '@id': `${SITE.url}/#office-${o.id}`,
-    name: `${SITE.name} – ${o.city}`,
-    telephone: CONTACT.PRIMARY_PHONE,
-    email: CONTACT.PRIMARY_EMAIL,
-    image: new URL(SITE.logo, SITE.url).href,
-    address: { '@type': 'PostalAddress', streetAddress: o.lines.join(', '), addressLocality: o.locality, addressRegion: o.region, postalCode: o.postalCode, addressCountry: 'IN' },
-    ...(o.geo ? { geo: { '@type': 'GeoCoordinates', latitude: o.geo.lat, longitude: o.geo.lng } } : {}),
-    areaServed: CITIES.map((c) => c.name),
-  })),
+  contactPoint: [{ '@type': 'ContactPoint', telephone: CONTACT.PRIMARY_PHONE, email: CONTACT.SALES_EMAIL, contactType: 'sales', areaServed: 'IN', availableLanguage: ['en', 'hi'] }],
+  ...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
+  ...(confirmedOffices.length ? {
+    subOrganization: confirmedOffices.map((o) => ({
+      '@type': 'LocalBusiness',
+      '@id': `${SITE.url}/#office-${o.id}`,
+      name: `${SITE.name}, ${o.city}`,
+      parentOrganization: { '@id': orgId },
+      telephone: CONTACT.PRIMARY_PHONE,
+      email: CONTACT.PRIMARY_EMAIL,
+      image: logo,
+      url: `${SITE.url}/`,
+      address: { '@type': 'PostalAddress', streetAddress: o.lines.join(', '), addressLocality: o.locality, addressRegion: o.region, postalCode: o.postalCode, addressCountry: 'IN' },
+      ...(o.geo ? { geo: { '@type': 'GeoCoordinates', latitude: o.geo.lat, longitude: o.geo.lng } } : {}),
+    })),
+  } : {}),
 };
-
-const breadcrumbSchema = crumbs?.length
+const website = {
+  '@type': 'WebSite', '@id': siteId, url: `${SITE.url}/`, name: SITE.name, alternateName: SITE.shortName,
+  publisher: { '@id': orgId }, inLanguage: 'en-IN',
+};
+const breadcrumb = crumbs?.length
   ? {
-      '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
+      '@id': crumbId,
       itemListElement: [{ name: 'Home', href: '/' }, ...crumbs].map((c, i) => ({
         '@type': 'ListItem', position: i + 1, name: c.name, item: new URL(c.href, SITE.url).href,
       })),
     }
   : null;
-
-const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : []), ...schema];
+const webpage = {
+  '@type': pageType, '@id': pageId, url: canonical, name: fullTitle, description,
+  isPartOf: { '@id': siteId }, about: { '@id': orgId }, inLanguage: 'en-IN',
+  ...(breadcrumb ? { breadcrumb: { '@id': crumbId } } : {}),
+  ...(mainEntity ? { mainEntity: { '@id': mainEntity } } : {}),
+  ...(ogIsDefault ? {} : { primaryImageOfPage: { '@type': 'ImageObject', url: ogImageUrl } }),
+};
+const strip = ({ '@context': _c, ...rest }: Record<string, unknown>) => rest;
+const graph = noindex
+  ? [organization]
+  : [organization, website, webpage, ...(breadcrumb ? [breadcrumb] : []), ...schema.map(strip)];
+const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
 ---
 <!doctype html>
 <html lang="en-IN">
@@ -77,8 +124,14 @@ const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : [])
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-visual" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {noindex
+      ? <meta name="robots" content="noindex, follow" />
+      : <>
+          <link rel="canonical" href={canonical} />
+          <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        </>}
+    {ANALYTICS.GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={ANALYTICS.GOOGLE_SITE_VERIFICATION} />}
+    {ANALYTICS.BING_SITE_VERIFICATION && <meta name="msvalidate.01" content={ANALYTICS.BING_SITE_VERIFICATION} />}
     <meta name="theme-color" content="#F3EEE5" />
     <link rel="icon" type="image/png" sizes="32x32" href="/brand/icon-32.png" />
     <link rel="apple-touch-icon" href="/brand/icon-180.png" />
@@ -90,14 +143,18 @@ const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : [])
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL(ogImage, SITE.url).href} />
+    <meta property="og:image" content={ogImageUrl} />
+    {ogIsDefault && <meta property="og:image:width" content={String(SITE.ogImageSize.width)} />}
+    {ogIsDefault && <meta property="og:image:height" content={String(SITE.ogImageSize.height)} />}
+    <meta property="og:image:alt" content={ogImageAlt ?? SITE.ogImageAlt} />
     <meta property="og:locale" content="en_IN" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL(ogImage, SITE.url).href} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt ?? SITE.ogImageAlt} />
 
-    {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+    <script type="application/ld+json" set:html={jsonLd} />
     <script is:inline>
       // Scroll scenes (home page): switch them on before first paint unless the visitor prefers
       // reduced motion. If the scene script never starts, fall back to the static layout.

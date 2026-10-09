@@ -90,6 +90,15 @@ function prefill(form: HTMLFormElement) {
 
 function init(form: HTMLFormElement) {
   prefill(form);
+  // form_start: the first time someone types or chooses something in this form (once per page view).
+  // Only the form type is sent, never what was typed.
+  const started = () => {
+    form.removeEventListener('input', started);
+    form.removeEventListener('change', started);
+    track('form_start', { form_type: form.dataset.formType });
+  };
+  form.addEventListener('input', started);
+  form.addEventListener('change', started);
   const fields = () => [...form.querySelectorAll<Field>('input:not([type=hidden]):not([type=checkbox]):not([name=website]), select, textarea')];
   fields().forEach((f) => {
     f.addEventListener('blur', () => { if (f.value || f.hasAttribute('data-touched')) setError(f, check(f)); f.setAttribute('data-touched', ''); });

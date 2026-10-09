@@ -89,6 +89,8 @@ If emails don't arrive, the host may require SMTP. The handler uses PHP `mail()`
 
 ### Keeping Google rankings (same domain)
 
+The full search setup (structured data, sitemap and robots rules, keyword-to-page map, location strategy, analytics events, Search Console steps) is in [SEO.md](SEO.md).
+
 The domain doesn't change, so rankings carry over as long as old URLs don't break:
 
 1. Download the old sitemap (`https://itrentals.in/sitemap.xml` or `/wp-sitemap.xml`) **before** switching.
@@ -121,7 +123,11 @@ These are marked in the code or currently published at your request. Please revi
 - [ ] **Office video** (`public/media/open-office-*`): "Open office space" (clip 914) from Mixkit, Mixkit Stock Video Free License (free for commercial use, no attribution required; a short credit is shown on the video anyway). Graded and cut to a 10-second loop from the 4K original, in 2560, 1920 and 1280 widths (WebM and MP4); the page picks the size for the screen. Replace with footage of your own team or deliveries when you have it.
 - [ ] **Upgrade options**: laptops offer RAM up to 16 GB (6th–8th Gen) or 32 GB (10th Gen and newer) and SSD up to 1 TB. Confirm these match what you can supply.
 - [ ] **Laptop list entries to double-check** (kept exactly as supplied): Dell Latitude 5280, 5380, 5480, 5580, 7280 and 7380 are listed with 8th Gen (these models shipped with 6th/7th Gen; the 8th Gen versions are 5290, 5390, 5490, 5590, 7290 and 7390), and Latitude 3420, 3520, 5420 and 5520 are listed with 12th Gen (these shipped with 11th Gen; the 12th Gen versions are 3430, 3530, 5430 and 5530).
-- [ ] **Google Analytics 4 ID** (`ANALYTICS.GA4_ID`). Phone, WhatsApp, email and form-submit events are already wired.
+- [ ] **Google Analytics 4 ID** (`ANALYTICS.GA4_ID`). Phone, WhatsApp, email, quote-link, form-start, form-submit and catalogue-filter events are already wired (see SEO.md).
+- [ ] **Office addresses in search results**: offices are marked up for Google (LocalBusiness) only once `confirmed: true` is set in `OFFICES`.
+- [ ] **Workstations**: if you rent them, which models, so a workstation rental page can be added.
+- [ ] **Official profiles** (LinkedIn, Google Business Profile, IndiaMART…) for `SITE.sameAs`.
+- [ ] **Cities you deliver to and support**, to confirm the 14 city pages.
 
 ---
 

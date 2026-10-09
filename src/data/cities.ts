@@ -11,6 +11,8 @@ import type { FAQ } from './categories';
 export interface City {
   id: string;
   name: string;
+  /** Name for the city's page when it covers more than the city, e.g. 'Kerala' for Kochi. */
+  pageName?: string;
   /** search-friendly name used in URL + titles */
   seoName: string;
   state: string;
@@ -35,7 +37,7 @@ export const CITIES: City[] = [
     intro: 'Setting up a team in Gurgaon shouldn’t mean locking lakhs into hardware. Our office is in Sector 49 on Sohna Road, so laptops, desktops and network kit for Cyber City, Udyog Vihar and Golf Course Road come from down the road, not from another state.',
     note: 'Support for Gurgaon customers runs from our Sector 49 office.',
     faqs: [
-      { q: 'Do you have an office in Gurgaon?', a: 'Yes. Our office is at Spaze iTech Park, Sector 49, Sohna Road. You are welcome to visit and see the equipment before you rent.' },
+      { q: 'Do you have an office in Gurgaon?', a: 'Yes. Our office is at Spaze iTech Park, Sector 49, Sohna Road, and support for Gurgaon customers runs from there.' },
       { q: 'Can you equip a new floor in Cyber City or Udyog Vihar?', a: 'Yes. Share the seat count, move-in date and software list. We plan delivery and setup with your facilities team so desks are ready on day one.' },
       { q: 'Do you deliver to Manesar and the rest of NCR?', a: 'Yes. We deliver across Gurgaon, Manesar, Delhi, Noida and Ghaziabad.' },
     ],
@@ -45,11 +47,11 @@ export const CITIES: City[] = [
     lat: 28.6139, lng: 77.209,
     areas: ['Nehru Place', 'Connaught Place', 'Okhla', 'Saket', 'Karol Bagh', 'Dwarka'],
     industries: ['Government and public sector', 'Media', 'Education and training', 'Events'],
-    intro: 'Delhi customers rent from us for everything from a ministry project office to a three-day conference at Pragati Maidan. We serve Nehru Place, Connaught Place, Okhla, Saket and Dwarka from our Gurgaon base, a short drive across NCR.',
+    intro: 'Delhi teams rent for everything from a project office to a three-day conference. We serve Nehru Place, Connaught Place, Okhla, Saket and Dwarka from our Gurgaon base, a short drive across NCR.',
     note: 'Serving Delhi from our Gurgaon office.',
     faqs: [
       { q: 'Do you rent laptops for events and conferences in Delhi?', a: 'Yes. Registration laptops, displays, Wi-Fi and phones for the event days, delivered before setup and collected after.' },
-      { q: 'Can government and PSU projects rent from you?', a: 'Yes. We work with project offices on fixed-term rentals and can match your documentation and billing requirements.' },
+      { q: 'Can government and PSU projects rent from you?', a: 'Yes. The rental period can match the project term. Share your documentation and billing requirements with the enquiry and we confirm them in the quote.' },
       { q: 'Where is support handled for Delhi?', a: 'From our Gurgaon office, which covers all of Delhi NCR.' },
     ],
   },
@@ -187,7 +189,7 @@ export const CITIES: City[] = [
     ],
   },
   {
-    id: 'kochi', name: 'Kochi', seoName: 'kerala', state: 'Kerala', region: 'South', office: false, page: true,
+    id: 'kochi', name: 'Kochi', pageName: 'Kerala', seoName: 'kerala', state: 'Kerala', region: 'South', office: false, page: true,
     lat: 9.9312, lng: 76.2673,
     areas: ['Infopark Kochi', 'Kakkanad', 'Technopark Trivandrum', 'SmartCity Kochi'],
     industries: ['IT services', 'Healthcare', 'Tourism and hospitality', 'Education'],

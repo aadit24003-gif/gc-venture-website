@@ -14,6 +14,15 @@ export const SITE = {
     'Laptops, desktops, MacBooks, servers, networking gear and phones on rent for businesses across India. Since 2013. Delivered configured, supported until return.',
   logo: '/brand/it-rental-solutions-logo.png',
   ogImage: '/brand/og-default.png',
+  /** Size and description of the default share image (public/brand/og-default.png). */
+  ogImageSize: { width: 1200, height: 630 },
+  ogImageAlt: 'IT Rentals: laptops and IT equipment on rent for businesses across India',
+  /**
+   * [REQUIRES CONFIRMATION] The company's official profiles (LinkedIn, Google Business Profile,
+   * IndiaMART, etc.), as full URLs. They are added to the Organization schema as `sameAs`.
+   * Leave empty until each one is confirmed to belong to the company.
+   */
+  sameAs: [] as string[],
 } as const;
 
 export const CONTACT = {
@@ -55,7 +64,10 @@ export interface Office {
   locality: string;
   region: string;
   postalCode: string;
-  /** false = address differs between source documents; confirm before launch */
+  /**
+   * false = address differs between source documents; confirm before launch.
+   * Only confirmed offices are added to structured data (as LocalBusiness branches).
+   */
   confirmed: boolean;
   geo?: { lat: number; lng: number };
 }
@@ -112,4 +124,11 @@ export const FORM_ENDPOINT = '/api/enquiry.php';
 export const ANALYTICS = {
   /** e.g. 'G-XXXXXXX'. Leave null to load no analytics script. */
   GA4_ID: null as string | null,
+  /**
+   * Google Search Console "HTML tag" verification: paste only the content value, e.g. 'abc123…'.
+   * Not needed if the site is verified by DNS (the recommended Domain property). See SEO.md.
+   */
+  GOOGLE_SITE_VERIFICATION: null as string | null,
+  /** Bing Webmaster Tools "HTML meta tag" verification value (msvalidate.01). Optional. */
+  BING_SITE_VERIFICATION: null as string | null,
 };

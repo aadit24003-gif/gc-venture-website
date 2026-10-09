@@ -1,6 +1,10 @@
+# itrentals.in
+# Everything public is open to crawlers, including the CSS, scripts, fonts and images pages need.
+# Pages that should not appear in search (thank-you, 404, draft legal pages, thin model pages)
+# carry <meta name="robots" content="noindex"> instead of a Disallow here, so crawlers can see it.
 User-agent: *
 Allow: /
+# Form handler endpoints: not pages
 Disallow: /api/
-Disallow: /thank-you/
 
 Sitemap: https://itrentals.in/sitemap-index.xml

@@ -43,9 +43,9 @@ export const CATEGORIES: Category[] = [
     group: 'computing',
     hasCatalogue: true,
     navBlurb: 'ThinkPad, Latitude, EliteBook. Core i5 to Core Ultra.',
-    seoTitle: 'Laptop on Rent for Business | Laptop Rental India',
+    seoTitle: 'Laptop on Rent for Businesses Across India',
     seoDescription:
-      'Rent business laptops from Lenovo, Dell and HP for teams of 10 to 1,000+. Configured before delivery, supported until return. Get a quote.',
+      'Rent ThinkPad, Latitude and EliteBook business laptops for teams of 10 to 1,000+, delivered across India. Configured before delivery, supported until return.',
     h1: 'Laptop rental for teams of ten to a thousand',
     intro:
       'Business laptops from the Lenovo ThinkPad, Dell Latitude and HP EliteBook ranges, from 6th Gen Intel Core i5 to the latest Core Ultra, with the processor, memory and storage chosen on each model. Every machine is checked, imaged with the software you specify and labelled before it leaves us, so your people log in on day one.',
@@ -84,7 +84,7 @@ export const CATEGORIES: Category[] = [
     group: 'apple',
     hasCatalogue: true,
     navBlurb: 'MacBook Air and Pro from 2019 to M5, plus iMac.',
-    seoTitle: 'MacBook on Rent | MacBook Air & Pro Rental',
+    seoTitle: 'MacBook on Rent for Businesses: Air, Pro & iMac',
     seoDescription:
       'Rent MacBook Air and MacBook Pro from 2019 to M5, M5 Pro and M5 Max, plus iMac, for design, development and leadership teams. Get a quote.',
     h1: 'MacBook rental for design, engineering and leadership teams',
@@ -122,9 +122,9 @@ export const CATEGORIES: Category[] = [
     group: 'computing',
     hasCatalogue: true,
     navBlurb: 'OptiPlex, ThinkCentre and mini PCs, with monitors.',
-    seoTitle: 'Desktop on Rent | Computer Rental for Offices',
+    seoTitle: 'Desktop on Rent for Offices, BPOs & Labs',
     seoDescription:
-      'Rent desktops and mini PCs from Dell OptiPlex, Lenovo ThinkCentre and HP with monitors, keyboards and mice. Ideal for BPO floors and training labs.',
+      'Rent Dell OptiPlex, Lenovo ThinkCentre and HP desktops and mini PCs as complete seats with monitor, keyboard and mouse, for offices, BPO floors and labs.',
     h1: 'Desktop rental for floors, labs and fixed seats',
     intro:
       'Dell OptiPlex, Lenovo ThinkCentre and HP desktops, including compact mini PCs that mount behind a monitor. Rented as complete seats: CPU, monitor, keyboard and mouse, imaged identically so every workstation behaves the same.',
@@ -154,7 +154,7 @@ export const CATEGORIES: Category[] = [
     group: 'computing',
     hasCatalogue: true,
     navBlurb: '21.5" to 24" FHD displays from HP, Dell, Lenovo.',
-    seoTitle: 'Monitor on Rent | 22" & 24" Monitor Rental',
+    seoTitle: 'Monitor on Rent: 22" & 24" Monitors for Offices & Events',
     seoDescription:
       'Rent 21.5", 22" and 24" full-HD monitors from HP, Dell and Lenovo for desks, dual-screen setups and events. Get a quote.',
     h1: 'Monitor rental for desks, dual screens and events',
@@ -179,7 +179,7 @@ export const CATEGORIES: Category[] = [
     group: 'infrastructure',
     hasCatalogue: false,
     navBlurb: 'Rack and tower servers for projects and migrations.',
-    seoTitle: 'Server on Rent | Rack & Tower Server Rental',
+    seoTitle: 'Server on Rent: Rack & Tower Servers',
     seoDescription:
       'Rent rack and tower servers for migrations, test environments, events and temporary sites. Configured to your requirement. Get a quote.',
     h1: 'Server rental for migrations, test labs and temporary sites',
@@ -205,7 +205,7 @@ export const CATEGORIES: Category[] = [
     group: 'infrastructure',
     hasCatalogue: false,
     navBlurb: 'Routers and Wi-Fi for sites, events and branches.',
-    seoTitle: 'Router on Rent | Wi-Fi & Router Rental',
+    seoTitle: 'Router & Wi-Fi Equipment on Rent for Sites & Events',
     seoDescription:
       'Rent business routers and Wi-Fi equipment for temporary sites, events and new branches. Delivered and supported. Get a quote.',
     h1: 'Router and Wi-Fi rental for sites, branches and events',
@@ -228,7 +228,7 @@ export const CATEGORIES: Category[] = [
     group: 'mobility',
     hasCatalogue: false,
     navBlurb: 'Android and iPhone handsets for field and test teams.',
-    seoTitle: 'Mobile Phone on Rent | Smartphone Rental',
+    seoTitle: 'Mobile Phones on Rent for Field Teams & App Testing',
     seoDescription:
       'Rent Android phones and iPhones for field teams, app testing and events. Monthly rental with replacement support. Get a quote.',
     h1: 'Mobile phone rental for field teams and app testing',
@@ -251,7 +251,7 @@ export const CATEGORIES: Category[] = [
     group: 'infrastructure',
     hasCatalogue: false,
     navBlurb: 'Anything else your setup needs. Ask us.',
-    seoTitle: 'IT Equipment on Rent | IT Infrastructure Rental',
+    seoTitle: 'IT Equipment on Rent for Businesses in India',
     seoDescription:
       'Rent complete IT setups: laptops, desktops, servers, networking and phones from one supplier, delivered and supported across India.',
     h1: 'IT equipment rental for complete setups',

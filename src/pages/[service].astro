@@ -26,25 +26,24 @@ const waMessage = `Hi IT Rentals, I would like to enquire about ${cat.name.toLow
 const path = `/${cat.slug}/`;
 const crumbs = [{ name: 'Equipment', href: '/equipment/' }, { name: cat.name, href: path }];
 
+/* The rental service this page describes. FAQs stay visible on the page but are not marked up:
+   Google only shows FAQ results for a few authoritative government and health sites. */
+const serviceId = `${new URL(path, SITE.url).href}#service`;
 const schema = [
   {
-    '@context': 'https://schema.org',
     '@type': 'Service',
+    '@id': serviceId,
     name: cat.name,
     serviceType: `${cat.name} for businesses`,
     description: cat.seoDescription,
     provider: { '@id': `${SITE.url}/#organization` },
     areaServed: { '@type': 'Country', name: 'India' },
+    audience: { '@type': 'BusinessAudience', name: 'Companies, teams and institutions' },
     url: new URL(path, SITE.url).href,
-  },
-  {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: cat.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
   },
 ];
 ---
-<Base title={cat.seoTitle} description={cat.seoDescription} path={path} crumbs={crumbs} schema={schema} waMessage={waMessage} closingCta={false}>
+<Base title={cat.seoTitle} description={cat.seoDescription} path={path} crumbs={crumbs} schema={schema} mainEntity={serviceId} waMessage={waMessage} closingCta={false}>
   <PageHero title={cat.h1} lead={cat.intro} crumbs={crumbs} waMessage={waMessage} quoteHref={`/request-a-quote/?category=${cat.id}`}>
     <aside slot="aside" class="panel panel--pad included" aria-labelledby="inc-title">
       <span class="inc-icon"><Icon name={cat.icon} size={34} stroke={1.5} /></span>

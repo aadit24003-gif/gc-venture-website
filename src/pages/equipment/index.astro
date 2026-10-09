@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import Icon from '../../components/Icon.astro';
-import { PRODUCTS, facets, formatGb } from '../../data/products';
+import { PRODUCTS, facets, formatGb, isThin } from '../../data/products';
 import { CATEGORIES } from '../../data/categories';
 import { pageCities } from '../../data/cities';
 import { SITE } from '../../config/site';
@@ -24,11 +24,13 @@ const groups: { key: string; legend: string; options: { v: string; l: string }[]
 const catLabel: Record<string, string> = { laptops: 'Laptops', macbooks: 'Apple Macs', desktops: 'Desktops', monitors: 'Monitors' };
 groups[0].options = catalogueCats.map((c) => ({ v: c.id, l: catLabel[c.id] ?? c.name }));
 
+/* Only models with their own indexable page are listed (thin ones carry noindex). */
+const listId = `${SITE.url}/equipment/#models`;
 const schema = [{
-  '@context': 'https://schema.org',
   '@type': 'ItemList',
+  '@id': listId,
   name: 'IT equipment available on rent',
-  itemListElement: PRODUCTS.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: new URL(`/equipment/${p.slug}/`, SITE.url).href, name: p.name })),
+  itemListElement: PRODUCTS.filter((p) => !isThin(p)).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: new URL(`/equipment/${p.slug}/`, SITE.url).href, name: p.name })),
 }];
 ---
 <Base
@@ -37,6 +39,8 @@ const schema = [{
   path="/equipment/"
   crumbs={crumbs}
   schema={schema}
+  pageType="CollectionPage"
+  mainEntity={listId}
 >
   <PageHero
     title="Equipment catalogue"
@@ -47,7 +51,7 @@ const schema = [{
 
   <section class="section cat-section">
     <div class="wrap cat-layout" data-catalogue>
-      <aside class="filters" aria-labelledby="filters-title">
+      <aside class="filters" aria-labelledby="filters-title" data-track-catalogue="catalogue">
         <div class="filters-head">
           <h2 id="filters-title" class="h4">Filter</h2>
           <button type="button" class="reset" data-reset hidden>Clear all</button>

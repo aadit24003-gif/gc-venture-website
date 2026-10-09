@@ -65,11 +65,11 @@ const faqs = [
 ];
 /**
  * No Product markup: Google treats Product without a price, offer or reviews as an
- * error. Add it back (with offers) once monthly prices are published.
+ * error, and these are rentals priced per quote. Add it back (with offers) once monthly
+ * prices are published. FAQs stay visible but are not marked up (see [service].astro).
+ * The page still gets WebPage and BreadcrumbList from Base.
  */
-const schema = [
-  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
-];
+const schema: Record<string, unknown>[] = [];
 ---
 <Base title={title} description={description} path={path} crumbs={crumbs} schema={schema} noindex={thin} waMessage={wa} closingCta={false}>
   <section class="pd grid-paper">

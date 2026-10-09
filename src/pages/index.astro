@@ -16,18 +16,11 @@ import { GENERAL_FAQS } from '../data/faqs';
 import { TESTIMONIALS } from '../data/clients';
 import { SITE } from '../config/site';
 
-const faqSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: GENERAL_FAQS.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
-};
-const websiteSchema = { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.name, url: SITE.url };
 ---
 <Base
-  title="Laptop & IT Equipment on Rent for Business | IT Rentals"
-  description="Rent laptops, desktops, MacBooks, servers, networking and phones for teams of 10 to 1,000+ across India. Configured, delivered and supported. Since 2013."
+  title="Laptop & IT Equipment Rental Across India"
+  description={`Rent laptops, MacBooks, desktops, servers, networking and phones for teams of 10 to 1,000+, anywhere in India. Configured, delivered and supported since ${SITE.founded}.`}
   path="/"
-  schema={[websiteSchema, faqSchema]}
 >
   <Hero />
   <LaptopCurator />
