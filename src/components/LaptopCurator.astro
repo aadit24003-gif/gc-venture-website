@@ -247,6 +247,14 @@ const cardSpec = (p: Product) => {
       radial-gradient(55% 70% at 0% 100%, rgba(184, 138, 85, .12), transparent 70%);
     background-size: 220px 220px, auto, auto, auto;
   }
+  /* a very light circuit-board texture over the cream (fades out towards the edges) */
+  .cur::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'><g fill='none' stroke='%2317130F' stroke-opacity='.075' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'><path d='M0 40h46l20 20h44l20-20h50'/><path d='M140 0v18l-14 14v8'/><path d='M140 180v-34l-16-16h-38'/><path d='M0 128h24l18 18h28'/><path d='M180 128h-14l-12-12v-26'/><path d='M66 60v34l12 12'/><path d='M30 0v14l12 12'/><path d='M30 180v-20'/></g><g fill='%23FAF7F1' stroke='%2317130F' stroke-opacity='.09' stroke-width='1'><circle cx='126' cy='40' r='3'/><circle cx='86' cy='130' r='3'/><circle cx='70' cy='146' r='2.5'/><circle cx='154' cy='90' r='2.5'/><circle cx='78' cy='106' r='2.5'/><circle cx='42' cy='26' r='2.5'/><circle cx='30' cy='160' r='2.5'/></g></svg>");
+    background-size: 180px 180px;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 220px, #000 calc(100% - 160px), transparent);
+    mask-image: linear-gradient(180deg, transparent 0, #000 220px, #000 calc(100% - 160px), transparent);
+  }
   .cur-wrap { max-width: calc(1320px + 2 * var(--gutter)); }
 
   .cur-head { display: grid; justify-items: center; gap: clamp(14px, 1.6vw, 20px); margin: 0 auto clamp(28px, 3.4vw, 44px); text-align: center; }
