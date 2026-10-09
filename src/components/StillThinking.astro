@@ -8,7 +8,8 @@
  * - Never takes focus or blocks the page; Escape or the close button hide it,
  *   and it moves out of the way of anything that gets keyboard focus.
  * - Shown at most once per visit; closing it keeps it away for a week, and
- *   using one of its links keeps it away for a month.
+ *   using one of its links, or any WhatsApp, call or quote link on the site,
+ *   keeps it away for a month.
  * - Waits while the visitor is typing, a menu or the compare tray is open, or
  *   the window is very short (phone held sideways, high zoom).
  * - Pages that are themselves contact or quote forms turn it off (Base: nudge={false}).
@@ -19,9 +20,9 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
 <aside class="nudge" data-nudge hidden aria-labelledby="nudge-title">
   <button type="button" class="nudge-x" data-nudge-close aria-label="Close this message"><Icon name="x" size={18} stroke={2} /></button>
   <span class="nudge-ic" aria-hidden="true"><Icon name="message-circle-question-mark" size={22} stroke={1.75} /></span>
-  <h2 id="nudge-title" class="nudge-title">Still thinking<span class="nudge-long"> it over</span>?</h2>
-  <p class="nudge-text">Get quick answers about models, quantities and delivery. WhatsApp us or call, whichever suits you.</p>
-  <p class="nudge-short">Quick answers on WhatsApp.</p>
+  <h2 id="nudge-title" class="nudge-title">Still thinking?</h2>
+  <p class="nudge-text">Get in touch for quick answers about models, quantities and delivery. WhatsApp us or call, whichever suits you.</p>
+  <p class="nudge-short">Get in touch for quick answers.</p>
   <div class="nudge-actions">
     <a class="btn btn--sm nudge-wa" href={whatsappLink('Hi IT Rentals, I have a question about renting laptops.')} target="_blank" rel="noopener" data-nudge-cta data-track-location="nudge"><Icon name="whatsapp" />WhatsApp us</a>
     <a class="btn btn--sm nudge-call" href={telLink(CONTACT.PRIMARY_PHONE)} data-nudge-cta data-track-location="nudge"><Icon name="phone" />{formatPhone(CONTACT.PRIMARY_PHONE)}</a>
@@ -76,7 +77,7 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       grid-template-columns: 1fr auto; column-gap: 12px; align-items: center;
       padding: 12px 52px 12px 16px; border-radius: 16px; transform-origin: 50% 100%;
     }
-    .nudge::after, .nudge-ic, .nudge-call, .nudge-link, .nudge-text, .nudge-long { display: none; }
+    .nudge::after, .nudge-ic, .nudge-call, .nudge-link, .nudge-text { display: none; }
     .nudge-title { grid-column: 1; padding: 0; font-size: 1.1875rem; }
     .nudge-short { display: block; grid-column: 1; margin: 2px 0 0; font-size: var(--fs-xs); line-height: 1.35; color: var(--ink-2); }
     .nudge-actions { grid-column: 2; grid-row: 1 / 3; margin: 0; }
@@ -203,7 +204,7 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       set(ss, K_SHOWN, '1');
       el.hidden = false;
       requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('in'); applyAway(); }));
-      if (status) status.textContent = 'Still thinking it over? You can message us on WhatsApp or call. Press Escape to close this message.';
+      if (status) status.textContent = 'Still thinking? Get in touch for quick answers on WhatsApp or by phone. Press Escape to close this message.';
       addEventListener('keydown', onKey, true);
       addEventListener('scroll', onScroll, { passive: true });
       tooShort.addEventListener('change', onShort);
@@ -225,6 +226,21 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
     // back/forward cache: the page comes back with a stale clock
     addEventListener('pageshow', (e) => { if (e.persisted) last = performance.now(); });
     document.addEventListener('input', () => { lastTyped = performance.now(); }, true);
+    // Already in touch (any WhatsApp, call, email or quote link, or an enquiry form): no need to ask.
+    const inTouch = () => {
+      if (open) { close('used'); return; }
+      set(ls, K_SNOOZE, String(Date.now() + SNOOZE_DAYS.used * 864e5));
+      window.clearInterval(timer);
+    };
+    document.addEventListener('click', (e) => {
+      const a = (e.target as Element | null)?.closest?.('a[href]');
+      if (!a || el.contains(a)) return;
+      const href = a.getAttribute('href') ?? '';
+      if (/^(https:\/\/wa\.me\/|tel:|mailto:)/.test(href) || href.startsWith('/request-a-quote')) inTouch();
+    }, true);
+    document.addEventListener('submit', (e) => {
+      if ((e.target as Element).matches?.('[data-enquiry], [data-need]')) inTouch();
+    }, true);
     el.querySelector('[data-nudge-close]')?.addEventListener('click', () => close('dismiss'));
     el.querySelectorAll('[data-nudge-cta]').forEach((a) => a.addEventListener('click', () => close('used')));
   }

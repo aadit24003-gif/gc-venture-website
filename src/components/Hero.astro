@@ -340,7 +340,9 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 85%);
   }
   /* Parts that only exist while the scene runs */
-  .topline, .face--b, .slot--back, .edge, .floor, .sheen, .tour-nav, .cue, .skip, .tc--itr, .tc--need { display: none; }
+  .face--b, .slot--back, .edge, .floor, .sheen, .tour-nav, .cue, .skip, .tc--itr, .tc--need, .k-txt--b { display: none; }
+  .topline { position: relative; margin: 0 auto clamp(18px, 2.6vw, 30px); text-align: center; }
+  .k-txt { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.2rem, .9rem + 1.2vw, 1.9rem); line-height: 1.15; letter-spacing: -0.015em; color: var(--ink); }
 
   /* ── The laptop (static layout: the IT Rentals screen) ── */
   .device-wrap { position: relative; width: 100%; max-width: 1040px; margin: 0 auto; }
@@ -408,8 +410,17 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   .need-go { flex: none; }
   .need-alt { margin: clamp(10px, 1.8cqi, 18px) 0 0; font-size: var(--fs-xs); color: var(--ink-2); }
   .need-alt a, .need-alt-a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
-  /* the working closing screen only exists in the scroll tour */
-  .need-live { display: none; }
+  /* Without the tour, the closing screen's form is a plain block under the brand links */
+  :global(html:not(.scenes)) .need-live { max-width: 640px; margin: clamp(32px, 4vw, 48px) auto 0; }
+  :global(html:not(.scenes)) .need-live :is(.cam, .deck) { display: none; }
+  :global(html:not(.scenes)) .need-live :is(.lid, .screen) { width: auto; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+  :global(html:not(.scenes)) .need-live .desk { padding: 0; }
+  @media (max-height: 559px) {
+    .need-live { max-width: 640px; margin: clamp(32px, 4vw, 48px) auto 0; }
+    .need-live :is(.cam, .deck) { display: none; }
+    .need-live :is(.lid, .screen) { width: auto; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+    .need-live .desk { padding: 0; }
+  }
 
   /* When a screen's words do not fit (short phones, small tablets), drop the extras in turn */
   .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3']) :is(.lead, .need-sub) { display: none; }
@@ -452,13 +463,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   @container (min-width: 396px) { .c7 { display: block; } }
   @container (min-width: 442px) { .c8 { display: block; } }
   @container (min-width: 488px) { .c9 { display: block; } }
-  @media (prefers-reduced-motion: no-preference) {
-    .fl { animation: drift 11s ease-in-out infinite alternate; animation-delay: calc(var(--d) * -1); }
-    @keyframes drift {
-      from { transform: translateY(-4px) rotate(var(--r)); }
-      to { transform: translateY(5px) rotate(calc(var(--r) * -0.4)); }
-    }
-  }
   @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
 
   /* ── Scroll scene (only when scenes run and the screen is tall enough) ── */
@@ -479,7 +483,8 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .hero[data-stop='5'][data-rest] .need-live { opacity: 1; pointer-events: auto; }
 
     /* The line above the laptop: the kicker, then the IT Rentals line once the tour starts */
-    :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; }
+    :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; margin: 0; }
+    :global(html.scenes) .k-txt--b { display: block; }
     .k-txt {
       grid-area: 1 / 1; margin: 0; text-align: center; font-family: var(--font-display); font-weight: 400;
       font-size: clamp(1.2rem, .9rem + 1.2vw, 1.9rem); line-height: 1.15; letter-spacing: -0.015em; color: var(--ink);
@@ -649,9 +654,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
     /* The lid opens and the screen comes on when the page loads */
     :global(html.scenes) .slot--screen[data-slot='0'] .lid { animation: lid-open .85s cubic-bezier(.2, .75, .2, 1) .05s backwards; transform-origin: 50% 100%; }
-    :global(html.scenes) .slot--screen[data-slot='0'] .desk { animation: power-on .35s ease .5s backwards; }
     @keyframes lid-open { from { transform: perspective(1500px) rotateX(-76deg); } to { transform: perspective(1500px) rotateX(0deg); } }
-    @keyframes power-on { from { opacity: 0; } to { opacity: 1; } }
 
     :global(html.scenes) .hero .since-long { display: none; }
     @media (min-width: 1100px) { :global(html.scenes) .hero .since-long { display: inline; } }

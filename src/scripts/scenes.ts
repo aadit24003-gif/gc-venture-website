@@ -263,8 +263,9 @@ function init() {
     }
   };
 
-  // Hero: a visitor who stops partway through a turn is eased to the nearer stop,
-  // leaning the way they were scrolling. Never while a finger is on the screen.
+  // Hero: a visitor who stops partway through a turn is eased on to the next stop in
+  // the direction they were scrolling (one wheel notch or arrow press is enough to
+  // move on; easing back would trap them). Never while a finger is on the screen.
   const heroScene = scenes.find((s) => s.name === 'hero');
   let settleTimer = 0;
   let touching = false;
@@ -274,11 +275,9 @@ function init() {
     const s = heroScene;
     if (!s || !s.pinned || touching) return;
     const p = target(s);
-    const f = FLIPS.find(([a, b]) => p > a + 0.006 && p < b - 0.006);
+    const f = FLIPS.find(([a, b]) => p > a + 0.001 && p < b - 0.001);
     if (!f) return;
-    const t = (p - f[0]) / (f[1] - f[0]);
-    const forward = dir > 0 ? t > 0.3 : t > 0.7;
-    const to = forward ? f[1] + 0.012 : f[0] - 0.012;
+    const to = dir > 0 ? f[1] + 0.012 : f[0] - 0.012;
     window.scrollTo({ top: s.top + to * s.span, behavior: 'smooth' });
   };
   const onScrollSettle = () => {
