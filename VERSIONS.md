@@ -40,6 +40,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v31 | `f0a858a` | 'What you can rent' pill row removed; under the builder the 'Your setup' bar is replaced by a centred 'Explore the full catalogue' button ('Start over' moves beside the catalogue link above the models) | https://claude.ai/artifact/SE2eYG1zUX87HkSA4nZTcb |
 | v32 | `6d950dc` | Scrolling from the first screen glides all the way to 'Describe your need, or build your own' (and back up), never stopping half-way; 'Your setup' bar back under the builder (quantity, quote, 'See all N in the catalogue'); matching-models cards removed, 'Explore the full catalogue' closes the section | https://claude.ai/artifact/5275Srw9c9DPAdpxzivR5m |
 | v33 | `6169489` | Smoother zoom-and-glide (zoom follows the scroll exactly, glide starts at once and settles gently, keys glide too, lighter frames); the laptop list is back under 'Explore the full catalogue' (popular models, then matching ones) | https://claude.ai/artifact/L2XsRyC7iKuiYVEz1DSw8H |
+| v34 | `f62d62f` | First screen back on the dark wine background with faint cream icons and the silver-based laptop (as in v14), same content; 'Describe your need, or build your own' on cream; 'How renting works' and 'From ten laptops to enterprise scale' swap places | https://claude.ai/artifact/WaxJw8Jff1h5nRkFjtrgMc |
 
 ## Going back to a version
 
