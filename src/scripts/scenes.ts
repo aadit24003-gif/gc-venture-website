@@ -250,9 +250,69 @@ function init() {
     }
   };
 
+  // Hero: no stopping halfway through the zoom. Once the visitor scrolls down from
+  // the first screen, the page glides on until the next section (#build) fills the
+  // window; scrolling up from there glides back to the top. Wheel, touch and scroll
+  // keys wait while it moves, so they cannot leave it in between.
+  const heroScene = scenes.find((s) => s.name === 'hero');
+  const landing = document.getElementById('build');
+  let glideRaf = 0;
+  /** a trackpad's momentum keeps sending wheel events after a glide lands: let them pass only after this */
+  let holdUntil = 0;
+  let lastY = scrollY;
+  const topY = () => Math.max(0, heroScene?.top ?? 0);
+  const landY = () => (landing ? Math.round(landing.getBoundingClientRect().top + scrollY) : 0);
+  const glide = (to: number) => {
+    cancelAnimationFrame(glideRaf);
+    const from = scrollY;
+    const d = to - from;
+    if (Math.abs(d) < 2) return;
+    const dur = Math.min(1300, Math.max(750, Math.abs(d) * 0.55));
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - t0) / dur);
+      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      window.scrollTo({ top: from + d * e, behavior: 'instant' as ScrollBehavior });
+      if (t < 1) glideRaf = requestAnimationFrame(step);
+      else { glideRaf = 0; lastY = scrollY; holdUntil = performance.now() + 350; }
+    };
+    glideRaf = requestAnimationFrame(step);
+  };
+  const onScrollGlide = () => {
+    const y = scrollY;
+    const dir = y - lastY;
+    lastY = y;
+    if (glideRaf || !heroScene?.pinned || !landing) return;
+    const top = topY();
+    const land = landY();
+    if (y <= top + 2 || y >= land - 2) return;
+    glide(dir < 0 ? top : land);
+  };
+  const SCROLL_KEYS = new Set([' ', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'Home', 'End']);
+  const holdInput = (e: Event) => {
+    if (!glideRaf && !(e.type === 'wheel' && performance.now() < holdUntil)) return;
+    if (e instanceof KeyboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (!SCROLL_KEYS.has(e.key) || t?.closest('input, textarea, select, [contenteditable="true"]')) return;
+    }
+    e.preventDefault();
+  };
+  // "Describe your need, or build your own" on the first screen glides there too
+  const onClick = (e: MouseEvent) => {
+    const a = (e.target as HTMLElement).closest<HTMLElement>('[data-to-describe]');
+    if (!a || !heroScene?.pinned || !landing) return;
+    e.preventDefault();
+    glide(landY());
+  };
+
   measure();
   frame();
   addEventListener('scroll', kick, { passive: true });
+  addEventListener('scroll', onScrollGlide, { passive: true });
+  addEventListener('wheel', holdInput, { passive: false });
+  addEventListener('touchmove', holdInput, { passive: false });
+  addEventListener('keydown', holdInput);
+  heroScene?.el.addEventListener('click', onClick);
   addEventListener('resize', relayout);
   addEventListener('load', relayout);
   document.fonts?.ready.then(relayout);
@@ -279,6 +339,12 @@ function init() {
   window.__scenes = {
     destroy() {
       removeEventListener('scroll', kick);
+      removeEventListener('scroll', onScrollGlide);
+      removeEventListener('wheel', holdInput);
+      removeEventListener('touchmove', holdInput);
+      removeEventListener('keydown', holdInput);
+      heroScene?.el.removeEventListener('click', onClick);
+      cancelAnimationFrame(glideRaf);
       removeEventListener('resize', relayout);
       removeEventListener('load', relayout);
       document.removeEventListener('focusin', onFocus);
