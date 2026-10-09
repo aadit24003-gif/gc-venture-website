@@ -169,7 +169,7 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       });
     };
     const onKey = (e: KeyboardEvent) => {
-      if (open && e.key === 'Escape' && !menuOpen()) close('dismiss');
+      if (open && e.key === 'Escape' && !menuOpen() && !el.classList.contains('away')) close('dismiss');
     };
     // menus, dialogs and the compare tray can open after the card: step aside while they are up
     let layerTimer = 0;

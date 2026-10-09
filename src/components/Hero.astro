@@ -220,7 +220,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
             ))}
 
             <!-- the closing screen as it looks while turning; the working form is .need-live below -->
-            <div class="slot slot--screen slot--need" data-slot="5" aria-hidden="true">
+            <div class="slot slot--screen slot--need" data-slot="5" aria-hidden="true" inert>
               <div class="lid">
                 <span class="cam"></span>
                 <div class="screen">
@@ -423,7 +423,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.lead, .need-sub) { display: none; }
   .desk:is([data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.trust, .need-alt) { display: none; }
   .desk:is([data-fit='3'], [data-fit='4']) :is(.since, .btn--wa) { display: none; }
-  .screen:has(> .desk[data-fit='4']) { overflow-y: auto; }
+  :is(.slot--screen[data-slot='0'], .need-live) .screen:has(> .desk[data-fit='4']) { overflow-y: auto; }
 
   /* Static layout: the four brands as links under the laptop */
   .tour { width: 100%; }
@@ -674,6 +674,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   @media (min-height: 560px) and (max-width: 1099px) {
     :global(html.scenes) .hero[data-stop]:not([data-stop='x']) .skip:not(:focus-visible) { opacity: 0; pointer-events: none; }
     :global(html.scenes) .skip { top: calc(max(96px, var(--head, 0px)) - 12px); bottom: auto; padding: 6px 10px; border-radius: 8px; background: var(--card); }
+    :global(html.scenes) .stage:has(> .skip:focus-visible) .topline { visibility: hidden; }
   }
 
   /* Phones and narrow tablets: taller screen, compact tour */
@@ -740,6 +741,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   @media (prefers-reduced-motion: reduce) { .pill, .pill .go { transition: none; } .pill:hover { transform: none; } .pill:hover .go { transform: none; } }
 
   @media (max-width: 639px) {
+    .pill { max-width: 100%; white-space: normal; }
     .since { font-size: .6875rem; padding: 6px 12px; }
     .since-long { display: none; }
     .rentables li:nth-child(n + 7) { display: none; }
@@ -781,7 +783,8 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       sizeRaf = requestAnimationFrame(() => {
         if (getComputedStyle(stage).position !== 'sticky') { stage.style.removeProperty('--reserve'); stage.style.removeProperty('--head'); return; }
         const cs = getComputedStyle(stage);
-        const head = header ? Math.round(header.getBoundingClientRect().bottom + 16) : 0;
+        // layout box, not the on-screen one: the header slides away while scrolling down
+        const head = header ? Math.round(header.offsetHeight + 16) : 0;
         stage.style.setProperty('--head', `${head}px`);
         const pad = Math.max(parseFloat(cs.paddingTop), head) + parseFloat(cs.paddingBottom);
         const reserve = Math.round(pad + parts[0].offsetHeight + parts[1].offsetHeight + 2 * parseFloat(cs.rowGap || '0') + 12);

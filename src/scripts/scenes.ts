@@ -61,7 +61,7 @@ function heroTurn(p: number) {
 type HeroParts = {
   slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[];
   sheens: { el: HTMLElement; k: number }[]; track: HTMLElement | null; drift: HTMLElement[];
-  front: string; a: number; b: number; stop: number; rest: boolean | null;
+  front: string; a: number; b: number; stop: number; rest: boolean | null; restDeg: number;
 };
 const heroParts = new WeakMap<HTMLElement, HeroParts>();
 
@@ -78,7 +78,7 @@ function hero(s: Scene, p: number) {
       sheens: [...slab.querySelectorAll<HTMLElement>('.sheen')].map((el) => ({ el, k: el.closest('.back--lenovo') ? 0.45 : 1 })),
       track: s.el.querySelector<HTMLElement>('.tour-track i'),
       drift: [...s.el.querySelectorAll<HTMLElement>('.fl-side, .pocket')],
-      front: '', a: -1, b: -1, stop: -1, rest: null,
+      front: '', a: -1, b: -1, stop: -1, rest: null, restDeg: NaN,
     };
     heroParts.set(s.el, h);
     // the slab's width only changes on resize; observing it keeps layout reads out of the scroll frame
@@ -98,7 +98,7 @@ function hero(s: Scene, p: number) {
     h.slots.forEach((el) => el.classList.toggle('on', el.dataset.slot === '0' || el.dataset.slot === '1'));
     showStop(s, h, 0);
     s.el.removeAttribute('data-rest');
-    h.front = 'static'; h.a = -1; h.b = -1; h.rest = null;
+    h.front = 'static'; h.a = -1; h.b = -1; h.rest = null; h.restDeg = NaN;
     return;
   }
   // Progress line under the stops, and the icon fields drifting up with the scroll.
@@ -117,7 +117,11 @@ function hero(s: Scene, p: number) {
   const cos = Math.cos(rad);
   const mid = Math.abs(Math.sin(rad));
   const rest = mid < 0.0005;
-  if (!(rest && h.rest)) {
+  // Resting on the same stop as last frame: nothing to redraw. A jump straight from one
+  // stop to another (keyboard focus, a stop button) still needs the new angle.
+  const restDeg = rest ? Math.round(deg) : NaN;
+  if (!(rest && restDeg === h.restDeg)) {
+    h.restDeg = restDeg;
     // Mid-turn the laptop lifts a little and moves back by half its width, so the
     // edge swinging towards the visitor stays the laptop's height. At rest it is
     // exactly flat and straight.
@@ -234,6 +238,8 @@ function init() {
   };
 
   let lastFrame = 0;
+  let heroRaw = NaN;
+  const heroScene = scenes.find((s) => s.name === 'hero');
   let dir = 1;
   let lastY = scrollY;
   const frame = (now = performance.now()) => {
@@ -245,6 +251,8 @@ function init() {
     // read the scroll position once, before this frame writes any styles
     const y = scrollY;
     if (y !== lastY) { dir = Math.sign(y - lastY); lastY = y; }
+    // where the visitor is in the tour, measured against the current layout (for relayout)
+    if (heroScene?.pinned && viewH() === vh) heroRaw = (y - heroScene.top) / heroScene.span;
     for (const s of scenes) {
       const t = target(s, y);
       if (s.cur < 0) s.cur = t;
@@ -266,17 +274,20 @@ function init() {
     cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
       const hs = heroScene;
-      const before = hs?.pinned ? { p: clamp((scrollY - hs.top) / hs.span), top: hs.top, span: hs.span } : null;
+      // the last stop sits exactly at the end of the tour, so up to the end counts as inside
+      const raw = Number.isFinite(heroRaw) ? heroRaw : hs?.pinned ? (scrollY - hs.top) / hs.span : NaN;
+      const before = hs?.pinned && raw > 0 && raw <= 1 + 2 / hs.span ? { p: Math.min(raw, 1), top: hs.top, span: hs.span } : null;
       const wasPinned = scenes.map((s) => s.pinned);
       measure();
       // A resize or rotation changes the tour's length: stay on the same stop rather
       // than the same pixel offset (which would land mid-turn or on another brand).
-      if (hs?.pinned && before && before.p > 0 && before.p < 1 && (Math.abs(hs.span - before.span) > 1 || Math.abs(hs.top - before.top) > 1)) {
+      if (hs?.pinned && before && (Math.abs(hs.span - before.span) > 1 || Math.abs(hs.top - before.top) > 1)) {
         window.scrollTo({ top: hs.top + before.p * hs.span, behavior: 'instant' as ScrollBehavior });
       }
       // a scene that switches between pinned and static jumps to where it should be
       // instead of easing across several turns
       scenes.forEach((s, i) => { if (s.pinned !== wasPinned[i]) s.cur = -1; s.shown = -1; });
+      heroRaw = before && hs?.pinned ? before.p : NaN;
       // An on-screen keyboard that shrinks the window can switch the tour to the static
       // layout while the visitor types in it: keep what they are typing in view.
       const a = document.activeElement as HTMLElement | null;
@@ -308,7 +319,6 @@ function init() {
   // Hero: a visitor who stops partway through a turn is eased on to the next stop in
   // the direction they were scrolling (one wheel notch or arrow press is enough to
   // move on; easing back would trap them). Never while a finger is on the screen.
-  const heroScene = scenes.find((s) => s.name === 'hero');
   let settleTimer = 0;
   let touching = false;
   const settle = () => {
@@ -333,11 +343,13 @@ function init() {
 
   // Hero stop buttons: go to a stop. Further than one stop away, jump to the turn
   // just before it first, so the visitor sees one turn rather than a long spin.
+  let cancelMove = () => {};
   const onClick = (e: MouseEvent) => {
     const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]');
     const s = heroScene;
     if (!btn || !s || !s.pinned || !s.el.contains(btn)) return;
     e.preventDefault();
+    cancelMove();
     const i = Number(btn.dataset.goto);
     const from = heroParts.get(s.el)?.stop ?? 0;
     if (Math.abs(i - from) > 1) {
@@ -353,10 +365,15 @@ function init() {
       if (e.detail !== 0 || i === 0) return;
       const to = i === STOP_AT.length - 1 ? s.el.querySelector<HTMLElement>('[data-need] input') : s.el.querySelector<HTMLElement>(`.tc[data-s="${i}"] a`);
       if (!to) return;
-      let done = false;
-      const move = () => { if (!done) { done = true; to.focus({ preventScroll: true }); } };
+      // only if the visitor has not moved on in the meantime (Tab, the skip link, a click)
+      let timer = 0;
+      const move = () => {
+        cancelMove();
+        if (document.activeElement === btn) to.focus({ preventScroll: true });
+      };
+      cancelMove = () => { removeEventListener('scrollend', move); clearTimeout(timer); cancelMove = () => {}; };
       addEventListener('scrollend', move, { once: true });
-      window.setTimeout(move, 900);
+      timer = window.setTimeout(move, 900);
     });
   };
 

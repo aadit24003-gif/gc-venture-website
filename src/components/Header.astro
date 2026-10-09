@@ -247,7 +247,7 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const openT = triggers.find((t) => t.getAttribute('aria-expanded') === 'true');
-    if (openT) { closeAll(); openT.focus(); }
+    if (openT) { closeAll(); openT.focus({ preventScroll: true }); }
   });
   document.addEventListener('click', (e) => {
     const el = e.target as Element;
@@ -293,7 +293,7 @@ const locationsActive = path.startsWith('/locations/') || path.startsWith('/lapt
     burger.setAttribute('aria-expanded', String(on));
     document.documentElement.style.overflow = on ? 'hidden' : '';
     document.documentElement.classList.toggle('menu-open', on);
-    (on ? closeBtn : burger).focus();
+    (on ? closeBtn : burger).focus({ preventScroll: true });
   };
   burger.addEventListener('click', () => setMenu(true));
   closeBtn.addEventListener('click', () => setMenu(false));
