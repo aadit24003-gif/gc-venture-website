@@ -136,7 +136,20 @@ function route(s: Scene, p: number) {
   items.forEach((li, i) => li.classList.toggle('reached', p > 0.02 && p >= i / last - 0.02));
 }
 
-const handlers: Record<string, (s: Scene, p: number) => void> = { hero, steps, qa, route };
+/* From ten laptops to enterprise: as the board moves up the screen the track walks
+   10 → 50 → 100 → 500+ (a flow scene, nothing is held). It selects the size's radio, so
+   ScaleSelector's own change handler draws it. Once the visitor picks a size, it stops. */
+function scale(s: Scene, p: number) {
+  if ('manual' in s.el.dataset) return;
+  const radios = s.el.querySelectorAll<HTMLInputElement>('input[name="scale"]');
+  const r = radios[Math.min(radios.length - 1, Math.floor(p * radios.length))];
+  if (r && !r.checked) {
+    r.checked = true;
+    r.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+}
+
+const handlers: Record<string, (s: Scene, p: number) => void> = { hero, steps, qa, route, scale };
 
 function init() {
   window.__scenes?.destroy();

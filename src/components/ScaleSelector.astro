@@ -3,10 +3,11 @@
  * "From ten laptops to enterprise scale", on the dark wine of the opening screen.
  *
  * A track of four team sizes (10, 50, 100, 500+). Choosing one lights the fleet of laptop
- * icons in a wave, counts the number up and swaps the description. When the board first
- * comes into view it plays through 10 → 50 → 100 → 500+ by itself (about four seconds, then
- * it stops); the page keeps scrolling normally throughout. Choosing a size stops it. With
- * reduced motion it doesn't play; without JavaScript it shows 50.
+ * icons in a wave, counts the number up and swaps the description. Like the preparation
+ * checks, it follows the scroll without holding it: as the board moves up the screen the
+ * track walks 10 → 50 → 100 → 500+ (scenes.ts `scale`, a flow scene). Choosing a size hands
+ * control to the visitor. With reduced motion, or without JavaScript, it is a plain selector
+ * showing 50.
  */
 import Icon from './Icon.astro';
 import { claim } from '../config/site';
@@ -46,7 +47,7 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
         <p class="scale-lead">Laptop rentals start at 10 units. The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
       </div>
 
-      <div class="board">
+      <div class="board" data-scene="scale" data-start="0.78" data-end="0.92">
         <fieldset class="track">
           <legend class="track-legend">How many people are you equipping?</legend>
           <div class="track-row">
@@ -189,6 +190,8 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
   .scale-copy .btn { margin-top: var(--s-6); white-space: normal; text-align: center; }
   .scale-copy .btn:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
 
+  /* following the scroll: the line fills with it, 10 at the start and 500+ three-quarters of the way */
+  :global(html.scenes) .board:not([data-manual]) .track-fill { transform: scaleX(min(1, calc(var(--p, 0) / .75))); transition: none; }
   @media (prefers-reduced-motion: reduce) {
     .track-fill, .fleet i, .step, .step.on, .stop-dot { transition: none; }
   }
@@ -249,47 +252,11 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
       shown = n;
     };
 
-    const select = (i: number) => {
-      const r = radios[i];
-      r.checked = true;
-      show(Number(r.value), i);
-    };
-
-    // The visitor's own choice: stop the walk-through and show that size
-    let playing = false;
-    let done = false;
-    let timer = 0;
+    const board = root.querySelector<HTMLElement>('.board')!;
     radios.forEach((r) => r.addEventListener('change', (e) => {
-      if (e.isTrusted) { done = true; playing = false; clearTimeout(timer); }
+      // the visitor's own choice: from now on the scroll no longer moves the track
+      if (e.isTrusted) board.dataset.manual = '';
       show(Number(r.value), Number(r.dataset.i));
     }));
-    root.querySelectorAll('.stop').forEach((l) => l.addEventListener('pointerdown', () => { done = true; clearTimeout(timer); }));
-
-    /*
-     * The walk-through: 10 → 50 → 100 → 500+ once, when the board is in view. It runs by
-     * itself while the page scrolls freely, pauses if the board leaves the screen and picks
-     * up where it was, and ends in under five seconds.
-     */
-    if (!still.matches && 'IntersectionObserver' in window) {
-      const board = root.querySelector<HTMLElement>('.board')!;
-      // pause before each size, in milliseconds: the whole walk-through takes about four seconds
-      const DELAYS = [0, 1100, 1350, 1450];
-      let next = 1;
-      // begin at 10 (the board is below the fold, so nobody sees the switch from 50)
-      select(0);
-      const step = () => {
-        timer = 0;
-        if (done || !playing) return;
-        select(next);
-        next += 1;
-        if (next >= radios.length) { done = true; playing = false; return; }
-        timer = window.setTimeout(step, DELAYS[next]);
-      };
-      new IntersectionObserver(([e]) => {
-        if (done) return;
-        if (e.isIntersecting && !playing) { playing = true; timer = window.setTimeout(step, 700); }
-        else if (!e.isIntersecting && playing) { playing = false; clearTimeout(timer); timer = 0; }
-      }, { threshold: 0.45 }).observe(board);
-    }
   });
 </script>
