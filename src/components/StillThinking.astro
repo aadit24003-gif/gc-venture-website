@@ -16,6 +16,9 @@
  */
 import Icon from './Icon.astro';
 import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
+interface Props { waMessage?: string }
+/** The same WhatsApp message as the page's own WhatsApp buttons (e.g. a product's name). */
+const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment.' } = Astro.props;
 ---
 <aside class="nudge" data-nudge hidden aria-labelledby="nudge-title">
   <button type="button" class="nudge-x" data-nudge-close aria-label="Close this message"><Icon name="x" size={18} stroke={2} /></button>
@@ -24,10 +27,10 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
   <p class="nudge-text">Get in touch for quick answers about models, quantities and delivery. WhatsApp us or call, whichever suits you.</p>
   <p class="nudge-short">Get in touch for quick answers.</p>
   <div class="nudge-actions">
-    <a class="btn btn--sm nudge-wa" href={whatsappLink('Hi IT Rentals, I have a question about renting laptops.')} target="_blank" rel="noopener" data-nudge-cta data-track-location="nudge"><Icon name="whatsapp" />WhatsApp us</a>
+    <a class="btn btn--sm nudge-wa" href={whatsappLink(waMessage)} target="_blank" rel="noopener" data-nudge-cta data-track-location="nudge"><Icon name="whatsapp" />WhatsApp us</a>
     <a class="btn btn--sm nudge-call" href={telLink(CONTACT.PRIMARY_PHONE)} data-nudge-cta data-track-location="nudge"><Icon name="phone" />{formatPhone(CONTACT.PRIMARY_PHONE)}</a>
   </div>
-  <a class="nudge-link" href="/request-a-quote/" data-nudge-cta>Or send us your requirement</a>
+  <a class="nudge-link" href="/request-a-quote/" data-nudge-cta>Or get a quote online</a>
 </aside>
 <p class="sr-only" role="status" aria-live="polite" data-nudge-status></p>
 
@@ -205,7 +208,10 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       set(ss, K_SHOWN, '1');
       el.hidden = false;
       requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('in'); applyAway(); }));
-      if (status) status.textContent = 'Still thinking? Get in touch for quick answers on WhatsApp or by phone. Press Escape to close this message.';
+      // say what the card actually offers here (phones show WhatsApp only; Escape needs a keyboard)
+      const compact = matchMedia('(max-width: 899px)').matches;
+      const keys = matchMedia('(pointer: fine)').matches;
+      if (status) status.textContent = `Still thinking? Get in touch for quick answers ${compact ? 'on WhatsApp' : 'on WhatsApp or by phone'}.${keys ? ' Press Escape to close this message.' : ''}`;
       addEventListener('keydown', onKey, true);
       addEventListener('scroll', onScroll, { passive: true });
       tooShort.addEventListener('change', onShort);

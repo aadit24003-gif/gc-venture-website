@@ -128,7 +128,7 @@ const allSchema = [organization, ...(breadcrumbSchema ? [breadcrumbSchema] : [])
     </main>
     <Footer cta={closingCta} />
     <MobileBar waMessage={waMessage} />
-    {nudge && <StillThinking />}
+    {nudge && <StillThinking waMessage={waMessage} />}
     <script>
       import '../scripts/track';
     </script>

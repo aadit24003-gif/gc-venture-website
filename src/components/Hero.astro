@@ -1,6 +1,6 @@
 ---
 /**
- * Home page opening scene: one laptop, every brand.
+ * Home page opening scene: one laptop, four brands.
  *
  * The page opens on the laptop showing the IT Rentals screen. While the stage
  * is pinned, scrolling turns the laptop around, 180 degrees at a time, to show
@@ -27,7 +27,7 @@ const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'lapt
 const rentables: { label: string; icon: string; href: string; count?: number }[] = [
   { label: 'Lenovo ThinkPad', icon: 'laptop', href: '/equipment/?category=laptops&brand=Lenovo', count: laptopsBy('Lenovo') },
   { label: 'Dell Latitude', icon: 'laptop', href: '/equipment/?category=laptops&brand=Dell', count: laptopsBy('Dell') },
-  { label: 'HP EliteBook', icon: 'laptop', href: '/equipment/?category=laptops&brand=HP', count: laptopsBy('HP') },
+  { label: 'HP EliteBook and ProBook', icon: 'laptop', href: '/equipment/?category=laptops&brand=HP', count: laptopsBy('HP') },
   { label: 'MacBook Air and Pro', icon: 'laptop-minimal', href: '/macbook-rental/' },
   { label: 'Desktops and mini PCs', icon: 'monitor-smartphone', href: '/desktop-rental/' },
   { label: 'Monitors', icon: 'monitor', href: '/monitor-rental/' },
@@ -44,11 +44,11 @@ type Stop = { id: string; name: string; at: number; caption: string; cta?: strin
 const range = `6th Gen Core i5 to Core Ultra 9`;
 const stops: Stop[] = [
   { id: 'itr', name: 'IT Rentals', at: 0, caption: 'Scroll to turn the laptop and see the brands we rent' },
-  { id: 'apple', name: 'Apple', at: 0.175, mark: 'apple', caption: 'MacBook Air and MacBook Pro, from the 2019 Intel models to M5', cta: 'Browse MacBooks', href: '/equipment/?category=macbooks&brand=Apple' },
+  { id: 'apple', name: 'Apple', at: 0.175, mark: 'apple', caption: 'MacBook Air and MacBook Pro, from the 2019 Intel models to M5', cta: 'Browse MacBooks', href: '/equipment/?category=macbooks&brand=Apple&q=macbook' },
   { id: 'dell', name: 'Dell', at: 0.375, mark: 'dell', caption: `${laptopsBy('Dell')} Dell Latitude models, ${range}`, cta: `Browse ${laptopsBy('Dell')} Dell laptops`, href: '/equipment/?category=laptops&brand=Dell' },
   { id: 'hp', name: 'HP', at: 0.575, mark: 'hp', caption: `${laptopsBy('HP')} HP EliteBook and ProBook models, ${range}`, cta: `Browse ${laptopsBy('HP')} HP laptops`, href: '/equipment/?category=laptops&brand=HP' },
   { id: 'lenovo', name: 'Lenovo', at: 0.775, mark: 'lenovo', caption: `${laptopsBy('Lenovo')} Lenovo ThinkPad models, ${range}`, cta: `Browse ${laptopsBy('Lenovo')} ThinkPads`, href: '/equipment/?category=laptops&brand=Lenovo' },
-  { id: 'need', name: 'Your need', at: 1, caption: `Every brand from one rental partner, since ${SITE.founded}` },
+  { id: 'need', name: 'Your need', at: 1, caption: `Apple, Dell, HP and Lenovo from one rental partner, since ${SITE.founded}` },
 ];
 
 /**
@@ -103,7 +103,6 @@ const flStyle = (side: 'l' | 'r', f: Floater) =>
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
 /** The closing screen's words, shared by its picture on the laptop and its working form. */
-const needSince = 'IT Rentals, every brand from one partner';
 const needTitle = 'Describe what your team needs';
 const needSub = 'How many machines, which city, from when, and any software. We reply with configurations and monthly pricing.';
 const needPlaceholder = 'e.g. 40 laptops in Pune';
@@ -225,7 +224,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
                 <span class="cam"></span>
                 <div class="screen">
                   <div class="desk desk--need" data-fit-desk>
-                    <p class="since"><span class="since-dot"></span><span>{needSince}</span></p>
                     <p class="need-title">{needTitle}</p>
                     <p class="need-sub">{needSub}</p>
                     <div class="need"><span class="need-in need-ph">{needPlaceholder}</span><span class="btn btn--primary need-go">Get a quote</span></div>
@@ -278,7 +276,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         <span class="cam" aria-hidden="true"></span>
         <div class="screen">
           <div class="desk desk--need" data-fit-desk>
-            <p class="since"><span class="since-dot" aria-hidden="true"></span><span>{needSince}</span></p>
             <h2 class="need-title">{needTitle}</h2>
             <p class="need-sub">{needSub}</p>
             <form class="need" action="/request-a-quote/" method="get" data-need>
