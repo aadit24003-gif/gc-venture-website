@@ -56,6 +56,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v47 | `5ed88c2` | Describe box on dark wine, typing out example requests while empty; 'From ten laptops to enterprise scale' on dark wine with a filling track, laptops lighting in a wave and a counting number, walked from 10 to 500+ by scrolling on larger screens | https://claude.ai/artifact/F4SfGwKMVDa2AzgEqC444L |
 | v48 | `a6d8f39` | The first screen's laptop gets a wallpaper: a small plant on a shelf against a warm wall (your photo, wall extended and warmed), kept clear of the words at every screen size; phones show only the wall and shelf | https://claude.ai/artifact/B9t8xCzRZhy9j4BAqUFwSM |
 | v49 | `31f8bef` | 'From ten laptops to enterprise scale' no longer holds the scroll: it plays 10 → 50 → 100 → 500+ by itself (about four seconds) when it comes into view while the page scrolls normally; choosing a size stops it | https://claude.ai/artifact/66XTqBhdXFRMR9e1pvJ8qe |
+| v50 | `2f73663` | 'From ten laptops to enterprise scale' follows the scroll like the preparation checks (10 → 50 → 100 → 500+ as the board moves up the screen, nothing held); plant wallpaper removed from the laptop | https://claude.ai/artifact/ER8boQmriSxYkwkh1hkpFv |
 
 ## Going back to a version
 
