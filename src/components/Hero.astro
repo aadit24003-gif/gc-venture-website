@@ -2,7 +2,8 @@
 /**
  * Home page opening screen, on the dark wine page colour: the laptop with the IT Rentals screen
  * (headline, quote and WhatsApp buttons, our promises), the line above it with
- * library icons on either side, and the four laptop brands we rent as links
+ * library icons on either side, and a row of capsules for what we rent, each
+ * linking to its rental page
  * underneath.
  *
  * Scrolling zooms into the laptop until its screen fills the window, and the
@@ -12,18 +13,7 @@
  */
 import Icon from './Icon.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
-import { PRODUCTS } from '../data/products';
-import { BRAND_MARKS } from '../data/brand-marks';
 import iconNodes from 'lucide-static/icon-nodes.json';
-
-const laptopsBy = (brand: string) => PRODUCTS.filter((p) => p.category === 'laptops' && p.brand === brand).length;
-const brands: { id: 'apple' | 'dell' | 'hp' | 'lenovo'; label: string; href: string }[] = [
-  { id: 'apple', label: 'MacBooks', href: '/equipment/?category=macbooks&brand=Apple&q=macbook' },
-  { id: 'dell', label: `${laptopsBy('Dell')} Dell laptops`, href: '/equipment/?category=laptops&brand=Dell' },
-  { id: 'hp', label: `${laptopsBy('HP')} HP laptops`, href: '/equipment/?category=laptops&brand=HP' },
-  { id: 'lenovo', label: `${laptopsBy('Lenovo')} ThinkPads`, href: '/equipment/?category=laptops&brand=Lenovo' },
-];
-const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '0 8 24 8.01' : '0 0 24 24');
 
 /**
  * Thin library icons (laptop set + hardware set) around the laptop and around
@@ -75,19 +65,15 @@ const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 8
 const flStyle = (side: 'l' | 'r', f: Floater) =>
   `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
 
-/**
- * Capsules beside the laptop naming what we rent, each tilted a little and
- * linking to its rental page. `t` is the height (share of the laptop), `x` the
- * distance from the laptop, `r` the tilt.
- */
+/** What we rent, as a row of capsules under the laptop, each linking to its rental page. */
 const caps = [
-  { side: 'l', label: 'Rent laptops', icon: 'laptop', href: '/laptop-rental/', t: 17, x: 58, r: -6 },
-  { side: 'l', label: 'Rent MacBooks', icon: 'laptop-minimal', href: '/macbook-rental/', t: 47, x: 26, r: 4 },
-  { side: 'l', label: 'Rent monitors', icon: 'monitor', href: '/monitor-rental/', t: 77, x: 54, r: -3 },
-  { side: 'r', label: 'Rent desktops', icon: 'pc-case', href: '/desktop-rental/', t: 23, x: 52, r: 5 },
-  { side: 'r', label: 'Rent servers', icon: 'server', href: '/server-rental/', t: 53, x: 24, r: -4 },
-  { side: 'r', label: 'Rent mobile phones', icon: 'smartphone', href: '/mobile-phone-rental/', t: 82, x: 50, r: 6 },
-] as const;
+  { label: 'Rent laptops', icon: 'laptop', href: '/laptop-rental/' },
+  { label: 'Rent MacBooks', icon: 'laptop-minimal', href: '/macbook-rental/' },
+  { label: 'Rent desktops', icon: 'pc-case', href: '/desktop-rental/' },
+  { label: 'Rent monitors', icon: 'monitor', href: '/monitor-rental/' },
+  { label: 'Rent servers', icon: 'server', href: '/server-rental/' },
+  { label: 'Rent mobile phones', icon: 'smartphone', href: '/mobile-phone-rental/' },
+];
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
@@ -127,15 +113,6 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
       ))}
     </div>
 
-    <!-- what we rent, in tilted capsules either side -->
-    <ul class="caps" role="list" aria-label="What we rent" data-fade data-at="0">
-      {caps.map((c) => (
-        <li class={`cap cap--${c.side}`} style={`--t:${c.t}%; --x:${c.x}px; --r:${c.r}deg`}>
-          <a class="cap-a" href={c.href} data-track-location="hero-capsule"><Icon name={c.icon} size={15} stroke={1.5} />{c.label}</a>
-        </li>
-      ))}
-    </ul>
-
     <div class="laptop">
       <div class="lid">
         <span class="cam" aria-hidden="true"></span>
@@ -168,17 +145,10 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     </div>
   </div>
 
-  <nav class="brands" aria-label="Laptop brands we rent" data-fade data-at="0">
+  <nav class="caps" aria-label="What we rent" data-fade data-at="0">
     <ul role="list">
-      {brands.map((b) => (
-        <li>
-          <a href={b.href} data-track-location={`hero-${b.id}`}>
-            <svg class={`bmark bmark--${b.id}`} viewBox={markBox(b.id)} aria-hidden="true" focusable="false">
-              {b.id === 'lenovo' ? <><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></> : <path d={BRAND_MARKS[b.id]} fill="currentColor" />}
-            </svg>
-            <span>Browse {b.label}</span>
-          </a>
-        </li>
+      {caps.map((c) => (
+        <li><a class="cap-a" href={c.href} data-track-location="hero-capsule"><Icon name={c.icon} size={15} stroke={1.5} />{c.label}</a></li>
       ))}
     </ul>
   </nav>
@@ -193,13 +163,13 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     position: relative; color: var(--on-dark);
     /* extend up under the floating header */
     margin-top: -80px;
-    --lw: min(1000px, 86vw, calc((100svh - 330px) * 1.52));
+    --lw: min(1100px, 88vw, calc((100svh - 300px) * 1.52));
   }
   .stage {
     position: relative; isolation: isolate; overflow: hidden;
     min-height: 100vh; min-height: 100svh;
-    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(14px, 2.2vh, 24px);
-    padding: calc(80px + clamp(28px, 4vh, 48px)) var(--gutter) clamp(28px, 4vh, 44px);
+    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(10px, 1.6vh, 18px);
+    padding: calc(80px + clamp(18px, 2.6vh, 32px)) var(--gutter) clamp(18px, 2.6vh, 32px);
     background:
       radial-gradient(60% 45% at 50% 38%, rgba(122, 32, 24, .38) 0%, transparent 70%),
       radial-gradient(90% 60% at 50% 110%, rgba(58, 21, 18, .7) 0%, transparent 70%),
@@ -244,34 +214,6 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   @container (min-width: 304px) { .c5 { display: block; } }
   @container (min-width: 350px) { .c6 { display: block; } }
   @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
-
-  /* Capsules beside the laptop, each at its own slight angle, in a gentle curve round it */
-  .caps { position: absolute; inset: 0; z-index: 2; margin: 0; padding: 0; list-style: none; pointer-events: none; }
-  .cap { position: absolute; top: var(--t); }
-  .cap--l { right: calc(100% + var(--x)); }
-  .cap--r { left: calc(100% + var(--x)); }
-  /* the page's own colour, a hairline edge and quiet text, so they sit back; a soft
-     clearing of the same colour keeps the icons from running into the words */
-  .cap-a {
-    display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px 8px 13px; border-radius: var(--r-pill);
-    background: rgb(22, 13, 12); border: 1px solid rgba(243, 238, 229, .16);
-    box-shadow: 0 0 22px 14px rgba(22, 13, 12, .92);
-    color: rgba(243, 238, 229, .74); font-size: .875rem; font-weight: 500; letter-spacing: .005em; white-space: nowrap; text-decoration: none;
-    transform: rotate(var(--r)); pointer-events: auto;
-    transition: transform var(--t-med) var(--ease-out), color var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
-  }
-  .cap-a :global(svg) { color: rgba(230, 133, 122, .8); flex: none; }
-  .cap-a:hover { transform: rotate(0deg) translateY(-2px); color: var(--on-dark); border-color: rgba(243, 238, 229, .4); }
-  .cap-a:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
-  /* only where there is room beside the laptop */
-  @media (max-width: 1179px) { .caps { display: none; } }
-  @media (prefers-reduced-motion: no-preference) {
-    .cap-a { animation: cap-in .7s var(--ease-out) backwards; }
-    .cap:nth-child(1) .cap-a { animation-delay: .5s; } .cap:nth-child(4) .cap-a { animation-delay: .58s; }
-    .cap:nth-child(2) .cap-a { animation-delay: .66s; } .cap:nth-child(5) .cap-a { animation-delay: .74s; }
-    .cap:nth-child(3) .cap-a { animation-delay: .82s; } .cap:nth-child(6) .cap-a { animation-delay: .9s; }
-    @keyframes cap-in { from { opacity: 0; transform: rotate(var(--r)) translateY(8px); } }
-  }
 
   /* ── The laptop: black body, cream IT Rentals screen ── */
   .device { position: relative; z-index: 1; width: var(--lw); }
@@ -334,21 +276,25 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   @media (min-width: 1100px) { .since-long { display: inline; } }
 
   /* Brands we rent */
-  .brands { margin-top: clamp(14px, 2.4vh, 26px); }
-  .brands ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 0; padding: 0; list-style: none; }
-  .brands a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--on-dark); font-weight: 600; text-decoration: none; }
-  .brands a span { border-bottom: 1px solid rgba(243, 238, 229, .32); padding-bottom: 2px; transition: border-color var(--t-fast); }
-  .brands a:hover span { border-color: var(--on-dark); }
-  .brands a:focus-visible, .next:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 4px; border-radius: 4px; }
-  .bmark { flex: none; width: 20px; height: 20px; color: var(--on-dark); }
-  .bmark--lenovo { width: 46px; height: 16px; }
-
+  /* What we rent: a row of quiet capsules, in the page's own colour with a hairline edge */
+  .caps { margin-top: clamp(6px, 1.2vh, 14px); max-width: 100%; }
+  .caps ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .cap-a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px 8px 13px; border-radius: var(--r-pill);
+    background: rgba(243, 238, 229, .03); border: 1px solid rgba(243, 238, 229, .18);
+    color: rgba(243, 238, 229, .8); font-size: .875rem; font-weight: 500; letter-spacing: .005em; white-space: nowrap; text-decoration: none;
+    transition: transform var(--t-med) var(--ease-out), color var(--t-fast), border-color var(--t-fast), background-color var(--t-fast);
+  }
+  .cap-a :global(svg) { color: rgba(230, 133, 122, .85); flex: none; }
+  .cap-a:hover { transform: translateY(-2px); color: var(--on-dark); border-color: rgba(243, 238, 229, .42); background: rgba(243, 238, 229, .06); }
+  .cap-a:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  .next:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 4px; border-radius: 4px; }
   .next {
     display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
     border-radius: var(--r-pill); border: 1px solid rgba(243, 238, 229, .28); background: rgba(243, 238, 229, .08); color: var(--on-dark);
     font-size: var(--fs-small); font-weight: 600; text-decoration: none; transition: border-color var(--t-fast), background-color var(--t-fast);
   }
-  .next { margin-top: clamp(4px, 1vh, 12px); }
+  .next { margin-top: 0; }
   .next:hover { border-color: var(--red-soft); background: rgba(224, 51, 40, .16); }
 
   /*
@@ -361,7 +307,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     :global(html.scenes) .stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
     :global(html.scenes) .device { will-change: transform; }
     /* their own layers, so fading them does not repaint the growing laptop */
-    :global(html.scenes) :is(.topline, .floaters, .caps, .brands, .next) { will-change: opacity; }
+    :global(html.scenes) :is(.topline, .floaters, .caps, .next) { will-change: opacity; }
     /* the screen's words grow with the laptop: drawn once and scaled, not redrawn at every step */
     :global(html.scenes) .desk { will-change: transform, opacity; }
     /* a plain reflection (a blend mode would be recomputed on every frame of the zoom) */
@@ -388,8 +334,11 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     .ctas .btn { min-height: 44px; padding: 10px 16px; font-size: .9375rem; }
     .trust { gap: 4px 14px; }
     .kicker { font-size: 1.125rem; }
-    .brands ul { gap: 8px 18px; }
-    .brands a { font-size: .875rem; }
+    /* one swipeable line of capsules */
+    .caps { width: calc(100% + 2 * var(--gutter)); margin-inline: calc(-1 * var(--gutter)); }
+    .caps ul { flex-wrap: nowrap; justify-content: flex-start; gap: 8px; overflow-x: auto; padding: 2px var(--gutter) 4px; scrollbar-width: none; }
+    .caps ul::-webkit-scrollbar { display: none; }
+    .cap-a { min-height: 38px; padding: 7px 14px 7px 11px; font-size: .8125rem; }
   }
   @media (forced-colors: active) { .lid { border: 1px solid CanvasText; } }
 </style>

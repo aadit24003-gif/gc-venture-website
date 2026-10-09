@@ -117,7 +117,14 @@ const cardSpec = (p: Product) => {
       </div>
     </form>
 
-    <p class="fork" aria-hidden="true"><span>or build your own</span></p>
+    <!-- between the two ways: the four laptop brands, faint, one to each quarter -->
+    <div class="fork" aria-hidden="true">
+      <div class="fork-q"><svg class="fork-mark fork-mark--lenovo" viewBox="0 8 24 8.01" focusable="false"><path d={BRAND_MARKS.lenovo} fill="currentColor" /></svg></div>
+      <div class="fork-q"><svg class="fork-mark" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg></div>
+      <div class="fork-q"><svg class="fork-mark" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg></div>
+      <div class="fork-q"><svg class="fork-mark fork-mark--apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="currentColor" /></svg></div>
+      <p class="fork-say">or build your own</p>
+    </div>
 
     <div class="bench">
       <!-- Left: the laptop, whose screen is the configurator, and the setup under it -->
@@ -300,9 +307,34 @@ const cardSpec = (p: Product) => {
     .eg { grid-column: 1 / -1; }
   }
 
-  /* the fork between the two ways */
-  .fork { display: flex; align-items: center; gap: 16px; width: min(100%, 920px); margin: clamp(28px, 3.4vw, 44px) auto; color: var(--ink-2); font-family: var(--font-display); font-style: italic; font-size: 1.25rem; }
-  .fork::before, .fork::after { content: ''; flex: 1; height: 1px; background: var(--line-strong); }
+  /* Between the two ways: a band in four quarters, each with one laptop brand, faint;
+     "or build your own" sits on the centre line */
+  .fork {
+    position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: clamp(32px, 4vw, 52px) 0; border-block: 1px solid var(--line);
+    background: linear-gradient(90deg, rgba(235, 229, 218, 0), rgba(235, 229, 218, .78) 12%, rgba(235, 229, 218, .78) 88%, rgba(235, 229, 218, 0));
+  }
+  .fork-q { display: grid; place-items: center; height: clamp(84px, 9vw, 124px); color: rgba(23, 19, 15, .16); }
+  .fork-q + .fork-q { border-left: 1px solid var(--line); }
+  .fork-mark { display: block; width: clamp(30px, 3.4vw, 46px); height: clamp(30px, 3.4vw, 46px); }
+  .fork-mark--apple { width: clamp(26px, 2.9vw, 40px); }
+  /* Lenovo's mark is a solid badge: lighter, so it weighs the same as the others */
+  .fork-q:has(.fork-mark--lenovo) { color: rgba(23, 19, 15, .07); }
+  .fork-mark--lenovo { width: clamp(84px, 9.6vw, 132px); height: clamp(28px, 3.2vw, 44px); }
+  .fork-say {
+    position: absolute; left: 50%; top: 50%; translate: -50% -50%; margin: 0; padding: 6px 18px; border-radius: var(--r-pill);
+    background: var(--paper-2); border: 1px solid var(--line); color: var(--ink-2);
+    font-family: var(--font-display); font-style: italic; font-size: 1.25rem; white-space: nowrap;
+  }
+  /* the words sit on the line between the second and third quarters: keep those marks clear of them */
+  .fork-q:nth-child(2) { justify-items: start; padding-left: 18%; }
+  .fork-q:nth-child(3) { justify-items: end; padding-right: 18%; }
+  @media (max-width: 759px) {
+    .fork-q:nth-child(2), .fork-q:nth-child(3) { justify-items: center; padding: 0; }
+    .fork-q { height: 64px; align-items: start; padding-top: 12px; }
+    .fork { padding-bottom: 34px; }
+    .fork-say { top: auto; bottom: 0; translate: -50% 50%; font-size: 1.125rem; }
+  }
 
   /* ── The builder: laptop and setup on the left, models on the right ── */
   .bench { display: grid; gap: clamp(28px, 3vw, 44px); align-items: start; }
