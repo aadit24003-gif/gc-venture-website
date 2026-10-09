@@ -38,6 +38,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v29 | `673779a` | First screen back on cream; scrolling zooms into the laptop until its screen becomes the 'Describe your need, or build your own.' page (describe box plus examples to start from); the wired builder follows on a burgundy bench | https://claude.ai/artifact/DgyTVAWRjNor73nNzPsR35 |
 | v30 | `1884855` | 'Describe your need, or build your own' is one full page in the dark wine colour of 'Checked, prepared and delivered': laptop in the middle, brand/processor and memory/storage boxes wired to it as hairline panels, the describe box under the laptop; the first screen's laptop zooms in and this page rises over it like a sheet | https://claude.ai/artifact/NtZ7jjwjhhBQ2ogbcGnNq7 |
 | v31 | `f0a858a` | 'What you can rent' pill row removed; under the builder the 'Your setup' bar is replaced by a centred 'Explore the full catalogue' button ('Start over' moves beside the catalogue link above the models) | https://claude.ai/artifact/SE2eYG1zUX87HkSA4nZTcb |
+| v32 | `6d950dc` | Scrolling from the first screen glides all the way to 'Describe your need, or build your own' (and back up), never stopping half-way; 'Your setup' bar back under the builder (quantity, quote, 'See all N in the catalogue'); matching-models cards removed, 'Explore the full catalogue' closes the section | https://claude.ai/artifact/5275Srw9c9DPAdpxzivR5m |
 
 ## Going back to a version
 
