@@ -120,8 +120,8 @@ const cardSpec = (p: Product) => {
     <!-- between the two ways: the four laptop brands, faint, one to each quarter -->
     <div class="fork" aria-hidden="true">
       <div class="fork-q"><svg class="fork-mark fork-mark--lenovo" viewBox="0 8 24 8.01" focusable="false"><path d={BRAND_MARKS.lenovo} fill="currentColor" /></svg></div>
-      <div class="fork-q"><svg class="fork-mark" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg></div>
-      <div class="fork-q"><svg class="fork-mark" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg></div>
+      <div class="fork-q"><svg class="fork-mark fork-mark--dell" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg></div>
+      <div class="fork-q"><svg class="fork-mark fork-mark--hp" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg></div>
       <div class="fork-q"><svg class="fork-mark fork-mark--apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="currentColor" /></svg></div>
       <p class="fork-say">or build your own</p>
     </div>
@@ -314,12 +314,16 @@ const cardSpec = (p: Product) => {
     margin: clamp(32px, 4vw, 52px) 0; border-block: 1px solid var(--line);
     background: linear-gradient(90deg, rgba(235, 229, 218, 0), rgba(235, 229, 218, .78) 12%, rgba(235, 229, 218, .78) 88%, rgba(235, 229, 218, 0));
   }
-  .fork-q { display: grid; place-items: center; height: clamp(84px, 9vw, 124px); color: rgba(23, 19, 15, .16); }
+  .fork-q { display: grid; place-items: center; height: clamp(84px, 9vw, 124px); }
   .fork-q + .fork-q { border-left: 1px solid var(--line); }
   .fork-mark { display: block; width: clamp(30px, 3.4vw, 46px); height: clamp(30px, 3.4vw, 46px); }
   .fork-mark--apple { width: clamp(26px, 2.9vw, 40px); }
-  /* Lenovo's mark is a solid badge: lighter, so it weighs the same as the others */
-  .fork-q:has(.fork-mark--lenovo) { color: rgba(23, 19, 15, .07); }
+  /* each in its own brand colour, softened so the band stays quiet */
+  .fork-mark { opacity: .55; }
+  .fork-mark--lenovo { color: #E2231A; opacity: .34; } /* a solid badge: lighter, so it weighs the same as the others */
+  .fork-mark--dell { color: #007DB8; }
+  .fork-mark--hp { color: #0096D6; }
+  .fork-mark--apple { color: #6E6E73; }
   .fork-mark--lenovo { width: clamp(84px, 9.6vw, 132px); height: clamp(28px, 3.2vw, 44px); }
   .fork-say {
     position: absolute; left: 50%; top: 50%; translate: -50% -50%; margin: 0; padding: 6px 18px; border-radius: var(--r-pill);

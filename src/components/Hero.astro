@@ -59,7 +59,8 @@ function field(rows: number, cols: number, yFrom: number, ySpan: number, gap: nu
   return out;
 }
 /** Beside the laptop (12 rows) and beside the line above it (2 rows). */
-const cols7 = (f: Floater[]) => f.filter((x) => x.c < 7); // wider columns only show on very wide screens
+// wider columns only show on very wide screens; every seventh icon is left out so the field stays light
+const cols7 = (f: Floater[]) => f.filter((x, i) => x.c < 7 && i % 7 !== 0);
 const sides = { l: cols7(field(12, 10, 2, 104, 0.24)), r: cols7(field(12, 10, 2, 104, 0.24)) };
 const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 84, 0.2)) };
 const flStyle = (side: 'l' | 'r', f: Floater) =>
@@ -163,13 +164,13 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     position: relative; color: var(--on-dark);
     /* extend up under the floating header */
     margin-top: -80px;
-    --lw: min(1100px, 88vw, calc((100svh - 300px) * 1.52));
+    --lw: min(1190px, 92vw, calc((100svh - 256px) * 1.52));
   }
   .stage {
     position: relative; isolation: isolate; overflow: hidden;
     min-height: 100vh; min-height: 100svh;
-    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(10px, 1.6vh, 18px);
-    padding: calc(80px + clamp(18px, 2.6vh, 32px)) var(--gutter) clamp(18px, 2.6vh, 32px);
+    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(8px, 1.1vh, 12px);
+    padding: calc(80px + clamp(12px, 1.8vh, 24px)) var(--gutter) clamp(12px, 1.8vh, 24px);
     background:
       radial-gradient(60% 45% at 50% 38%, rgba(122, 32, 24, .38) 0%, transparent 70%),
       radial-gradient(90% 60% at 50% 110%, rgba(58, 21, 18, .7) 0%, transparent 70%),
@@ -257,15 +258,16 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .since {
     display: inline-flex; align-items: center; gap: 10px; margin: 0 0 clamp(14px, 2.6cqi, 28px);
     padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--line-strong);
-    color: var(--ink-2); font-size: clamp(.6875rem, 1.3cqi, .875rem); font-weight: 500;
+    color: var(--ink-2); font-size: clamp(.6875rem, 1.38cqi, .9375rem); font-weight: 500;
   }
   .since-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 3px rgba(224,51,40,.15); }
   .headline { display: grid; justify-items: center; gap: clamp(6px, 1.2cqi, 14px); margin: 0; font-family: var(--font-display); font-weight: 400; font-optical-sizing: auto; }
-  .hl-brand { font-size: clamp(2.6rem, 12cqi, 7.75rem); line-height: .88; letter-spacing: -0.035em; }
-  .hl-line { font-size: clamp(1.25rem, 4.3cqi, 2.9rem); line-height: 1.08; letter-spacing: -0.02em; max-width: 21ch; color: var(--ink); text-wrap: balance; }
-  .lead { margin: clamp(12px, 2.2cqi, 24px) auto 0; max-width: 56ch; font-size: clamp(.875rem, 1.75cqi, 1.125rem); line-height: 1.55; color: var(--ink-2); }
+  .hl-brand { font-size: clamp(2.6rem, 12.6cqi, 8.5rem); line-height: .88; letter-spacing: -0.035em; }
+  .hl-line { font-size: clamp(1.25rem, 4.5cqi, 3.125rem); line-height: 1.08; letter-spacing: -0.02em; max-width: 21ch; color: var(--ink); text-wrap: balance; }
+  .lead { margin: clamp(12px, 2.2cqi, 24px) auto 0; max-width: 56ch; font-size: clamp(.875rem, 1.84cqi, 1.1875rem); line-height: 1.55; color: var(--ink-2); }
   .ctas { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-3); margin-top: clamp(14px, 2.8cqi, 30px); }
-  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin: clamp(12px, 2.4cqi, 26px) 0 0; padding: 0; list-style: none; font-size: var(--fs-xs); color: var(--ink-2); }
+  .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin: clamp(12px, 2.4cqi, 26px) 0 0; padding: 0; list-style: none; font-size: clamp(var(--fs-xs), 1.42cqi, .9375rem); color: var(--ink-2); }
+  @media (min-width: 761px) { .ctas .btn--lg { min-height: clamp(48px, 5.6cqi, 58px); padding-inline: clamp(22px, 2.6cqi, 30px); font-size: clamp(1rem, 1.75cqi, 1.125rem); } }
   .trust li { display: inline-flex; align-items: center; gap: 6px; }
   .trust :global(svg) { color: var(--red-ink); }
   /* When the screen's words do not fit (short windows, large text), drop the extras in turn */
@@ -277,7 +279,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
   /* Brands we rent */
   /* What we rent: a row of quiet capsules, in the page's own colour with a hairline edge */
-  .caps { margin-top: clamp(6px, 1.2vh, 14px); max-width: 100%; }
+  .caps { margin-top: clamp(2px, .5vh, 6px); max-width: 100%; }
   .caps ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0; padding: 0; list-style: none; }
   .cap-a {
     display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px 8px 13px; border-radius: var(--r-pill);
@@ -324,7 +326,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
   /* Phones and narrow tablets: a taller screen */
   @media (max-width: 760px) {
-    .hero { --lw: min(92vw, max(270px, calc((100svh - 400px) * .78))); }
+    .hero { --lw: min(95vw, max(270px, calc((100svh - 380px) * .8))); }
     .stage { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
     .screen { aspect-ratio: 3 / 4; }
     .desk { padding: 6cqi 5cqi; }
