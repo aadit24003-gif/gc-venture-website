@@ -50,6 +50,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v41 | `3d23573` | Side laptops removed from the first screen; only the main laptop with the device icons either side | https://claude.ai/artifact/9JyJCyHYYY7eWjhoJhj9Hr |
 | v42 | `60da1ea` | Tilted capsules either side of the first screen's laptop naming what we rent (Rent laptops, MacBooks, Monitors; Desktops, Servers, Mobile phones), each linking to its rental page | https://claude.ai/artifact/2U4LbmA5JRxUm9JRJ2BDCt |
 | v43 | `50c75f9` | Capsules now read 'Rent laptops / MacBooks / monitors / desktops / servers / mobile phones', in the page's own dark colour with a hairline edge and a soft clearing in the icons, arranged in a gentle curve either side | https://claude.ai/artifact/FXWhN4Mnc6DDG2aFvMB6St |
+| v44 | `3dcf690` | The 'Rent …' capsules replace the brand links under the first screen's laptop, in one straight row; the laptop is a little bigger; a band split into four with faint Lenovo, Dell, HP and Apple logos sits between the describe box and the builder | https://claude.ai/artifact/3a2vhg5jCdJUegwQtWKYVd |
 
 ## Going back to a version
 
