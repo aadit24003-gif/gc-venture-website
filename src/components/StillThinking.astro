@@ -47,6 +47,8 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
     background: var(--card); border-right: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong);
   }
   .nudge:global(.in) { opacity: 1; transform: none; }
+  /* stepping aside for a moment (laptop tour on screen, focus underneath, very short window) */
+  .nudge:global(.in.away) { opacity: 0; transform: translateY(14px) scale(.98); visibility: hidden; pointer-events: none; transition: opacity .25s ease, transform .3s ease, visibility 0s linear .3s; }
   .nudge-ic {
     grid-row: 1 / 3; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
     background: var(--red-tint); color: var(--red-ink);
@@ -110,12 +112,18 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
   if (el && !get(ss, K_SHOWN) && !(snoozedUntil > Date.now())) {
     const pageStart = performance.now();
     const tooShort = matchMedia('(max-height: 520px)');
+    const tour = document.querySelector<HTMLElement>('[data-scene="hero"]');
     let spent = Number(get(ss, K_TIME) ?? 0) || 0;
     let last = performance.now();
+    let lastSaved = spent;
     let lastTyped = -Infinity;
     let open = false;
+    let lastOutside: HTMLElement | null = null;
+    // Reasons to step aside for a moment without closing: the home page's laptop tour
+    // is on screen, a focused element would be covered, or the window is very short.
+    const away = { tour: false, focus: false, short: false };
 
-    const save = () => set(ss, K_TIME, String(Math.round(spent)));
+    const save = () => { set(ss, K_TIME, String(Math.round(spent))); lastSaved = spent; };
     const otherLayerOpen = () =>
       root.classList.contains('menu-open') ||
       !!document.querySelector('[data-menu-trigger][aria-expanded="true"], dialog[open], [data-tray]:not([hidden])');
@@ -123,27 +131,70 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       const a = document.activeElement as HTMLElement | null;
       return !!a && (a.matches('input, textarea, select, [contenteditable="true"]') || performance.now() - lastTyped < 8000);
     };
-
-    // Keep whatever has keyboard focus visible (WCAG 2.4.11).
-    const onFocusIn = (e: FocusEvent) => {
-      const t = e.target as HTMLElement;
-      if (!open || el.contains(t)) return;
+    // The pinned laptop tour fills the screen until its section has scrolled past.
+    const inTour = () => !!tour && root.classList.contains('scenes') && tour.getBoundingClientRect().bottom > root.clientHeight + 1;
+    const covers = (t: Element) => {
       const r = t.getBoundingClientRect();
       const n = el.getBoundingClientRect();
-      if (r.bottom > n.top && r.top < n.bottom && r.right > n.left && r.left < n.right) t.scrollIntoView({ block: 'center' });
+      return r.bottom > n.top && r.top < n.bottom && r.right > n.left && r.left < n.right;
+    };
+
+    const applyAway = () => {
+      const hide = away.tour || away.focus || away.short;
+      el.classList.toggle('away', hide);
+      root.style.scrollPaddingBottom = hide ? '' : `${Math.round(root.clientHeight - el.getBoundingClientRect().top) + 16}px`;
+    };
+
+    // Keep whatever has keyboard focus visible (WCAG 2.4.11). The check waits a frame,
+    // so the browser has already scrolled the newly focused element into view.
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement;
+      if (el.contains(t)) { if (away.focus) { away.focus = false; applyAway(); } return; }
+      lastOutside = t;
+      requestAnimationFrame(() => {
+        if (!open || document.activeElement !== t) return;
+        away.focus = false;
+        if (covers(t) && !t.closest('[data-scene]')) t.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior });
+        away.focus = covers(t);
+        applyAway();
+      });
     };
     const onKey = (e: KeyboardEvent) => {
       if (open && e.key === 'Escape' && !e.defaultPrevented && !otherLayerOpen()) close('dismiss');
+    };
+    let scrollRaf = 0;
+    const onScroll = () => {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = 0;
+        const t = inTour();
+        if (t !== away.tour) { away.tour = t; applyAway(); }
+      });
+    };
+    const onShort = () => { away.short = tooShort.matches; applyAway(); };
+
+    // Closing from inside the card puts keyboard focus back where the visitor was.
+    const returnFocus = () => {
+      if (!el.contains(document.activeElement)) return;
+      const back = [lastOutside, document.querySelector<HTMLElement>('.wa-fab, .mbar a'), document.getElementById('main')]
+        .find((x): x is HTMLElement => !!x && x.isConnected && x.getClientRects().length > 0);
+      if (back) {
+        if (back.id === 'main' && !back.hasAttribute('tabindex')) back.setAttribute('tabindex', '-1');
+        back.focus({ preventScroll: true });
+      }
     };
 
     const close = (why: keyof typeof SNOOZE_DAYS) => {
       if (!open) return;
       open = false;
+      returnFocus();
       el.classList.remove('in');
       window.setTimeout(() => { el.hidden = true; }, 450);
       root.style.scrollPaddingBottom = '';
       set(ls, K_SNOOZE, String(Date.now() + SNOOZE_DAYS[why] * 864e5));
       removeEventListener('keydown', onKey, true);
+      removeEventListener('scroll', onScroll);
+      tooShort.removeEventListener('change', onShort);
       document.removeEventListener('focusin', onFocusIn);
     };
 
@@ -151,13 +202,11 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       open = true;
       set(ss, K_SHOWN, '1');
       el.hidden = false;
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        el.classList.add('in');
-        root.style.scrollPaddingBottom = `${el.offsetHeight + 32}px`;
-      }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add('in'); applyAway(); }));
       if (status) status.textContent = 'Still thinking it over? You can message us on WhatsApp or call. Press Escape to close this message.';
       addEventListener('keydown', onKey, true);
-      document.addEventListener('focusin', onFocusIn);
+      addEventListener('scroll', onScroll, { passive: true });
+      tooShort.addEventListener('change', onShort);
       window.clearInterval(timer);
     };
 
@@ -165,12 +214,16 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       const now = performance.now();
       if (document.visibilityState === 'visible') spent += Math.min(now - last, 2000);
       last = now;
-      if (spent >= DELAY && now - pageStart >= MIN_ON_PAGE && !tooShort.matches && !typing() && !otherLayerOpen()) show();
+      if (spent - lastSaved >= 5000) save();
+      if (spent >= DELAY && now - pageStart >= MIN_ON_PAGE && !tooShort.matches && !typing() && !otherLayerOpen() && !inTour()) show();
     };
-    const timer = window.setInterval(() => { tick(); if (Math.round(spent / 1000) % 5 === 0) save(); }, 1000);
+    const timer = window.setInterval(tick, 1000);
 
+    document.addEventListener('focusin', onFocusIn);
     document.addEventListener('visibilitychange', () => { last = performance.now(); save(); });
     addEventListener('pagehide', save);
+    // back/forward cache: the page comes back with a stale clock
+    addEventListener('pageshow', (e) => { if (e.persisted) last = performance.now(); });
     document.addEventListener('input', () => { lastTyped = performance.now(); }, true);
     el.querySelector('[data-nudge-close]')?.addEventListener('click', () => close('dismiss'));
     el.querySelectorAll('[data-nudge-cta]').forEach((a) => a.addEventListener('click', () => close('used')));

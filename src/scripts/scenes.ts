@@ -58,7 +58,7 @@ function heroTurn(p: number) {
   return { k, t };
 }
 
-type HeroParts = { slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[]; front: string; a: number; b: number; stop: number };
+type HeroParts = { slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[]; front: string; a: number; b: number; stop: number; rest: boolean | null };
 const heroParts = new WeakMap<HTMLElement, HeroParts>();
 
 function hero(s: Scene, p: number) {
@@ -70,12 +70,27 @@ function hero(s: Scene, p: number) {
       slab, width: slab.offsetWidth, floor: s.el.querySelector<HTMLElement>('[data-floor]'),
       slots: [...s.el.querySelectorAll<HTMLElement>('[data-slot]')],
       marks: [...s.el.querySelectorAll<HTMLElement>('[data-s]')],
-      front: '', a: -1, b: -1, stop: -1,
+      front: '', a: -1, b: -1, stop: -1, rest: null,
     };
     heroParts.set(s.el, h);
     // the slab's width only changes on resize; observing it keeps layout reads out of the scroll frame
     const parts = h;
     new ResizeObserver(([entry]) => { parts.width = entry.contentRect.width; }).observe(slab);
+  }
+  // Too short a window for the pinned tour (phone held sideways, high zoom): the
+  // static layout shows the IT Rentals screen, so undo anything the tour set.
+  if (!s.pinned) {
+    if (h.front === 'static') return;
+    h.slab.style.transform = '';
+    h.slab.style.removeProperty('--sx');
+    h.slab.style.removeProperty('--so');
+    if (h.floor) { h.floor.style.transform = ''; h.floor.style.opacity = ''; }
+    h.slab.dataset.front = 'a';
+    h.slots.forEach((el) => el.classList.toggle('on', el.dataset.slot === '0' || el.dataset.slot === '1'));
+    showStop(s, h, 0);
+    s.el.removeAttribute('data-rest');
+    h.front = 'static'; h.a = -1; h.b = -1; h.rest = null;
+    return;
   }
   const { k, t } = heroTurn(p);
   const e = smoother(t);
@@ -103,16 +118,21 @@ function hero(s: Scene, p: number) {
     h.a = a; h.b = b;
     h.slots.forEach((el) => { const n = Number(el.dataset.slot); el.classList.toggle('on', n === a || n === b); });
   }
+  // at rest the laptop is flat, so the live layer for the closing screen can sit on top
+  const rest = mid < 0.0005;
+  if (rest !== h.rest) { h.rest = rest; s.el.toggleAttribute('data-rest', rest); }
   const stop = t < 0.5 ? k : k + 1;
-  if (stop !== h.stop) {
-    h.stop = stop;
-    s.el.dataset.stop = String(stop);
-    h.marks.forEach((el) => {
-      const on = el.dataset.s === String(stop);
-      el.classList.toggle('on', on);
-      if (el.tagName === 'BUTTON') { if (on) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); }
-    });
-  }
+  if (stop !== h.stop) showStop(s, h, stop);
+}
+
+function showStop(s: Scene, h: HeroParts, stop: number) {
+  h.stop = stop;
+  s.el.dataset.stop = String(stop);
+  h.marks.forEach((el) => {
+    const on = el.dataset.s === String(stop);
+    el.classList.toggle('on', on);
+    if (el.tagName === 'BUTTON') { if (on) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); }
+  });
 }
 
 /* How renting works: which cards have landed, for the step dots. */
@@ -166,11 +186,14 @@ function init() {
   }));
   if (!scenes.length) return;
 
-  let vh = innerHeight;
+  // clientHeight, not innerHeight: on phones a page that is accidentally wider than the
+  // screen makes the browser zoom out and innerHeight grow, which would unpin every scene.
+  const viewH = () => document.documentElement.clientHeight || innerHeight;
+  let vh = viewH();
   let raf = 0;
 
   const measure = () => {
-    vh = innerHeight;
+    vh = viewH();
     for (const s of scenes) {
       const r = s.el.getBoundingClientRect();
       s.top = r.top + scrollY;
@@ -216,7 +239,11 @@ function init() {
   let resizeRaf = 0;
   const relayout = () => {
     cancelAnimationFrame(resizeRaf);
-    resizeRaf = requestAnimationFrame(() => { measure(); kick(); });
+    resizeRaf = requestAnimationFrame(() => {
+      measure();
+      for (const s of scenes) s.shown = -1;
+      kick();
+    });
   };
 
   // Keyboard users: tabbing into a part of a pinned scene that is not on
@@ -262,7 +289,11 @@ function init() {
     settleTimer = window.setTimeout(settle, 240);
   };
   const onTouchStart = () => { touching = true; clearTimeout(settleTimer); };
-  const onTouchEnd = () => { touching = false; clearTimeout(settleTimer); settleTimer = window.setTimeout(settle, 240); };
+  const onTouchEnd = (e: TouchEvent) => {
+    touching = e.touches.length > 0;
+    clearTimeout(settleTimer);
+    if (!touching) settleTimer = window.setTimeout(settle, 240);
+  };
 
   // Hero stop buttons: go to a stop. Further than one stop away, jump to the turn
   // just before it first, so the visitor sees one turn rather than a long spin.
@@ -289,6 +320,7 @@ function init() {
     addEventListener('scroll', onScrollSettle, { passive: true });
     addEventListener('touchstart', onTouchStart, { passive: true });
     addEventListener('touchend', onTouchEnd, { passive: true });
+    addEventListener('touchcancel', onTouchEnd, { passive: true });
     heroScene.el.addEventListener('click', onClick);
   }
   addEventListener('resize', relayout);
@@ -320,6 +352,7 @@ function init() {
       removeEventListener('scroll', onScrollSettle);
       removeEventListener('touchstart', onTouchStart);
       removeEventListener('touchend', onTouchEnd);
+      removeEventListener('touchcancel', onTouchEnd);
       heroScene?.el.removeEventListener('click', onClick);
       clearTimeout(settleTimer);
       removeEventListener('resize', relayout);

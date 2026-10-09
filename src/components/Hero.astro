@@ -102,6 +102,11 @@ const flStyle = (side: 'l' | 'r', f: Floater) =>
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
+/** The closing screen's words, shared by its picture on the laptop and its working form. */
+const needSince = 'IT Rentals, every brand from one partner';
+const needTitle = 'Describe what your team needs';
+const needSub = 'How many machines, which city, from when, and any software. We reply with configurations and monthly pricing.';
+const needPlaceholder = 'e.g. 40 laptops in Pune from Monday';
 
 /** Brand mark as inline SVG, filled with a gradient id or a colour. */
 const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '0 8 24 8.01' : '0 0 24 24');
@@ -111,9 +116,9 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     <div class="glow" aria-hidden="true"></div>
 
     <!-- The line above the laptop, with icons on either side -->
-    <div class="topline" aria-hidden="true">
+    <div class="topline">
       {(['l', 'r'] as const).map((side) => (
-        <span class={`pocket pocket--${side}`}>
+        <span class={`pocket pocket--${side}`} aria-hidden="true">
           {pockets[side].map((f) => (
             <span class={`fl c${f.c}`} style={flStyle(side, f)}>
               <svg width={f.s} height={f.s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><use href={`#hf-${f.icon}`} /></svg>
@@ -122,7 +127,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         </span>
       ))}
       <p class="k-txt k-txt--a">Rent the laptops your team already knows.</p>
-      <p class="k-txt k-txt--b"><b>IT Rentals:</b> one-stop solution for all your renting needs</p>
+      <p class="k-txt k-txt--b" aria-hidden="true"><b>IT Rentals:</b> one-stop solution for all your renting needs</p>
     </div>
 
     <div class="device-wrap">
@@ -157,7 +162,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
               <div class="lid">
                 <span class="cam" aria-hidden="true"></span>
                 <div class="screen">
-                  <div class="desk">
+                  <div class="desk" data-fit-desk>
                     <p class="since mono"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
                     <h1 id="hero-title" class="headline">
                       <span class="hl-brand">IT Rentals</span><span class="sr-only">: </span>
@@ -214,25 +219,22 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
               </div>
             ))}
 
-            <div class="slot slot--screen slot--need" data-slot="5" data-at="1">
+            <!-- the closing screen as it looks while turning; the working form is .need-live below -->
+            <div class="slot slot--screen slot--need" data-slot="5" aria-hidden="true">
               <div class="lid">
-                <span class="cam" aria-hidden="true"></span>
+                <span class="cam"></span>
                 <div class="screen">
-                  <div class="desk desk--need">
-                    <p class="since"><span class="since-dot" aria-hidden="true"></span><span>IT Rentals, every brand from one partner</span></p>
-                    <h2 class="need-title">Describe what your team needs</h2>
-                    <p class="need-sub">How many machines, which city, from when, and any software. We reply with configurations and monthly pricing.</p>
-                    <form class="need" action="/request-a-quote/" method="get" data-need>
-                      <label for="hero-need" class="sr-only">Describe what your team needs</label>
-                      <input id="hero-need" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder="e.g. 40 laptops in Pune from Monday" />
-                      <button class="btn btn--primary need-go" type="submit">Get a quote</button>
-                    </form>
-                    <p class="need-alt">Prefer chat? <a href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need">Send it on WhatsApp</a></p>
+                  <div class="desk desk--need" data-fit-desk>
+                    <p class="since"><span class="since-dot"></span><span>{needSince}</span></p>
+                    <p class="need-title">{needTitle}</p>
+                    <p class="need-sub">{needSub}</p>
+                    <div class="need"><span class="need-in need-ph">{needPlaceholder}</span><span class="btn btn--primary need-go">Get a quote</span></div>
+                    <p class="need-alt">Prefer chat? <span class="need-alt-a">Send it on WhatsApp</span></p>
                   </div>
-                  <span class="sheen sheen--glass" aria-hidden="true"></span>
+                  <span class="sheen sheen--glass"></span>
                 </div>
               </div>
-              <div class="deck" aria-hidden="true"><span class="notch"></span></div>
+              <div class="deck"><span class="notch"></span></div>
             </div>
           </div>
 
@@ -241,6 +243,8 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         </div>
       </div>
     </div>
+
+    <a class="skip" href="#rent">Skip the brand tour<Icon name="arrow-down" size={15} /></a>
 
     <!-- Under the laptop: the stops, and what each one offers -->
     <div class="tour">
@@ -267,8 +271,29 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       </ul>
     </div>
 
+    <!-- The closing screen's working form. It sits flat exactly over the laptop once the
+         last turn has finished, and comes after the tour in reading and tab order. -->
+    <div class="need-live" data-at="1">
+      <div class="lid">
+        <span class="cam" aria-hidden="true"></span>
+        <div class="screen">
+          <div class="desk desk--need" data-fit-desk>
+            <p class="since"><span class="since-dot" aria-hidden="true"></span><span>{needSince}</span></p>
+            <h2 class="need-title">{needTitle}</h2>
+            <p class="need-sub">{needSub}</p>
+            <form class="need" action="/request-a-quote/" method="get" data-need>
+              <label for="hero-need" class="sr-only">{needTitle}</label>
+              <input id="hero-need" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder={needPlaceholder} />
+              <button class="btn btn--primary need-go" type="submit">Get a quote</button>
+            </form>
+            <p class="need-alt">Prefer chat? <a href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need">Send it on WhatsApp</a></p>
+          </div>
+        </div>
+      </div>
+      <div class="deck" aria-hidden="true"><span class="notch"></span></div>
+    </div>
+
     <p class="cue" aria-hidden="true"><span>Scroll</span><i></i></p>
-    <a class="skip" href="#rent">Skip the brand tour<Icon name="arrow-down" size={15} /></a>
   </div>
 </section>
 
@@ -348,7 +373,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
   /* The IT Rentals screen */
   .desk {
-    display: grid; justify-items: center; align-content: center; text-align: center;
+    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; text-align: center;
     padding: clamp(32px, 6cqi, 72px) clamp(16px, 5cqi, 56px) clamp(28px, 5cqi, 56px);
   }
   .since {
@@ -375,12 +400,21 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     box-shadow: 0 14px 30px -20px rgba(23,19,15,.45);
   }
   .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .18), 0 14px 30px -20px rgba(23,19,15,.45); }
-  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: clamp(.875rem, 1.6cqi, 1rem); color: var(--ink); }
+  /* 16px stops iPhones zooming in when the field is tapped */
+  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: 1rem; line-height: 1.5; color: var(--ink); }
+  .need-ph { display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; color: var(--ink-3); }
   .need-in:focus { outline: none; }
   .need-in::placeholder { color: var(--ink-3); }
   .need-go { flex: none; }
   .need-alt { margin: clamp(10px, 1.8cqi, 18px) 0 0; font-size: var(--fs-xs); color: var(--ink-2); }
-  .need-alt a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+  .need-alt a, .need-alt-a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  /* the working closing screen only exists in the scroll tour */
+  .need-live { display: none; }
+
+  /* When a screen's words do not fit (short phones, small tablets), drop the extras in turn */
+  .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3']) :is(.lead, .need-sub) { display: none; }
+  .desk:is([data-fit='2'], [data-fit='3']) :is(.trust, .need-alt) { display: none; }
+  .desk[data-fit='3'] :is(.since, .btn--wa) { display: none; }
 
   /* Static layout: the four brands as links under the laptop */
   .tour { width: 100%; }
@@ -437,6 +471,13 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       --lw: min(980px, 84vw, calc((100svh - 330px) * 1.52));
     }
 
+    /* Rows: the line above, the laptop (with the closing screen's form over it), the tour */
+    :global(html.scenes) .topline { grid-area: 1 / 1; }
+    :global(html.scenes) .device-wrap, :global(html.scenes) .need-live { grid-area: 2 / 1; }
+    :global(html.scenes) .tour { grid-area: 3 / 1; }
+    :global(html.scenes) .need-live { display: block; position: relative; z-index: 2; width: var(--lw); align-self: center; opacity: 0; pointer-events: none; }
+    :global(html.scenes) .hero[data-stop='5'][data-rest] .need-live { opacity: 1; pointer-events: auto; }
+
     /* The line above the laptop: the kicker, then the IT Rentals line once the tour starts */
     :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; }
     .k-txt {
@@ -450,6 +491,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .hero:not([data-stop='0']) .k-txt--b { opacity: 1; translate: 0 0; }
     /* icons either side of the line: from its edge to the edge of the screen */
     :global(html.scenes) .pocket { display: block; position: absolute; top: -34px; bottom: -14px; width: max(0px, calc((100vw - 100%) / 2 - 16px)); container-type: inline-size; pointer-events: none; --icon-accent: var(--red); }
+    @media (max-width: 1099px) { :global(html.scenes) .pocket { display: none; } }
     .pocket--l { right: calc(100% - 6px); }
     .pocket--r { left: calc(100% - 6px); }
 
@@ -565,7 +607,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .tour-nav ol { display: flex; justify-content: space-between; list-style: none; margin: 0; padding: 0; }
     .stop {
       min-height: 32px; padding: 4px 6px; border: 0; background: none; cursor: pointer;
-      font: inherit; font-size: .875rem; font-weight: 600; color: var(--ink-3); transition: color .3s ease;
+      font: inherit; font-size: .875rem; font-weight: 600; color: var(--ink-2); transition: color .3s ease;
     }
     .stop:hover { color: var(--ink); }
     .stop:global(.on) { color: var(--ink); }
@@ -599,11 +641,11 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .hero:not([data-stop='0']) .cue { opacity: 0; }
     :global(html.scenes) .skip {
       display: inline-flex; align-items: center; gap: 6px; position: absolute; left: var(--gutter); bottom: clamp(18px, 3.2vh, 34px);
-      font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); text-underline-offset: 3px; visibility: hidden; opacity: 0;
-      transition: opacity .3s ease, visibility 0s linear .3s;
+      font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); text-underline-offset: 3px; opacity: 0; pointer-events: none;
+      transition: opacity .3s ease;
     }
     :global(html.scenes) .hero:not([data-stop='0']):not([data-stop='5']) .skip,
-    :global(html.scenes) .skip:focus-visible { visibility: visible; opacity: 1; transition: opacity .3s ease; }
+    :global(html.scenes) .skip:focus-visible { opacity: 1; pointer-events: auto; }
 
     /* The lid opens and the screen comes on when the page loads */
     :global(html.scenes) .slot--screen[data-slot='0'] .lid { animation: lid-open .85s cubic-bezier(.2, .75, .2, 1) .05s backwards; transform-origin: 50% 100%; }
@@ -613,6 +655,15 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
     :global(html.scenes) .hero .since-long { display: none; }
     @media (min-width: 1100px) { :global(html.scenes) .hero .since-long { display: inline; } }
+  }
+
+  /* Up to 899px the call / WhatsApp / quote bar sits at the bottom: keep the tour above it */
+  @media (min-height: 560px) and (max-width: 899px) {
+    :global(html.scenes) .stage { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+    /* no room beside the caption: the scroll cue goes, and the skip link shows only when tabbed to */
+    :global(html.scenes) .cue { display: none; }
+    :global(html.scenes) .hero[data-stop]:not([data-stop='x']) .skip:not(:focus-visible) { opacity: 0; pointer-events: none; }
+    :global(html.scenes) .skip { top: 84px; bottom: auto; padding: 6px 10px; border-radius: 8px; background: var(--card); }
   }
 
   /* Phones and narrow tablets: taller screen, compact tour */
@@ -640,7 +691,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .hero .trust { gap: 4px 14px; }
     .stop span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
     .stop { position: relative; min-width: 24px; min-height: 24px; }
-    .stop::before { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: rgba(23,19,15,.22); transition: background .3s ease, width .3s ease, margin .3s ease; }
+    .stop::before { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--ink-3); transition: background .3s ease, width .3s ease, margin .3s ease; }
     .stop:global(.on)::before { width: 18px; margin-left: -9px; border-radius: 4px; background: var(--red-ink); }
     .tour-nav ol { justify-content: center; gap: 6px; }
     .tour-track { display: none; }
@@ -648,7 +699,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .tc { flex-direction: column; gap: 6px; }
     :global(html.scenes) .tc-cap { font-size: var(--fs-xs); line-height: 1.35; }
     :global(html.scenes) .k-txt { font-size: 1.0625rem; }
-    :global(html.scenes) .cue, :global(html.scenes) .skip { display: none; }
   }
 
   /* What we rent */
@@ -681,6 +731,27 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 </style>
 
 <script>
+  // Laptop screens have a fixed shape. Where their words do not fit (short phones,
+  // small tablets), drop the extras one level at a time (see .desk[data-fit] in the CSS).
+  const desks = [...document.querySelectorAll<HTMLElement>('.hero [data-fit-desk]')];
+  let fitRaf = 0;
+  const fit = () => {
+    cancelAnimationFrame(fitRaf);
+    fitRaf = requestAnimationFrame(() => {
+      for (const d of desks) {
+        const screen = d.parentElement!;
+        let level = 0;
+        d.removeAttribute('data-fit');
+        while (level < 3 && d.offsetHeight > screen.clientHeight + 1) d.dataset.fit = String(++level);
+      }
+    });
+  };
+  if (desks.length) {
+    const ro = new ResizeObserver(fit);
+    desks.forEach((d) => ro.observe(d.parentElement!));
+    document.fonts?.ready.then(fit);
+  }
+
   // "Describe what your team needs": send it to the quote form, or as a WhatsApp message.
   // Navigation goes through a link click so it also works inside the site preview.
   const form = document.querySelector<HTMLFormElement>('[data-need]');
