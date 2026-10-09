@@ -3,10 +3,10 @@
  * "From ten laptops to enterprise scale", on the dark wine of the opening screen.
  *
  * A track of four team sizes (10, 50, 100, 500+). Choosing one lights the fleet of laptop
- * icons in a wave, counts the number up and swaps the description. With scroll scenes on
- * a tall enough screen the section pins and scrolling walks the track from 10 to 500+
- * (scenes.ts `scale`); clicking a size scrolls to its place. Everywhere else it is a plain
- * selector. Without JavaScript it shows 50.
+ * icons in a wave, counts the number up and swaps the description. When the board first
+ * comes into view it plays through 10 → 50 → 100 → 500+ by itself (about four seconds, then
+ * it stops); the page keeps scrolling normally throughout. Choosing a size stops it. With
+ * reduced motion it doesn't play; without JavaScript it shows 50.
  */
 import Icon from './Icon.astro';
 import { claim } from '../config/site';
@@ -38,7 +38,7 @@ const initial = 50;
 const initialIdx = steps.findIndex((s) => s.n === initial);
 const lit = (n: number) => (n >= 500 ? 100 : n);
 ---
-<section class="scale" data-scene="scale" data-scale aria-labelledby="scale-title" style={`--step-fill:${initialIdx / (steps.length - 1)}`}>
+<section class="scale" data-scale aria-labelledby="scale-title" style={`--step-fill:${initialIdx / (steps.length - 1)}`}>
   <div class="stage">
     <div class="wrap scale-wrap">
       <div class="scale-head">
@@ -189,29 +189,6 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
   .scale-copy .btn { margin-top: var(--s-6); white-space: normal; text-align: center; }
   .scale-copy .btn:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
 
-  /*
-   * The scroll version: the board stays in place while the page scrolls and the track walks
-   * from 10 to 500+. Only where the whole board fits on screen.
-   */
-  @media (min-width: 900px) and (min-height: 760px) {
-    :global(html.scenes) .scale { height: 300vh; height: 300svh; }
-    :global(html.scenes) .scale .stage {
-      position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; align-content: center;
-      padding-block: calc(80px + 1.5vh) 2.5vh;
-    }
-    /* the line follows the scroll exactly: 10 at the start, 500+ three-quarters of the way */
-    :global(html.scenes) .scale .track-fill { transform: scaleX(min(1, calc(var(--p, 0) / .75))); transition: none; }
-    /* compact enough that the whole board fits on one screen */
-    :global(html.scenes) .scale .scale-wrap { gap: clamp(16px, 2.6vh, 32px); }
-    :global(html.scenes) .scale .scale-title { font-size: clamp(2rem, .6rem + 2.6vw + 1.2vh, 3.5rem); }
-    :global(html.scenes) .scale .scale-lead { font-size: var(--fs-body, 1rem); }
-    :global(html.scenes) .scale .board { gap: clamp(16px, 2.8vh, 32px); padding: clamp(18px, 3vh, 32px) clamp(20px, 3vw, 40px); }
-    :global(html.scenes) .scale .track-legend { margin-bottom: clamp(8px, 1.4vh, 16px); }
-    :global(html.scenes) .scale .count { margin-bottom: clamp(8px, 1.6vh, 16px); }
-    :global(html.scenes) .scale .count-n { font-size: clamp(3rem, 1rem + 6vh, 5.5rem); }
-    :global(html.scenes) .scale .points { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: clamp(10px, 1.8vh, 16px); padding-top: clamp(10px, 1.8vh, 16px); }
-    :global(html.scenes) .scale .scale-copy .btn { margin-top: clamp(14px, 2.6vh, 28px); }
-  }
   @media (prefers-reduced-motion: reduce) {
     .track-fill, .fleet i, .step, .step.on, .stop-dot { transition: none; }
   }
@@ -219,7 +196,6 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-scale]').forEach((root) => {
-    const stage = root.querySelector<HTMLElement>('.stage')!;
     const fleet = root.querySelector<HTMLElement>('[data-fleet]')!;
     const cells = [...fleet.querySelectorAll('i')];
     const count = root.querySelector<HTMLElement>('[data-count]')!;
@@ -273,17 +249,47 @@ const lit = (n: number) => (n >= 500 ? 100 : n);
       shown = n;
     };
 
-    const pinned = () => getComputedStyle(stage).position === 'sticky' && root.offsetHeight > stage.offsetHeight * 1.2;
-
-    radios.forEach((r) => r.addEventListener('change', (e) => {
-      const i = Number(r.dataset.i);
+    const select = (i: number) => {
+      const r = radios[i];
+      r.checked = true;
       show(Number(r.value), i);
-      // a visitor's choice while the section is pinned: scroll to that size's place on the track
-      if (e.isTrusted && pinned()) {
-        const top = root.getBoundingClientRect().top + scrollY;
-        const span = root.offsetHeight - stage.offsetHeight;
-        scrollTo({ top: Math.round(top + span * (i * 0.25 + 0.125)), behavior: still.matches ? 'auto' : 'smooth' });
-      }
+    };
+
+    // The visitor's own choice: stop the walk-through and show that size
+    let playing = false;
+    let done = false;
+    let timer = 0;
+    radios.forEach((r) => r.addEventListener('change', (e) => {
+      if (e.isTrusted) { done = true; playing = false; clearTimeout(timer); }
+      show(Number(r.value), Number(r.dataset.i));
     }));
+    root.querySelectorAll('.stop').forEach((l) => l.addEventListener('pointerdown', () => { done = true; clearTimeout(timer); }));
+
+    /*
+     * The walk-through: 10 → 50 → 100 → 500+ once, when the board is in view. It runs by
+     * itself while the page scrolls freely, pauses if the board leaves the screen and picks
+     * up where it was, and ends in under five seconds.
+     */
+    if (!still.matches && 'IntersectionObserver' in window) {
+      const board = root.querySelector<HTMLElement>('.board')!;
+      // pause before each size, in milliseconds: the whole walk-through takes about four seconds
+      const DELAYS = [0, 1100, 1350, 1450];
+      let next = 1;
+      // begin at 10 (the board is below the fold, so nobody sees the switch from 50)
+      select(0);
+      const step = () => {
+        timer = 0;
+        if (done || !playing) return;
+        select(next);
+        next += 1;
+        if (next >= radios.length) { done = true; playing = false; return; }
+        timer = window.setTimeout(step, DELAYS[next]);
+      };
+      new IntersectionObserver(([e]) => {
+        if (done) return;
+        if (e.isIntersecting && !playing) { playing = true; timer = window.setTimeout(step, 700); }
+        else if (!e.isIntersecting && playing) { playing = false; clearTimeout(timer); timer = 0; }
+      }, { threshold: 0.45 }).observe(board);
+    }
   });
 </script>

@@ -136,19 +136,7 @@ function route(s: Scene, p: number) {
   items.forEach((li, i) => li.classList.toggle('reached', p > 0.02 && p >= i / last - 0.02));
 }
 
-/* From ten laptops to enterprise: while pinned, scrolling walks the track 10 → 50 → 100 → 500+.
-   It selects the size's radio, so ScaleSelector's own change handler draws it. */
-function scale(s: Scene, p: number) {
-  if (!s.pinned) return;
-  const radios = s.el.querySelectorAll<HTMLInputElement>('input[name="scale"]');
-  const r = radios[Math.min(radios.length - 1, Math.floor(p * radios.length))];
-  if (r && !r.checked) {
-    r.checked = true;
-    r.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-}
-
-const handlers: Record<string, (s: Scene, p: number) => void> = { hero, steps, qa, route, scale };
+const handlers: Record<string, (s: Scene, p: number) => void> = { hero, steps, qa, route };
 
 function init() {
   window.__scenes?.destroy();
