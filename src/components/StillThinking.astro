@@ -87,6 +87,8 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
     .nudge-x { top: 50%; right: 8px; translate: 0 -50%; }
   }
   :global(html.menu-open) .nudge { display: none; }
+  /* a header menu opening over the card wins at once (the script also steps the card aside) */
+  :global(body:has([data-menu-trigger][aria-expanded="true"])) .nudge { visibility: hidden; pointer-events: none; }
   @media (prefers-reduced-motion: reduce) {
     .nudge { transform: none; transition: opacity .2s ease; }
   }
@@ -114,7 +116,7 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
   const snoozedUntil = Number(get(ls, K_SNOOZE) ?? 0);
 
   if (el && !get(ss, K_SHOWN) && !(snoozedUntil > Date.now())) {
-    const pageStart = performance.now();
+    let pageStart = performance.now();
     const tooShort = matchMedia('(max-height: 520px)');
     const tour = document.querySelector<HTMLElement>('[data-scene="hero"]');
     let spent = Number(get(ss, K_TIME) ?? 0) || 0;
@@ -125,15 +127,17 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
     let lastOutside: HTMLElement | null = null;
     // Reasons to step aside for a moment without closing: the home page's laptop tour
     // is on screen, a focused element would be covered, or the window is very short.
-    const away = { tour: false, focus: false, short: false };
+    const away = { tour: false, focus: false, short: false, layer: false };
 
     const save = () => { set(ss, K_TIME, String(Math.round(spent))); lastSaved = spent; };
-    const otherLayerOpen = () =>
-      root.classList.contains('menu-open') ||
-      !!document.querySelector('[data-menu-trigger][aria-expanded="true"], dialog[open], [data-tray]:not([hidden])');
+    // a menu or dialog is open (Escape belongs to it), or the compare tray is up
+    const menuOpen = () => root.classList.contains('menu-open') || !!document.querySelector('[data-menu-trigger][aria-expanded="true"], dialog[open]');
+    const otherLayerOpen = () => menuOpen() || !!document.querySelector('[data-tray]:not([hidden])');
+    // only text entry counts as typing; a ticked filter box or option keeps focus but is not typing
+    const TEXT = 'textarea, [contenteditable="true"], input:not([type=checkbox], [type=radio], [type=button], [type=submit], [type=reset], [type=range], [type=color], [type=file], [type=image])';
     const typing = () => {
       const a = document.activeElement as HTMLElement | null;
-      return !!a && (a.matches('input, textarea, select, [contenteditable="true"]') || performance.now() - lastTyped < 8000);
+      return (!!a && a.matches(TEXT)) || performance.now() - lastTyped < 8000;
     };
     // The laptop tour fills the screen until most of it has scrolled away (its last
     // stop, the describe-your-need form, still counts as the tour).
@@ -145,7 +149,7 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
     };
 
     const applyAway = () => {
-      const hide = away.tour || away.focus || away.short;
+      const hide = away.tour || away.focus || away.short || away.layer;
       el.classList.toggle('away', hide);
       root.style.scrollPaddingBottom = hide ? '' : `${Math.round(root.clientHeight - el.getBoundingClientRect().top) + 16}px`;
     };
@@ -165,7 +169,13 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       });
     };
     const onKey = (e: KeyboardEvent) => {
-      if (open && e.key === 'Escape' && !e.defaultPrevented && !otherLayerOpen()) close('dismiss');
+      if (open && e.key === 'Escape' && !menuOpen()) close('dismiss');
+    };
+    // menus, dialogs and the compare tray can open after the card: step aside while they are up
+    let layerTimer = 0;
+    const watchLayers = () => {
+      const l = otherLayerOpen();
+      if (l !== away.layer) { away.layer = l; applyAway(); }
     };
     let scrollRaf = 0;
     const onScroll = () => {
@@ -199,6 +209,7 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       set(ls, K_SNOOZE, String(Date.now() + SNOOZE_DAYS[why] * 864e5));
       removeEventListener('keydown', onKey, true);
       removeEventListener('scroll', onScroll);
+      window.clearInterval(layerTimer);
       tooShort.removeEventListener('change', onShort);
       document.removeEventListener('focusin', onFocusIn);
     };
@@ -215,6 +226,7 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       addEventListener('keydown', onKey, true);
       addEventListener('scroll', onScroll, { passive: true });
       tooShort.addEventListener('change', onShort);
+      layerTimer = window.setInterval(watchLayers, 400);
       window.clearInterval(timer);
     };
 
@@ -225,13 +237,25 @@ const { waMessage = 'Hi IT Rentals, I have a question about renting IT equipment
       if (spent - lastSaved >= 5000) save();
       if (spent >= DELAY && now - pageStart >= MIN_ON_PAGE && !tooShort.matches && !typing() && !otherLayerOpen() && !inTour()) show();
     };
-    const timer = window.setInterval(tick, 1000);
+    let timer = window.setInterval(tick, 1000);
 
     document.addEventListener('focusin', onFocusIn);
     document.addEventListener('visibilitychange', () => { last = performance.now(); save(); });
     addEventListener('pagehide', save);
-    // back/forward cache: the page comes back with a stale clock
-    addEventListener('pageshow', (e) => { if (e.persisted) last = performance.now(); });
+    // Back/forward cache: the page comes back as it was left. Catch up with the rest of
+    // the visit: stop if the card was shown or closed elsewhere, and take the time
+    // spent on other pages.
+    addEventListener('pageshow', (e) => {
+      if (!e.persisted) return;
+      last = performance.now();
+      if (open) return;
+      if (get(ss, K_SHOWN) || Number(get(ls, K_SNOOZE) ?? 0) > Date.now()) { window.clearInterval(timer); return; }
+      spent = Math.max(spent, Number(get(ss, K_TIME) ?? 0) || 0);
+      lastSaved = spent;
+      pageStart = performance.now();
+      window.clearInterval(timer);
+      timer = window.setInterval(tick, 1000);
+    });
     document.addEventListener('input', () => { lastTyped = performance.now(); }, true);
     // Already in touch (any WhatsApp, call, email or quote link, or an enquiry form): no need to ask.
     const inTouch = () => {

@@ -58,7 +58,11 @@ function heroTurn(p: number) {
   return { k, t };
 }
 
-type HeroParts = { slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[]; front: string; a: number; b: number; stop: number; rest: boolean | null };
+type HeroParts = {
+  slab: HTMLElement; width: number; floor: HTMLElement | null; slots: HTMLElement[]; marks: HTMLElement[];
+  sheens: { el: HTMLElement; k: number }[]; track: HTMLElement | null; drift: HTMLElement[];
+  front: string; a: number; b: number; stop: number; rest: boolean | null;
+};
 const heroParts = new WeakMap<HTMLElement, HeroParts>();
 
 function hero(s: Scene, p: number) {
@@ -70,6 +74,10 @@ function hero(s: Scene, p: number) {
       slab, width: slab.offsetWidth, floor: s.el.querySelector<HTMLElement>('[data-floor]'),
       slots: [...s.el.querySelectorAll<HTMLElement>('[data-slot]')],
       marks: [...s.el.querySelectorAll<HTMLElement>('[data-s]')],
+      // matte Lenovo lid: a fainter highlight
+      sheens: [...slab.querySelectorAll<HTMLElement>('.sheen')].map((el) => ({ el, k: el.closest('.back--lenovo') ? 0.45 : 1 })),
+      track: s.el.querySelector<HTMLElement>('.tour-track i'),
+      drift: [...s.el.querySelectorAll<HTMLElement>('.fl-side, .pocket')],
       front: '', a: -1, b: -1, stop: -1, rest: null,
     };
     heroParts.set(s.el, h);
@@ -82,9 +90,10 @@ function hero(s: Scene, p: number) {
   if (!s.pinned) {
     if (h.front === 'static') return;
     h.slab.style.transform = '';
-    h.slab.style.removeProperty('--sx');
-    h.slab.style.removeProperty('--so');
+    h.sheens.forEach(({ el }) => { el.style.transform = ''; el.style.opacity = ''; });
     if (h.floor) { h.floor.style.transform = ''; h.floor.style.opacity = ''; }
+    if (h.track) h.track.style.transform = '';
+    h.drift.forEach((el) => { el.style.transform = ''; });
     h.slab.dataset.front = 'a';
     h.slots.forEach((el) => el.classList.toggle('on', el.dataset.slot === '0' || el.dataset.slot === '1'));
     showStop(s, h, 0);
@@ -92,23 +101,35 @@ function hero(s: Scene, p: number) {
     h.front = 'static'; h.a = -1; h.b = -1; h.rest = null;
     return;
   }
+  // Progress line under the stops, and the icon fields drifting up with the scroll.
+  // Written straight onto those few elements: an inherited custom property on the
+  // section would restyle every icon in it on every frame.
+  if (h.track) h.track.style.transform = `scaleX(${p.toFixed(4)})`;
+  const lift = `translate3d(0, ${(-p * 70).toFixed(1)}px, 0)`;
+  h.drift.forEach((el) => { el.style.transform = lift; });
+
   const { k, t } = heroTurn(p);
-  const e = smoother(t);
+  // the very ends of a turn count as resting, so the laptop is never left a hair off straight
+  const e0 = smoother(t);
+  const e = e0 < 0.002 ? 0 : e0 > 0.998 ? 1 : e0;
   const deg = (k + e) * 180;
   const rad = (deg * Math.PI) / 180;
   const cos = Math.cos(rad);
   const mid = Math.abs(Math.sin(rad));
-  // Mid-turn the laptop lifts a little and moves back by half its width, so the
-  // edge swinging towards the visitor stays the laptop's height. At rest it is
-  // exactly flat and straight.
-  h.slab.style.transform = mid < 0.0005
-    ? `rotateY(${Math.round(deg)}deg)`
-    : `translate3d(0, ${(-mid * 12).toFixed(2)}px, ${(-mid * h.width * 0.5).toFixed(1)}px) rotateY(${deg.toFixed(2)}deg)`;
-  h.slab.style.setProperty('--sx', `${(e * 120 - 60).toFixed(1)}%`);
-  h.slab.style.setProperty('--so', (mid * 0.9).toFixed(3));
-  if (h.floor) {
-    h.floor.style.transform = `scaleX(${(0.22 + 0.78 * Math.abs(cos)).toFixed(3)})`;
-    h.floor.style.opacity = (0.45 + 0.55 * Math.abs(cos)).toFixed(3);
+  const rest = mid < 0.0005;
+  if (!(rest && h.rest)) {
+    // Mid-turn the laptop lifts a little and moves back by half its width, so the
+    // edge swinging towards the visitor stays the laptop's height. At rest it is
+    // exactly flat and straight.
+    h.slab.style.transform = rest
+      ? `rotateY(${Math.round(deg)}deg)`
+      : `translate3d(0, ${(-mid * Math.min(12, h.width * 0.03)).toFixed(2)}px, ${(-mid * h.width * 0.5).toFixed(1)}px) rotateY(${deg.toFixed(2)}deg)`;
+    const sweep = `translateX(${(e * 120 - 60).toFixed(1)}%)`;
+    h.sheens.forEach(({ el, k: dim }) => { el.style.transform = sweep; el.style.opacity = (mid * 0.9 * dim).toFixed(3); });
+    if (h.floor) {
+      h.floor.style.transform = `scaleX(${(0.22 + 0.78 * Math.abs(cos)).toFixed(3)})`;
+      h.floor.style.opacity = (0.45 + 0.55 * Math.abs(cos)).toFixed(3);
+    }
   }
   const front = cos >= 0 ? 'a' : 'b';
   if (front !== h.front) { h.front = front; h.slab.dataset.front = front; }
@@ -119,7 +140,6 @@ function hero(s: Scene, p: number) {
     h.slots.forEach((el) => { const n = Number(el.dataset.slot); el.classList.toggle('on', n === a || n === b); });
   }
   // at rest the laptop is flat, so the live layer for the closing screen can sit on top
-  const rest = mid < 0.0005;
   if (rest !== h.rest) { h.rest = rest; s.el.toggleAttribute('data-rest', rest); }
   const stop = t < 0.5 ? k : k + 1;
   if (stop !== h.stop) showStop(s, h, stop);
@@ -205,30 +225,35 @@ function init() {
     }
   };
 
-  const target = (s: Scene) => {
-    if (s.pinned) return clamp((scrollY - s.top) / s.span);
-    const top = s.top - scrollY;
+  const target = (s: Scene, y = scrollY) => {
+    if (s.pinned) return clamp((y - s.top) / s.span);
+    const top = s.top - y;
     const startY = vh * s.start;
     const endY = vh * s.end;
     return clamp((startY - top) / (startY - endY + s.height));
   };
 
   let lastFrame = 0;
+  let dir = 1;
+  let lastY = scrollY;
   const frame = (now = performance.now()) => {
     raf = 0;
     let moving = false;
     // Same feel at 60 and 120 frames a second: 20% of the gap per 60th of a second.
     const dt = lastFrame ? Math.min(64, now - lastFrame) : 16.7;
     const ease = 1 - Math.pow(0.8, dt / 16.7);
+    // read the scroll position once, before this frame writes any styles
+    const y = scrollY;
+    if (y !== lastY) { dir = Math.sign(y - lastY); lastY = y; }
     for (const s of scenes) {
-      const t = target(s);
+      const t = target(s, y);
       if (s.cur < 0) s.cur = t;
       const d = t - s.cur;
       s.cur = Math.abs(d) < 0.0004 ? t : s.cur + d * ease;
       if (s.cur !== t) moving = true;
       if (Math.abs(s.cur - s.shown) > 0.0002 || s.shown < 0) {
         s.shown = s.cur;
-        s.el.style.setProperty('--p', s.cur.toFixed(4));
+        if (s.name !== 'hero') s.el.style.setProperty('--p', s.cur.toFixed(4));
         handlers[s.name]?.(s, s.cur);
       }
     }
@@ -240,9 +265,26 @@ function init() {
   const relayout = () => {
     cancelAnimationFrame(resizeRaf);
     resizeRaf = requestAnimationFrame(() => {
+      const hs = heroScene;
+      const before = hs?.pinned ? { p: clamp((scrollY - hs.top) / hs.span), top: hs.top, span: hs.span } : null;
+      const wasPinned = scenes.map((s) => s.pinned);
       measure();
-      for (const s of scenes) s.shown = -1;
+      // A resize or rotation changes the tour's length: stay on the same stop rather
+      // than the same pixel offset (which would land mid-turn or on another brand).
+      if (hs?.pinned && before && before.p > 0 && before.p < 1 && (Math.abs(hs.span - before.span) > 1 || Math.abs(hs.top - before.top) > 1)) {
+        window.scrollTo({ top: hs.top + before.p * hs.span, behavior: 'instant' as ScrollBehavior });
+      }
+      // a scene that switches between pinned and static jumps to where it should be
+      // instead of easing across several turns
+      scenes.forEach((s, i) => { if (s.pinned !== wasPinned[i]) s.cur = -1; s.shown = -1; });
+      // An on-screen keyboard that shrinks the window can switch the tour to the static
+      // layout while the visitor types in it: keep what they are typing in view.
+      const a = document.activeElement as HTMLElement | null;
+      if (a && a.matches('input, textarea') && scenes.some((s, i) => wasPinned[i] && !s.pinned && s.el.contains(a))) {
+        a.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior });
+      }
       kick();
+      if (hs?.pinned) { clearTimeout(settleTimer); settleTimer = window.setTimeout(settle, 240); }
     });
   };
 
@@ -269,8 +311,6 @@ function init() {
   const heroScene = scenes.find((s) => s.name === 'hero');
   let settleTimer = 0;
   let touching = false;
-  let dir = 1;
-  let lastY = scrollY;
   const settle = () => {
     const s = heroScene;
     if (!s || !s.pinned || touching) return;
@@ -281,9 +321,6 @@ function init() {
     window.scrollTo({ top: s.top + to * s.span, behavior: 'smooth' });
   };
   const onScrollSettle = () => {
-    const y = scrollY;
-    if (y !== lastY) dir = Math.sign(y - lastY);
-    lastY = y;
     clearTimeout(settleTimer);
     settleTimer = window.setTimeout(settle, 240);
   };
@@ -309,7 +346,18 @@ function init() {
       s.cur = pre;
       kick();
     }
-    requestAnimationFrame(() => window.scrollTo({ top: s.top + STOP_AT[i] * s.span, behavior: 'smooth' }));
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: s.top + STOP_AT[i] * s.span, behavior: 'smooth' });
+      // From the keyboard, carry focus on to what that stop offers (its catalogue link,
+      // or the describe-your-need field), so the next Tab does not turn the laptop back.
+      if (e.detail !== 0 || i === 0) return;
+      const to = i === STOP_AT.length - 1 ? s.el.querySelector<HTMLElement>('[data-need] input') : s.el.querySelector<HTMLElement>(`.tc[data-s="${i}"] a`);
+      if (!to) return;
+      let done = false;
+      const move = () => { if (!done) { done = true; to.focus({ preventScroll: true }); } };
+      addEventListener('scrollend', move, { once: true });
+      window.setTimeout(move, 900);
+    });
   };
 
   measure();

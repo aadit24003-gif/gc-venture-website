@@ -95,10 +95,11 @@ function field(rows: number, cols: number, yFrom: number, ySpan: number, gap: nu
   return out;
 }
 /** Beside the laptop (12 rows) and beside the line above it (2 rows). */
-const sides = { l: field(12, 10, 2, 104, 0.24), r: field(12, 10, 2, 104, 0.24) };
-const pockets = { l: field(2, 10, 8, 84, 0.2), r: field(2, 10, 8, 84, 0.2) };
+const cols7 = (f: Floater[]) => f.filter((x) => x.c < 7); // wider columns only show on very wide screens
+const sides = { l: cols7(field(12, 10, 2, 104, 0.24)), r: cols7(field(12, 10, 2, 104, 0.24)) };
+const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 84, 0.2)) };
 const flStyle = (side: 'l' | 'r', f: Floater) =>
-  `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}; --d:${f.d}s; --z:${f.z}`;
+  `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
@@ -276,11 +277,10 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         <span class="cam" aria-hidden="true"></span>
         <div class="screen">
           <div class="desk desk--need" data-fit-desk>
-            <h2 class="need-title">{needTitle}</h2>
+            <h2 class="need-title" id="hero-need-title">{needTitle}</h2>
             <p class="need-sub">{needSub}</p>
             <form class="need" action="/request-a-quote/" method="get" data-need>
-              <label for="hero-need" class="sr-only">{needTitle}</label>
-              <input id="hero-need" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder={needPlaceholder} />
+              <input id="hero-need" aria-labelledby="hero-need-title" class="need-in" name="need" type="text" maxlength="300" autocomplete="off" enterkeyhint="send" placeholder={needPlaceholder} />
               <button class="btn btn--primary need-go" type="submit">Get a quote</button>
             </form>
             <p class="need-alt">Prefer chat? <a href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need">Send it on WhatsApp</a></p>
@@ -360,7 +360,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   .screen {
     position: relative; container-type: inline-size; color: var(--ink);
     border-radius: 10px 10px 2px 2px; overflow: hidden;
-    background: radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
+    background: #EDE6DA radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
   }
   .deck {
     position: relative; z-index: 1; height: clamp(12px, 1.5vw, 18px); margin-top: -1px;
@@ -391,7 +391,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   .trust :global(svg) { color: var(--red-ink); }
 
   /* The closing screen: describe what your team needs */
-  .need-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 6.2cqi, 4.1rem); line-height: 1; letter-spacing: -0.03em; max-width: 14ch; }
+  .need-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 6.2cqi, 4.1rem); line-height: 1; letter-spacing: -0.03em; max-width: 14ch; text-wrap: balance; }
   .need-sub { margin: clamp(10px, 1.8cqi, 20px) auto 0; max-width: 50ch; font-size: clamp(.8125rem, 1.6cqi, 1.0625rem); line-height: 1.5; color: var(--ink-2); }
   .need {
     display: flex; align-items: stretch; gap: 8px; width: min(100%, 64cqi); margin-top: clamp(14px, 2.6cqi, 28px);
@@ -400,7 +400,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   }
   .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .18), 0 14px 30px -20px rgba(23,19,15,.45); }
   /* 16px stops iPhones zooming in when the field is tapped */
-  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: 1rem; line-height: 1.5; color: var(--ink); }
+  .need-in { flex: 1; min-width: 0; border: 0; background: transparent; padding: 8px 10px; font: inherit; font-size: 1rem; line-height: 1.5; color: var(--ink); text-overflow: ellipsis; }
   .need-ph { display: flex; align-items: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; color: var(--ink-3); }
   .need-in:focus { outline: none; }
   .need-in::placeholder { color: var(--ink-3); }
@@ -420,9 +420,10 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   }
 
   /* When a screen's words do not fit (short phones, small tablets), drop the extras in turn */
-  .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3']) :is(.lead, .need-sub) { display: none; }
-  .desk:is([data-fit='2'], [data-fit='3']) :is(.trust, .need-alt) { display: none; }
-  .desk[data-fit='3'] :is(.since, .btn--wa) { display: none; }
+  .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.lead, .need-sub) { display: none; }
+  .desk:is([data-fit='2'], [data-fit='3'], [data-fit='4']) :is(.trust, .need-alt) { display: none; }
+  .desk:is([data-fit='3'], [data-fit='4']) :is(.since, .btn--wa) { display: none; }
+  .screen:has(> .desk[data-fit='4']) { overflow-y: auto; }
 
   /* Static layout: the four brands as links under the laptop */
   .tour { width: 100%; }
@@ -446,7 +447,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     position: absolute; display: none; color: var(--ink); opacity: calc(var(--o) * .9);
     /* columns sit 46px apart, spreading out when the space is wider than ten of them */
     --sp: max(46px, (100cqi - 40px) / 10);
-    transform: rotate(var(--r)); translate: 0 calc(var(--p, 0) * var(--z) * -110px);
+    transform: rotate(var(--r));
   }
   .fl svg { display: block; max-width: none; flex: none; }
   /* A column shows only when its icons fit in full: 74px for the first, 46px more for each next one. */
@@ -468,16 +469,17 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .stage {
       position: sticky; top: 0; height: 100vh; height: 100svh;
       display: grid; grid-template-rows: auto minmax(0, 1fr) auto; justify-items: center; align-items: center; gap: clamp(8px, 1.6vh, 16px);
-      padding: clamp(96px, 12.5vh, 112px) var(--gutter) clamp(16px, 3vh, 30px);
-      --lw: min(980px, 84vw, calc((100svh - 330px) * 1.52));
+      padding: max(clamp(96px, 12.5vh, 112px), var(--head, 0px)) var(--gutter) clamp(16px, 3vh, 30px);
+      --lw: min(980px, 84vw, calc((100svh - var(--reserve, 330px)) * 1.52));
     }
 
     /* Rows: the line above, the laptop (with the closing screen's form over it), the tour */
     :global(html.scenes) .topline { grid-area: 1 / 1; }
     :global(html.scenes) .device-wrap, :global(html.scenes) .need-live { grid-area: 2 / 1; }
-    :global(html.scenes) .tour { grid-area: 3 / 1; }
+    :global(html.scenes) .tour { grid-area: 3 / 1; position: relative; z-index: 3; }
     :global(html.scenes) .need-live { display: block; position: relative; z-index: 2; width: var(--lw); align-self: center; opacity: 0; pointer-events: none; }
     :global(html.scenes) .hero[data-stop='5'][data-rest] .need-live { opacity: 1; pointer-events: auto; }
+    :global(html.scenes) .hero[data-stop='5'][data-rest] .slot--need { visibility: hidden; }
 
     /* The line above the laptop: the kicker, then the IT Rentals line once the tour starts */
     :global(html.scenes) .topline { display: grid; place-items: center; position: relative; width: min(820px, 100%); min-height: 2.5rem; margin: 0; }
@@ -501,6 +503,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .device-wrap { width: auto; max-width: none; align-self: center; }
     :global(html.scenes) .flip { width: var(--lw); perspective: calc(var(--lw) * 2.4); perspective-origin: 50% 45%; }
     :global(html.scenes) .slab { transform-style: preserve-3d; -webkit-transform-style: preserve-3d; will-change: transform; }
+    :global(html.scenes) .fl-side, :global(html.scenes) .pocket, :global(html.scenes) .floor { will-change: transform; }
     :global(html.scenes) .face { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
     :global(html.scenes) .face--b { display: block; position: absolute; inset: 0; transform: rotateY(180deg); }
     /* the face turned away is hidden outright as well (Safari draws some layers through backface-visibility) */
@@ -515,6 +518,9 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     }
     :global(html.scenes) .screen, .sizer { aspect-ratio: 16 / 10.4; }
     .sizer { display: block; }
+    /* the words sit in the middle of the screen (top-aligned if they ever overflow) */
+    :global(html.scenes) .screen { display: grid; align-content: safe center; }
+    :global(html.scenes) .cam { top: calc(var(--lw) * .0065); width: max(3px, calc(var(--lw) * .006)); height: max(3px, calc(var(--lw) * .006)); margin-left: 0; translate: -50% -50%; }
     :global(html.scenes) .deck { box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
 
     /* Contact shadow on the floor, narrowing as the laptop turns edge-on */
@@ -537,7 +543,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .sheen {
       display: block; position: absolute; inset: 0 -60%; pointer-events: none; z-index: 3;
       background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.34) 50%, transparent 60%);
-      transform: translateX(var(--sx, -60%)); opacity: var(--so, 0);
+      transform: translateX(-60%); opacity: 0;
     }
     .sheen--glass { inset: 0 -60%; background: linear-gradient(100deg, transparent 42%, rgba(255,255,255,.22) 50%, transparent 58%); }
 
@@ -585,7 +591,6 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
       background: var(--top-light), linear-gradient(180deg, #1e1e20 0%, #19191b 60%, #141415 100%);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06), 0 0 0 1px rgba(0,0,0,.6);
     }
-    .back--lenovo .sheen { opacity: calc(var(--so, 0) * .45); }
 
     /* The base seen from behind: one hinge band (Apple, HP) or two hinge barrels and a vent (Dell, Lenovo) */
     .deck--rear { height: clamp(12px, 1.5vw, 18px); border-radius: 2px 2px 14px 14px / 2px 2px 9px 9px; }
@@ -615,7 +620,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     .stop:global(.on) { color: var(--ink); }
     .stop:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
     .tour-track { position: relative; height: 2px; border-radius: 2px; background: rgba(23,19,15,.12); overflow: hidden; }
-    .tour-track i { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(var(--p, 0)); background: var(--red-ink); }
+    .tour-track i { position: absolute; inset: 0; transform-origin: 0 50%; transform: scaleX(0); background: var(--red-ink); }
     :global(html.scenes) .tour-ctas { display: grid; width: 100%; min-height: 2.75rem; margin: 0; }
     :global(html.scenes) .tc {
       grid-area: 1 / 1; display: flex; justify-content: center; align-items: center; gap: 10px 16px; flex-wrap: wrap;
@@ -648,6 +653,8 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     }
     :global(html.scenes) .hero:not([data-stop='0']):not([data-stop='5']) .skip,
     :global(html.scenes) .skip:focus-visible { opacity: 1; pointer-events: auto; }
+    :global(html.scenes) .skip:focus-visible { padding: 6px 10px; margin: -6px -10px; border-radius: 8px; background: var(--card); }
+    :global(html.scenes) .skip:focus-visible ~ .cue { opacity: 0; }
 
     /* The lid opens and the screen comes on when the page loads */
     :global(html.scenes) .slot--screen[data-slot='0'] .lid { animation: lid-open .85s cubic-bezier(.2, .75, .2, 1) .05s backwards; transform-origin: 50% 100%; }
@@ -660,16 +667,19 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
   /* Up to 899px the call / WhatsApp / quote bar sits at the bottom: keep the tour above it */
   @media (min-height: 560px) and (max-width: 899px) {
     :global(html.scenes) .stage { padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
-    /* no room beside the caption: the scroll cue goes, and the skip link shows only when tabbed to */
+    /* no room beside the caption for the scroll cue */
     :global(html.scenes) .cue { display: none; }
+  }
+  /* Below 1100px the captions reach the left edge: the skip link moves to the top and shows only when tabbed to */
+  @media (min-height: 560px) and (max-width: 1099px) {
     :global(html.scenes) .hero[data-stop]:not([data-stop='x']) .skip:not(:focus-visible) { opacity: 0; pointer-events: none; }
-    :global(html.scenes) .skip { top: 84px; bottom: auto; padding: 6px 10px; border-radius: 8px; background: var(--card); }
+    :global(html.scenes) .skip { top: calc(max(96px, var(--head, 0px)) - 12px); bottom: auto; padding: 6px 10px; border-radius: 8px; background: var(--card); }
   }
 
   /* Phones and narrow tablets: taller screen, compact tour */
   @media (min-height: 560px) and (max-width: 760px) {
     :global(html.scenes) .hero { height: 420vh; height: 420svh; }
-    :global(html.scenes) .stage { padding: 96px var(--gutter) calc(88px + env(safe-area-inset-bottom, 0px)); gap: 10px; --lw: min(92vw, calc((100svh - 330px) * .74)); }
+    :global(html.scenes) .stage { padding: max(96px, var(--head, 0px)) var(--gutter) calc(88px + env(safe-area-inset-bottom, 0px)); gap: 10px; --lw: min(92vw, calc((100svh - var(--reserve, 330px)) * .74)); }
     :global(html.scenes) .screen, .sizer { aspect-ratio: 3 / 4; }
     :global(html.scenes) .desk { padding: 6cqi 5cqi; }
     .hl-brand { font-size: clamp(2.4rem, 14cqi, 4rem); }
@@ -699,6 +709,12 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
     :global(html.scenes) .tc { flex-direction: column; gap: 6px; }
     :global(html.scenes) .tc-cap { font-size: var(--fs-xs); line-height: 1.35; }
     :global(html.scenes) .k-txt { font-size: 1.0625rem; }
+  }
+
+  @media (forced-colors: active) {
+    .lid { border: 1px solid CanvasText; }
+    .stop::before { forced-color-adjust: none; background: ButtonText !important; }
+    .stop:global(.on)::before { background: Highlight !important; }
   }
 
   /* What we rent */
@@ -732,7 +748,7 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
 
 <script>
   // Laptop screens have a fixed shape. Where their words do not fit (short phones,
-  // small tablets), drop the extras one level at a time (see .desk[data-fit] in the CSS).
+  // small tablets), drop the extras one level at a time (see .desk[data-fit] in the CSS); at the last level the screen scrolls.
   const desks = [...document.querySelectorAll<HTMLElement>('.hero [data-fit-desk]')];
   let fitRaf = 0;
   const fit = () => {
@@ -742,14 +758,39 @@ const markBox = (id: 'apple' | 'dell' | 'hp' | 'lenovo') => (id === 'lenovo' ? '
         const screen = d.parentElement!;
         let level = 0;
         d.removeAttribute('data-fit');
-        while (level < 3 && d.offsetHeight > screen.clientHeight + 1) d.dataset.fit = String(++level);
+        while (level < 4 && d.offsetHeight > screen.clientHeight + 1) d.dataset.fit = String(++level);
       }
     });
   };
   if (desks.length) {
     const ro = new ResizeObserver(fit);
-    desks.forEach((d) => ro.observe(d.parentElement!));
+    // the desk too: text size or spacing can change after load without resizing the screen
+    desks.forEach((d) => { ro.observe(d.parentElement!); ro.observe(d); });
     document.fonts?.ready.then(fit);
+  }
+
+  // The laptop gets whatever height the line above, the tour below and the header leave
+  // (they grow with larger text), so it never covers the stop buttons.
+  const stage = document.querySelector<HTMLElement>('.hero .stage');
+  const parts = ['.topline', '.tour'].map((q) => stage?.querySelector<HTMLElement>(q)).filter((x): x is HTMLElement => !!x);
+  const header = document.querySelector<HTMLElement>('.site-header');
+  if (stage && parts.length === 2) {
+    let sizeRaf = 0;
+    const size = () => {
+      cancelAnimationFrame(sizeRaf);
+      sizeRaf = requestAnimationFrame(() => {
+        if (getComputedStyle(stage).position !== 'sticky') { stage.style.removeProperty('--reserve'); stage.style.removeProperty('--head'); return; }
+        const cs = getComputedStyle(stage);
+        const head = header ? Math.round(header.getBoundingClientRect().bottom + 16) : 0;
+        stage.style.setProperty('--head', `${head}px`);
+        const pad = Math.max(parseFloat(cs.paddingTop), head) + parseFloat(cs.paddingBottom);
+        const reserve = Math.round(pad + parts[0].offsetHeight + parts[1].offsetHeight + 2 * parseFloat(cs.rowGap || '0') + 12);
+        stage.style.setProperty('--reserve', `${reserve}px`);
+      });
+    };
+    const ro2 = new ResizeObserver(size);
+    [...parts, stage].forEach((el) => ro2.observe(el));
+    if (header) ro2.observe(header);
   }
 
   // "Describe what your team needs": send it to the quote form, or as a WhatsApp message.
