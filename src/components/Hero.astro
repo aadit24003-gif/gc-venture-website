@@ -68,12 +68,17 @@ function field(rows: number, cols: number, yFrom: number, ySpan: number, gap: nu
   }
   return out;
 }
-/** Beside the laptop (12 rows) and beside the line above it (2 rows). */
+/** Beside the line above the laptop (2 rows). */
 const cols7 = (f: Floater[]) => f.filter((x) => x.c < 7); // wider columns only show on very wide screens
-const sides = { l: cols7(field(12, 10, 2, 104, 0.24)), r: cols7(field(12, 10, 2, 104, 0.24)) };
 const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 84, 0.2)) };
 const flStyle = (side: 'l' | 'r', f: Floater) =>
   `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
+
+/** The laptops either side of the main one (decorative: brands we rent). */
+const ghosts: { side: 'l' | 'r'; id: 'lenovo' | 'apple'; name: string }[] = [
+  { side: 'l', id: 'lenovo', name: 'ThinkPad' },
+  { side: 'r', id: 'apple', name: 'MacBook' },
+];
 
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
@@ -101,17 +106,23 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   </div>
 
   <div class="device" data-device>
-    <div class="floaters" aria-hidden="true" data-fade>
-      {(['l', 'r'] as const).map((side) => (
-        <div class={`fl-side fl-side--${side}`}>
-          {sides[side].map((f) => (
-            <span class={`fl c${f.c}`} style={flStyle(side, f)}>
-              <svg width={f.s} height={f.s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><use href={`#hf-${f.icon}`} /></svg>
-            </span>
-          ))}
+    <!-- a laptop on either side, cut off by the edge of the window -->
+    {ghosts.map((g) => (
+      <div class={`ghost ghost--${g.side}`} aria-hidden="true" data-fade>
+        <div class="g-lid">
+          <div class="g-screen">
+            <div class="g-card">
+              <svg class={`g-mark g-mark--${g.id}`} viewBox={markBox(g.id)} focusable="false">
+                {g.id === 'lenovo' ? <><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></> : <path d={BRAND_MARKS[g.id]} fill="currentColor" />}
+              </svg>
+              <span class="g-name">{g.name}</span>
+              <span class="g-lines"><i></i><i></i><i></i></span>
+            </div>
+          </div>
         </div>
-      ))}
-    </div>
+        <div class="g-deck"><span class="g-notch"></span></div>
+      </div>
+    ))}
 
     <div class="laptop">
       <div class="lid">
@@ -202,11 +213,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .pocket--r { left: calc(100% - 6px); }
 
   /* Icon field */
-  .floaters, .pocket { --icon-accent: var(--red-soft); }
-  .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
-  .fl-side { position: absolute; top: 0; bottom: 0; width: max(0px, calc((100vw - 100%) / 2 - 12px)); container-type: inline-size; }
-  .fl-side--l { right: 100%; }
-  .fl-side--r { left: 100%; }
+  .pocket { --icon-accent: var(--red-soft); }
   .fl {
     position: absolute; display: none; color: var(--on-dark); opacity: var(--o);
     --sp: max(46px, (100cqi - 40px) / 10);
@@ -220,7 +227,50 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   @container (min-width: 258px) { .c4 { display: block; } }
   @container (min-width: 304px) { .c5 { display: block; } }
   @container (min-width: 350px) { .c6 { display: block; } }
-  @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
+  @media (max-width: 1099px) { .pocket { display: none; } }
+
+  /* ── The laptops either side: same build as the main one, cut off by the window ── */
+  .ghost { position: absolute; top: 0; width: 100%; z-index: 0; pointer-events: none; --gap: clamp(40px, 5vw, 88px); }
+  .ghost--l { right: calc(100% + var(--gap)); }
+  .ghost--r { left: calc(100% + var(--gap)); }
+  .g-lid {
+    position: relative; width: 94%; margin: 0 auto;
+    padding: calc(var(--lw) * .013) calc(var(--lw) * .013) calc(var(--lw) * .022);
+    background: linear-gradient(180deg, #0c0a09, #050404);
+    border-radius: calc(var(--lw) * .024) calc(var(--lw) * .024) calc(var(--lw) * .007) calc(var(--lw) * .007);
+    box-shadow: inset 0 0 0 1px rgba(243, 238, 229, .08), 0 0 0 1px rgba(0, 0, 0, .6), 0 50px 120px -30px rgba(0, 0, 0, .9);
+    transform-origin: 50% 100%;
+  }
+  .g-screen {
+    position: relative; aspect-ratio: 16 / 10.4; overflow: hidden; display: grid; align-items: center;
+    padding: 0 7%; border-radius: calc(var(--lw) * .011) calc(var(--lw) * .011) 2px 2px; color: var(--ink);
+    background: #EDE6DA radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
+  }
+  /* they recede: darker towards the outer edge of the window */
+  .g-screen::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(18, 14, 13, .12), rgba(18, 14, 13, .55)); }
+  .ghost--l .g-screen::after { transform: scaleX(-1); }
+  .ghost--l .g-screen { justify-items: end; }
+  .ghost--r .g-screen { justify-items: start; }
+  .g-card { display: grid; gap: calc(var(--lw) * .014); justify-items: start; }
+  .ghost--l .g-card { justify-items: end; text-align: right; }
+  .g-mark { display: block; color: var(--ink); }
+  .g-mark--apple { width: calc(var(--lw) * .05); height: calc(var(--lw) * .06); }
+  .g-mark--lenovo { width: calc(var(--lw) * .13); height: calc(var(--lw) * .044); }
+  .g-name { font-family: var(--font-display); font-size: calc(var(--lw) * .07); line-height: 1; letter-spacing: -0.03em; }
+  .g-lines { display: grid; gap: calc(var(--lw) * .01); justify-items: inherit; }
+  .g-lines i { display: block; height: calc(var(--lw) * .008); border-radius: 99px; background: rgba(23, 19, 15, .14); }
+  .g-lines i:nth-child(1) { width: calc(var(--lw) * .24); }
+  .g-lines i:nth-child(2) { width: calc(var(--lw) * .18); }
+  .g-lines i:nth-child(3) { width: calc(var(--lw) * .12); background: rgba(185, 41, 30, .35); }
+  .g-deck {
+    position: relative; height: max(10px, calc(var(--lw) * .018)); margin-top: -1px;
+    background: linear-gradient(180deg, #b9b2a6 0%, #948d81 45%, #625c54 100%);
+    border-radius: 2px 2px 20px 20px / 2px 2px 12px 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 18px 30px -12px rgba(0,0,0,.8);
+  }
+  .g-notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #7f786d, #9d968a); border-radius: 0 0 9px 9px; }
+  /* only where there is room for a visible slice */
+  @media (max-width: 1099px) { .ghost { display: none; } }
 
   /* ── The laptop: black body, cream IT Rentals screen ── */
   .device { position: relative; z-index: 1; width: var(--lw); }
@@ -310,7 +360,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     :global(html.scenes) .stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
     :global(html.scenes) .device { will-change: transform; }
     /* their own layers, so fading them does not repaint the growing laptop */
-    :global(html.scenes) :is(.topline, .floaters, .brands, .next) { will-change: opacity; }
+    :global(html.scenes) :is(.topline, .ghost, .brands, .next) { will-change: opacity; }
     /* the screen's words grow with the laptop: drawn once and scaled, not redrawn at every step */
     :global(html.scenes) .desk { will-change: transform, opacity; }
     /* a plain reflection (a blend mode would be recomputed on every frame of the zoom) */
@@ -320,6 +370,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   /* The lid opens when the page loads (the headline is painted from the first frame) */
   @media (prefers-reduced-motion: no-preference) {
     .lid { animation: lid-open .9s cubic-bezier(.2, .75, .2, 1) .05s backwards; }
+    .g-lid { animation: lid-open 1s cubic-bezier(.2, .75, .2, 1) .25s backwards; }
     @keyframes lid-open { from { transform: perspective(1500px) rotateX(-70deg); } to { transform: perspective(1500px) rotateX(0deg); } }
     .next :global(svg) { animation: nudge-down 2.4s ease-in-out 1.2s 3; }
     @keyframes nudge-down { 50% { transform: translateY(3px); } }
