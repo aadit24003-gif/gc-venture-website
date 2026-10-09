@@ -105,7 +105,9 @@ function hero(s: Scene, p: number) {
   h.device.style.transform = z === 0 ? '' : `translate3d(${(g.dx * z).toFixed(1)}px, ${(g.dy * z).toFixed(1)}px, 0) scale(${(1 + (g.s - 1) * z).toFixed(4)})`;
   const out = (1 - clamp(p / 0.14)).toFixed(3);
   h.fades.forEach((el) => { el.style.opacity = out; });
-  if (h.desk) h.desk.style.opacity = (1 - clamp((p - 0.2) / 0.24)).toFixed(3);
+  // faded early: on its own layer, a fully clear screen costs nothing while the laptop
+  // keeps growing (and the page's h1 on it stays readable to screen readers)
+  if (h.desk) h.desk.style.opacity = (1 - clamp((p - 0.06) / 0.2)).toFixed(3);
 }
 
 /* How renting works: which cards have landed, for the step dots. */
@@ -199,7 +201,9 @@ function init() {
     const y = scrollY;
     for (const s of scenes) {
       const t = target(s, y);
-      if (s.cur < 0) s.cur = t;
+      // the hero's zoom follows the scroll exactly (its glide is already smooth), so the
+      // laptop and the page rising over it never drift apart
+      if (s.cur < 0 || s.name === 'hero') s.cur = t;
       const d = t - s.cur;
       s.cur = Math.abs(d) < 0.0004 ? t : s.cur + d * ease;
       if (s.cur !== t) moving = true;
@@ -264,14 +268,25 @@ function init() {
   const landY = () => (landing ? Math.round(landing.getBoundingClientRect().top + scrollY) : 0);
   const glide = (to: number) => {
     cancelAnimationFrame(glideRaf);
-    const from = scrollY;
-    const d = to - from;
-    if (Math.abs(d) < 2) return;
-    const dur = Math.min(1300, Math.max(750, Math.abs(d) * 0.55));
-    const t0 = performance.now();
+    if (Math.abs(to - scrollY) < 2) return;
+    // the wheel's own smooth scroll may still be moving: start from wherever it has got
+    // to on the first frame (never pull back), and take over from there
+    let from = NaN;
+    let d = 0;
+    let dur = 0;
+    let t0 = 0;
+    // Starts moving straight away (the visitor is already scrolling) and settles
+    // gently: a sine ease-out, softened at the start so there is no jolt.
+    const curve = (t: number) => 0.85 * Math.sin((t * Math.PI) / 2) + 0.15 * (1 - Math.cos(t * Math.PI)) / 2;
     const step = (now: number) => {
+      if (Number.isNaN(from)) {
+        from = scrollY;
+        d = to - from;
+        dur = Math.min(1500, Math.max(900, Math.abs(d) * 0.85));
+        t0 = now;
+      }
       const t = Math.min(1, (now - t0) / dur);
-      const e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const e = curve(t);
       window.scrollTo({ top: from + d * e, behavior: 'instant' as ScrollBehavior });
       if (t < 1) glideRaf = requestAnimationFrame(step);
       else { glideRaf = 0; lastY = scrollY; holdUntil = performance.now() + 350; }
@@ -290,12 +305,23 @@ function init() {
   };
   const SCROLL_KEYS = new Set([' ', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'Home', 'End']);
   const holdInput = (e: Event) => {
-    if (!glideRaf && !(e.type === 'wheel' && performance.now() < holdUntil)) return;
     if (e instanceof KeyboardEvent) {
       const t = e.target as HTMLElement | null;
-      if (!SCROLL_KEYS.has(e.key) || t?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (!SCROLL_KEYS.has(e.key) || e.altKey || e.ctrlKey || e.metaKey || t?.closest('input, textarea, select, button, [contenteditable="true"]')) return;
+      if (glideRaf) { e.preventDefault(); return; }
+      // Scroll keys on the first screen glide instead of starting the browser's own
+      // smooth scroll (which would carry on past the landing point)
+      if (!heroScene?.pinned || !landing) return;
+      const y = scrollY;
+      const top = topY();
+      const land = landY();
+      const down = e.key === 'PageDown' || e.key === 'ArrowDown' || (e.key === ' ' && !e.shiftKey);
+      const up = e.key === 'PageUp' || e.key === 'ArrowUp' || (e.key === ' ' && e.shiftKey);
+      if (down && y < land - 2) { e.preventDefault(); glide(land); }
+      else if (up && y > top + 2 && y <= land + 2) { e.preventDefault(); glide(top); }
+      return;
     }
-    e.preventDefault();
+    if (glideRaf || (e.type === 'wheel' && performance.now() < holdUntil)) e.preventDefault();
   };
   // "Describe your need, or build your own" on the first screen glides there too
   const onClick = (e: MouseEvent) => {

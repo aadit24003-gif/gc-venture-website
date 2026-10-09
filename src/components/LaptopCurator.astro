@@ -7,7 +7,8 @@
  * storage. Choosing an option plugs its cable into the laptop, the screen shows
  * the brand and the specification. "Your setup" underneath sums up the choice,
  * with a quote link for the chosen quantity and a link to the matching models in
- * the catalogue; "Explore the full catalogue" closes the section.
+ * the catalogue; then "Explore the full catalogue" and the matching models
+ * (popular ones before anything is chosen).
  *
  * Options come from the catalogue data (src/data/products.ts), so the curator
  * never offers a combination that does not exist. Without JavaScript it is a
@@ -87,6 +88,14 @@ const boxes = [
   { n: 4, id: 'storage', title: 'Storage', rows: storageRows, area: 'b4' },
 ];
 
+/** Shown before anything is chosen, and without JavaScript. */
+const popular = PRODUCTS.filter((p) => p.featured && p.configs?.length).slice(0, 4);
+const span = (xs: number[]) => (xs.length > 1 ? `${formatGb(Math.min(...xs))} to ${formatGb(Math.max(...xs))}` : formatGb(xs[0]));
+const cardSpec = (p: Product) => {
+  const c = p.configs!;
+  const proc = isMac(p) ? p.processor ?? '' : uniq(c.flatMap((x) => x.family ?? [])).join(' or ');
+  return [proc, `${span(uniq(c.flatMap((x) => x.ram)))} memory`, `${span(uniq(c.flatMap((x) => x.storage)))} storage`].join(', ');
+};
 ---
 <section class="cur" id="build" aria-labelledby="cur-title">
   <div class="wrap cur-wrap">
@@ -213,6 +222,26 @@ const boxes = [
 
     <div class="explore-row">
       <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+    </div>
+
+    <div class="results">
+      <div class="results-head">
+        <h3 class="results-title" data-results-title>Popular models</h3>
+        <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
+      </div>
+      <div class="matches" data-matches>
+        {popular.map((p) => (
+          <article class="mcard">
+            <a class:list={['mcard-img', { 'mcard-img--studio': /-studio-/.test(p.images[0].card ?? p.images[0].src) }]} href={`/equipment/${p.slug}/`} tabindex="-1" aria-hidden="true"><img src={p.images[0].card ?? p.images[0].src} alt="" width="800" height="500" loading="lazy" decoding="async" /></a>
+            <div class="mcard-body">
+              <p class="mcard-sub">{p.subcategory}</p>
+              <h4 class="mcard-name"><a href={`/equipment/${p.slug}/`}>{p.name}</a></h4>
+              <p class="mcard-spec">{cardSpec(p)}</p>
+              <a class="mcard-quote" href={`/request-a-quote/?product=${encodeURIComponent(p.slug)}&qty=10`}>Quote this model</a>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   </div>
 </section>
@@ -507,7 +536,7 @@ const boxes = [
       /* it lands at the top of the window, under the floating header */
       padding-top: calc(80px + clamp(36px, 3.4vw, 56px));
       border-radius: clamp(24px, 3vw, 40px) clamp(24px, 3vw, 40px) 0 0;
-      box-shadow: 0 -30px 60px -20px rgba(18, 14, 13, .35);
+      box-shadow: 0 -24px 40px -24px rgba(18, 14, 13, .3);
     }
   }
 
@@ -516,6 +545,43 @@ const boxes = [
   .explore { --btn-bg: var(--paper); --btn-fg: var(--ink); --btn-bd: var(--paper); font-weight: 600; }
   .explore:hover { --btn-bg: var(--red-ink); --btn-fg: #fff; --btn-bd: var(--red-ink); }
   .explore:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+
+  /* ── Matching models ── */
+  .results { margin-top: var(--s-7); }
+  .results-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: var(--s-5); }
+  .results-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); }
+  .results .link-arrow { color: var(--on-dark); }
+  .matches { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @media (max-width: 1099px) { .matches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .matches :global(.mcard) {
+    display: grid; grid-template-rows: auto 1fr; overflow: hidden; border-radius: var(--r-lg); color: var(--ink);
+    background: var(--card); border: 1px solid var(--line); box-shadow: 0 24px 50px -30px rgba(0, 0, 0, .8);
+    transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
+  }
+  .matches :global(.mcard:hover) { transform: translateY(-3px); box-shadow: var(--shadow-block); }
+  .matches :global(.mcard-img) { display: block; overflow: hidden; background: var(--paper-3); }
+  .matches :global(.mcard-img img) { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 600ms var(--ease-out); }
+  .matches :global(.mcard:hover .mcard-img img) { transform: scale(1.035); }
+  .matches :global(.mcard-img--studio) { background: radial-gradient(70% 85% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
+  .matches :global(.mcard-img--studio img) { object-fit: cover; mix-blend-mode: multiply; }
+  .matches :global(.mcard-body) { display: grid; align-content: start; gap: 6px; padding: 14px 16px 18px; }
+  .matches :global(.mcard-sub) { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
+  .matches :global(.mcard-name) { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; line-height: 1.15; letter-spacing: -0.01em; }
+  .matches :global(.mcard-name a) { text-decoration: none; }
+  .matches :global(.mcard-name a:hover) { text-decoration: underline; text-underline-offset: 3px; }
+  .matches :global(.mcard-spec) { margin: 0; font-size: var(--fs-small); line-height: 1.5; color: var(--ink-2); }
+  .matches :global(.mcard-quote) { justify-self: start; margin-top: 6px; font-size: var(--fs-small); font-weight: 600; color: var(--red-ink); text-underline-offset: 3px; }
+  /* Phones: compact cards with a thumbnail */
+  @media (max-width: 699px) {
+    .matches { grid-template-columns: 1fr; gap: 12px; }
+    .matches :global(.mcard) { grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: none; }
+    .matches :global(.mcard-img) { display: block; }
+    .matches :global(.mcard-img img) { height: 100%; aspect-ratio: auto; }
+    .matches :global(.mcard-body) { padding: 12px 14px 14px; gap: 4px; }
+    .matches :global(.mcard-name) { font-size: 1.125rem; }
+    .matches :global(.mcard-spec) { font-size: var(--fs-xs); }
+  }
+  .matches :global(.empty) { grid-column: 1 / -1; margin: 0; padding: 22px; border: 1px dashed var(--hair-2); border-radius: var(--r-lg); color: var(--on-dark-2); }
 
   @media (prefers-reduced-motion: reduce) {
     .scr-mark, .box, .need, .pick span, .tile-face, .lap-deck, .lap-lid, .lap-floor, .scr-spec div { transition: none; }
@@ -530,6 +596,11 @@ const boxes = [
   type Key = keyof Sel;
 
   const fmt = (n: number) => (n >= 1024 ? `${n / 1024} TB` : `${n} GB`);
+  const span = (xs: number[]) => {
+    const u = [...new Set(xs)].sort((a, b) => a - b);
+    return u.length > 1 ? `${fmt(u[0])} to ${fmt(u[u.length - 1])}` : fmt(u[0]);
+  };
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   const chipName = (c: string) => c.replace(/^Intel /, '').replace(/^Apple /, '').replace(/ \((\d+\w\w Gen)\)/, ' $1');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -578,6 +649,11 @@ const boxes = [
     const quote = form.querySelector<HTMLAnchorElement>('[data-quote]')!;
     const reset = form.querySelector<HTMLButtonElement>('[data-reset]')!;
     const browse = form.querySelector<HTMLButtonElement>('[data-browse]')!;
+    const section = form.closest('section')!;
+    const matchesEl = section.querySelector<HTMLElement>('[data-matches]')!;
+    const titleEl = section.querySelector<HTMLElement>('[data-results-title]')!;
+    const allEl = section.querySelector<HTMLAnchorElement>('[data-all]')!;
+    const popularHTML = matchesEl.innerHTML;
     const box = (id: string) => form.querySelector<HTMLFieldSetElement>(`[data-box="${id}"]`)!;
     const BOXES = ['brand', 'proc', 'ram', 'storage'] as const;
     const KEYS: Key[] = ['brand', 'proc', 'gen', 'model', 'chip', 'ram', 'storage'];
@@ -665,6 +741,21 @@ const boxes = [
       return [s.proc, s.gen].filter(Boolean).join(' ');
     };
 
+    function card(m: Model, vs: Variant[], s: Sel, n: number) {
+      const chipsTxt = [...new Set(vs.map((v) => chipName(v.c)))];
+      const proc = chipsTxt.length > 2 ? `${chipsTxt.slice(0, 2).join(', ')} and ${chipsTxt.length - 2} more` : chipsTxt.join(' or ');
+      const mem = `${s.ram ? fmt(Number(s.ram)) : span(vs.flatMap((v) => v.r))} memory`;
+      const sto = s.storage ? `${fmt(Number(s.storage))} ${vs[0].t}` : `${span(vs.flatMap((v) => v.st))} storage`;
+      const config = `${m.n}, ${proc}, ${mem}, ${sto}`;
+      const href = `/equipment/${m.s}/`;
+      const q = `/request-a-quote/?product=${encodeURIComponent(m.s)}&qty=${n}&config=${encodeURIComponent(config)}`;
+      const studio = /-studio-/.test(m.img) ? ' mcard-img--studio' : '';
+      return `<article class="mcard"><a class="mcard-img${studio}" href="${href}" tabindex="-1" aria-hidden="true"><img src="${esc(m.img)}" alt="" width="800" height="500" loading="lazy" decoding="async"></a>`
+        + `<div class="mcard-body"><p class="mcard-sub">${esc(m.sub)}</p><h4 class="mcard-name"><a href="${href}">${esc(m.n)}</a></h4>`
+        + `<p class="mcard-spec">${esc(`${proc}, ${mem}, ${sto}`)}</p>`
+        + `<a class="mcard-quote" href="${q}">Quote ${n} of this model</a></div></article>`;
+    }
+
     function catalogueUrl(s: Sel) {
       const p = new URLSearchParams();
       if (isMacSel(s)) {
@@ -742,6 +833,26 @@ const boxes = [
         + (list.length && list.length <= 6 ? `. Models: ${list.map((x) => x.m.n).join(', ')}` : '');
       quote.href = `/request-a-quote/?category=${isMacSel(s) ? 'macbooks' : 'laptops'}&qty=${n}&config=${encodeURIComponent(config.slice(0, 300))}`;
       reset.hidden = !s.brand && !s.ram && !s.storage;
+
+      // Matching models
+      if (!s.brand) {
+        titleEl.textContent = 'Popular models';
+        if (last?.brand) matchesEl.innerHTML = popularHTML;
+        matchesEl.querySelectorAll<HTMLAnchorElement>('a.mcard-quote').forEach((a) => {
+          const u = new URL(a.href, location.href);
+          u.searchParams.set('qty', String(n));
+          a.href = u.pathname + u.search;
+        });
+        allEl.href = '/equipment/';
+        allEl.firstChild!.textContent = 'Open the catalogue ';
+      } else {
+        titleEl.textContent = list.length ? `${list.length} matching ${list.length === 1 ? 'model' : 'models'}` : 'No exact match';
+        matchesEl.innerHTML = list.length
+          ? list.slice(0, 4).map((x) => card(x.m, x.vs, s, n)).join('')
+          : `<p class="empty">Nothing in our listed range has exactly this setup. Ask for a quote anyway: we source to order and will suggest the closest match.</p>`;
+        allEl.href = catalogueUrl(s);
+        allEl.firstChild!.textContent = list.length > 4 ? `See all ${list.length} in the catalogue ` : 'Open in the catalogue ';
+      }
 
       // The catalogue button opens the matching models there
       browse.textContent = !s.brand ? 'Open the catalogue' : list.length > 1 ? `See all ${list.length} in the catalogue` : list.length ? 'See it in the catalogue' : 'Open the catalogue';

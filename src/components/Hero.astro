@@ -312,6 +312,12 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     :global(html.scenes) .hero { height: 210vh; height: 210svh; }
     :global(html.scenes) .stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
     :global(html.scenes) .device { will-change: transform; }
+    /* their own layers, so fading them does not repaint the growing laptop */
+    :global(html.scenes) :is(.topline, .floaters, .brands, .next) { will-change: opacity; }
+    /* the screen's words grow with the laptop: drawn once and scaled, not redrawn at every step */
+    :global(html.scenes) .desk { will-change: transform, opacity; }
+    /* a plain reflection (a blend mode would be recomputed on every frame of the zoom) */
+    :global(html.scenes) .glass { mix-blend-mode: normal; opacity: .35; }
   }
 
   /* The lid opens when the page loads (the headline is painted from the first frame) */
