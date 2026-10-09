@@ -6,7 +6,7 @@
  * filled in), and four option boxes wired to it: brand, processor, memory and
  * storage. Choosing an option plugs its cable into the laptop, the screen shows
  * the brand and the specification, and the models that match are listed with a
- * quote link for the chosen quantity.
+ * quote link. "Explore the full catalogue" sits between the builder and the models.
  *
  * Options come from the catalogue data (src/data/products.ts), so the curator
  * never offers a combination that does not exist. Without JavaScript it is a
@@ -196,32 +196,21 @@ const cardSpec = (p: Product) => {
         ))}
       </div>
 
-      <!-- Your setup -->
-      <div class="setup" data-setup>
-        <div class="setup-text">
-          <p class="setup-label">Your setup</p>
-          <p class="setup-line" data-setup-line>Any brand, any processor, any memory, any storage</p>
-          <p class="setup-count"><span role="status" aria-live="polite" data-count>{models.length} models to choose from</span> <button type="button" class="reset" data-reset hidden>Start over</button></p>
-        </div>
-        <div class="setup-actions">
-          <div class="qty">
-            <label for="cur-qty">Quantity</label>
-            <div class="qty-ctl">
-              <button type="button" class="qty-btn" data-qty-step="-1" aria-label="Fewer laptops"><Icon name="minus" size={16} /></button>
-              <input id="cur-qty" class="qty-in" type="number" inputmode="numeric" min="1" max="10000" value="10" data-qty />
-              <button type="button" class="qty-btn" data-qty-step="1" aria-label="More laptops"><Icon name="plus" size={16} /></button>
-            </div>
-          </div>
-          <a class="btn btn--primary" href="/request-a-quote/?category=laptops&qty=10" data-quote><span>Get a quote for <span data-qty-n>10</span> <span data-qty-noun>laptops</span></span></a>
-          <button type="submit" class="btn" data-browse>See matches in the catalogue</button>
-        </div>
-      </div>
+      <!-- read out as choices change (the title above the models says the same) -->
+      <p class="sr-only" role="status" aria-live="polite" data-count>{models.length} models to choose from</p>
     </form>
+
+    <div class="explore-row">
+      <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+    </div>
 
     <div class="results">
       <div class="results-head">
         <h3 class="results-title" data-results-title>Popular models</h3>
-        <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
+        <div class="results-links">
+          <button type="button" class="reset" data-reset hidden>Start over</button>
+          <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
+        </div>
       </div>
       <div class="matches" data-matches>
         {popular.map((p) => (
@@ -252,7 +241,7 @@ const cardSpec = (p: Product) => {
     --hair: rgba(243, 238, 229, .14); --hair-2: rgba(243, 238, 229, .26); --panel: rgba(243, 238, 229, .04);
     --done-bd: rgba(230, 133, 122, .55); --done-bg: rgba(224, 51, 40, .08);
     position: relative; isolation: isolate; overflow-x: clip; color: var(--on-dark);
-    padding-block: clamp(64px, 6vw, 104px) var(--section);
+    padding-block: clamp(64px, 6vw, 104px);
     background:
       radial-gradient(46% 40% at 50% 52%, rgba(122, 32, 24, .34) 0%, transparent 70%),
       radial-gradient(60% 50% at 100% 100%, rgba(122, 32, 24, .22) 0%, transparent 65%),
@@ -492,33 +481,15 @@ const cardSpec = (p: Product) => {
     .box--brand::before { display: none; }
   }
 
-  /* ── Your setup ── */
-  .setup {
-    display: grid; gap: 18px 32px; margin-top: clamp(24px, 3vw, 36px); padding: 20px 22px; border-radius: var(--r-lg);
-    background: var(--panel); border: 1px solid var(--hair-2); color: var(--on-dark);
-  }
-  .setup-label { margin: 0; font-size: var(--fs-xs); color: var(--on-dark-2); }
-  .setup-line { margin: 4px 0 0; font-family: var(--font-display); font-size: clamp(1.25rem, 1.05rem + .7vw, 1.6rem); line-height: 1.25; }
-  .setup-count { margin: 6px 0 0; font-size: var(--fs-small); color: var(--on-dark-2); }
-  .setup-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
-  .setup .btn:not(.btn--primary) { --btn-fg: var(--on-dark); --btn-bd: var(--hair-dark-strong); --btn-bg: transparent; }
-  .setup .btn:not(.btn--primary):hover { --btn-bd: var(--on-dark); }
-  .qty { display: flex; align-items: center; gap: 10px; }
-  .qty label { font-size: var(--fs-xs); color: var(--on-dark-2); }
-  .qty-ctl { display: inline-flex; align-items: center; border: 1px solid var(--hair-dark-strong); border-radius: var(--r-pill); }
-  .qty-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--on-dark); cursor: pointer; }
-  .qty-btn:hover { background: rgba(243,238,229,.08); }
-  .qty-in {
-    width: 64px; height: 40px; border: 0; background: transparent; color: var(--on-dark); text-align: center;
-    font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield;
-  }
-  .qty-in::-webkit-outer-spin-button, .qty-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .qty-btn:focus-visible, .qty-in:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
-  .setup .btn:focus-visible { outline-color: var(--red-soft); }
-  .reset { margin-left: 10px; border: 0; background: none; padding: 4px 2px; color: var(--on-dark); font: inherit; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  /* ── Explore the full catalogue ── */
+  .explore-row { display: flex; justify-content: center; margin-top: clamp(32px, 4vw, 56px); }
+  .explore { --btn-bg: var(--paper); --btn-fg: var(--ink); --btn-bd: var(--paper); font-weight: 600; }
+  .explore:hover { --btn-bg: var(--red-ink); --btn-fg: #fff; --btn-bd: var(--red-ink); }
+  .explore:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  .reset { border: 0; background: none; padding: 4px 2px; color: var(--on-dark-2); font: inherit; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .reset:hover { color: var(--on-dark); }
   .reset:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
-  @media (min-width: 1100px) { .setup { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
-  @media (forced-colors: active) { .box, .need, .setup, .lap-lid { border: 1px solid CanvasText; } }
+  @media (forced-colors: active) { .box, .need, .lap-lid { border: 1px solid CanvasText; } }
 
   /*
    * In the full version this page rises like a sheet over the first screen as
@@ -533,10 +504,11 @@ const cardSpec = (p: Product) => {
   }
 
   /* ── Matching models ── */
-  .results { margin-top: var(--s-7); }
+  .results { margin-top: clamp(48px, 5vw, 72px); }
   .results-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: var(--s-5); }
   .results-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); }
   .results .link-arrow { color: var(--on-dark); }
+  .results-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 22px; }
   .matches { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
   @media (max-width: 1099px) { .matches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .matches :global(.mcard) {
@@ -632,9 +604,9 @@ const cardSpec = (p: Product) => {
     const lid = lap.querySelector<HTMLElement>('[data-port-lid]')!;
     const screen = lap.querySelector<HTMLElement>('.lap-screen')!;
     screen.addEventListener('animationend', () => screen.classList.remove('scan'));
-    const qty = form.querySelector<HTMLInputElement>('[data-qty]')!;
-    const quote = form.querySelector<HTMLAnchorElement>('[data-quote]')!;
-    const reset = form.querySelector<HTMLButtonElement>('[data-reset]')!;
+    const reset = section.querySelector<HTMLButtonElement>('[data-reset]')!;
+    // quote links ask for 10, where laptop rentals start; the quote form takes the real number
+    const n = 10;
     const matchesEl = section.querySelector<HTMLElement>('[data-matches]')!;
     const titleEl = section.querySelector<HTMLElement>('[data-results-title]')!;
     const allEl = section.querySelector<HTMLAnchorElement>('[data-all]')!;
@@ -738,7 +710,7 @@ const cardSpec = (p: Product) => {
       return `<article class="mcard"><a class="mcard-img${studio}" href="${href}" tabindex="-1" aria-hidden="true"><img src="${esc(m.img)}" alt="" width="800" height="500" loading="lazy" decoding="async"></a>`
         + `<div class="mcard-body"><p class="mcard-sub">${esc(m.sub)}</p><h4 class="mcard-name"><a href="${href}">${esc(m.n)}</a></h4>`
         + `<p class="mcard-spec">${esc(`${proc}, ${mem}, ${sto}`)}</p>`
-        + `<a class="mcard-quote" href="${q}">Quote ${n} of this model</a></div></article>`;
+        + `<a class="mcard-quote" href="${q}">Quote this model</a></div></article>`;
     }
 
     function catalogueUrl(s: Sel) {
@@ -765,8 +737,6 @@ const cardSpec = (p: Product) => {
     function render() {
       const s = get();
       const list = s.brand ? matching(s) : [];
-      const n = Math.max(1, Math.min(10000, parseInt(qty.value, 10) || 1));
-      const brandName = s.brand === 'any' ? 'Lenovo, Dell or HP' : s.brand;
       const proc = procText(s, list);
       const mem = s.ram ? fmt(Number(s.ram)) : '';
       const sto = s.storage ? fmt(Number(s.storage)) : '';
@@ -804,30 +774,14 @@ const cardSpec = (p: Product) => {
       const countTxt = !s.brand ? `${models.length} models to choose from` : list.length ? `${list.length} ${list.length === 1 ? 'model matches' : 'models match'}` : 'No exact match: ask us and we will source it';
       lap.querySelector('[data-scr-foot]')!.textContent = s.brand ? countTxt : 'Choose a brand to start';
 
-      // Setup summary and links
-      const parts = [
-        isMacSel(s) ? `Apple ${proc || 'MacBook, any chip'}` : `${s.brand ? brandName : 'Any brand'}, ${proc || 'any processor'}`,
-        mem ? `${mem} memory` : 'any memory',
-        sto ? `${sto} storage` : 'any storage',
-      ];
-      form.querySelector('[data-setup-line]')!.textContent = parts.join(', ');
+      // Read out the count, and offer to start over once something is chosen
       form.querySelector('[data-count]')!.textContent = countTxt;
-      form.querySelectorAll('[data-qty-n]').forEach((el) => (el.textContent = String(n)));
-      form.querySelectorAll('[data-qty-noun]').forEach((el) => (el.textContent = isMacSel(s) ? (n === 1 ? 'MacBook' : 'MacBooks') : (n === 1 ? 'laptop' : 'laptops')));
-      const config = `${isMacSel(s) ? 'MacBook' : 'Laptop'}: ${parts.join(', ')}`
-        + (list.length && list.length <= 6 ? `. Models: ${list.map((x) => x.m.n).join(', ')}` : '');
-      quote.href = `/request-a-quote/?category=${isMacSel(s) ? 'macbooks' : 'laptops'}&qty=${n}&config=${encodeURIComponent(config.slice(0, 300))}`;
       reset.hidden = !s.brand && !s.ram && !s.storage;
 
       // Matching models
       if (!s.brand) {
         titleEl.textContent = 'Popular models';
         if (last?.brand) matchesEl.innerHTML = popularHTML;
-        matchesEl.querySelectorAll<HTMLAnchorElement>('a.mcard-quote').forEach((a) => {
-          const u = new URL(a.href, location.href);
-          u.searchParams.set('qty', String(n));
-          a.href = u.pathname + u.search;
-        });
         allEl.href = '/equipment/';
         allEl.firstChild!.textContent = 'Open the catalogue ';
       } else {
@@ -908,18 +862,11 @@ const cardSpec = (p: Product) => {
 
     form.addEventListener('change', (e) => {
       const t = e.target as HTMLInputElement;
-      if (t === qty) { render(); return; }
       if (!KEYS.includes(t.name as Key)) return;
       settle(t.name as Key);
       syncOptions(get());
       render();
     });
-    qty.addEventListener('input', () => render());
-    form.querySelectorAll<HTMLButtonElement>('[data-qty-step]').forEach((b) => b.addEventListener('click', () => {
-      const n = (parseInt(qty.value, 10) || 0) + Number(b.dataset.qtyStep) * (Number(qty.value) >= 50 ? 10 : Number(qty.value) >= 20 ? 5 : 1);
-      qty.value = String(Math.max(1, Math.min(10000, n)));
-      render();
-    }));
     reset.addEventListener('click', () => {
       radios('brand').forEach((r) => (r.checked = false));
       (['proc', 'gen', 'model', 'chip', 'ram', 'storage'] as Key[]).forEach((k) => set(k, ''));
@@ -933,7 +880,6 @@ const cardSpec = (p: Product) => {
       allEl.href = catalogueUrl(get());
       allEl.click();
     });
-    qty.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); render(); } });
 
     let raf = 0;
     const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(geometry); };
