@@ -75,6 +75,20 @@ const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 8
 const flStyle = (side: 'l' | 'r', f: Floater) =>
   `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
 
+/**
+ * Capsules beside the laptop naming what we rent, each tilted a little and
+ * linking to its rental page. `t` is the height (share of the laptop), `x` the
+ * distance from the laptop, `r` the tilt.
+ */
+const caps = [
+  { side: 'l', label: 'Rent laptops', icon: 'laptop', href: '/laptop-rental/', t: 14, x: 34, r: -8, hot: true },
+  { side: 'l', label: 'MacBooks', icon: 'laptop-minimal', href: '/macbook-rental/', t: 46, x: 70, r: 6 },
+  { side: 'l', label: 'Monitors', icon: 'monitor', href: '/monitor-rental/', t: 76, x: 24, r: -4 },
+  { side: 'r', label: 'Desktops', icon: 'pc-case', href: '/desktop-rental/', t: 18, x: 56, r: 7 },
+  { side: 'r', label: 'Servers', icon: 'server', href: '/server-rental/', t: 48, x: 22, r: -6 },
+  { side: 'r', label: 'Mobile phones', icon: 'smartphone', href: '/mobile-phone-rental/', t: 78, x: 62, r: 5 },
+] as const;
+
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
 <section class="hero" data-scene="hero" aria-labelledby="hero-title">
@@ -112,6 +126,15 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
         </div>
       ))}
     </div>
+
+    <!-- what we rent, in tilted capsules either side -->
+    <ul class="caps" role="list" aria-label="What we rent" data-fade data-at="0">
+      {caps.map((c) => (
+        <li class={`cap cap--${c.side}`} style={`--t:${c.t}%; --x:${c.x}px; --r:${c.r}deg`}>
+          <a class:list={['cap-a', { 'cap-a--hot': 'hot' in c && c.hot }]} href={c.href} data-track-location="hero-capsule"><Icon name={c.icon} size={16} />{c.label}</a>
+        </li>
+      ))}
+    </ul>
 
     <div class="laptop">
       <div class="lid">
@@ -222,6 +245,33 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   @container (min-width: 350px) { .c6 { display: block; } }
   @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
 
+  /* Capsules beside the laptop, each at its own slight angle */
+  .caps { position: absolute; inset: 0; z-index: 2; margin: 0; padding: 0; list-style: none; pointer-events: none; }
+  .cap { position: absolute; top: var(--t); }
+  .cap--l { right: calc(100% + var(--x)); }
+  .cap--r { left: calc(100% + var(--x)); }
+  .cap-a {
+    display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px 10px 14px; border-radius: var(--r-pill);
+    background: var(--paper); color: var(--ink); font-weight: 600; font-size: .9375rem; white-space: nowrap; text-decoration: none;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .5) inset, 0 16px 30px -14px rgba(0, 0, 0, .8), 0 0 40px -12px rgba(224, 51, 40, .35);
+    transform: rotate(var(--r)); pointer-events: auto;
+    transition: transform var(--t-med) var(--ease-out), background-color var(--t-fast), color var(--t-fast);
+  }
+  .cap-a :global(svg) { color: var(--red-ink); flex: none; }
+  .cap-a--hot { background: var(--red-ink); color: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, .18) inset, 0 16px 30px -14px rgba(0, 0, 0, .8), 0 0 40px -10px rgba(224, 51, 40, .6); }
+  .cap-a--hot :global(svg) { color: #fff; }
+  .cap-a:hover { transform: rotate(0deg) translateY(-2px) scale(1.04); }
+  .cap-a:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  /* only where there is room beside the laptop */
+  @media (max-width: 1179px) { .caps { display: none; } }
+  @media (prefers-reduced-motion: no-preference) {
+    .cap-a { animation: cap-in .7s var(--ease-out) backwards; }
+    .cap:nth-child(1) .cap-a { animation-delay: .5s; } .cap:nth-child(4) .cap-a { animation-delay: .58s; }
+    .cap:nth-child(2) .cap-a { animation-delay: .66s; } .cap:nth-child(5) .cap-a { animation-delay: .74s; }
+    .cap:nth-child(3) .cap-a { animation-delay: .82s; } .cap:nth-child(6) .cap-a { animation-delay: .9s; }
+    @keyframes cap-in { from { opacity: 0; transform: rotate(0deg) translateY(10px) scale(.9); } }
+  }
+
   /* ── The laptop: black body, cream IT Rentals screen ── */
   .device { position: relative; z-index: 1; width: var(--lw); }
   .laptop { position: relative; z-index: 1; }
@@ -310,7 +360,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     :global(html.scenes) .stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
     :global(html.scenes) .device { will-change: transform; }
     /* their own layers, so fading them does not repaint the growing laptop */
-    :global(html.scenes) :is(.topline, .floaters, .brands, .next) { will-change: opacity; }
+    :global(html.scenes) :is(.topline, .floaters, .caps, .brands, .next) { will-change: opacity; }
     /* the screen's words grow with the laptop: drawn once and scaled, not redrawn at every step */
     :global(html.scenes) .desk { will-change: transform, opacity; }
     /* a plain reflection (a blend mode would be recomputed on every frame of the zoom) */
