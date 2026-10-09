@@ -1,6 +1,6 @@
 ---
 /**
- * Home page opening screen, on cream: the laptop with the IT Rentals screen
+ * Home page opening screen, on the dark wine page colour: the laptop with the IT Rentals screen
  * (headline, quote and WhatsApp buttons, our promises), the line above it with
  * library icons on either side, and the four laptop brands we rent as links
  * underneath.
@@ -165,9 +165,9 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 </section>
 
 <style>
-  /* Cream opening screen, with a faint wine light under the laptop */
+  /* Dark wine opening screen, with a warm light behind the laptop */
   .hero {
-    position: relative; color: var(--ink);
+    position: relative; color: var(--on-dark);
     /* extend up under the floating header */
     margin-top: -80px;
     --lw: min(1000px, 86vw, calc((100svh - 330px) * 1.52));
@@ -177,19 +177,15 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     min-height: 100vh; min-height: 100svh;
     display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(14px, 2.2vh, 24px);
     padding: calc(80px + clamp(28px, 4vh, 48px)) var(--gutter) clamp(28px, 4vh, 44px);
-    background-color: var(--paper);
-    background-image:
-      var(--grain),
-      radial-gradient(48% 42% at 50% 44%, rgba(255, 252, 246, .95) 0%, rgba(255, 252, 246, 0) 72%),
-      radial-gradient(60% 34% at 50% 100%, rgba(124, 27, 37, .13) 0%, rgba(124, 27, 37, 0) 75%),
-      radial-gradient(42% 38% at 8% 14%, rgba(224, 51, 40, .07) 0%, transparent 72%),
-      radial-gradient(48% 44% at 94% 86%, rgba(184, 138, 85, .14) 0%, transparent 72%);
-    background-size: 220px 220px, auto, auto, auto, auto;
+    background:
+      radial-gradient(60% 45% at 50% 38%, rgba(122, 32, 24, .38) 0%, transparent 70%),
+      radial-gradient(90% 60% at 50% 110%, rgba(58, 21, 18, .7) 0%, transparent 70%),
+      var(--night);
   }
   /* fine dot texture, strongest round the laptop */
   .glow {
     position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background-image: radial-gradient(rgba(23, 19, 15, .07) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(243, 238, 229, .07) 1px, transparent 1px);
     background-size: 22px 22px;
     mask-image: radial-gradient(70% 60% at 50% 48%, #000 30%, transparent 85%);
   }
@@ -206,13 +202,13 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .pocket--r { left: calc(100% - 6px); }
 
   /* Icon field */
-  .floaters, .pocket { --icon-accent: var(--red); }
+  .floaters, .pocket { --icon-accent: var(--red-soft); }
   .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
   .fl-side { position: absolute; top: 0; bottom: 0; width: max(0px, calc((100vw - 100%) / 2 - 12px)); container-type: inline-size; }
   .fl-side--l { right: 100%; }
   .fl-side--r { left: 100%; }
   .fl {
-    position: absolute; display: none; color: var(--ink); opacity: var(--o);
+    position: absolute; display: none; color: var(--on-dark); opacity: var(--o);
     --sp: max(46px, (100cqi - 40px) / 10);
     transform: rotate(var(--r));
   }
@@ -232,13 +228,13 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .lid {
     position: relative; z-index: 1; width: 94%; margin: 0 auto;
     padding: calc(var(--lw) * .013) calc(var(--lw) * .013) calc(var(--lw) * .022);
-    background: linear-gradient(180deg, #141214, #050405);
+    background: linear-gradient(180deg, #0c0a09, #050404);
     border-radius: calc(var(--lw) * .024) calc(var(--lw) * .024) calc(var(--lw) * .007) calc(var(--lw) * .007);
     box-shadow:
-      inset 0 0 0 1px rgba(243, 238, 229, .12),
-      0 0 0 1px rgba(0, 0, 0, .7),
-      0 60px 100px -46px rgba(58, 12, 18, .55),
-      0 24px 40px -30px rgba(23, 19, 15, .5);
+      inset 0 0 0 1px rgba(243, 238, 229, .10),
+      0 0 0 1px rgba(0, 0, 0, .6),
+      0 50px 120px -30px rgba(0, 0, 0, .9),
+      0 0 140px -20px rgba(185, 41, 30, .25);
     transform-origin: 50% 100%;
   }
   .cam { position: absolute; top: calc(var(--lw) * .0065); left: 50%; width: max(3px, calc(var(--lw) * .006)); height: max(3px, calc(var(--lw) * .006)); translate: -50% -50%; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; z-index: 2; }
@@ -253,12 +249,12 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .glass { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 32%); mix-blend-mode: soft-light; }
   .deck {
     position: relative; z-index: 1; height: max(10px, calc(var(--lw) * .018)); margin-top: -1px;
-    background: linear-gradient(180deg, #3a3a3e 0%, #1c1c1f 40%, #0b0b0c 100%);
+    background: linear-gradient(180deg, #d6cfc3 0%, #b2aa9d 45%, #7d766c 100%);
     border-radius: 2px 2px 20px 20px / 2px 2px 12px 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 18px 30px -12px rgba(0,0,0,.8);
   }
-  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #050506, #2a2a2e); border-radius: 0 0 9px 9px; }
-  .floor { position: absolute; left: 4%; right: 4%; bottom: calc(var(--lw) * -.035); height: calc(var(--lw) * .06); border-radius: 50%; background: radial-gradient(closest-side, rgba(40, 10, 14, .38), rgba(40, 10, 14, 0)); z-index: 0; }
+  .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #9d9588, #b9b1a4); border-radius: 0 0 9px 9px; }
+  .floor { position: absolute; left: 4%; right: 4%; bottom: calc(var(--lw) * -.035); height: calc(var(--lw) * .06); border-radius: 50%; background: radial-gradient(closest-side, rgba(0, 0, 0, .6), rgba(0, 0, 0, 0)); z-index: 0; }
 
   /* The IT Rentals screen */
   .desk {
@@ -289,19 +285,20 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   /* Brands we rent */
   .brands { margin-top: clamp(14px, 2.4vh, 26px); }
   .brands ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 0; padding: 0; list-style: none; }
-  .brands a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--ink); font-weight: 600; text-decoration: none; }
-  .brands a span { border-bottom: 1px solid var(--line-strong); padding-bottom: 2px; transition: border-color var(--t-fast); }
-  .brands a:hover span { border-color: var(--ink); }
-  .bmark { flex: none; width: 20px; height: 20px; color: var(--ink); }
+  .brands a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--on-dark); font-weight: 600; text-decoration: none; }
+  .brands a span { border-bottom: 1px solid rgba(243, 238, 229, .32); padding-bottom: 2px; transition: border-color var(--t-fast); }
+  .brands a:hover span { border-color: var(--on-dark); }
+  .brands a:focus-visible, .next:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 4px; border-radius: 4px; }
+  .bmark { flex: none; width: 20px; height: 20px; color: var(--on-dark); }
   .bmark--lenovo { width: 46px; height: 16px; }
 
   .next {
     display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
-    border-radius: var(--r-pill); border: 1px solid var(--line-strong); background: rgba(250, 247, 241, .7); color: var(--ink);
+    border-radius: var(--r-pill); border: 1px solid rgba(243, 238, 229, .28); background: rgba(243, 238, 229, .08); color: var(--on-dark);
     font-size: var(--fs-small); font-weight: 600; text-decoration: none; transition: border-color var(--t-fast), background-color var(--t-fast);
   }
   .next { margin-top: clamp(4px, 1vh, 12px); }
-  .next:hover { border-color: var(--ink); background: var(--card); }
+  .next:hover { border-color: var(--red-soft); background: rgba(224, 51, 40, .16); }
 
   /*
    * The full version: the first screen stays put while the page scrolls, and the
