@@ -1,4 +1,13 @@
 ---
+/**
+ * "From ten laptops to enterprise scale", on the dark wine of the opening screen.
+ *
+ * A track of four team sizes (10, 50, 100, 500+). Choosing one lights the fleet of laptop
+ * icons in a wave, counts the number up and swaps the description. With scroll scenes on
+ * a tall enough screen the section pins and scrolling walks the track from 10 to 500+
+ * (scenes.ts `scale`); clicking a size scrolls to its place. Everywhere else it is a plain
+ * selector. Without JavaScript it shows 50.
+ */
 import Icon from './Icon.astro';
 import { claim } from '../config/site';
 
@@ -26,42 +35,56 @@ const steps = [
   },
 ];
 const initial = 50;
+const initialIdx = steps.findIndex((s) => s.n === initial);
+const lit = (n: number) => (n >= 500 ? 100 : n);
 ---
-<section class="section scale" aria-labelledby="scale-title" data-scale>
-  <div class="wrap">
-    <div class="section-head section-head--split">
-      <h2 id="scale-title" class="h2">From ten laptops to enterprise scale</h2>
-      <p class="lead">Laptop rentals start at 10 units. The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
-    </div>
+<section class="scale" data-scene="scale" data-scale aria-labelledby="scale-title" style={`--step-fill:${initialIdx / (steps.length - 1)}`}>
+  <div class="stage">
+    <div class="wrap scale-wrap">
+      <div class="scale-head">
+        <h2 id="scale-title" class="scale-title">From ten laptops to enterprise scale</h2>
+        <p class="scale-lead">Laptop rentals start at 10 units. The order size changes how we plan the work, not how easy it is to ask. Pick a team size to see what that looks like.</p>
+      </div>
 
-    <div class="scale-board panel">
-      <fieldset class="seg scale-seg">
-        <legend class="label">How many people are you equipping?</legend>
-        {steps.map((s) => (
-          <>
-            <input type="radio" name="scale" id={`scale-${s.n}`} value={s.n} checked={s.n === initial} />
-            <label for={`scale-${s.n}`}><span class="num">{s.label}</span></label>
-          </>
-        ))}
-      </fieldset>
-
-      <div class="scale-body">
-        <div class="fleet" data-fleet data-n={initial} aria-hidden="true">
-          {Array.from({ length: 100 }, (_, i) => <i class={i < initial ? 'on' : ''} style={`--d:${(i % 25) * 8}ms`}></i>)}
-        </div>
-        <div class="scale-copy">
-          {steps.map((s) => (
-            <div class="step" data-step={s.n} hidden={s.n !== initial}>
-              <p class="count num">{s.label}<span> laptops</span></p>
-              <h3 class="h3">{s.title}</h3>
-              <p class="muted">{s.text}</p>
-              <ul role="list" class="points">
-                {s.points.map((p) => <li><Icon name="check" size={18} stroke={2.5} />{p}</li>)}
-              </ul>
-              {s.n === 500 && <p class="xs muted note">Grid shows 100 icons, each one is 5 laptops.</p>}
-            </div>
+      <div class="board">
+        <fieldset class="track">
+          <legend class="track-legend">How many people are you equipping?</legend>
+          <div class="track-row">
+          <span class="track-line" aria-hidden="true"><span class="track-fill"></span></span>
+          {steps.map((s, i) => (
+            <>
+              <input type="radio" name="scale" id={`scale-${s.n}`} value={s.n} data-i={i} checked={s.n === initial} />
+              <label for={`scale-${s.n}`} class="stop">
+                <span class="stop-dot" aria-hidden="true"></span>
+                <span class="stop-n">{s.label}</span>
+                <span class="stop-t">{s.title}</span>
+              </label>
+            </>
           ))}
-          <a class="btn btn--primary btn--lg" href={`/request-a-quote/?qty=${initial}`} data-scale-cta><span>Get a quote for <span data-scale-cta-n>{initial} laptops</span></span></a>
+          </div>
+        </fieldset>
+
+        <div class="scale-body">
+          <div class="fleet" data-fleet data-n={initial} aria-hidden="true">
+            {Array.from({ length: 100 }, (_, i) => <i class={i < lit(initial) ? 'on' : ''}></i>)}
+          </div>
+
+          <div class="scale-copy">
+            <p class="count"><span class="count-n" data-count>{steps[initialIdx].label}</span><span class="count-u">laptops</span></p>
+            <div class="steps">
+              {steps.map((s) => (
+                <div class:list={['step', { on: s.n === initial }]} data-step={s.n}>
+                  <h3 class="step-t">{s.title}</h3>
+                  <p class="step-d">{s.text}</p>
+                  <ul role="list" class="points">
+                    {s.points.map((p) => <li><Icon name="check" size={16} stroke={2.5} />{p}</li>)}
+                  </ul>
+                  {s.n === 500 && <p class="note">The grid shows 100 icons; each stands for 5 laptops.</p>}
+                </div>
+              ))}
+            </div>
+            <a class="btn btn--primary btn--lg" href={`/request-a-quote/?qty=${initial}`} data-scale-cta><span>Get a quote for <span data-scale-cta-n>{initial} laptops</span></span></a>
+          </div>
         </div>
       </div>
     </div>
@@ -69,52 +92,198 @@ const initial = 50;
 </section>
 
 <style>
-  .scale-board { padding: clamp(20px, 3vw, 40px); border: 1px solid var(--line-strong); box-shadow: var(--shadow-block); }
-  .scale-seg { gap: 10px; margin-bottom: var(--s-6); align-items: center; }
-  .scale-seg legend { float: left; width: 100%; margin-bottom: var(--s-3); font-weight: 700; font-size: 1.125rem; }
-  .scale-seg label { min-width: 72px; justify-content: center; font-family: var(--font-display); font-weight: 400; font-size: 1.375rem; padding: 8px 18px; }
-  .scale-body { display: grid; gap: var(--s-6); align-items: center; }
-  @media (min-width: 900px) { .scale-body { grid-template-columns: 1.15fr 1fr; gap: var(--s-8); } }
+  /* Dark wine, like the opening screen */
+  .scale {
+    position: relative; color: var(--on-dark);
+    background:
+      radial-gradient(55% 45% at 85% 12%, rgba(122, 32, 24, .42) 0%, transparent 70%),
+      radial-gradient(60% 50% at 10% 100%, rgba(58, 21, 18, .75) 0%, transparent 70%),
+      var(--night);
+  }
+  .stage { padding-block: var(--section); }
+  .scale-wrap { display: grid; gap: clamp(28px, 4vh, 48px); }
+  .scale-head { display: grid; gap: var(--s-5); align-items: end; }
+  @media (min-width: 900px) { .scale-head { grid-template-columns: 1.1fr 1fr; gap: var(--s-8); } }
+  .scale-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(2.4rem, 1.2rem + 3.4vw, 4.4rem); line-height: .98; letter-spacing: -0.03em; text-wrap: balance; }
+  .scale-lead { margin: 0; max-width: 52ch; font-size: var(--fs-lead); line-height: 1.55; color: var(--on-dark-2); }
 
-  .fleet { display: grid; grid-template-columns: repeat(20, 1fr); gap: 6px; }
+  /* The board: a dark card with a hairline edge and a warm light in one corner */
+  .board {
+    position: relative; isolation: isolate; overflow: hidden;
+    display: grid; gap: clamp(24px, 3.4vh, 40px); padding: clamp(20px, 3vw, 40px);
+    border-radius: var(--r-xl); border: 1px solid rgba(243, 238, 229, .09);
+    background:
+      radial-gradient(60% 70% at 100% 0%, rgba(122, 32, 24, .32) 0%, transparent 60%),
+      linear-gradient(180deg, rgba(243, 238, 229, .035), rgba(243, 238, 229, .01));
+    box-shadow: inset 0 1px 0 rgba(243, 238, 229, .06), 0 50px 90px -60px rgba(0, 0, 0, .9);
+  }
+
+  /* The track: four stops on a line that fills as the team grows */
+  .track { margin: 0; padding: 0; border: 0; min-width: 0; }
+  .track-legend { margin-bottom: var(--s-4); padding: 0; font-size: var(--fs-small); font-weight: 600; color: var(--on-dark-2); }
+  .track-row { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* runs between the first and last dot, through their centres */
+  .track-line { position: absolute; left: 12.5%; right: 12.5%; top: 8px; height: 2px; border-radius: 2px; background: rgba(243, 238, 229, .12); }
+  .track-fill {
+    position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; transform: scaleX(var(--step-fill, 0));
+    background: linear-gradient(90deg, rgba(230, 133, 122, .55), var(--red-soft));
+    box-shadow: 0 0 12px rgba(224, 51, 40, .55);
+    transition: transform 700ms var(--ease-out);
+  }
+  .track input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+  .stop { display: grid; justify-items: center; align-content: start; gap: 6px; padding: 0 4px 4px; text-align: center; cursor: pointer; }
+  /* phones: the size's name shows below in the description */
+  @media (max-width: 599px) { .stop-t { display: none; } }
+  .stop-dot {
+    position: relative; z-index: 1; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--night); border: 2px solid rgba(243, 238, 229, .28);
+    transition: border-color 300ms, background-color 300ms, box-shadow 300ms, transform 300ms var(--ease-spring);
+  }
+  .stop-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.25rem); line-height: 1; color: var(--on-dark-2); transition: color 300ms; }
+  .stop-t { font-size: var(--fs-xs); color: rgba(243, 238, 229, .5); transition: color 300ms; }
+  .stop:hover .stop-dot { border-color: rgba(243, 238, 229, .6); }
+  .stop:hover .stop-n { color: var(--on-dark); }
+  /* sizes already reached: a filled dot */
+  .track:has(input[data-i='1']:checked) .stop:nth-of-type(1) .stop-dot,
+  .track:has(input[data-i='2']:checked) :is(.stop:nth-of-type(1), .stop:nth-of-type(2)) .stop-dot,
+  .track:has(input[data-i='3']:checked) :is(.stop:nth-of-type(1), .stop:nth-of-type(2), .stop:nth-of-type(3)) .stop-dot { background: var(--red-soft); border-color: var(--red-soft); }
+  .track input:checked + .stop .stop-dot { background: var(--red); border-color: #fff; box-shadow: 0 0 0 6px rgba(224, 51, 40, .22), 0 0 22px rgba(224, 51, 40, .7); transform: scale(1.15); }
+  .track input:checked + .stop .stop-n { color: #fff; }
+  .track input:checked + .stop .stop-t { color: var(--on-dark-2); }
+  .track input:focus-visible + .stop .stop-dot { outline: 3px solid var(--red-soft); outline-offset: 4px; }
+
+  .scale-body { display: grid; gap: clamp(24px, 3vw, 48px); align-items: center; }
+  @media (min-width: 900px) { .scale-body { grid-template-columns: 1.15fr 1fr; } }
+
+  /* The fleet: one icon per laptop (per 5 at 500+), lighting up in a wave */
+  .fleet { display: grid; grid-template-columns: repeat(20, 1fr); gap: clamp(4px, .5vw, 7px); }
   @media (max-width: 520px) { .fleet { grid-template-columns: repeat(10, 1fr); } }
   .fleet i {
-    aspect-ratio: 1; background: var(--paper-3);
+    aspect-ratio: 1; background: rgba(243, 238, 229, .09);
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5V15H5z M2.5 16.5h19v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5z'/%3E%3C/svg%3E") center / contain no-repeat;
             mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5.5A1.5 1.5 0 0 1 6.5 4h11A1.5 1.5 0 0 1 19 5.5V15H5z M2.5 16.5h19v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5z'/%3E%3C/svg%3E") center / contain no-repeat;
-    transition: background-color 200ms var(--ease-out) var(--d), transform 300ms var(--ease-spring) var(--d);
+    transition: background-color 260ms var(--ease-out) var(--d, 0ms), transform 420ms var(--ease-spring) var(--d, 0ms);
   }
-  .fleet i.on { background: var(--ink); }
-  .fleet i.on:first-child { background: var(--red); }
-  .fleet[data-n='500'] i.on { background: var(--red-ink); }
-  .fleet i.pop { transform: scale(1.2); }
+  .fleet i.on { background: rgba(243, 238, 229, .88); }
+  .fleet i.on:first-child { background: var(--red-soft); }
+  .fleet[data-n='500'] i.on { background: var(--red-soft); }
+  .fleet i.pop { transform: scale(1.25); }
 
-  .count { font-family: var(--font-display); font-weight: 400; font-size: clamp(3.5rem, 2.5rem + 4vw, 6rem); line-height: .85; margin-bottom: var(--s-3); }
-  .count span { font-family: var(--font-text); font-size: .2em; color: var(--ink-3); margin-left: 10px; letter-spacing: 0; }
-  .step .h3 { margin-bottom: var(--s-2); }
-  .points { display: grid; gap: 8px; margin: var(--s-4) 0 0; list-style: none; font-weight: 600; }
-  .points li { display: flex; gap: 8px; align-items: center; }
-  .points :global(svg) { color: var(--green); flex: none; }
-  .note { margin-top: var(--s-3); }
+  /* The number and what that size looks like */
+  .scale-copy { display: grid; justify-items: start; min-width: 0; }
+  .count { display: flex; align-items: baseline; gap: 12px; margin: 0 0 var(--s-4); }
+  .count-n { font-family: var(--font-display); font-weight: 400; font-size: clamp(4rem, 2.6rem + 4.4vw, 7rem); line-height: .82; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: #fff; text-shadow: 0 0 40px rgba(224, 51, 40, .35); }
+  .count-u { font-size: var(--fs-small); color: var(--on-dark-2); }
+  .steps { display: grid; width: 100%; }
+  .step {
+    grid-area: 1 / 1; opacity: 0; visibility: hidden; transform: translateY(12px);
+    transition: opacity 300ms var(--ease-out), transform 450ms var(--ease-out), visibility 0s 450ms;
+  }
+  .step.on { opacity: 1; visibility: visible; transform: none; transition: opacity 450ms var(--ease-out) 80ms, transform 550ms var(--ease-out) 80ms, visibility 0s; }
+  .step-t { margin: 0 0 var(--s-2); font-family: var(--font-display); font-weight: 400; font-size: clamp(1.6rem, 1.3rem + .8vw, 2.1rem); line-height: 1.1; }
+  .step-d { margin: 0; max-width: 46ch; color: var(--on-dark-2); line-height: 1.6; }
+  .points { display: grid; gap: 8px; margin: var(--s-4) 0 0; padding: var(--s-4) 0 0; list-style: none; border-top: 1px solid rgba(243, 238, 229, .1); font-size: var(--fs-small); font-weight: 600; }
+  .points li { display: flex; gap: 10px; align-items: center; }
+  .points :global(svg) { color: var(--red-soft); flex: none; }
+  .note { margin: var(--s-3) 0 0; font-size: var(--fs-xs); color: var(--on-dark-2); }
   .scale-copy .btn { margin-top: var(--s-6); white-space: normal; text-align: center; }
+  .scale-copy .btn:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+
+  /*
+   * The scroll version: the board stays in place while the page scrolls and the track walks
+   * from 10 to 500+. Only where the whole board fits on screen.
+   */
+  @media (min-width: 900px) and (min-height: 760px) {
+    :global(html.scenes) .scale { height: 300vh; height: 300svh; }
+    :global(html.scenes) .scale .stage {
+      position: sticky; top: 0; height: 100vh; height: 100svh; display: grid; align-content: center;
+      padding-block: calc(80px + 1.5vh) 2.5vh;
+    }
+    /* the line follows the scroll exactly: 10 at the start, 500+ three-quarters of the way */
+    :global(html.scenes) .scale .track-fill { transform: scaleX(min(1, calc(var(--p, 0) / .75))); transition: none; }
+    /* compact enough that the whole board fits on one screen */
+    :global(html.scenes) .scale .scale-wrap { gap: clamp(16px, 2.6vh, 32px); }
+    :global(html.scenes) .scale .scale-title { font-size: clamp(2rem, .6rem + 2.6vw + 1.2vh, 3.5rem); }
+    :global(html.scenes) .scale .scale-lead { font-size: var(--fs-body, 1rem); }
+    :global(html.scenes) .scale .board { gap: clamp(16px, 2.8vh, 32px); padding: clamp(18px, 3vh, 32px) clamp(20px, 3vw, 40px); }
+    :global(html.scenes) .scale .track-legend { margin-bottom: clamp(8px, 1.4vh, 16px); }
+    :global(html.scenes) .scale .count { margin-bottom: clamp(8px, 1.6vh, 16px); }
+    :global(html.scenes) .scale .count-n { font-size: clamp(3rem, 1rem + 6vh, 5.5rem); }
+    :global(html.scenes) .scale .points { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: clamp(10px, 1.8vh, 16px); padding-top: clamp(10px, 1.8vh, 16px); }
+    :global(html.scenes) .scale .scale-copy .btn { margin-top: clamp(14px, 2.6vh, 28px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track-fill, .fleet i, .step, .step.on, .stop-dot { transition: none; }
+  }
 </style>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-scale]').forEach((root) => {
+    const stage = root.querySelector<HTMLElement>('.stage')!;
     const fleet = root.querySelector<HTMLElement>('[data-fleet]')!;
     const cells = [...fleet.querySelectorAll('i')];
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
     const cta = root.querySelector<HTMLAnchorElement>('[data-scale-cta]')!;
     const ctaN = root.querySelector<HTMLElement>('[data-scale-cta-n]')!;
-    root.querySelectorAll<HTMLInputElement>('input[name="scale"]').forEach((r) =>
-      r.addEventListener('change', () => {
-        const n = Number(r.value);
-        const lit = n >= 500 ? 100 : n;
-        fleet.dataset.n = String(n);
-        cells.forEach((c, i) => { c.classList.toggle('on', i < lit); });
-        root.querySelectorAll<HTMLElement>('[data-step]').forEach((s) => { s.hidden = s.dataset.step !== String(n); });
-        cta.href = `/request-a-quote/?qty=${n}`;
-        ctaN.textContent = `${n >= 500 ? '500+' : n} laptops`;
-      }),
-    );
+    const radios = [...root.querySelectorAll<HTMLInputElement>('input[name="scale"]')];
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+    const litFor = (n: number) => (n >= 500 ? 100 : n);
+    let shown = Number(fleet.dataset.n);
+    let raf = 0;
+
+    // the number counts from the old size to the new one
+    const countTo = (from: number, to: number) => {
+      cancelAnimationFrame(raf);
+      const suffix = to >= 500 ? '+' : '';
+      if (still.matches) { count.textContent = `${to}${suffix}`; return; }
+      const t0 = performance.now();
+      const dur = 650;
+      const step = (now: number) => {
+        const t = Math.min(1, (now - t0) / dur);
+        const e = 1 - Math.pow(1 - t, 3);
+        count.textContent = `${Math.round(from + (to - from) * e)}${t === 1 ? suffix : ''}`;
+        if (t < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+
+    const show = (n: number, i: number) => {
+      if (n === shown) return;
+      const a = litFor(shown), b = litFor(n);
+      // the laptops that change light up (or go dark) in order, from the edge of the lit block
+      const changing = Math.max(1, Math.abs(b - a));
+      const gap = Math.min(14, 520 / changing);
+      // into or out of 500+ every icon changes colour: a wave sweeps across the grid instead
+      const sweep = (n >= 500) !== (shown >= 500);
+      cells.forEach((c, k) => {
+        const on = k < b;
+        const d = sweep ? ((k % 20) + Math.floor(k / 20) * 2) * 16 : b > a ? (k - a) * gap : (a - 1 - k) * gap;
+        c.style.setProperty('--d', `${Math.max(0, Math.round(d))}ms`);
+        if (c.classList.contains('on') !== on) {
+          c.classList.toggle('on', on);
+          if (on && !still.matches) { c.classList.add('pop'); setTimeout(() => c.classList.remove('pop'), 260 + Math.max(0, d)); }
+        }
+      });
+      fleet.dataset.n = String(n);
+      countTo(shown >= 500 ? 500 : shown, n);
+      root.querySelectorAll<HTMLElement>('[data-step]').forEach((s) => s.classList.toggle('on', s.dataset.step === String(n)));
+      root.style.setProperty('--step-fill', String(i / (radios.length - 1)));
+      cta.href = `/request-a-quote/?qty=${n}`;
+      ctaN.textContent = `${n >= 500 ? '500+' : n} laptops`;
+      shown = n;
+    };
+
+    const pinned = () => getComputedStyle(stage).position === 'sticky' && root.offsetHeight > stage.offsetHeight * 1.2;
+
+    radios.forEach((r) => r.addEventListener('change', (e) => {
+      const i = Number(r.dataset.i);
+      show(Number(r.value), i);
+      // a visitor's choice while the section is pinned: scroll to that size's place on the track
+      if (e.isTrusted && pinned()) {
+        const top = root.getBoundingClientRect().top + scrollY;
+        const span = root.offsetHeight - stage.offsetHeight;
+        scrollTo({ top: Math.round(top + span * (i * 0.25 + 0.125)), behavior: still.matches ? 'auto' : 'smooth' });
+      }
+    }));
   });
 </script>
