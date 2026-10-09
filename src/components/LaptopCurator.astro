@@ -224,23 +224,29 @@ const cardSpec = (p: Product) => {
       <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
     </div>
 
-    <div class="results">
-      <div class="results-head">
-        <h3 class="results-title" data-results-title>Popular models</h3>
-        <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
-      </div>
-      <div class="matches" data-matches>
-        {popular.map((p) => (
-          <article class="mcard">
-            <a class:list={['mcard-img', { 'mcard-img--studio': /-studio-/.test(p.images[0].card ?? p.images[0].src) }]} href={`/equipment/${p.slug}/`} tabindex="-1" aria-hidden="true"><img src={p.images[0].card ?? p.images[0].src} alt="" width="800" height="500" loading="lazy" decoding="async" /></a>
-            <div class="mcard-body">
-              <p class="mcard-sub">{p.subcategory}</p>
-              <h4 class="mcard-name"><a href={`/equipment/${p.slug}/`}>{p.name}</a></h4>
-              <p class="mcard-spec">{cardSpec(p)}</p>
-              <a class="mcard-quote" href={`/request-a-quote/?product=${encodeURIComponent(p.slug)}&qty=10`}>Quote this model</a>
-            </div>
-          </article>
-        ))}
+  </div>
+
+  <!-- the models, on the dark wine band -->
+  <div class="results-band">
+    <div class="wrap cur-wrap">
+      <div class="results">
+        <div class="results-head">
+          <h3 class="results-title" data-results-title>Popular models</h3>
+          <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
+        </div>
+        <div class="matches" data-matches>
+          {popular.map((p) => (
+            <article class="mcard">
+              <a class:list={['mcard-img', { 'mcard-img--studio': /-studio-/.test(p.images[0].card ?? p.images[0].src) }]} href={`/equipment/${p.slug}/`} tabindex="-1" aria-hidden="true"><img src={p.images[0].card ?? p.images[0].src} alt="" width="800" height="500" loading="lazy" decoding="async" /></a>
+              <div class="mcard-body">
+                <p class="mcard-sub">{p.subcategory}</p>
+                <h4 class="mcard-name"><a href={`/equipment/${p.slug}/`}>{p.name}</a></h4>
+                <p class="mcard-spec">{cardSpec(p)}</p>
+                <a class="mcard-quote" href={`/request-a-quote/?product=${encodeURIComponent(p.slug)}&qty=10`}>Quote this model</a>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   </div>
@@ -258,7 +264,7 @@ const cardSpec = (p: Product) => {
     --hair: var(--line); --hair-2: var(--line-strong); --panel: var(--card);
     --done-bd: rgba(185, 41, 30, .5); --done-bg: #FCF4F1;
     position: relative; isolation: isolate; overflow-x: clip; color: var(--ink);
-    padding-block: clamp(64px, 6vw, 104px);
+    padding-block: clamp(64px, 6vw, 104px) 0;
     background-color: var(--paper-2);
     background-image:
       var(--grain),
@@ -549,7 +555,16 @@ const cardSpec = (p: Product) => {
   .explore:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 
   /* ── Matching models ── */
-  .results { margin-top: var(--s-7); }
+  /* the models sit on the site's dark wine band, closing the section */
+  .results-band {
+    margin-top: clamp(48px, 5vw, 72px); padding-block: clamp(56px, 6vw, 96px); color: var(--on-dark);
+    background:
+      radial-gradient(70% 90% at 85% 0%, rgba(122, 32, 24, .34) 0%, transparent 60%),
+      radial-gradient(60% 80% at 0% 100%, rgba(58, 21, 18, .55) 0%, transparent 65%),
+      var(--night);
+  }
+  .results-band .link-arrow { color: var(--on-dark); }
+  .results-band .link-arrow:focus-visible { outline-color: var(--red-soft); }
   .results-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: var(--s-5); }
   .results-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); }
   
@@ -583,7 +598,7 @@ const cardSpec = (p: Product) => {
     .matches :global(.mcard-name) { font-size: 1.125rem; }
     .matches :global(.mcard-spec) { font-size: var(--fs-xs); }
   }
-  .matches :global(.empty) { grid-column: 1 / -1; margin: 0; padding: 22px; border: 1px dashed var(--hair-2); border-radius: var(--r-lg); color: var(--ink-2); }
+  .matches :global(.empty) { grid-column: 1 / -1; margin: 0; padding: 22px; border: 1px dashed var(--hair-dark-strong); border-radius: var(--r-lg); color: var(--on-dark-2); }
 
   @media (prefers-reduced-motion: reduce) {
     .scr-mark, .box, .need, .pick span, .tile-face, .lap-deck, .lap-lid, .lap-floor, .scr-spec div { transition: none; }

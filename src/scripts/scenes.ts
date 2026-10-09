@@ -256,17 +256,27 @@ function init() {
 
   // Hero: no stopping halfway through the zoom. Once the visitor scrolls down from
   // the first screen, the page glides on until the next section (#build) fills the
-  // window; scrolling up from there glides back to the top. Wheel, touch and scroll
-  // keys wait while it moves, so they cannot leave it in between.
+  // window. Coming back up from further down, the page stops there first; one more,
+  // separate push glides back to the top. Wheel, touch and scroll keys wait while it
+  // moves, so they cannot leave it in between.
   const heroScene = scenes.find((s) => s.name === 'hero');
   const landing = document.getElementById('build');
   let glideRaf = 0;
   /** a trackpad's momentum keeps sending wheel events after a glide lands: let them pass only after this */
   let holdUntil = 0;
   let lastY = scrollY;
+  // A "push" is one gesture: a touch, a key press, or a run of wheel events with no
+  // pause longer than GAP (a trackpad's momentum counts as part of the same push).
+  const GAP = 260;
+  let gesture = 0;
+  let lastWheel = -Infinity;
+  /** stopped at the describe page on the way up; the push that brought it there */
+  let parked = false;
+  let parkedBy = -1;
+  const newGesture = () => { gesture++; };
   const topY = () => Math.max(0, heroScene?.top ?? 0);
   const landY = () => (landing ? Math.round(landing.getBoundingClientRect().top + scrollY) : 0);
-  const glide = (to: number) => {
+  const glide = (to: number, minDur = 900) => {
     cancelAnimationFrame(glideRaf);
     if (Math.abs(to - scrollY) < 2) return;
     // the wheel's own smooth scroll may still be moving: start from wherever it has got
@@ -282,26 +292,47 @@ function init() {
       if (Number.isNaN(from)) {
         from = scrollY;
         d = to - from;
-        dur = Math.min(1500, Math.max(900, Math.abs(d) * 0.85));
+        dur = Math.min(1500, Math.max(minDur, Math.abs(d) * 0.85));
         t0 = now;
       }
       const t = Math.min(1, (now - t0) / dur);
       const e = curve(t);
       window.scrollTo({ top: from + d * e, behavior: 'instant' as ScrollBehavior });
       if (t < 1) glideRaf = requestAnimationFrame(step);
-      else { glideRaf = 0; lastY = scrollY; holdUntil = performance.now() + 350; }
+      else {
+        glideRaf = 0;
+        lastY = scrollY;
+        holdUntil = performance.now() + 350;
+        // resting at the describe page counts as stopped there: the next push up goes on
+        if (landing && Math.abs(scrollY - landY()) <= 4) { parked = true; parkedBy = gesture; }
+      }
     };
     glideRaf = requestAnimationFrame(step);
   };
+  const park = (land: number) => {
+    parked = true;
+    parkedBy = gesture;
+    glide(land, 320);
+  };
   const onScrollGlide = () => {
     const y = scrollY;
-    const dir = y - lastY;
+    const prev = lastY;
+    const dir = y - prev;
     lastY = y;
     if (glideRaf || !heroScene?.pinned || !landing) return;
     const top = topY();
     const land = landY();
+    if (y > land + 4) parked = false;
     if (y <= top + 2 || y >= land - 2) return;
-    glide(dir < 0 ? top : land);
+    if (dir >= 0) { parked = false; glide(land); return; }
+    // Going up into the zoom from the describe page or below it: stop at the describe
+    // page first, unless this is a new push after stopping there
+    if (prev >= land - 2) {
+      if (parked && gesture !== parkedBy) { parked = false; glide(top); }
+      else park(land);
+      return;
+    }
+    glide(top);
   };
   const SCROLL_KEYS = new Set([' ', 'PageDown', 'PageUp', 'ArrowDown', 'ArrowUp', 'Home', 'End']);
   const holdInput = (e: Event) => {
@@ -317,11 +348,31 @@ function init() {
       const land = landY();
       const down = e.key === 'PageDown' || e.key === 'ArrowDown' || (e.key === ' ' && !e.shiftKey);
       const up = e.key === 'PageUp' || e.key === 'ArrowUp' || (e.key === ' ' && e.shiftKey);
-      if (down && y < land - 2) { e.preventDefault(); glide(land); }
-      else if (up && y > top + 2 && y <= land + 2) { e.preventDefault(); glide(top); }
+      newGesture();
+      if (down && y < land - 2) { e.preventDefault(); parked = false; glide(land); }
+      else if (up && y > top + 2 && y <= land + 2) { e.preventDefault(); parked = false; glide(top); }
       return;
     }
-    if (glideRaf || (e.type === 'wheel' && performance.now() < holdUntil)) e.preventDefault();
+    if (e.type === 'touchmove') { if (glideRaf) e.preventDefault(); return; }
+    // wheel
+    const w = e as WheelEvent;
+    const now = performance.now();
+    if (now - lastWheel > GAP) newGesture();
+    lastWheel = now;
+    if (glideRaf || now < holdUntil) { e.preventDefault(); return; }
+    if (!heroScene?.pinned || !landing) return;
+    const y = scrollY;
+    const land = landY();
+    const dy = w.deltaY * (w.deltaMode === 1 ? 16 : w.deltaMode === 2 ? innerHeight : 1);
+    if (dy >= 0) return;
+    if (parked && Math.abs(y - land) <= 4) {
+      // stopped at the describe page: the rest of that push is ignored, a new one goes on up
+      e.preventDefault();
+      if (gesture !== parkedBy) { parked = false; glide(topY()); }
+      return;
+    }
+    // on the way up, a push that would carry past the describe page stops there
+    if (y >= land - 2 && y + dy < land - 2) { e.preventDefault(); park(land); }
   };
   // "Describe your need, or build your own" on the first screen glides there too
   const onClick = (e: MouseEvent) => {
@@ -337,6 +388,8 @@ function init() {
   addEventListener('scroll', onScrollGlide, { passive: true });
   addEventListener('wheel', holdInput, { passive: false });
   addEventListener('touchmove', holdInput, { passive: false });
+  addEventListener('touchstart', newGesture, { passive: true });
+  addEventListener('mousedown', newGesture, { passive: true });
   addEventListener('keydown', holdInput);
   heroScene?.el.addEventListener('click', onClick);
   addEventListener('resize', relayout);
@@ -368,6 +421,8 @@ function init() {
       removeEventListener('scroll', onScrollGlide);
       removeEventListener('wheel', holdInput);
       removeEventListener('touchmove', holdInput);
+      removeEventListener('touchstart', newGesture);
+      removeEventListener('mousedown', newGesture);
       removeEventListener('keydown', holdInput);
       heroScene?.el.removeEventListener('click', onClick);
       cancelAnimationFrame(glideRaf);
