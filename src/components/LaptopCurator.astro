@@ -1,14 +1,12 @@
 ---
 /**
  * Describe your need, or build your own (home page, right after the hero, on
- * cream). One page: the laptop in the middle with a box
- * above it to describe the need in words (opens the quote form, or WhatsApp,
- * filled in), and four option boxes wired to it: brand, processor, memory and
- * storage. Choosing an option plugs its cable into the laptop, the screen shows
- * the brand and the specification. "Your setup" underneath sums up the choice,
- * with a quote link for the chosen quantity and a link to the matching models in
- * the catalogue; then "Explore the full catalogue" and the matching models
- * (popular ones before anything is chosen).
+ * cream). Under the heading, a box to describe the need in words (opens the
+ * quote form, or WhatsApp, filled in). Below it, the builder: on the left a
+ * laptop whose screen is the configurator (brand, then processor, memory and
+ * storage drop-downs), with "Your setup" under it (quantity and quote); on the
+ * right, on the dark wine panel, the models that match the choice so far
+ * (popular ones before anything is chosen) and the way into the catalogue.
  *
  * Options come from the catalogue data (src/data/products.ts), so the curator
  * never offers a combination that does not exist. Without JavaScript it is a
@@ -50,7 +48,7 @@ const brands = [
   { v: 'Dell', label: 'Dell', sub: `${count('Dell')} models`, mark: 'dell' },
   { v: 'HP', label: 'HP', sub: `${count('HP')} models`, mark: 'hp' },
   { v: 'Apple', label: 'Apple', sub: 'Air and Pro', mark: 'apple' },
-  { v: 'any', label: 'No preference', sub: 'Lenovo, Dell or HP', mark: '' },
+  { v: 'any', label: 'Any', sub: 'Lenovo, Dell or HP', mark: '' },
 ] as const;
 
 const families = uniq(pcs.flatMap((p) => p.configs!.flatMap((c) => c.family ?? []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
@@ -68,25 +66,22 @@ const examples = [
   'Desktops with monitors for a training batch',
 ];
 
-const short = (f: string) => f.replace(/^Core Ultra /, 'Ultra ');
+const short = (f: string) => f;
 
-/** Rows of options inside each box. `for` limits a row to PCs or Macs. */
+/** The drop-downs and their options. `for` limits one to PCs or Macs. */
 type Row = { key: string; label: string; for?: 'pc' | 'mac'; options: { v: string; l: string }[] };
 const any = { v: '', l: 'Any' };
 const procRows: Row[] = [
-  { key: 'proc', label: 'Type', for: 'pc', options: [any, ...families.map((f) => ({ v: f, l: short(f) }))] },
-  { key: 'gen', label: 'Generation', for: 'pc', options: [any, ...gens.map((g) => ({ v: g, l: g.replace(' Gen', '') }))] },
+  { key: 'proc', label: 'Processor', for: 'pc', options: [any, ...families.map((f) => ({ v: f, l: short(f) }))] },
+  { key: 'gen', label: 'Generation', for: 'pc', options: [any, ...gens.map((g) => ({ v: g, l: g }))] },
   { key: 'model', label: 'Model', for: 'mac', options: [any, ...macModels.map((m) => ({ v: m, l: m }))] },
   { key: 'chip', label: 'Chip', for: 'mac', options: [any, ...chips.map((c) => ({ v: c, l: c }))] },
 ];
 const ramRows: Row[] = [{ key: 'ram', label: 'Memory', options: [any, ...ram.map((r) => ({ v: String(r), l: `${r} GB` }))] }];
 const storageRows: Row[] = [{ key: 'storage', label: 'Storage', options: [any, ...storage.map((s) => ({ v: String(s), l: formatGb(s) }))] }];
 
-const boxes = [
-  { n: 2, id: 'proc', title: 'Processor', rows: procRows, area: 'b2' },
-  { n: 3, id: 'ram', title: 'Memory', rows: ramRows, area: 'b3' },
-  { n: 4, id: 'storage', title: 'Storage', rows: storageRows, area: 'b4' },
-];
+/** The drop-downs on the laptop's screen, in order. */
+const fields = [...procRows, ...ramRows, ...storageRows];
 
 /** Shown before anything is chosen, and without JavaScript. */
 const popular = PRODUCTS.filter((p) => p.featured && p.configs?.length).slice(0, 4);
@@ -101,138 +96,115 @@ const cardSpec = (p: Product) => {
   <div class="wrap cur-wrap">
     <div class="cur-head">
       <h2 id="cur-title" class="cur-title">Describe your need,<span> or build your own.</span></h2>
-      <p class="cur-lead">Write it in a line, or wire up a brand, processor, memory and storage on the boxes around the laptop. Either way, you get a quote for as many as you need.</p>
+      <p class="cur-lead">Write it in a line, or set up the laptop below: the models that match appear beside it. Either way, you get a quote for as many as you need.</p>
     </div>
 
-    <!-- the describe box lives inside the builder's layout; its controls belong to this form -->
-    <form id="need-form" action="/request-a-quote/" method="get" data-need></form>
+    <!-- Describe it in words -->
+    <form class="need" action="/request-a-quote/" method="get" data-need>
+      <div class="need-main">
+        <label class="need-label" for="need-text"><span class="need-ic" aria-hidden="true"><Icon name="message-square" size={16} /></span>Describe your need</label>
+        <textarea id="need-text" class="need-in" name="need" rows="2" maxlength="600" placeholder="How many, which city, from when, and anything they must have"></textarea>
+      </div>
+      <div class="need-actions">
+        <button class="btn btn--primary" type="submit">Get a quote</button>
+        <a class="need-wa" href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="build-need"><Icon name="whatsapp" size={18} />Send it on WhatsApp</a>
+      </div>
+      <div class="eg">
+        <p class="eg-label" id="eg-label">Or start from an example</p>
+        <ul class="eg-list" role="list" aria-labelledby="eg-label">
+          {examples.map((e) => <li><button type="button" class="eg-btn" data-eg>{e}</button></li>)}
+        </ul>
+      </div>
+    </form>
 
-    <form class="cur-form" action="/equipment/" method="get" data-cur>
-      <script type="application/json" is:inline data-cur-data set:html={JSON.stringify(data)} />
-      <div class="stage" data-cur-stage>
-        <svg class="cables" aria-hidden="true" focusable="false" data-cables></svg>
+    <p class="fork" aria-hidden="true"><span>or build your own</span></p>
 
-        <!-- Describe it in words -->
-        <div class="need" style="grid-area: need">
-          <label class="need-label" for="need-text"><span class="need-ic" aria-hidden="true"><Icon name="message-square" size={16} /></span>Describe your need</label>
-          <textarea id="need-text" class="need-in" name="need" form="need-form" rows="3" maxlength="600" placeholder="How many, which city, from when, and anything they must have"></textarea>
-          <div class="need-row">
-            <button class="btn btn--primary" type="submit" form="need-form">Get a quote</button>
-            <a class="need-wa" href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="build-need"><Icon name="whatsapp" size={18} />Send it on WhatsApp</a>
-          </div>
-          <div class="eg">
-            <p class="eg-label" id="eg-label">Or start from an example</p>
-            <ul class="eg-list" role="list" aria-labelledby="eg-label">
-              {examples.map((e) => <li><button type="button" class="eg-btn" data-eg>{e}</button></li>)}
-            </ul>
-          </div>
-        </div>
-
-        <!-- 1 Brand -->
-        <fieldset class="box box--brand" style="grid-area: b1" data-box="brand" data-state="open">
-          <legend class="box-legend"><span class="step" aria-hidden="true">1</span>Brand</legend>
-          <p class="box-note" data-note>Start here.</p>
-          <div class="tiles">
-            {brands.map((b) => (
-              <label class:list={['tile', { 'tile--wide': b.v === 'any' }]}>
-                <input type="radio" name="brand" value={b.v} />
-                <span class="tile-face">
-                  {b.mark === 'lenovo' ? (
-                    <svg class="tile-mark tile-mark--lenovo" viewBox="0 8 24 8.01" aria-hidden="true" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
-                  ) : b.mark ? (
-                    <svg class={`tile-mark tile-mark--${b.mark}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={BRAND_MARKS[b.mark]} fill="currentColor" /></svg>
-                  ) : (
-                    <span class="tile-mark tile-mark--any" aria-hidden="true"><Icon name="shuffle" size={18} stroke={1.75} /></span>
-                  )}
-                  <span class="tile-name">{b.label}</span>
-                  <span class="tile-sub">{b.sub}</span>
-                </span>
-              </label>
-            ))}
-          </div>
-        </fieldset>
-
-        <!-- The laptop -->
-        <div class="lap" style="grid-area: lap" data-brand="" aria-hidden="true" data-lap>
-          <div class="lap-lid" data-port-lid>
-            <span class="lap-cam"></span>
-            <div class="lap-screen">
-              <div class="scr-marks" data-port="brand">
-                <span class="scr-mark scr-mark--itr on" data-mark="">IT Rentals</span>
-                <svg class="scr-mark scr-mark--lenovo" data-mark="Lenovo" viewBox="0 8 24 8.01" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
-                <svg class="scr-mark scr-mark--dell" data-mark="Dell" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg>
-                <svg class="scr-mark scr-mark--hp" data-mark="HP" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg>
-                <svg class="scr-mark scr-mark--apple" data-mark="Apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="currentColor" /></svg>
-                <span class="scr-mark scr-mark--itr" data-mark="any">IT Rentals</span>
+    <div class="bench">
+      <!-- Left: the laptop, whose screen is the configurator, and the setup under it -->
+      <form class="cur-form" id="cur-form" action="/equipment/" method="get" data-cur aria-label="Build your laptop">
+        <script type="application/json" is:inline data-cur-data set:html={JSON.stringify(data)} />
+        <div class="lap" data-brand="" data-lap>
+          <div class="lap-lid">
+            <span class="lap-cam" aria-hidden="true"></span>
+            <div class="lap-screen" data-screen>
+              <div class="scr-top">
+                <div class="scr-marks" aria-hidden="true">
+                  <span class="scr-mark scr-mark--itr on" data-mark="">IT Rentals</span>
+                  <svg class="scr-mark scr-mark--lenovo" data-mark="Lenovo" viewBox="0 8 24 8.01" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
+                  <svg class="scr-mark scr-mark--dell" data-mark="Dell" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.dell} fill="currentColor" /></svg>
+                  <svg class="scr-mark scr-mark--hp" data-mark="HP" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.hp} fill="currentColor" /></svg>
+                  <svg class="scr-mark scr-mark--apple" data-mark="Apple" viewBox="0 0 24 24" focusable="false"><path d={BRAND_MARKS.apple} fill="currentColor" /></svg>
+                  <span class="scr-mark scr-mark--itr" data-mark="any">IT Rentals</span>
+                </div>
+                <p class="scr-count"><span class="scr-dot" aria-hidden="true"></span><span data-scr-count>Choose a brand to start</span></p>
               </div>
-              <dl class="scr-spec">
-                <div data-port="proc" data-row="proc"><dt>Processor</dt><dd data-val="proc">Any</dd></div>
-                <div data-port="ram" data-row="ram"><dt>Memory</dt><dd data-val="ram">Any</dd></div>
-                <div data-port="storage" data-row="storage"><dt>Storage</dt><dd data-val="storage">Any</dd></div>
-              </dl>
-              <p class="scr-foot" data-scr-foot>Choose a brand to start</p>
-            </div>
-          </div>
-          <div class="lap-deck"><span class="lap-notch"></span></div>
-          <span class="lap-floor"></span>
-        </div>
 
-        {boxes.map((b) => (
-          <fieldset class="box" style={`grid-area: ${b.area}`} data-box={b.id} data-state="open">
-            <legend class="box-legend"><span class="step" aria-hidden="true">{b.n}</span>{b.title}</legend>
-            <p class="box-note" data-note hidden></p>
-            {b.rows.map((r) => (
-              <fieldset class="row" data-row-key={r.key} data-for={r.for} hidden={r.for === 'mac'}>
-                {b.rows.length > 1 ? <legend class="row-label">{r.label}</legend> : <legend class="sr-only">{r.label}</legend>}
-                <div class="chips">
-                  {r.options.map((o) => (
-                    <label class="pick" data-opt={o.v}>
-                      <input type="radio" name={r.key} value={o.v} checked={o.v === ''} />
-                      <span>{o.l}</span>
+              <fieldset class="brandset">
+                <legend class="fld-label">Brand</legend>
+                <div class="tiles">
+                  {brands.map((b) => (
+                    <label class="tile" title={b.sub}>
+                      <input type="radio" name="brand" value={b.v} />
+                      <span class="tile-face">
+                        {b.mark === 'lenovo' ? (
+                          <svg class="tile-mark tile-mark--lenovo" viewBox="0 8 24 8.01" aria-hidden="true" focusable="false"><rect x=".4" y="8.4" width="23.2" height="7.2" fill="#fff" /><path d={BRAND_MARKS.lenovo} fill="#E2231A" /></svg>
+                        ) : b.mark ? (
+                          <svg class={`tile-mark tile-mark--${b.mark}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d={BRAND_MARKS[b.mark]} fill="currentColor" /></svg>
+                        ) : (
+                          <span class="tile-mark tile-mark--any" aria-hidden="true"><Icon name="shuffle" size={16} stroke={1.75} /></span>
+                        )}
+                        <span class="tile-name">{b.label}</span>
+                      </span>
                     </label>
                   ))}
                 </div>
               </fieldset>
-            ))}
-          </fieldset>
-        ))}
-      </div>
 
-      <!-- Your setup -->
-      <div class="setup" data-setup>
-        <div class="setup-text">
-          <p class="setup-label">Your setup</p>
-          <p class="setup-line" data-setup-line>Any brand, any processor, any memory, any storage</p>
-          <p class="setup-count"><span role="status" aria-live="polite" data-count>{models.length} models to choose from</span> <button type="button" class="reset" data-reset hidden>Start over</button></p>
-        </div>
-        <div class="setup-actions">
-          <div class="qty">
-            <label for="cur-qty">Quantity</label>
-            <div class="qty-ctl">
-              <button type="button" class="qty-btn" data-qty-step="-1" aria-label="Fewer laptops"><Icon name="minus" size={16} /></button>
-              <input id="cur-qty" class="qty-in" type="number" inputmode="numeric" min="1" max="10000" value="10" data-qty />
-              <button type="button" class="qty-btn" data-qty-step="1" aria-label="More laptops"><Icon name="plus" size={16} /></button>
+              <div class="fields">
+                {fields.map((f) => (
+                  <div class="fld" data-fld={f.key} data-for={f.for} hidden={f.for === 'mac'}>
+                    <label class="fld-label" for={`cur-${f.key}`}>{f.label}</label>
+                    <div class="sel">
+                      <select id={`cur-${f.key}`} name={f.key} data-sel={f.key}>
+                        {f.options.map((o) => <option value={o.v} selected={o.v === ''}>{o.l}</option>)}
+                      </select>
+                      <Icon name="chevron-down" size={16} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <a class="btn btn--primary" href="/request-a-quote/?category=laptops&qty=10" data-quote><span>Get a quote for <span data-qty-n>10</span> <span data-qty-noun>laptops</span></span></a>
-          <button type="submit" class="btn" data-browse>Open the catalogue</button>
+          <div class="lap-deck" aria-hidden="true"><span class="lap-notch"></span></div>
+          <span class="lap-floor" aria-hidden="true"></span>
         </div>
-      </div>
-    </form>
 
-    <div class="explore-row">
-      <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
-    </div>
+        <!-- Your setup -->
+        <div class="setup" data-setup>
+          <div class="setup-text">
+            <p class="setup-label">Your setup</p>
+            <p class="setup-line" data-setup-line>Any brand, any processor, any memory, any storage</p>
+            <p class="setup-count"><span role="status" aria-live="polite" data-count>{models.length} models to choose from</span> <button type="button" class="reset" data-reset hidden>Start over</button></p>
+          </div>
+          <div class="setup-actions">
+            <div class="qty">
+              <label for="cur-qty">Quantity</label>
+              <div class="qty-ctl">
+                <button type="button" class="qty-btn" data-qty-step="-1" aria-label="Fewer laptops"><Icon name="minus" size={16} /></button>
+                <input id="cur-qty" class="qty-in" type="number" inputmode="numeric" min="1" max="10000" value="10" data-qty />
+                <button type="button" class="qty-btn" data-qty-step="1" aria-label="More laptops"><Icon name="plus" size={16} /></button>
+              </div>
+            </div>
+            <a class="btn btn--primary" href="/request-a-quote/?category=laptops&qty=10" data-quote><span>Get a quote for <span data-qty-n>10</span> <span data-qty-noun>laptops</span></span></a>
+          </div>
+        </div>
+      </form>
 
-  </div>
-
-  <!-- the models, on the dark wine band -->
-  <div class="results-band">
-    <div class="wrap cur-wrap">
-      <div class="results">
-        <div class="results-head">
-          <h3 class="results-title" data-results-title>Popular models</h3>
-          <a class="link-arrow" href="/equipment/" data-all>Open the catalogue <Icon name="arrow-right" /></a>
+      <!-- Right: the models that match, on the dark wine panel -->
+      <aside class="shelf" aria-labelledby="shelf-title">
+        <div class="shelf-head">
+          <h3 id="shelf-title" class="shelf-title" data-results-title>Popular models</h3>
+          <p class="shelf-note" data-shelf-note>Choose a brand on the laptop and this list follows your choices.</p>
         </div>
         <div class="matches" data-matches>
           {popular.map((p) => (
@@ -247,7 +219,11 @@ const cardSpec = (p: Product) => {
             </article>
           ))}
         </div>
-      </div>
+        <div class="shelf-foot">
+          <button type="submit" form="cur-form" class="btn shelf-browse" data-browse>See matches in the catalogue</button>
+          <a class="btn btn--lg explore" href="/equipment/">Explore the full catalogue <Icon name="arrow-right" /></a>
+        </div>
+      </aside>
     </div>
   </div>
 </section>
@@ -257,282 +233,253 @@ const cardSpec = (p: Product) => {
   @property --cd1 { syntax: '<color>'; inherits: true; initial-value: #d6cfc3; }
   @property --cd2 { syntax: '<color>'; inherits: true; initial-value: #b2aa9d; }
   @property --cd3 { syntax: '<color>'; inherits: true; initial-value: #7d766c; }
-  @property --glow { syntax: '<color>'; inherits: true; initial-value: rgba(224, 51, 40, .32); }
+  @property --glow { syntax: '<color>'; inherits: true; initial-value: rgba(224, 51, 40, .28); }
 
   /* ── The page: cream, rising over the first screen's dark ── */
   .cur {
-    --hair: var(--line); --hair-2: var(--line-strong); --panel: var(--card);
-    --done-bd: rgba(185, 41, 30, .5); --done-bg: #FCF4F1;
     position: relative; isolation: isolate; overflow-x: clip; color: var(--ink);
-    padding-block: clamp(64px, 6vw, 104px) 0;
+    padding-block: clamp(64px, 6vw, 104px);
     background-color: var(--paper-2);
     background-image:
       var(--grain),
-      radial-gradient(46% 40% at 50% 50%, rgba(255, 252, 246, .9) 0%, rgba(255, 252, 246, 0) 72%),
+      radial-gradient(40% 40% at 30% 62%, rgba(255, 252, 246, .9) 0%, rgba(255, 252, 246, 0) 72%),
       radial-gradient(60% 80% at 100% 0%, rgba(224, 51, 40, .06), transparent 70%),
       radial-gradient(55% 70% at 0% 100%, rgba(184, 138, 85, .12), transparent 70%);
     background-size: 220px 220px, auto, auto, auto;
   }
-  /* fine dot texture round the laptop */
-  .cur::before {
-    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background-image: radial-gradient(rgba(23, 19, 15, .07) 1px, transparent 1px); background-size: 22px 22px;
-    mask-image: radial-gradient(50% 36% at 50% 40%, #000 20%, transparent 85%);
-  }
-  .cur-wrap { max-width: calc(1380px + 2 * var(--gutter)); }
+  .cur-wrap { max-width: calc(1320px + 2 * var(--gutter)); }
 
-  .cur-head { display: grid; justify-items: center; gap: clamp(14px, 1.6vw, 22px); margin: 0 auto clamp(36px, 4.4vw, 64px); text-align: center; }
+  .cur-head { display: grid; justify-items: center; gap: clamp(14px, 1.6vw, 20px); margin: 0 auto clamp(28px, 3.4vw, 44px); text-align: center; }
   .cur-title {
     margin: 0; max-width: 18ch; font-family: var(--font-display); font-weight: 400; font-optical-sizing: auto;
     font-size: clamp(2.4rem, 1.1rem + 3.4vw, 4.5rem); line-height: .96; letter-spacing: -0.035em; text-wrap: balance;
   }
   .cur-title span { display: block; font-style: italic; color: var(--red-ink); }
-  .cur-lead { margin: 0; max-width: 58ch; font-size: var(--fs-lead); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
+  .cur-lead { margin: 0; max-width: 60ch; font-size: var(--fs-lead); line-height: 1.55; color: var(--ink-2); text-wrap: pretty; }
 
-  .stage { position: relative; display: grid; gap: 16px; }
-
-  /* ── Describe it in words ── */
+  /* ── Describe it in words: one compact strip ── */
   .need {
-    position: relative; z-index: 1; display: grid; gap: 10px; min-width: 0; padding: 16px 18px 16px;
-    border-radius: var(--r-lg); background: var(--panel); border: 1px solid var(--hair-2); box-shadow: var(--shadow-soft);
-    transition: border-color var(--t-fast), background-color var(--t-fast);
+    display: grid; gap: 12px 24px; width: min(100%, 920px); margin: 0 auto; padding: 18px 20px;
+    border-radius: var(--r-xl); background: var(--card); border: 1px solid var(--line-strong); box-shadow: var(--shadow-soft);
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
   }
   .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .14), var(--shadow-soft); }
+  .need-main { display: grid; gap: 8px; min-width: 0; }
   .need-label { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.0625rem; }
   .need-ic { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--red-ink); color: #fff; }
   .need-in {
-    width: 100%; min-height: 66px; resize: vertical; border: 0; padding: 4px 0 0; background: transparent;
+    width: 100%; min-height: 54px; resize: vertical; border: 0; padding: 2px 0 0; background: transparent;
     font: inherit; font-size: 1rem; line-height: 1.55; color: var(--ink);
   }
   .need-in:focus { outline: none; }
-  .need-in::placeholder { color: var(--ink-2); }
-  .need-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 12px; border-top: 1px solid var(--hair); }
+  .need-in::placeholder { color: var(--ink-3); }
+  .need-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
   .need-wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--fs-small); font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
   .need-wa :global(svg) { color: var(--whatsapp); }
-  .need-wa:focus-visible, .eg-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
-  
-  .eg { display: grid; gap: 8px; }
+  .eg { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 12px; border-top: 1px solid var(--line); }
   .eg-label { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
   .eg-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
   .eg-btn {
-    min-height: 32px; padding: 5px 12px; border-radius: var(--r-pill); border: 1px dashed var(--hair-2); background: transparent;
+    min-height: 32px; padding: 5px 12px; border-radius: var(--r-pill); border: 1px dashed var(--line-strong); background: transparent;
     font: inherit; font-size: .8125rem; color: var(--ink); cursor: pointer; text-align: left; transition: border-color var(--t-fast), background-color var(--t-fast);
   }
-  .eg-btn:hover { border-style: solid; border-color: var(--ink); background: var(--card); }
+  .eg-btn:hover { border-style: solid; border-color: var(--ink); background: var(--paper); }
+  @media (min-width: 760px) {
+    .need { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+    .need-actions { flex-direction: column; align-items: stretch; gap: 6px; }
+    .need-actions .btn { justify-content: center; }
+    .need-wa { justify-content: center; }
+    .eg { grid-column: 1 / -1; }
+  }
 
-  /* ── Option boxes ── */
-  .box {
-    position: relative; z-index: 1; min-width: 0; margin: 0;
-    padding: 16px 16px 18px; border: 1px solid var(--hair-2); border-radius: var(--r-lg);
-    background: var(--panel); box-shadow: var(--shadow-soft);
-    transition: border-color .3s ease, background-color .3s ease, opacity .3s ease;
-  }
-  .box[data-state='done'] { border-color: var(--done-bd); background: var(--done-bg); }
-  .box[data-state='locked'] { border-color: var(--hair); background: rgba(250, 247, 241, .6); box-shadow: none; }
-  .box[data-state='locked'] .chips, .box[data-state='locked'] .row-label { opacity: .5; }
-  .box-legend { display: flex; align-items: center; gap: 10px; padding: 0; float: left; width: 100%; font-weight: 600; font-size: 1.0625rem; }
-  .box > :not(.box-legend) { clear: both; }
-  .step {
-    display: inline-grid; place-items: center; width: 28px; height: 28px; flex: none; border-radius: 50%;
-    border: 1px solid var(--hair-2); font-size: .8125rem; font-weight: 700; color: var(--ink-2);
-    transition: background-color .25s ease, border-color .25s ease, color .25s ease;
-  }
-  .box[data-state='done'] .step { background: var(--red-ink); border-color: var(--red-ink); color: #fff; }
-  .box-note { margin: 4px 0 0; padding-left: 38px; font-size: var(--fs-xs); color: var(--ink-2); }
-  .row { min-width: 0; margin: 12px 0 0; padding: 0; border: 0; }
-  .row-label { padding: 0; margin-bottom: 8px; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .pick { position: relative; }
-  .pick input, .tile input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
-  .pick span {
-    display: inline-flex; align-items: center; min-height: 34px; padding: 5px 12px; border-radius: var(--r-pill);
-    border: 1px solid var(--hair-2); background: transparent; color: var(--ink); font-size: .8125rem; font-weight: 600; white-space: nowrap;
-    cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease;
-  }
-  .pick:hover span { border-color: var(--ink); }
-  .pick input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-  .pick input:focus-visible + span, .tile input:focus-visible + .tile-face { outline: 3px solid var(--blue); outline-offset: 2px; }
-  .pick input:disabled + span { cursor: not-allowed; border-style: dashed; color: var(--ink-3); border-color: var(--line-strong); }
-  .pick input:checked:disabled + span { background: var(--paper-2); border-style: solid; border-color: transparent; color: var(--ink-2); }
+  /* the fork between the two ways */
+  .fork { display: flex; align-items: center; gap: 16px; width: min(100%, 920px); margin: clamp(28px, 3.4vw, 44px) auto; color: var(--ink-2); font-family: var(--font-display); font-style: italic; font-size: 1.25rem; }
+  .fork::before, .fork::after { content: ''; flex: 1; height: 1px; background: var(--line-strong); }
 
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
-  .tile { position: relative; }
-  .tile--wide { grid-column: 1 / -1; }
-  .tile-face {
-    display: grid; align-content: start; gap: 2px; height: 100%; padding: 11px 12px 10px;
-    border-radius: var(--r-md); border: 1px solid var(--hair-2); background: var(--paper); color: var(--ink);
-    cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease;
-  }
-  .tile--wide .tile-face { grid-template-columns: auto 1fr; column-gap: 12px; align-items: center; }
-  .tile--wide .tile-mark { grid-row: 1 / 3; }
-  .tile:hover .tile-face { border-color: var(--ink); }
-  .tile input:checked + .tile-face { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-  .tile-mark { display: block; width: 22px; height: 22px; margin-bottom: 6px; color: currentColor; }
-  .tile-mark--apple { width: 19px; }
-  .tile-mark--lenovo { width: 54px; height: 18px; margin-top: 2px; margin-bottom: 8px; }
-  .tile-mark--any { display: grid; place-items: center; margin: 0; }
-  .tile-name { font-weight: 600; font-size: .9375rem; line-height: 1.2; }
-  .tile-sub { font-size: .75rem; line-height: 1.3; color: var(--ink-2); }
-  .tile input:checked + .tile-face .tile-sub { color: rgba(243, 238, 229, .78); }
+  /* ── The builder: laptop and setup on the left, models on the right ── */
+  .bench { display: grid; gap: clamp(28px, 3vw, 44px); align-items: start; }
+  @media (min-width: 1100px) { .bench { grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr); } }
+  .cur-form { min-width: 0; display: grid; gap: clamp(28px, 3vw, 40px); }
 
-  /* ── The laptop: black, with the cream screen of the first page ── */
-  .lap { position: relative; z-index: 1; width: 100%; max-width: 560px; margin: 8px auto; container-type: inline-size; }
+  /* The laptop: black lid, the cream screen of the first page, silver base */
+  .lap { position: relative; width: 100%; max-width: 760px; margin: 0 auto; container-type: inline-size; }
   .lap-lid {
-    position: relative; z-index: 1; width: 94%; margin: 0 auto; padding: 2.2cqi 2.2cqi 3.4cqi;
-    background: linear-gradient(180deg, #1a1719, #070607); border-radius: 3.6cqi 3.6cqi 1cqi 1cqi;
+    position: relative; z-index: 1; width: 94%; margin: 0 auto; padding: 2cqi 2cqi 3.2cqi;
+    background: linear-gradient(180deg, #141214, #050405); border-radius: 3.4cqi 3.4cqi 1cqi 1cqi;
     box-shadow:
       inset 0 0 0 1px rgba(243,238,229,.16), 0 0 0 1px rgba(0,0,0,.7),
       0 40px 70px -40px rgba(23,19,15,.6), 0 18px 34px -24px rgba(23,19,15,.45), 0 0 110px -40px var(--glow);
     transition: box-shadow .6s ease;
   }
-  .lap-cam { position: absolute; top: 1cqi; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; }
+  .lap-cam { position: absolute; top: .9cqi; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; }
   .lap-screen {
-    position: relative; aspect-ratio: 16 / 10.6; overflow: hidden; border-radius: 1.4cqi 1.4cqi .4cqi .4cqi;
-    display: grid; grid-template-rows: 1fr auto auto; padding: 4cqi 6cqi 3.4cqi; gap: 2.4cqi;
+    position: relative; overflow: hidden; border-radius: 1.2cqi 1.2cqi .4cqi .4cqi;
+    display: grid; align-content: start; gap: clamp(12px, 2.4cqi, 20px); padding: clamp(14px, 3.2cqi, 28px) clamp(14px, 3.6cqi, 32px) clamp(16px, 3.4cqi, 30px);
     color: var(--ink);
     background: #EDE6DA radial-gradient(120% 80% at 50% 0%, #FBF8F2 0%, var(--paper) 60%, #EDE6DA 100%);
   }
+  @container (min-width: 600px) { .lap-screen { aspect-ratio: 16 / 10.4; align-content: space-between; } }
   /* a soft reflection on the glass, and a line of light that sweeps down when the brand changes */
   .lap-screen::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 34%); }
   .lap-screen::after {
     content: ''; position: absolute; left: 0; right: 0; top: -30%; height: 30%; pointer-events: none; opacity: 0;
-    background: linear-gradient(180deg, rgba(224,51,40,0), rgba(224,51,40,.06) 85%, rgba(224,51,40,.18));
+    background: linear-gradient(180deg, rgba(224,51,40,0), rgba(224,51,40,.05) 85%, rgba(224,51,40,.16));
   }
   .lap-screen:global(.scan)::after { animation: scan .7s cubic-bezier(.4, 0, .2, 1); }
   @keyframes scan { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(430%); } }
-  .scr-marks { position: relative; display: grid; place-items: center; min-height: 0; }
+
+  .scr-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: clamp(10px, 2cqi, 16px); border-bottom: 1px solid var(--line); }
+  .scr-marks { position: relative; display: grid; align-items: center; justify-items: start; height: clamp(26px, 5cqi, 40px); min-width: 0; }
   .scr-mark {
-    grid-area: 1 / 1; display: block; opacity: 0; transform: scale(.92); filter: blur(6px); color: var(--ink);
-    transition: opacity .4s ease, transform .6s var(--ease-out), filter .4s ease;
+    grid-area: 1 / 1; display: block; opacity: 0; transform: translateY(4px); color: var(--ink);
+    transition: opacity .35s ease, transform .5s var(--ease-out);
   }
-  .scr-mark.on { opacity: 1; transform: none; filter: none; }
-  .scr-mark--apple { width: 9cqi; height: 11cqi; }
-  .scr-mark--hp, .scr-mark--dell { width: 12cqi; height: 12cqi; }
-  .scr-mark--lenovo { width: 27cqi; height: 9cqi; }
-  .scr-mark--itr { font-family: var(--font-display); font-size: 9.5cqi; line-height: 1; letter-spacing: -0.03em; white-space: nowrap; }
-  .scr-spec { display: grid; gap: .6cqi; margin: 0; padding: 2.2cqi 0 0; border-top: 1px solid var(--line); }
-  .scr-spec div {
-    display: grid; grid-template-columns: 26cqi 1fr; align-items: baseline; padding: 1cqi 1.6cqi; border-radius: 1cqi;
-    transition: background-color .5s ease;
+  .scr-mark.on { opacity: 1; transform: none; }
+  .scr-mark--apple { width: clamp(22px, 4.2cqi, 32px); height: clamp(26px, 5cqi, 38px); }
+  .scr-mark--hp, .scr-mark--dell { width: clamp(28px, 5.4cqi, 40px); height: clamp(28px, 5.4cqi, 40px); }
+  .scr-mark--lenovo { width: clamp(70px, 13cqi, 100px); height: clamp(22px, 4.2cqi, 32px); }
+  .scr-mark--itr { font-family: var(--font-display); font-size: clamp(1.5rem, 4.6cqi, 2.25rem); line-height: 1; letter-spacing: -0.03em; white-space: nowrap; }
+  .scr-count { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 5px 12px; border-radius: var(--r-pill); background: rgba(23,19,15,.05); font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+  .scr-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 3px rgba(224,51,40,.16); }
+
+  .fld-label { display: block; padding: 0; margin: 0 0 6px; font-size: var(--fs-xs); font-weight: 600; color: var(--ink-2); }
+  .brandset { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .tile { position: relative; min-width: 0; }
+  .tile input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+  .tile-face {
+    display: grid; justify-items: center; align-content: center; gap: 6px; height: 100%; min-height: 64px; padding: 10px 6px;
+    border-radius: var(--r-md); border: 1px solid var(--line-strong); background: rgba(250, 247, 241, .7);
+    cursor: pointer; transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s var(--ease-out);
   }
-  .scr-spec div.flash { background-color: rgba(224, 51, 40, .16); transition: none; }
-  .scr-spec dt { font-size: 3cqi; color: var(--ink-2); }
-  .scr-spec dd { margin: 0; font-size: 3.6cqi; font-weight: 600; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .scr-spec dd.set { color: var(--ink); }
-  .scr-foot { margin: 0; display: flex; align-items: center; gap: 1.6cqi; font-size: 3cqi; color: var(--ink-2); }
-  .scr-foot::before { content: ''; width: 1.6cqi; height: 1.6cqi; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 .8cqi rgba(224,51,40,.18); }
+  .tile:hover .tile-face { border-color: var(--ink); transform: translateY(-1px); }
+  .tile input:checked + .tile-face { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+  .tile input:focus-visible + .tile-face { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .tile-mark { display: block; width: 20px; height: 20px; color: currentColor; }
+  .tile-mark--apple { width: 17px; }
+  .tile-mark--lenovo { width: 48px; height: 16px; margin-block: 2px; }
+  .tile-mark--any { display: grid; place-items: center; }
+  .tile-name { font-weight: 600; font-size: .8125rem; line-height: 1.2; }
+
+  /* two by two: processor and generation (or model and chip), memory and storage */
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+  .fld { min-width: 0; border-radius: var(--r-md); transition: background-color .5s ease; }
+  .fld:global(.flash) { background-color: rgba(224, 51, 40, .1); transition: none; }
+  .sel { position: relative; }
+  .sel select {
+    width: 100%; min-height: 44px; padding: 8px 38px 8px 14px; border-radius: var(--r-md);
+    border: 1px solid var(--line-strong); background: var(--card); color: var(--ink);
+    font: inherit; font-size: .9375rem; font-weight: 600; cursor: pointer;
+    -webkit-appearance: none; appearance: none; transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .sel select:hover { border-color: var(--ink); }
+  .sel select:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .sel select:disabled { cursor: not-allowed; color: var(--ink-3); background: rgba(250, 247, 241, .5); border-style: dashed; }
+  .sel :global(svg) { position: absolute; right: 12px; top: 50%; translate: 0 -50%; pointer-events: none; color: var(--ink-2); }
+  .fld[data-set] .sel select { border-color: var(--red-ink); box-shadow: inset 0 0 0 1px var(--red-ink); }
+  /* narrow screens: three brands on top, Apple and Any sharing the second row */
+  @container (max-width: 520px) {
+    .tiles { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .tile { grid-column: span 2; }
+    .tile:nth-child(n+4) { grid-column: span 3; }
+    .sel select { padding-left: 12px; font-size: .875rem; }
+  }
+
   .lap-deck {
-    position: relative; z-index: 1; height: 3cqi; margin-top: -1px;
+    position: relative; z-index: 1; height: 2.8cqi; min-height: 10px; margin-top: -1px;
     background: linear-gradient(180deg, var(--cd1) 0%, var(--cd2) 45%, var(--cd3) 100%);
     border-radius: 2px 2px 3.4cqi 3.4cqi / 2px 2px 2cqi 2cqi;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.5), 0 14px 22px -12px rgba(23,19,15,.5);
     transition: --cd1 .6s ease, --cd2 .6s ease, --cd3 .6s ease;
   }
   .lap-notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, var(--cd3), var(--cd2)); border-radius: 0 0 9px 9px; opacity: .7; }
-  /* the light the screen throws on the desk */
   .lap-floor {
-    position: absolute; left: -6%; right: -6%; bottom: -9cqi; height: 16cqi; z-index: 0; pointer-events: none; border-radius: 50%;
-    background: radial-gradient(closest-side, var(--glow), transparent); opacity: .6; transition: --glow .6s ease;
+    position: absolute; left: -4%; right: -4%; bottom: -7cqi; height: 12cqi; z-index: 0; pointer-events: none; border-radius: 50%;
+    background: radial-gradient(closest-side, var(--glow), transparent); opacity: .55; transition: --glow .6s ease;
   }
-  .lap[data-brand='Apple'] { --cd1: #e6e6e9; --cd2: #bcbcc1; --cd3: #8d8d93; --glow: rgba(214, 214, 224, .26); }
-  .lap[data-brand='HP'] { --cd1: #dedfe2; --cd2: #b3b4b8; --cd3: #85868b; --glow: rgba(0, 150, 214, .3); }
-  .lap[data-brand='Dell'] { --cd1: #73767c; --cd2: #4a4d52; --cd3: #2c2e32; --glow: rgba(0, 118, 206, .32); }
-  .lap[data-brand='Lenovo'] { --cd1: #404042; --cd2: #252527; --cd3: #131314; --glow: rgba(226, 35, 26, .36); }
+  .lap[data-brand='Apple'] { --cd1: #e6e6e9; --cd2: #bcbcc1; --cd3: #8d8d93; --glow: rgba(150, 150, 165, .3); }
+  .lap[data-brand='HP'] { --cd1: #dedfe2; --cd2: #b3b4b8; --cd3: #85868b; --glow: rgba(0, 150, 214, .26); }
+  .lap[data-brand='Dell'] { --cd1: #73767c; --cd2: #4a4d52; --cd3: #2c2e32; --glow: rgba(0, 118, 206, .28); }
+  .lap[data-brand='Lenovo'] { --cd1: #404042; --cd2: #252527; --cd3: #131314; --glow: rgba(226, 35, 26, .3); }
 
   /* The screen switches on the first time the builder comes into view */
-  .stage[data-boot='off'] .lap-screen > * { opacity: 0; }
-  .stage[data-boot='on'] .lap-screen > * { animation: boot .7s ease backwards; }
-  .stage[data-boot='on'] .scr-spec { animation-delay: .25s; }
-  .stage[data-boot='on'] .scr-foot { animation-delay: .45s; }
-  @keyframes boot { from { opacity: 0; transform: translateY(1.6cqi); } }
-
-  /* ── Cables (drawn by the script on wide screens) ── */
-  .cables { display: none; }
-  .cables :global(.cable) { fill: none; stroke: rgba(23,19,15,.3); stroke-width: 1.5; stroke-dasharray: 3 6; stroke-linecap: round; transition: stroke .3s ease; }
-  .cables :global(.cable.locked) { stroke: rgba(23,19,15,.16); }
-  .cables :global(.cable.done) { stroke: var(--red-ink); stroke-dasharray: none; stroke-width: 2; }
-  /* current flowing to the laptop along a plugged-in cable */
-  .cables :global(.flow) { fill: none; stroke: #ffd2c9; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1.5 14; opacity: 0; transition: opacity .3s ease; }
-  .cables :global(.flow.done) { opacity: .85; animation: flow 1.1s linear infinite; }
-  @keyframes flow { to { stroke-dashoffset: -15.5; } }
-  .cables :global(.spark) { fill: none; stroke: #ffe3dc; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 0 100; opacity: 0; filter: drop-shadow(0 0 6px #e6857a); }
-  .cables :global(.spark.run) { animation: spark .75s cubic-bezier(.45, 0, .2, 1) both; }
-  @keyframes spark {
-    0% { stroke-dasharray: 0 100; stroke-dashoffset: 0; opacity: 1; }
-    20% { stroke-dasharray: 10 100; }
-    100% { stroke-dasharray: 10 100; stroke-dashoffset: -100; opacity: 0; }
-  }
-  .cables :global(.sock) { fill: var(--card); stroke: rgba(23,19,15,.35); stroke-width: 1.5; transition: fill .3s ease, stroke .3s ease; }
-  .cables :global(.sock.done) { fill: var(--red-ink); stroke: var(--red-ink); }
-  .cables :global(.port) { fill: #2a2622; stroke: rgba(23,19,15,.3); stroke-width: 1; transition: fill .3s ease; }
-  .cables :global(.port.done) { fill: var(--red); stroke: rgba(255,255,255,.6); }
-
-  /*
-   * Wide screens: the laptop in the middle with the describe box under it,
-   * brand and processor on the left, memory and storage on the right.
-   */
-  @media (min-width: 1100px) {
-    .stage {
-      grid-template-columns: minmax(260px, 310px) minmax(0, 1fr) minmax(260px, 310px);
-      grid-template-areas: 'b1 lap b3' 'b2 need b4';
-      column-gap: clamp(56px, 5vw, 96px); row-gap: 20px; align-items: start;
-    }
-    .need { width: min(100%, 600px); justify-self: center; }
-    .lap { max-width: 600px; margin: 0 auto; align-self: center; }
-    .cables { display: block; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
-  }
-
-  /* Narrower screens: a chain of boxes, each linked to the next */
-  @media (max-width: 1099px) {
-    .box::before {
-      content: ''; position: absolute; left: 30px; top: -23px; width: 2px; height: 22px;
-      background: repeating-linear-gradient(to bottom, rgba(23,19,15,.3) 0 3px, transparent 3px 7px);
-    }
-    .box[data-state='done']::before { background: var(--red-ink); }
-  }
-  /* Phones: describe box, then the laptop, then the chain */
-  @media (max-width: 759px) {
-    .stage { grid-template-areas: 'need' 'lap' 'b1' 'b2' 'b3' 'b4'; gap: 22px; }
-    .lap { max-width: 460px; margin: 10px auto 14px; }
-  }
-  /* Tablets: the laptop stays in view on the left while the boxes scroll past */
-  @media (min-width: 760px) and (max-width: 1099px) {
-    .stage {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: 'need need' 'lap b1' 'lap b2' 'lap b3' 'lap b4';
-      column-gap: clamp(24px, 4vw, 40px); row-gap: 22px; align-items: start;
-    }
-    .need { margin-bottom: 10px; }
-    .lap { position: sticky; top: 112px; align-self: start; max-width: none; margin: 0; }
-    .box--brand::before { display: none; }
-  }
+  .lap[data-boot='off'] .lap-screen > * { opacity: 0; }
+  .lap[data-boot='on'] .lap-screen > * { animation: boot .6s ease backwards; }
+  .lap[data-boot='on'] .brandset { animation-delay: .12s; }
+  .lap[data-boot='on'] .fields { animation-delay: .24s; }
+  @keyframes boot { from { opacity: 0; transform: translateY(8px); } }
 
   /* ── Your setup ── */
   .setup {
-    display: grid; gap: 18px 32px; margin-top: clamp(24px, 3vw, 36px); padding: 20px 22px; border-radius: var(--r-lg);
+    display: grid; gap: 16px 28px; padding: 20px 22px; border-radius: var(--r-xl);
     background: var(--ink); color: var(--on-dark);
   }
   .setup-label { margin: 0; font-size: var(--fs-xs); color: var(--on-dark-2); }
-  .setup-line { margin: 4px 0 0; font-family: var(--font-display); font-size: clamp(1.25rem, 1.05rem + .7vw, 1.6rem); line-height: 1.25; }
+  .setup-line { margin: 4px 0 0; font-family: var(--font-display); font-size: clamp(1.2rem, 1.05rem + .5vw, 1.45rem); line-height: 1.25; }
   .setup-count { margin: 6px 0 0; font-size: var(--fs-small); color: var(--on-dark-2); }
   .setup-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
-  .setup .btn:not(.btn--primary) { --btn-fg: var(--on-dark); --btn-bd: var(--hair-dark-strong); --btn-bg: transparent; }
-  .setup .btn:not(.btn--primary):hover { --btn-bd: var(--on-dark); }
   .qty { display: flex; align-items: center; gap: 10px; }
   .qty label { font-size: var(--fs-xs); color: var(--on-dark-2); }
   .qty-ctl { display: inline-flex; align-items: center; border: 1px solid var(--hair-dark-strong); border-radius: var(--r-pill); }
   .qty-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--on-dark); cursor: pointer; }
   .qty-btn:hover { background: rgba(243,238,229,.08); }
   .qty-in {
-    width: 64px; height: 40px; border: 0; background: transparent; color: var(--on-dark); text-align: center;
+    width: 60px; height: 40px; border: 0; background: transparent; color: var(--on-dark); text-align: center;
     font: inherit; font-weight: 600; font-variant-numeric: tabular-nums; -moz-appearance: textfield; appearance: textfield;
   }
   .qty-in::-webkit-outer-spin-button, .qty-in::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  .qty-btn:focus-visible, .qty-in:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
+  .qty-btn:focus-visible, .qty-in:focus-visible, .reset:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
   .setup .btn:focus-visible { outline-color: var(--red-soft); }
   .reset { margin-left: 10px; border: 0; background: none; padding: 4px 2px; color: var(--on-dark); font: inherit; font-size: var(--fs-small); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
-  .reset:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 2px; }
-  @media (min-width: 1100px) { .setup { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
-  @media (forced-colors: active) { .box, .need, .setup, .lap-lid { border: 1px solid CanvasText; } }
+  @media (min-width: 700px) { .setup { grid-template-columns: minmax(0, 1fr) auto; align-items: center; } }
+
+  /* ── The models: the dark wine panel ── */
+  .shelf {
+    display: grid; gap: 16px; min-width: 0; padding: clamp(18px, 2vw, 26px); border-radius: var(--r-xl); color: var(--on-dark);
+    background:
+      radial-gradient(80% 60% at 100% 0%, rgba(122, 32, 24, .42) 0%, transparent 65%),
+      radial-gradient(70% 60% at 0% 100%, rgba(58, 21, 18, .6) 0%, transparent 65%),
+      var(--night);
+    box-shadow: 0 40px 70px -46px rgba(58, 12, 18, .8);
+  }
+  @media (min-width: 1100px) { .shelf { position: sticky; top: 100px; } }
+  .shelf-head { display: grid; gap: 4px; }
+  .shelf-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.5rem, 1.25rem + .6vw, 1.9rem); line-height: 1.1; }
+  .shelf-note { margin: 0; font-size: var(--fs-small); color: var(--on-dark-2); }
+  .matches { display: grid; gap: 10px; }
+  .matches :global(.mcard) {
+    display: grid; grid-template-columns: 120px minmax(0, 1fr); overflow: hidden; border-radius: var(--r-lg); color: var(--ink);
+    background: var(--card); box-shadow: 0 18px 30px -24px rgba(0, 0, 0, .8);
+    transition: transform var(--t-med) var(--ease-out);
+    animation: card-in .45s var(--ease-out) backwards;
+  }
+  .matches :global(.mcard:nth-child(2)) { animation-delay: .05s; }
+  .matches :global(.mcard:nth-child(3)) { animation-delay: .1s; }
+  .matches :global(.mcard:nth-child(4)) { animation-delay: .15s; }
+  @keyframes card-in { from { opacity: 0; transform: translateY(8px); } }
+  .matches :global(.mcard:hover) { transform: translateX(3px); }
+  .matches :global(.mcard-img) { display: block; overflow: hidden; background: var(--paper-3); }
+  .matches :global(.mcard-img img) { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .matches :global(.mcard-img--studio) { background: radial-gradient(70% 85% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
+  .matches :global(.mcard-img--studio img) { mix-blend-mode: multiply; }
+  .matches :global(.mcard-body) { display: grid; align-content: start; gap: 3px; padding: 11px 14px 12px; }
+  .matches :global(.mcard-sub) { margin: 0; font-size: .75rem; color: var(--ink-2); }
+  .matches :global(.mcard-name) { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; line-height: 1.15; letter-spacing: -0.01em; }
+  .matches :global(.mcard-name a) { text-decoration: none; }
+  .matches :global(.mcard-name a:hover) { text-decoration: underline; text-underline-offset: 3px; }
+  .matches :global(.mcard-spec) { margin: 0; font-size: .8125rem; line-height: 1.45; color: var(--ink-2); }
+  .matches :global(.mcard-quote) { justify-self: start; margin-top: 4px; font-size: .8125rem; font-weight: 600; color: var(--red-ink); text-underline-offset: 3px; }
+  .matches :global(.empty) { margin: 0; padding: 18px; border: 1px dashed var(--hair-dark-strong); border-radius: var(--r-lg); color: var(--on-dark-2); }
+  .shelf-foot { display: grid; gap: 10px; padding-top: 4px; }
+  .shelf-foot .btn { justify-content: center; }
+  .shelf-browse { --btn-fg: var(--on-dark); --btn-bd: var(--hair-dark-strong); --btn-bg: transparent; }
+  .shelf-browse:hover { --btn-bd: var(--on-dark); }
+  .explore { --btn-bg: var(--paper); --btn-fg: var(--ink); --btn-bd: var(--paper); font-weight: 600; }
+  .explore:hover { --btn-bg: var(--red-ink); --btn-fg: #fff; --btn-bd: var(--red-ink); }
+  .shelf .btn:focus-visible { outline: 3px solid var(--red-soft); outline-offset: 3px; }
+  /* tablets: two columns of models */
+  @media (min-width: 700px) and (max-width: 1099px) { .matches { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) { .matches :global(.mcard) { grid-template-columns: 96px minmax(0, 1fr); } }
 
   /*
    * In the full version this page rises like a sheet over the first screen as
@@ -548,62 +495,11 @@ const cardSpec = (p: Product) => {
     }
   }
 
-  /* ── Explore the full catalogue ── */
-  .explore-row { display: flex; justify-content: center; margin-top: clamp(32px, 4vw, 52px); }
-  .explore { --btn-bg: var(--ink); --btn-fg: var(--paper); --btn-bd: var(--ink); font-weight: 600; }
-  .explore:hover { --btn-bg: var(--red-ink); --btn-fg: #fff; --btn-bd: var(--red-ink); }
-  .explore:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
-
-  /* ── Matching models ── */
-  /* the models sit on the site's dark wine band, closing the section */
-  .results-band {
-    margin-top: clamp(48px, 5vw, 72px); padding-block: clamp(56px, 6vw, 96px); color: var(--on-dark);
-    background:
-      radial-gradient(70% 90% at 85% 0%, rgba(122, 32, 24, .34) 0%, transparent 60%),
-      radial-gradient(60% 80% at 0% 100%, rgba(58, 21, 18, .55) 0%, transparent 65%),
-      var(--night);
-  }
-  .results-band .link-arrow { color: var(--on-dark); }
-  .results-band .link-arrow:focus-visible { outline-color: var(--red-soft); }
-  .results-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: var(--s-5); }
-  .results-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: var(--fs-h3); }
-  
-  .matches { display: grid; gap: 16px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  @media (max-width: 1099px) { .matches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .matches :global(.mcard) {
-    display: grid; grid-template-rows: auto 1fr; overflow: hidden; border-radius: var(--r-lg); color: var(--ink);
-    background: var(--card); border: 1px solid var(--line); box-shadow: 0 24px 50px -30px rgba(0, 0, 0, .8);
-    transition: transform var(--t-med) var(--ease-out), box-shadow var(--t-med) var(--ease-out);
-  }
-  .matches :global(.mcard:hover) { transform: translateY(-3px); box-shadow: var(--shadow-block); }
-  .matches :global(.mcard-img) { display: block; overflow: hidden; background: var(--paper-3); }
-  .matches :global(.mcard-img img) { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 600ms var(--ease-out); }
-  .matches :global(.mcard:hover .mcard-img img) { transform: scale(1.035); }
-  .matches :global(.mcard-img--studio) { background: radial-gradient(70% 85% at 50% 42%, #FBF8F2 0%, #EFE9DF 62%, #E6DED1 100%); }
-  .matches :global(.mcard-img--studio img) { object-fit: cover; mix-blend-mode: multiply; }
-  .matches :global(.mcard-body) { display: grid; align-content: start; gap: 6px; padding: 14px 16px 18px; }
-  .matches :global(.mcard-sub) { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
-  .matches :global(.mcard-name) { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; line-height: 1.15; letter-spacing: -0.01em; }
-  .matches :global(.mcard-name a) { text-decoration: none; }
-  .matches :global(.mcard-name a:hover) { text-decoration: underline; text-underline-offset: 3px; }
-  .matches :global(.mcard-spec) { margin: 0; font-size: var(--fs-small); line-height: 1.5; color: var(--ink-2); }
-  .matches :global(.mcard-quote) { justify-self: start; margin-top: 6px; font-size: var(--fs-small); font-weight: 600; color: var(--red-ink); text-underline-offset: 3px; }
-  /* Phones: compact cards with a thumbnail */
-  @media (max-width: 699px) {
-    .matches { grid-template-columns: 1fr; gap: 12px; }
-    .matches :global(.mcard) { grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: none; }
-    .matches :global(.mcard-img) { display: block; }
-    .matches :global(.mcard-img img) { height: 100%; aspect-ratio: auto; }
-    .matches :global(.mcard-body) { padding: 12px 14px 14px; gap: 4px; }
-    .matches :global(.mcard-name) { font-size: 1.125rem; }
-    .matches :global(.mcard-spec) { font-size: var(--fs-xs); }
-  }
-  .matches :global(.empty) { grid-column: 1 / -1; margin: 0; padding: 22px; border: 1px dashed var(--hair-dark-strong); border-radius: var(--r-lg); color: var(--on-dark-2); }
-
   @media (prefers-reduced-motion: reduce) {
-    .scr-mark, .box, .need, .pick span, .tile-face, .lap-deck, .lap-lid, .lap-floor, .scr-spec div { transition: none; }
-    .cables :global(.spark.run), .cables :global(.flow.done), .lap-screen:global(.scan)::after { animation: none; }
+    .scr-mark, .tile-face, .lap-deck, .lap-lid, .lap-floor, .fld, .sel select { transition: none; }
+    .lap-screen:global(.scan)::after, .matches :global(.mcard) { animation: none; }
   }
+  @media (forced-colors: active) { .lap-lid, .need, .shelf { border: 1px solid CanvasText; } }
 </style>
 
 <script>
@@ -620,66 +516,73 @@ const cardSpec = (p: Product) => {
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   const chipName = (c: string) => c.replace(/^Intel /, '').replace(/^Apple /, '').replace(/ \((\d+\w\w Gen)\)/, ' $1');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  // navigation goes through a link click so it also works inside the site preview
+  const go = (href: string) => {
+    const a = document.createElement('a');
+    a.href = href;
+    document.body.append(a);
+    a.click();
+    a.remove();
+  };
 
   // "Describe your need": send it to the quote form, or as a WhatsApp message.
-  // Navigation goes through a link click so it also works inside the site preview.
-  const needForm = document.querySelector<HTMLFormElement>('[data-need]');
-  const needIn = document.querySelector<HTMLTextAreaElement>('#need-text');
-  const needWa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
-  if (needForm && needIn) {
-    const base = needWa ? new URL(needWa.href) : null;
+  document.querySelectorAll<HTMLFormElement>('[data-need]').forEach((needForm) => {
+    const input = needForm.querySelector<HTMLTextAreaElement>('[name="need"]')!;
+    const wa = needForm.querySelector<HTMLAnchorElement>('[data-need-wa]');
+    const base = wa ? new URL(wa.href) : null;
     const prefix = base?.searchParams.get('text') ?? '';
     const syncWa = () => {
-      if (!needWa || !base) return;
+      if (!wa || !base) return;
       const u = new URL(base.href);
-      u.searchParams.set('text', `${prefix}${needIn.value.trim()}`.trim());
-      needWa.href = u.href;
+      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
+      wa.href = u.href;
     };
-    needIn.addEventListener('input', syncWa);
+    input.addEventListener('input', syncWa);
     // an example fills the box, ready to edit
-    document.querySelectorAll<HTMLButtonElement>('[data-eg]').forEach((b) => b.addEventListener('click', () => {
-      needIn.value = b.textContent?.trim() ?? '';
+    needForm.querySelectorAll<HTMLButtonElement>('[data-eg]').forEach((b) => b.addEventListener('click', () => {
+      input.value = b.textContent?.trim() ?? '';
       syncWa();
-      needIn.focus({ preventScroll: true });
-      needIn.setSelectionRange(needIn.value.length, needIn.value.length);
+      input.focus({ preventScroll: true });
+      input.setSelectionRange(input.value.length, input.value.length);
     }));
     needForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const need = needIn.value.trim();
-      const a = document.createElement('a');
-      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
-      document.body.append(a);
-      a.click();
-      a.remove();
+      const need = input.value.trim();
+      go(need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/');
     });
-  }
+  });
 
   document.querySelectorAll<HTMLFormElement>('[data-cur]').forEach((form) => {
+    const section = form.closest('section')!;
     const models = JSON.parse(form.querySelector('[data-cur-data]')!.textContent!) as Model[];
-    const stage = form.querySelector<HTMLElement>('[data-cur-stage]')!;
-    const svg = form.querySelector<SVGSVGElement>('[data-cables]')!;
     const lap = form.querySelector<HTMLElement>('[data-lap]')!;
-    const lid = lap.querySelector<HTMLElement>('[data-port-lid]')!;
-    const screen = lap.querySelector<HTMLElement>('.lap-screen')!;
-    screen.addEventListener('animationend', () => screen.classList.remove('scan'));
+    const screen = form.querySelector<HTMLElement>('[data-screen]')!;
+    screen.addEventListener('animationend', (e) => { if (e.target === screen) screen.classList.remove('scan'); });
     const qty = form.querySelector<HTMLInputElement>('[data-qty]')!;
     const quote = form.querySelector<HTMLAnchorElement>('[data-quote]')!;
     const reset = form.querySelector<HTMLButtonElement>('[data-reset]')!;
-    const browse = form.querySelector<HTMLButtonElement>('[data-browse]')!;
-    const section = form.closest('section')!;
+    const browse = section.querySelector<HTMLButtonElement>('[data-browse]')!;
     const matchesEl = section.querySelector<HTMLElement>('[data-matches]')!;
     const titleEl = section.querySelector<HTMLElement>('[data-results-title]')!;
-    const allEl = section.querySelector<HTMLAnchorElement>('[data-all]')!;
+    const noteEl = section.querySelector<HTMLElement>('[data-shelf-note]')!;
     const popularHTML = matchesEl.innerHTML;
-    const box = (id: string) => form.querySelector<HTMLFieldSetElement>(`[data-box="${id}"]`)!;
-    const BOXES = ['brand', 'proc', 'ram', 'storage'] as const;
-    const KEYS: Key[] = ['brand', 'proc', 'gen', 'model', 'chip', 'ram', 'storage'];
-    const radios = (k: Key) => [...form.querySelectorAll<HTMLInputElement>(`input[name="${k}"]`)];
-    const get = (): Sel => Object.fromEntries(KEYS.map((k) => [k, radios(k).find((r) => r.checked)?.value ?? ''])) as Sel;
-    const set = (k: Key, v: string) => radios(k).forEach((r) => (r.checked = r.value === v));
+    const OPTS: Key[] = ['proc', 'gen', 'model', 'chip', 'ram', 'storage'];
+    const KEYS: Key[] = ['brand', ...OPTS];
+    const radios = () => [...form.querySelectorAll<HTMLInputElement>('input[name="brand"]')];
+    const sel = (k: Key) => form.querySelector<HTMLSelectElement>(`select[name="${k}"]`)!;
+    const fld = (k: Key) => form.querySelector<HTMLElement>(`[data-fld="${k}"]`)!;
+    // every option each drop-down can ever offer, in order
+    const all = Object.fromEntries(OPTS.map((k) => [k, [...sel(k).options].map((o) => ({ v: o.value, l: o.text }))])) as Record<Key, { v: string; l: string }[]>;
+    const get = (): Sel => Object.fromEntries(KEYS.map((k) => [k, k === 'brand' ? radios().find((r) => r.checked)?.value ?? '' : sel(k).value])) as Sel;
+    const set = (k: Key, v: string) => {
+      if (k === 'brand') { radios().forEach((r) => (r.checked = r.value === v)); return; }
+      const s = sel(k);
+      if (![...s.options].some((o) => o.value === v)) s.add(new Option(all[k].find((o) => o.v === v)?.l ?? v, v));
+      s.value = v;
+    };
 
     // A brand restored by the browser (back button) keeps its choices; otherwise start clean.
-    if (!get().brand) (['proc', 'gen', 'model', 'chip', 'ram', 'storage'] as Key[]).forEach((k) => set(k, ''));
+    if (!get().brand) OPTS.forEach((k) => set(k, ''));
 
     const isMacSel = (s: Sel) => s.brand === 'Apple';
     function brandOk(m: Model, s: Sel) {
@@ -710,38 +613,42 @@ const cardSpec = (p: Product) => {
     };
     const matching = (s: Sel) => models.map((m) => ({ m, vs: m.v.filter((v) => fits(m, v, s)) })).filter((x) => x.vs.length);
 
-    /** Show only the options the chosen brand has; disable ones that clash with other choices. */
+    /**
+     * Each drop-down lists only what the chosen brand has; options that clash with the
+     * other choices stay listed but cannot be picked. Nothing to choose before a brand.
+     */
     function syncOptions(s: Sel) {
       const brandModels = models.filter((m) => brandOk(m, s));
-      for (const k of ['proc', 'gen', 'model', 'chip', 'ram', 'storage'] as Key[]) {
-        radios(k).forEach((r) => {
-          if (!r.value) { r.disabled = !s.brand; return; }
-          const exists = brandModels.some((m) => m.v.some((v) => has(k, r.value, m, v)));
-          const possible = exists && brandModels.some((m) => m.v.some((v) => has(k, r.value, m, v) && fits(m, v, s, k)));
-          r.closest<HTMLElement>('.pick')!.hidden = !!s.brand && !exists;
-          r.disabled = !s.brand || !possible;
-        });
+      for (const k of OPTS) {
+        const el = sel(k);
+        const keep = el.value;
+        const opts = all[k]
+          .filter((o) => !o.v || brandModels.some((m) => m.v.some((v) => has(k, o.v, m, v))))
+          .map((o) => {
+            const opt = new Option(o.v ? o.l : 'Any', o.v, false, o.v === keep);
+            if (o.v) opt.disabled = !brandModels.some((m) => m.v.some((v) => has(k, o.v, m, v) && fits(m, v, s, k)));
+            return opt;
+          });
+        el.replaceChildren(...opts);
+        el.value = opts.some((o) => o.value === keep) ? keep : '';
+        el.disabled = !s.brand;
       }
-      // Processor rows: PC rows or Mac rows; no generation row for Core Ultra.
-      form.querySelectorAll<HTMLFieldSetElement>('[data-row-key]').forEach((row) => {
-        const forWhat = row.dataset.for;
+      // PC or Mac drop-downs; no generation for Core Ultra
+      form.querySelectorAll<HTMLElement>('[data-fld]').forEach((f) => {
+        const forWhat = f.dataset.for;
         let show = !forWhat || (forWhat === 'mac' ? isMacSel(s) : !isMacSel(s));
-        if (row.dataset.rowKey === 'gen' && s.proc.startsWith('Core Ultra')) show = false;
-        row.hidden = !show;
+        if (f.dataset.fld === 'gen' && s.proc.startsWith('Core Ultra')) show = false;
+        f.hidden = !show;
       });
     }
 
-    /**
-     * Drop choices that no longer fit after another choice changed. The choice
-     * just made wins, then the boxes in order.
-     */
+    /** Drop choices that no longer fit after another changed: the latest choice wins. */
     function settle(changed: Key) {
       if (changed === 'brand') (['proc', 'gen', 'model', 'chip'] as Key[]).forEach((k) => set(k, ''));
       if (changed === 'proc' && get().proc.startsWith('Core Ultra')) set('gen', '');
       const s = get();
       const acc: Sel = { brand: s.brand, proc: '', gen: '', model: '', chip: '', ram: '', storage: '' };
-      const order: Key[] = ['proc', 'gen', 'model', 'chip', 'ram', 'storage'];
-      for (const k of [changed, ...order.filter((x) => x !== changed)]) {
+      for (const k of [changed, ...OPTS.filter((x) => x !== changed)]) {
         if (k === 'brand' || !s[k]) continue;
         const trial = { ...acc, [k]: s[k] };
         if (models.some((m) => m.v.some((v) => fits(m, v, trial)))) acc[k] = s[k];
@@ -794,7 +701,8 @@ const cardSpec = (p: Product) => {
     }
 
     let last: Sel | null = null;
-    function render() {
+    let lastList = '';
+    function render(changed?: Key) {
       const s = get();
       const list = s.brand ? matching(s) : [];
       const n = Math.max(1, Math.min(10000, parseInt(qty.value, 10) || 1));
@@ -803,40 +711,24 @@ const cardSpec = (p: Product) => {
       const mem = s.ram ? fmt(Number(s.ram)) : '';
       const sto = s.storage ? fmt(Number(s.storage)) : '';
 
-      // Boxes: locked until a brand is chosen, done once something specific is picked.
-      const picked: Record<string, boolean> = {
-        brand: !!s.brand, proc: !!(s.proc || s.gen || s.model || s.chip), ram: !!s.ram, storage: !!s.storage,
-      };
-      BOXES.forEach((id) => {
-        const st = id !== 'brand' && !s.brand ? 'locked' : picked[id] ? 'done' : 'open';
-        box(id).dataset.state = st;
-        const note = box(id).querySelector<HTMLElement>('[data-note]');
-        if (note && id !== 'brand') { note.hidden = st !== 'locked'; note.textContent = 'Choose a brand first.'; }
-      });
-      box('brand').querySelector<HTMLElement>('[data-note]')!.hidden = !!s.brand;
-
-      // Screen (a line of light sweeps down it when the brand changes)
+      // The screen: the brand's mark, the count, a line of light when the brand changes
       if (last && last.brand !== s.brand && !reduced.matches) {
         screen.classList.remove('scan');
         void screen.offsetWidth;
         screen.classList.add('scan');
       }
       lap.dataset.brand = s.brand;
-      lap.querySelectorAll<Element>('[data-mark]').forEach((el) => el.classList.toggle('on', (el as HTMLElement).dataset.mark === s.brand));
-      const vals: Record<string, string> = { proc: proc || 'Any', ram: mem || 'Any', storage: sto || 'Any' };
-      (['proc', 'ram', 'storage'] as const).forEach((k) => {
-        const dd = lap.querySelector<HTMLElement>(`[data-val="${k}"]`)!;
-        if (dd.textContent !== vals[k]) {
-          dd.textContent = vals[k];
-          const row = dd.parentElement!;
-          if (last && !reduced.matches) { row.classList.add('flash'); requestAnimationFrame(() => requestAnimationFrame(() => row.classList.remove('flash'))); }
-        }
-        dd.classList.toggle('set', vals[k] !== 'Any');
-      });
+      lap.querySelectorAll<HTMLElement>('[data-mark]').forEach((el) => el.classList.toggle('on', el.dataset.mark === s.brand));
+      OPTS.forEach((k) => fld(k).toggleAttribute('data-set', !!s[k]));
+      if (changed && changed !== 'brand' && last && !reduced.matches) {
+        const f = fld(changed);
+        f.classList.add('flash');
+        requestAnimationFrame(() => requestAnimationFrame(() => f.classList.remove('flash')));
+      }
       const countTxt = !s.brand ? `${models.length} models to choose from` : list.length ? `${list.length} ${list.length === 1 ? 'model matches' : 'models match'}` : 'No exact match: ask us and we will source it';
-      lap.querySelector('[data-scr-foot]')!.textContent = s.brand ? countTxt : 'Choose a brand to start';
+      lap.querySelector('[data-scr-count]')!.textContent = s.brand ? (list.length ? `${list.length} ${list.length === 1 ? 'match' : 'matches'}` : 'No exact match') : 'Choose a brand to start';
 
-      // Setup summary and links
+      // Your setup
       const parts = [
         isMacSel(s) ? `Apple ${proc || 'MacBook, any chip'}` : `${s.brand ? brandName : 'Any brand'}, ${proc || 'any processor'}`,
         mem ? `${mem} memory` : 'any memory',
@@ -851,103 +743,40 @@ const cardSpec = (p: Product) => {
       quote.href = `/request-a-quote/?category=${isMacSel(s) ? 'macbooks' : 'laptops'}&qty=${n}&config=${encodeURIComponent(config.slice(0, 300))}`;
       reset.hidden = !s.brand && !s.ram && !s.storage;
 
-      // Matching models
-      if (!s.brand) {
-        titleEl.textContent = 'Popular models';
-        if (last?.brand) matchesEl.innerHTML = popularHTML;
-        matchesEl.querySelectorAll<HTMLAnchorElement>('a.mcard-quote').forEach((a) => {
-          const u = new URL(a.href, location.href);
-          u.searchParams.set('qty', String(n));
-          a.href = u.pathname + u.search;
-        });
-        allEl.href = '/equipment/';
-        allEl.firstChild!.textContent = 'Open the catalogue ';
-      } else {
-        titleEl.textContent = list.length ? `${list.length} matching ${list.length === 1 ? 'model' : 'models'}` : 'No exact match';
-        matchesEl.innerHTML = list.length
-          ? list.slice(0, 4).map((x) => card(x.m, x.vs, s, n)).join('')
-          : `<p class="empty">Nothing in our listed range has exactly this setup. Ask for a quote anyway: we source to order and will suggest the closest match.</p>`;
-        allEl.href = catalogueUrl(s);
-        allEl.firstChild!.textContent = list.length > 4 ? `See all ${list.length} in the catalogue ` : 'Open in the catalogue ';
-      }
-
-      // The catalogue button opens the matching models there
-      browse.textContent = !s.brand ? 'Open the catalogue' : list.length > 1 ? `See all ${list.length} in the catalogue` : list.length ? 'See it in the catalogue' : 'Open the catalogue';
-
-      const prev = last;
-      last = s;
-      draw(prev, s, picked);
-    }
-
-    // ── Cables ──
-    const NS = 'http://www.w3.org/2000/svg';
-    const wide = matchMedia('(min-width: 1100px)');
-    const cable: Record<string, { path: SVGPathElement; flow: SVGPathElement; spark: SVGPathElement; sock: SVGCircleElement; port: SVGRectElement }> = {};
-    BOXES.forEach((id) => {
-      const g = document.createElementNS(NS, 'g');
-      const path = document.createElementNS(NS, 'path'); path.setAttribute('class', 'cable');
-      const flow = document.createElementNS(NS, 'path'); flow.setAttribute('class', 'flow');
-      const spark = document.createElementNS(NS, 'path'); spark.setAttribute('class', 'spark'); spark.setAttribute('pathLength', '100');
-      const sock = document.createElementNS(NS, 'circle'); sock.setAttribute('class', 'sock'); sock.setAttribute('r', '5');
-      const port = document.createElementNS(NS, 'rect'); port.setAttribute('class', 'port'); port.setAttribute('width', '6'); port.setAttribute('height', '14'); port.setAttribute('rx', '2');
-      spark.addEventListener('animationend', () => spark.classList.remove('run'));
-      g.append(path, flow, spark, sock, port);
-      svg.append(g);
-      cable[id] = { path, flow, spark, sock, port };
-    });
-
-    function geometry() {
-      if (!wide.matches) return;
-      const o = stage.getBoundingClientRect();
-      const L = lid.getBoundingClientRect();
-      svg.setAttribute('viewBox', `0 0 ${o.width} ${o.height}`);
-      BOXES.forEach((id) => {
-        const b = box(id).getBoundingClientRect();
-        const left = b.right <= L.left;
-        const target = lap.querySelector<HTMLElement>(`[data-port="${id}"]`)!.getBoundingClientRect();
-        const ax = (left ? b.right : b.left) - o.left;
-        const ay = b.top + Math.min(b.height / 2, 120) - o.top;
-        const px = (left ? L.left : L.right) - o.left;
-        const py = target.top + target.height / 2 - o.top;
-        const mx = (ax + px) / 2;
-        const d = `M${ax.toFixed(1)} ${ay.toFixed(1)} C${mx.toFixed(1)} ${ay.toFixed(1)} ${mx.toFixed(1)} ${py.toFixed(1)} ${(px + (left ? -3 : 3)).toFixed(1)} ${py.toFixed(1)}`;
-        const c = cable[id];
-        c.path.setAttribute('d', d);
-        c.flow.setAttribute('d', d);
-        c.spark.setAttribute('d', d);
-        c.sock.setAttribute('cx', ax.toFixed(1)); c.sock.setAttribute('cy', ay.toFixed(1));
-        c.port.setAttribute('x', (px - 3).toFixed(1)); c.port.setAttribute('y', (py - 7).toFixed(1));
-      });
-    }
-
-    function draw(prev: Sel | null, s: Sel, picked: Record<string, boolean>) {
-      geometry();
-      BOXES.forEach((id) => {
-        const c = cable[id];
-        const locked = id !== 'brand' && !s.brand;
-        c.path.classList.toggle('locked', locked);
-        c.path.classList.toggle('done', picked[id]);
-        c.flow.classList.toggle('done', picked[id]);
-        c.sock.classList.toggle('done', picked[id]);
-        c.port.classList.toggle('done', picked[id]);
-        // A spark runs to the laptop when a box's choice changes to something specific.
-        const was = prev && (id === 'proc' ? [prev.proc, prev.gen, prev.model, prev.chip].join('|') : prev[id as Key]);
-        const now = id === 'proc' ? [s.proc, s.gen, s.model, s.chip].join('|') : s[id as Key];
-        if (prev && picked[id] && was !== now && wide.matches && !reduced.matches) {
-          c.spark.classList.remove('run');
-          void c.spark.getBoundingClientRect();
-          c.spark.classList.add('run');
+      // The models beside the laptop
+      const key = s.brand ? JSON.stringify([s, n]) : `popular:${n}`;
+      if (key !== lastList) {
+        lastList = key;
+        if (!s.brand) {
+          titleEl.textContent = 'Popular models';
+          noteEl.textContent = 'Choose a brand on the laptop and this list follows your choices.';
+          matchesEl.innerHTML = popularHTML;
+          matchesEl.querySelectorAll<HTMLAnchorElement>('a.mcard-quote').forEach((a) => {
+            const u = new URL(a.href, location.href);
+            u.searchParams.set('qty', String(n));
+            a.href = u.pathname + u.search;
+          });
+        } else {
+          titleEl.textContent = list.length ? `${list.length} matching ${list.length === 1 ? 'model' : 'models'}` : 'No exact match';
+          noteEl.textContent = list.length > 4 ? `The first four, with the setup you chose. The catalogue has all ${list.length}.` : list.length ? 'With the setup you chose.' : 'Ask for a quote anyway: we source to order and suggest the closest match.';
+          matchesEl.innerHTML = list.length
+            ? list.slice(0, 4).map((x) => card(x.m, x.vs, s, n)).join('')
+            : `<p class="empty">Nothing in our listed range has exactly this setup.</p>`;
         }
-      });
+      }
+      browse.hidden = !s.brand || !list.length;
+      browse.textContent = list.length > 1 ? `See all ${list.length} in the catalogue` : 'See it in the catalogue';
+
+      last = s;
     }
 
     form.addEventListener('change', (e) => {
-      const t = e.target as HTMLInputElement;
+      const t = e.target as HTMLInputElement | HTMLSelectElement;
       if (t === qty) { render(); return; }
       if (!KEYS.includes(t.name as Key)) return;
       settle(t.name as Key);
       syncOptions(get());
-      render();
+      render(t.name as Key);
     });
     qty.addEventListener('input', () => render());
     form.querySelectorAll<HTMLButtonElement>('[data-qty-step]').forEach((b) => b.addEventListener('click', () => {
@@ -956,52 +785,32 @@ const cardSpec = (p: Product) => {
       render();
     }));
     reset.addEventListener('click', () => {
-      radios('brand').forEach((r) => (r.checked = false));
-      (['proc', 'gen', 'model', 'chip', 'ram', 'storage'] as Key[]).forEach((k) => set(k, ''));
+      radios().forEach((r) => (r.checked = false));
+      OPTS.forEach((k) => set(k, ''));
       syncOptions(get());
       render();
-      form.querySelector<HTMLInputElement>('input[name="brand"]')?.focus();
+      radios()[0]?.focus();
     });
-    // The catalogue button opens the catalogue with the same filters. Navigation goes
-    // through a link click so it also works inside the site preview.
+    // The catalogue button opens the catalogue with the same filters.
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const s = get();
-      const a = document.createElement('a');
-      a.href = s.brand ? catalogueUrl(s) : '/equipment/';
-      document.body.append(a);
-      a.click();
-      a.remove();
+      go(s.brand ? catalogueUrl(s) : '/equipment/');
     });
     qty.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); render(); } });
-
-    let raf = 0;
-    const relayout = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(geometry); };
-    new ResizeObserver(relayout).observe(stage);
-    wide.addEventListener('change', relayout);
-    document.fonts?.ready.then(relayout);
 
     syncOptions(get());
     render();
 
-    // The first time the builder comes into view, the screen switches on and a spark
-    // runs down each cable to the laptop. Skipped if it is already in view.
-    const r = stage.getBoundingClientRect();
+    // The first time the builder comes into view, the screen switches on.
+    const r = lap.getBoundingClientRect();
     if (!reduced.matches && 'IntersectionObserver' in window && r.top > innerHeight * 0.75) {
-      stage.dataset.boot = 'off';
+      lap.dataset.boot = 'off';
       const io = new IntersectionObserver(([e]) => {
         if (!e.isIntersecting) return;
         io.disconnect();
-        stage.dataset.boot = 'on';
-        if (!wide.matches) return;
-        geometry();
-        BOXES.forEach((id, i) => window.setTimeout(() => {
-          const sp = cable[id].spark;
-          sp.classList.remove('run');
-          void sp.getBoundingClientRect();
-          sp.classList.add('run');
-        }, 120 + i * 140));
-      }, { threshold: 0.35 });
+        lap.dataset.boot = 'on';
+      }, { threshold: 0.3 });
       io.observe(lap);
     }
   });
