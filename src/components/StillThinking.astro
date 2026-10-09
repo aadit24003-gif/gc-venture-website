@@ -132,8 +132,9 @@ import { CONTACT, formatPhone, telLink, whatsappLink } from '../config/site';
       const a = document.activeElement as HTMLElement | null;
       return !!a && (a.matches('input, textarea, select, [contenteditable="true"]') || performance.now() - lastTyped < 8000);
     };
-    // The pinned laptop tour fills the screen until its section has scrolled past.
-    const inTour = () => !!tour && root.classList.contains('scenes') && tour.getBoundingClientRect().bottom > root.clientHeight + 1;
+    // The laptop tour fills the screen until most of it has scrolled away (its last
+    // stop, the describe-your-need form, still counts as the tour).
+    const inTour = () => !!tour && root.classList.contains('scenes') && tour.getBoundingClientRect().bottom > root.clientHeight * 0.4;
     const covers = (t: Element) => {
       const r = t.getBoundingClientRect();
       const n = el.getBoundingClientRect();
