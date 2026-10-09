@@ -44,6 +44,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v35 | `74a89ae` | Scrolling up from further down stops at 'Describe your need, or build your own' first; one more push glides back to the first screen; popular models on the dark wine band | https://claude.ai/artifact/2wSSU57x71GhD2GzUFrHRv |
 | v36 | `c84a874` | Scrolling back to v34; 'Build your own' rebuilt: the laptop's screen is the configurator (brand tiles, processor/memory/storage drop-downs), 'Your setup' under it, and the matching models on a dark wine panel beside it that update as you choose; the describe box is a compact strip under the heading | https://claude.ai/artifact/3JbDCMtnuBuye5BZ5vGRne |
 | v37 | `ecc2b63` | A very light circuit-board texture (faint traces and solder points) behind the cream describe/build page | https://claude.ai/artifact/P7b5GTzFn3DrtSb3U86idY |
+| v38 | `ecc2b63` (site unchanged) | Preview only: the About page's team photo and workplace photo are embedded at full size (2000 and 1600 px) instead of small 720 px copies, so they are sharp | https://claude.ai/artifact/9fwHNX1DYdpWAqZh3btu56 |
 
 ## Going back to a version
 
