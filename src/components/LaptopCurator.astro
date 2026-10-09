@@ -1,11 +1,10 @@
 ---
 /**
- * Describe your need, or build your own (home page, right after the hero).
- * At the top, a box to describe the need in words (opens the quote form filled
- * in, or WhatsApp). Below it, the builder: a laptop in the middle, wired to four
- * option boxes: brand, processor, memory and storage. Choosing an option plugs
- * its cable into the laptop, the screen shows the brand and the specification,
- * and the models that match are listed with a quote link for the chosen quantity.
+ * Build your own (home page, right after the hero and its describe-your-need
+ * page). A laptop sits in the middle of a burgundy bench, wired to four option
+ * boxes: brand, processor, memory and storage. Choosing an option plugs its
+ * cable into the laptop, the screen shows the brand and the specification, and
+ * the models that match are listed with a quote link for the chosen quantity.
  *
  * Options come from the catalogue data (src/data/products.ts), so the curator
  * never offers a combination that does not exist. Without JavaScript it is a
@@ -14,7 +13,6 @@
 import Icon from './Icon.astro';
 import { PRODUCTS, formatGb, genOrder, type Product } from '../data/products';
 import { BRAND_MARKS } from '../data/brand-marks';
-import { whatsappLink } from '../config/site';
 
 const isMac = (p: Product) => p.brand === 'Apple';
 const models = PRODUCTS.filter((p) => p.configs?.length && (p.category === 'laptops' || p.category === 'macbooks'));
@@ -57,8 +55,6 @@ const macModels = macs.map((p) => p.name.replace(/^Apple /, ''));
 const ram = uniq(models.flatMap((p) => p.configs!.flatMap((c) => c.ram))).sort((a, b) => a - b);
 const storage = uniq(models.flatMap((p) => p.configs!.flatMap((c) => c.storage))).sort((a, b) => a - b);
 
-const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
-
 const short = (f: string) => f.replace(/^Core Ultra /, 'Ultra ');
 
 /** Rows of options inside each box. `for` limits a row to PCs or Macs. */
@@ -90,22 +86,9 @@ const cardSpec = (p: Product) => {
 ---
 <section class="section cur" id="build" aria-labelledby="cur-title">
   <div class="wrap cur-wrap">
-    <div class="intro">
-      <h2 id="cur-title" class="cur-title">Describe your need,<span> or build your own.</span></h2>
-
-      <form class="need" action="/request-a-quote/" method="get" data-need>
-        <label class="need-label" for="need-text">Tell us what your team needs</label>
-        <textarea id="need-text" class="need-in" name="need" rows="3" maxlength="600" placeholder="e.g. 40 laptops in Pune from Monday, Core i5 with 16 GB, Office installed"></textarea>
-        <div class="need-row">
-          <button class="btn btn--primary" type="submit">Get a quote</button>
-          <a class="need-wa" href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="build-need"><Icon name="whatsapp" size={18} />Send it on WhatsApp</a>
-        </div>
-      </form>
-    </div>
-
     <div class="bench">
       <div class="bench-head">
-        <h3 class="bench-title">Build your team’s laptop</h3>
+        <h2 id="cur-title" class="bench-title">Build your team’s laptop</h2>
         <p class="bench-text">Choose a brand, then the processor, memory and storage. The models that match appear below, ready to quote for as many as you need.</p>
       </div>
 
@@ -236,46 +219,21 @@ const cardSpec = (p: Product) => {
   @property --cd3 { syntax: '<color>'; inherits: true; initial-value: #0a0a0b; }
   @property --glow { syntax: '<color>'; inherits: true; initial-value: rgba(224, 51, 40, .5); }
 
-  .cur { padding-top: clamp(56px, 7vw, 112px); }
+  .cur { padding-top: clamp(24px, 3vw, 48px); }
   .cur-wrap { max-width: calc(1380px + 2 * var(--gutter)); }
-
-  /* ── Describe it in words: centred, first thing on the page after the hero ── */
-  .intro { display: grid; justify-items: center; text-align: center; }
-  .cur-title {
-    margin: 0; max-width: 16ch; font-family: var(--font-display); font-weight: 400; font-optical-sizing: auto;
-    font-size: clamp(2.6rem, 1.2rem + 4.4vw, 5.5rem); line-height: .95; letter-spacing: -0.035em; text-wrap: balance;
-  }
-  .cur-title span { display: block; font-style: italic; color: var(--ink-2); }
-  .need {
-    display: grid; gap: 10px; width: min(100%, 720px); margin-top: clamp(28px, 3.4vw, 44px); padding: 18px 18px 16px;
-    text-align: left; border-radius: var(--r-xl); background: var(--card); border: 1px solid var(--line-strong);
-    box-shadow: 0 1px 0 rgba(23,19,15,.03), 0 30px 60px -36px rgba(74, 14, 21, .45);
-    transition: border-color var(--t-fast), box-shadow var(--t-fast);
-  }
-  .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .16), 0 30px 60px -36px rgba(74, 14, 21, .45); }
-  .need-label { font-size: var(--fs-small); font-weight: 600; color: var(--ink); }
-  .need-in {
-    width: 100%; min-height: 84px; resize: vertical; border: 0; padding: 0; background: transparent;
-    font: inherit; font-size: 1.0625rem; line-height: 1.55; color: var(--ink);
-  }
-  .need-in:focus { outline: none; }
-  .need-in::placeholder { color: var(--ink-3); }
-  .need-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-top: 12px; border-top: 1px solid var(--line); }
-  .need-wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--fs-small); font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
-  .need-wa :global(svg) { color: var(--whatsapp); }
 
   /* ── The bench: a dark stage where the laptop is wired to its options ── */
   .bench {
-    position: relative; isolation: isolate; margin-top: clamp(48px, 6vw, 88px);
+    position: relative; isolation: isolate;
     padding: clamp(22px, 3.4vw, 52px) clamp(14px, 3vw, 48px) clamp(16px, 2.6vw, 36px);
     border-radius: clamp(20px, 2.4vw, 32px); color: var(--on-dark);
-    background-color: var(--night);
+    background-color: #2a0a0f;
     background-image:
       var(--grain),
-      radial-gradient(42% 46% at 50% 44%, rgba(124, 27, 37, .7) 0%, rgba(74, 14, 21, .35) 50%, rgba(74, 14, 21, 0) 80%),
-      linear-gradient(180deg, #1d1412 0%, var(--night) 70%);
+      radial-gradient(44% 48% at 50% 46%, rgba(168, 42, 52, .62) 0%, rgba(110, 24, 33, .3) 50%, rgba(110, 24, 33, 0) 80%),
+      linear-gradient(180deg, #4a0e15 0%, #2a0a0f 55%, #1c060a 100%);
     background-size: 220px 220px, auto, auto;
-    box-shadow: 0 50px 90px -60px rgba(37, 6, 9, .9);
+    box-shadow: 0 50px 90px -50px rgba(58, 12, 18, .75);
   }
   /* fine dot texture, strongest round the laptop */
   .bench::before {
@@ -284,8 +242,8 @@ const cardSpec = (p: Product) => {
     mask-image: radial-gradient(60% 55% at 50% 45%, #000 20%, transparent 80%);
   }
   .bench-head { display: grid; justify-items: center; gap: 8px; margin: 0 auto clamp(22px, 3vw, 40px); max-width: 640px; text-align: center; }
-  .bench-title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem); line-height: 1.05; letter-spacing: -0.02em; }
-  .bench-text { margin: 0; color: var(--on-dark-2); line-height: 1.55; }
+  .bench-title { margin: 0; color: var(--on-dark); font-family: var(--font-display); font-weight: 400; font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.75rem); line-height: 1.05; letter-spacing: -0.02em; }
+  .bench-text { margin: 0; color: rgba(243, 238, 229, .78); line-height: 1.55; }
 
   .stage { position: relative; display: grid; gap: 16px; }
 
@@ -431,7 +389,7 @@ const cardSpec = (p: Product) => {
     20% { stroke-dasharray: 10 100; }
     100% { stroke-dasharray: 10 100; stroke-dashoffset: -100; opacity: 0; }
   }
-  .cables :global(.sock) { fill: var(--night); stroke: rgba(243,238,229,.45); stroke-width: 1.5; transition: fill .3s ease, stroke .3s ease; }
+  .cables :global(.sock) { fill: #2a0a0f; stroke: rgba(243,238,229,.45); stroke-width: 1.5; transition: fill .3s ease, stroke .3s ease; }
   .cables :global(.sock.done) { fill: var(--red); stroke: #ffc2b8; filter: drop-shadow(0 0 6px rgba(224, 51, 40, .9)); }
   .cables :global(.port) { fill: #2a2622; stroke: rgba(243,238,229,.3); stroke-width: 1; transition: fill .3s ease; }
   .cables :global(.port.done) { fill: var(--red); stroke: rgba(255,255,255,.6); filter: drop-shadow(0 0 5px rgba(224, 51, 40, .9)); }
@@ -553,31 +511,6 @@ const cardSpec = (p: Product) => {
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   const chipName = (c: string) => c.replace(/^Intel /, '').replace(/^Apple /, '').replace(/ \((\d+\w\w Gen)\)/, ' $1');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-
-  // "Describe your need": send it to the quote form, or as a WhatsApp message.
-  // Navigation goes through a link click so it also works inside the site preview.
-  const needForm = document.querySelector<HTMLFormElement>('[data-need]');
-  const needWa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
-  if (needForm) {
-    const input = needForm.querySelector<HTMLTextAreaElement>('[name="need"]')!;
-    const base = needWa ? new URL(needWa.href) : null;
-    const prefix = base?.searchParams.get('text') ?? '';
-    input.addEventListener('input', () => {
-      if (!needWa || !base) return;
-      const u = new URL(base.href);
-      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
-      needWa.href = u.href;
-    });
-    needForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const need = input.value.trim();
-      const a = document.createElement('a');
-      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
-      document.body.append(a);
-      a.click();
-      a.remove();
-    });
-  }
 
   document.querySelectorAll<HTMLFormElement>('[data-cur]').forEach((form) => {
     const section = form.closest('section')!;

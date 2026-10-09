@@ -1,10 +1,16 @@
 ---
 /**
- * Home page opening screen, on burgundy: the laptop with the IT Rentals screen
+ * Home page opening screen, on cream: the laptop with the IT Rentals screen
  * (headline, quote and WhatsApp buttons, our promises), the line above it with
  * library icons on either side, and the four laptop brands we rent as links
- * underneath. The next section (LaptopCurator) is where visitors describe what
- * they need or build their own laptop.
+ * underneath.
+ *
+ * Scrolling zooms into the laptop until its screen fills the window, and the
+ * screen becomes the next page: "Describe your need, or build your own", with a
+ * box that opens the quote form (or WhatsApp) already filled in. The builder
+ * (LaptopCurator) follows. The zoom is run by scenes.ts (`hero`); without it
+ * (reduced motion, no script, short windows) the describe page simply follows
+ * the laptop.
  */
 import Icon from './Icon.astro';
 import { SITE, whatsappLink, enabledClaims } from '../config/site';
@@ -71,9 +77,18 @@ const pockets = { l: cols7(field(2, 10, 8, 84, 0.2)), r: cols7(field(2, 10, 8, 8
 const flStyle = (side: 'l' | 'r', f: Floater) =>
   `${side === 'l' ? 'right' : 'left'}:calc(${f.x}px + ${f.c} * var(--sp)); top:${f.y}%; --r:${f.r}deg; --o:${f.o}`;
 
+const waNeed = whatsappLink('Hi IT Rentals, here is what my team needs: ');
+/** Examples that fill in the describe box (the visitor edits them). */
+const examples = [
+  '40 laptops for a new office, Core i5 with 16 GB',
+  '12 MacBook Pros for a three-month project',
+  'Desktops with monitors for a training batch',
+];
+
 const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support247']);
 ---
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero" data-scene="hero" aria-labelledby="hero-title">
+  <div class="stage">
   <div class="glow" aria-hidden="true"></div>
   <svg class="sprite" width="0" height="0" focusable="false" aria-hidden="true">
     <defs>
@@ -82,7 +97,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     </defs>
   </svg>
 
-  <div class="topline">
+  <div class="topline" data-fade data-at="0">
     {(['l', 'r'] as const).map((side) => (
       <span class={`pocket pocket--${side}`} aria-hidden="true">
         {pockets[side].map((f) => (
@@ -95,8 +110,8 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     <p class="kicker">Rent the laptops your team already knows.</p>
   </div>
 
-  <div class="device">
-    <div class="floaters" aria-hidden="true">
+  <div class="device" data-device>
+    <div class="floaters" aria-hidden="true" data-fade>
       {(['l', 'r'] as const).map((side) => (
         <div class={`fl-side fl-side--${side}`}>
           {sides[side].map((f) => (
@@ -111,8 +126,8 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     <div class="laptop">
       <div class="lid">
         <span class="cam" aria-hidden="true"></span>
-        <div class="screen">
-          <div class="desk" data-fit-desk>
+        <div class="screen" data-screen>
+          <div class="desk" data-fit-desk data-desk data-at="0">
             <p class="since"><span class="since-dot" aria-hidden="true"></span><span>Renting IT<span class="since-long"> to Indian businesses</span> since {SITE.founded}</span></p>
             <h1 id="hero-title" class="headline">
               <span class="hl-brand">IT Rentals</span><span class="sr-only">: </span>
@@ -140,7 +155,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     </div>
   </div>
 
-  <nav class="brands" aria-label="Laptop brands we rent">
+  <nav class="brands" aria-label="Laptop brands we rent" data-fade data-at="0">
     <ul role="list">
       {brands.map((b) => (
         <li>
@@ -155,31 +170,60 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     </ul>
   </nav>
 
-  <a class="next" href="#build"><span>Describe your need, or build your own</span><Icon name="arrow-down" size={16} /></a>
+  <a class="next" href="#describe" data-fade data-at="0" data-to-describe><span>Describe your need, or build your own</span><Icon name="arrow-down" size={16} /></a>
+
+  <!-- The next page: in the full version the laptop's screen grows into it -->
+  <div class="p2" id="describe" data-p2 data-at="1">
+    <span class="p2-fill" data-p2-fill aria-hidden="true"></span>
+    <div class="p2-in" data-p2-in>
+      <h2 id="need-title" class="p2-title">Describe your need,<span> or build your own.</span></h2>
+      <p class="p2-lead">Tell us in a line or two what your team needs, and we come back with a quote.</p>
+      <form class="need" action="/request-a-quote/" method="get" data-need>
+        <label class="need-label" for="need-text">What does your team need?</label>
+        <textarea id="need-text" class="need-in" name="need" rows="3" maxlength="600" placeholder="How many, which city, from when, and anything they must have"></textarea>
+        <div class="need-row">
+          <button class="btn btn--primary" type="submit">Get a quote</button>
+          <a class="need-wa" href={waNeed} target="_blank" rel="noopener" data-need-wa data-track-location="hero-need"><Icon name="whatsapp" size={18} />Send it on WhatsApp</a>
+        </div>
+      </form>
+      <div class="eg">
+        <p class="eg-label" id="eg-label">Or start from an example</p>
+        <ul class="eg-list" role="list" aria-labelledby="eg-label">
+          {examples.map((e) => <li><button type="button" class="eg-btn" data-eg>{e}</button></li>)}
+        </ul>
+      </div>
+      <a class="p2-build" href="#build"><span>Build your own laptop instead</span><Icon name="arrow-down" size={16} /></a>
+    </div>
+  </div>
+  </div>
 </section>
 
 <style>
-  /* Burgundy opening screen: deep wine with a warm light behind the laptop */
+  /* Cream opening screen, with a faint wine light under the laptop */
   .hero {
-    --bg: #4a0e15; --bg-hi: #7c1b25; --bg-lo: #250609; --cream: #f3eee5; --cream-2: rgba(243, 238, 229, .72);
-    position: relative; isolation: isolate; overflow: hidden; color: var(--cream);
+    position: relative; color: var(--ink);
     /* extend up under the floating header */
     margin-top: -80px;
+    --lw: min(1000px, 86vw, calc((100svh - 330px) * 1.52));
+  }
+  .stage {
+    position: relative; isolation: isolate; overflow: hidden;
     min-height: 100vh; min-height: 100svh;
-    display: grid; grid-template-rows: auto auto auto auto; justify-items: center; align-content: center; row-gap: clamp(14px, 2.2vh, 24px);
+    display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: safe center; row-gap: clamp(14px, 2.2vh, 24px);
     padding: calc(80px + clamp(28px, 4vh, 48px)) var(--gutter) clamp(28px, 4vh, 44px);
-    background-color: var(--bg);
+    background-color: var(--paper);
     background-image:
       var(--grain),
-      radial-gradient(52% 46% at 50% 46%, rgba(160, 40, 48, .55) 0%, rgba(124, 27, 37, .25) 45%, rgba(124, 27, 37, 0) 75%),
-      radial-gradient(120% 90% at 50% 40%, var(--bg) 40%, var(--bg-lo) 100%);
-    background-size: 220px 220px, auto, auto;
-    --lw: min(1000px, 86vw, calc((100svh - 330px) * 1.52));
+      radial-gradient(48% 42% at 50% 44%, rgba(255, 252, 246, .95) 0%, rgba(255, 252, 246, 0) 72%),
+      radial-gradient(60% 34% at 50% 100%, rgba(124, 27, 37, .13) 0%, rgba(124, 27, 37, 0) 75%),
+      radial-gradient(42% 38% at 8% 14%, rgba(224, 51, 40, .07) 0%, transparent 72%),
+      radial-gradient(48% 44% at 94% 86%, rgba(184, 138, 85, .14) 0%, transparent 72%);
+    background-size: 220px 220px, auto, auto, auto, auto;
   }
   /* fine dot texture, strongest round the laptop */
   .glow {
     position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background-image: radial-gradient(rgba(243, 238, 229, .09) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(23, 19, 15, .07) 1px, transparent 1px);
     background-size: 22px 22px;
     mask-image: radial-gradient(70% 60% at 50% 48%, #000 30%, transparent 85%);
   }
@@ -189,20 +233,20 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .topline { position: relative; width: min(820px, 100%); text-align: center; }
   .kicker {
     margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(1.25rem, .95rem + 1.2vw, 2rem);
-    line-height: 1.15; letter-spacing: -0.015em; color: var(--cream); text-wrap: balance;
+    line-height: 1.15; letter-spacing: -0.015em; text-wrap: balance;
   }
   .pocket { position: absolute; top: -34px; bottom: -14px; width: max(0px, calc((100vw - 100%) / 2 - 16px)); container-type: inline-size; pointer-events: none; }
   .pocket--l { right: calc(100% - 6px); }
   .pocket--r { left: calc(100% - 6px); }
 
   /* Icon field */
-  .floaters, .pocket { --icon-accent: #ef8a7c; }
+  .floaters, .pocket { --icon-accent: var(--red); }
   .floaters { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
   .fl-side { position: absolute; top: 0; bottom: 0; width: max(0px, calc((100vw - 100%) / 2 - 12px)); container-type: inline-size; }
   .fl-side--l { right: 100%; }
   .fl-side--r { left: 100%; }
   .fl {
-    position: absolute; display: none; color: var(--cream); opacity: calc(var(--o) * 1.25);
+    position: absolute; display: none; color: var(--ink); opacity: var(--o);
     --sp: max(46px, (100cqi - 40px) / 10);
     transform: rotate(var(--r));
   }
@@ -217,18 +261,18 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   @media (max-width: 1099px) { .floaters, .pocket { display: none; } }
 
   /* ── The laptop: black body, cream IT Rentals screen ── */
-  .device { position: relative; width: var(--lw); }
+  .device { position: relative; z-index: 1; width: var(--lw); }
   .laptop { position: relative; z-index: 1; }
   .lid {
     position: relative; z-index: 1; width: 94%; margin: 0 auto;
     padding: calc(var(--lw) * .013) calc(var(--lw) * .013) calc(var(--lw) * .022);
-    background: linear-gradient(180deg, #121012, #050405);
+    background: linear-gradient(180deg, #141214, #050405);
     border-radius: calc(var(--lw) * .024) calc(var(--lw) * .024) calc(var(--lw) * .007) calc(var(--lw) * .007);
     box-shadow:
       inset 0 0 0 1px rgba(243, 238, 229, .12),
       0 0 0 1px rgba(0, 0, 0, .7),
-      0 60px 110px -40px rgba(10, 0, 2, .85),
-      0 0 140px -30px rgba(255, 140, 120, .28);
+      0 60px 100px -46px rgba(58, 12, 18, .55),
+      0 24px 40px -30px rgba(23, 19, 15, .5);
     transform-origin: 50% 100%;
   }
   .cam { position: absolute; top: calc(var(--lw) * .0065); left: 50%; width: max(3px, calc(var(--lw) * .006)); height: max(3px, calc(var(--lw) * .006)); translate: -50% -50%; border-radius: 50%; background: #2a2622; box-shadow: inset 0 0 0 1px #3d3832; z-index: 2; }
@@ -248,7 +292,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
   }
   .notch { position: absolute; top: 0; left: 50%; width: 15%; height: 42%; transform: translateX(-50%); background: linear-gradient(180deg, #050506, #2a2a2e); border-radius: 0 0 9px 9px; }
-  .floor { position: absolute; left: 4%; right: 4%; bottom: calc(var(--lw) * -.04); height: calc(var(--lw) * .07); border-radius: 50%; background: radial-gradient(closest-side, rgba(10, 0, 2, .7), rgba(10, 0, 2, 0)); z-index: 0; }
+  .floor { position: absolute; left: 4%; right: 4%; bottom: calc(var(--lw) * -.035); height: calc(var(--lw) * .06); border-radius: 50%; background: radial-gradient(closest-side, rgba(40, 10, 14, .38), rgba(40, 10, 14, 0)); z-index: 0; }
 
   /* The IT Rentals screen */
   .desk {
@@ -269,7 +313,7 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   .trust { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 20px; margin: clamp(12px, 2.4cqi, 26px) 0 0; padding: 0; list-style: none; font-size: var(--fs-xs); color: var(--ink-2); }
   .trust li { display: inline-flex; align-items: center; gap: 6px; }
   .trust :global(svg) { color: var(--red-ink); }
-  /* When the screen's words do not fit (short windows), drop the extras in turn */
+  /* When the screen's words do not fit (short windows, large text), drop the extras in turn */
   .desk:is([data-fit='1'], [data-fit='2'], [data-fit='3'], [data-fit='4']) .lead { display: none; }
   .desk:is([data-fit='2'], [data-fit='3'], [data-fit='4']) .trust { display: none; }
   .desk:is([data-fit='3'], [data-fit='4']) :is(.since, .btn--wa) { display: none; }
@@ -279,20 +323,77 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
   /* Brands we rent */
   .brands { margin-top: clamp(14px, 2.4vh, 26px); }
   .brands ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 26px; margin: 0; padding: 0; list-style: none; }
-  .brands a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--cream); font-weight: 600; text-decoration: none; }
-  .brands a span { border-bottom: 1px solid rgba(243, 238, 229, .4); padding-bottom: 2px; transition: border-color var(--t-fast); }
-  .brands a:hover span { border-color: var(--cream); }
-  .brands a:focus-visible { outline: 3px solid #ef8a7c; outline-offset: 4px; border-radius: 4px; }
-  .bmark { flex: none; width: 20px; height: 20px; color: var(--cream); }
+  .brands a { display: inline-flex; align-items: center; gap: 10px; min-height: 32px; color: var(--ink); font-weight: 600; text-decoration: none; }
+  .brands a span { border-bottom: 1px solid var(--line-strong); padding-bottom: 2px; transition: border-color var(--t-fast); }
+  .brands a:hover span { border-color: var(--ink); }
+  .bmark { flex: none; width: 20px; height: 20px; color: var(--ink); }
   .bmark--lenovo { width: 46px; height: 16px; }
 
-  .next {
-    display: inline-flex; align-items: center; gap: 8px; margin-top: clamp(4px, 1vh, 12px); padding: 8px 14px;
-    border-radius: var(--r-pill); border: 1px solid rgba(243, 238, 229, .28); color: var(--cream-2);
-    font-size: var(--fs-small); font-weight: 600; text-decoration: none; transition: color var(--t-fast), border-color var(--t-fast);
+  .next, .p2-build {
+    display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px;
+    border-radius: var(--r-pill); border: 1px solid var(--line-strong); background: rgba(250, 247, 241, .7); color: var(--ink);
+    font-size: var(--fs-small); font-weight: 600; text-decoration: none; transition: border-color var(--t-fast), background-color var(--t-fast);
   }
-  .next:hover { color: var(--cream); border-color: var(--cream); }
-  .next:focus-visible { outline: 3px solid #ef8a7c; outline-offset: 3px; }
+  .next { margin-top: clamp(4px, 1vh, 12px); }
+  .next:hover, .p2-build:hover { border-color: var(--ink); background: var(--card); }
+
+  /* ── The next page: describe your need ── */
+  .p2 { position: relative; width: 100%; padding-top: clamp(56px, 8vw, 104px); }
+  .p2-fill { display: none; }
+  .p2-in { display: grid; justify-items: center; width: min(100%, 760px); margin-inline: auto; text-align: center; }
+  .p2-title {
+    margin: 0; max-width: 16ch; font-family: var(--font-display); font-weight: 400; font-optical-sizing: auto;
+    font-size: clamp(2.5rem, 1.1rem + 4.4vw, 5.25rem); line-height: .95; letter-spacing: -0.035em; text-wrap: balance;
+  }
+  .p2-title span { display: block; font-style: italic; color: var(--red-ink); }
+  .p2-lead { margin: clamp(14px, 1.6vw, 20px) 0 0; max-width: 46ch; font-size: var(--fs-lead); line-height: 1.5; color: var(--ink-2); }
+  .need {
+    display: grid; gap: 10px; width: min(100%, 680px); margin-top: clamp(22px, 2.6vw, 32px); padding: 18px 18px 14px;
+    text-align: left; border-radius: var(--r-xl); background: var(--card); border: 1px solid var(--line-strong);
+    box-shadow: 0 1px 0 rgba(23,19,15,.03), 0 34px 60px -38px rgba(74, 14, 21, .5);
+    transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  }
+  .need:focus-within { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(185, 41, 30, .16), 0 34px 60px -38px rgba(74, 14, 21, .5); }
+  .need-label { font-size: var(--fs-small); font-weight: 600; }
+  .need-in {
+    width: 100%; min-height: 76px; resize: vertical; border: 0; padding: 0; background: transparent;
+    font: inherit; font-size: 1.0625rem; line-height: 1.55; color: var(--ink);
+  }
+  .need-in:focus { outline: none; }
+  .need-in::placeholder { color: var(--ink-3); }
+  .need-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .need-wa { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: var(--fs-small); font-weight: 600; color: var(--ink); text-underline-offset: 3px; }
+  .need-wa :global(svg) { color: var(--whatsapp); }
+  .eg { display: grid; justify-items: center; gap: 10px; margin-top: clamp(16px, 2vw, 22px); }
+  .eg-label { margin: 0; font-size: var(--fs-xs); color: var(--ink-2); }
+  .eg-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .eg-btn {
+    min-height: 36px; padding: 6px 14px; border-radius: var(--r-pill); border: 1px dashed var(--line-strong); background: transparent;
+    font: inherit; font-size: .875rem; color: var(--ink); cursor: pointer; transition: border-color var(--t-fast), background-color var(--t-fast);
+  }
+  .eg-btn:hover { border-style: solid; border-color: var(--ink); background: var(--card); }
+  .p2-build { margin-top: clamp(18px, 2.4vw, 28px); }
+
+  /*
+   * The full version: the first screen stays put while the page scrolls, and the
+   * laptop grows until its screen fills the window (scenes.ts sets the transforms).
+   * The describe page then sits on top, in the same place.
+   */
+  @media (min-height: 560px) {
+    :global(html.scenes) .hero { height: 250vh; height: 250svh; }
+    :global(html.scenes) .stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
+    :global(html.scenes) .device { will-change: transform; }
+    :global(html.scenes) .p2 {
+      position: absolute; inset: 0; z-index: 3; display: grid; align-content: center; overflow-y: auto;
+      padding: calc(80px + 12px) var(--gutter) 24px; pointer-events: none;
+    }
+    :global(html.scenes) .p2-fill {
+      display: block; position: absolute; inset: 0; z-index: -1; opacity: 0;
+      background-color: var(--paper); background-image: var(--grain); background-size: 220px 220px;
+    }
+    :global(html.scenes) .p2-in { opacity: 0; }
+    :global(html.scenes) .stage[data-p2-on] .p2 { pointer-events: auto; }
+  }
 
   /* The lid opens when the page loads (the headline is painted from the first frame) */
   @media (prefers-reduced-motion: no-preference) {
@@ -304,7 +405,8 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
 
   /* Phones and narrow tablets: a taller screen */
   @media (max-width: 760px) {
-    .hero { --lw: min(92vw, max(280px, calc((100svh - 300px) * .74))); padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+    .hero { --lw: min(92vw, max(270px, calc((100svh - 400px) * .78))); }
+    .stage { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
     .screen { aspect-ratio: 3 / 4; }
     .desk { padding: 6cqi 5cqi; }
     .hl-brand { font-size: clamp(2.4rem, 14cqi, 4rem); }
@@ -315,6 +417,11 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     .kicker { font-size: 1.125rem; }
     .brands ul { gap: 8px 18px; }
     .brands a { font-size: .875rem; }
+    .p2-lead { font-size: 1rem; }
+    .eg-list li:nth-child(n+3) { display: none; }
+  }
+  @media (max-width: 760px) and (min-height: 560px) {
+    :global(html.scenes) .p2 { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
   }
   @media (forced-colors: active) { .lid { border: 1px solid CanvasText; } }
 </style>
@@ -339,5 +446,38 @@ const trust = enabledClaims(['zeroDeposit', 'noLockIn', 'fastDelivery', 'support
     const ro = new ResizeObserver(fit);
     desks.forEach((d) => { ro.observe(d.parentElement!); ro.observe(d); });
     document.fonts?.ready.then(fit);
+  }
+
+  // "Describe your need": send it to the quote form, or as a WhatsApp message.
+  // Navigation goes through a link click so it also works inside the site preview.
+  const needForm = document.querySelector<HTMLFormElement>('[data-need]');
+  const needWa = document.querySelector<HTMLAnchorElement>('[data-need-wa]');
+  if (needForm) {
+    const input = needForm.querySelector<HTMLTextAreaElement>('[name="need"]')!;
+    const base = needWa ? new URL(needWa.href) : null;
+    const prefix = base?.searchParams.get('text') ?? '';
+    const syncWa = () => {
+      if (!needWa || !base) return;
+      const u = new URL(base.href);
+      u.searchParams.set('text', `${prefix}${input.value.trim()}`.trim());
+      needWa.href = u.href;
+    };
+    input.addEventListener('input', syncWa);
+    // an example fills the box, ready to edit
+    document.querySelectorAll<HTMLButtonElement>('[data-eg]').forEach((b) => b.addEventListener('click', () => {
+      input.value = b.textContent?.trim() ?? '';
+      syncWa();
+      input.focus({ preventScroll: true });
+      input.setSelectionRange(input.value.length, input.value.length);
+    }));
+    needForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const need = input.value.trim();
+      const a = document.createElement('a');
+      a.href = need ? `/request-a-quote/?need=${encodeURIComponent(need)}` : '/request-a-quote/';
+      document.body.append(a);
+      a.click();
+      a.remove();
+    });
   }
 </script>

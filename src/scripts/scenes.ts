@@ -36,6 +36,89 @@ declare global {
 const root = document.documentElement;
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
+function smoother(t: number) { return t * t * t * (t * (6 * t - 15) + 10); }
+
+/*
+ * Hero: the first screen stays put while the visitor scrolls, and the laptop
+ * grows until its screen fills the window; the screen's words fade, the screen
+ * becomes plain page, and the describe-your-need page fades in on it
+ * (Hero.astro). Written straight onto those few elements, not as an inherited
+ * custom property (which would restyle every icon in the section each frame).
+ */
+type HeroParts = {
+  stage: HTMLElement; device: HTMLElement; screen: HTMLElement; desk: HTMLElement | null;
+  fades: HTMLElement[]; fill: HTMLElement | null; inner: HTMLElement | null;
+  geo: { dx: number; dy: number; s: number } | null; on: boolean; still: boolean;
+};
+const heroParts = new WeakMap<HTMLElement, HeroParts>();
+
+/** Offset of `el` inside `box`, ignoring transforms (the lid is still opening on load). */
+function offsetIn(el: HTMLElement, box: HTMLElement) {
+  let x = 0;
+  let y = 0;
+  let n: HTMLElement | null = el;
+  while (n && n !== box) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent as HTMLElement | null; }
+  return { x, y };
+}
+
+function hero(s: Scene, p: number) {
+  let h = heroParts.get(s.el);
+  if (!h) {
+    const stage = s.stage;
+    const device = s.el.querySelector<HTMLElement>('[data-device]');
+    const screen = s.el.querySelector<HTMLElement>('[data-screen]');
+    if (!stage || !device || !screen) return;
+    h = {
+      stage, device, screen, desk: s.el.querySelector<HTMLElement>('[data-desk]'),
+      fades: [...s.el.querySelectorAll<HTMLElement>('[data-fade]')],
+      fill: s.el.querySelector<HTMLElement>('[data-p2-fill]'), inner: s.el.querySelector<HTMLElement>('[data-p2-in]'),
+      geo: null, on: false, still: false,
+    };
+    heroParts.set(s.el, h);
+  }
+  // Too short a window for the pinned version: everything shows as laid out.
+  if (!s.pinned) {
+    if (h.still) return;
+    h.still = true;
+    h.device.style.transform = '';
+    h.device.style.transformOrigin = '';
+    for (const el of [...h.fades, h.desk, h.fill, h.inner]) if (el) { el.style.opacity = ''; el.style.transform = ''; }
+    h.stage.removeAttribute('data-p2-on');
+    h.on = false;
+    return;
+  }
+  h.still = false;
+  if (!h.geo) {
+    // where the screen sits in the window, and how much it must grow to fill it
+    const sw = h.screen.offsetWidth;
+    const sh = h.screen.offsetHeight;
+    const o = offsetIn(h.screen, h.device);
+    const d = offsetIn(h.device, h.stage);
+    const W = h.stage.clientWidth;
+    const H = h.stage.clientHeight;
+    h.device.style.transformOrigin = `${(o.x + sw / 2).toFixed(1)}px ${(o.y + sh / 2).toFixed(1)}px`;
+    h.geo = {
+      dx: W / 2 - (d.x + o.x + sw / 2),
+      dy: H / 2 - (d.y + o.y + sh / 2),
+      s: Math.max(W / sw, H / sh) * 1.06,
+    };
+  }
+  const g = h.geo;
+  const z = smoother(clamp((p - 0.02) / 0.5));
+  h.device.style.transform = z === 0 ? '' : `translate3d(${(g.dx * z).toFixed(1)}px, ${(g.dy * z).toFixed(1)}px, 0) scale(${(1 + (g.s - 1) * z).toFixed(4)})`;
+  const out = (1 - clamp(p / 0.14)).toFixed(3);
+  h.fades.forEach((el) => { el.style.opacity = out; });
+  if (h.desk) h.desk.style.opacity = (1 - clamp((p - 0.08) / 0.2)).toFixed(3);
+  if (h.fill) h.fill.style.opacity = clamp((p - 0.3) / 0.16).toFixed(3);
+  const q = smoother(clamp((p - 0.33) / 0.22));
+  if (h.inner) {
+    h.inner.style.opacity = q.toFixed(3);
+    h.inner.style.transform = q >= 1 ? '' : `translate3d(0, ${((1 - q) * 28).toFixed(1)}px, 0)`;
+  }
+  const on = q > 0.5;
+  if (on !== h.on) { h.on = on; h.stage.toggleAttribute('data-p2-on', on); }
+}
+
 /* How renting works: which cards have landed, for the step dots. */
 function steps(s: Scene, p: number) {
   const landed = [0, 1, 2, 3].filter((i) => p >= 0.04 + i * 0.21 + 0.12).length;
@@ -62,7 +145,7 @@ function route(s: Scene, p: number) {
   items.forEach((li, i) => li.classList.toggle('reached', p > 0.02 && p >= i / last - 0.02));
 }
 
-const handlers: Record<string, (s: Scene, p: number) => void> = { steps, qa, route };
+const handlers: Record<string, (s: Scene, p: number) => void> = { hero, steps, qa, route };
 
 function init() {
   window.__scenes?.destroy();
@@ -103,6 +186,8 @@ function init() {
       // The pinned stage is 100svh: measuring it (not innerHeight) keeps progress steady
       // while a phone's address bar slides in and out.
       s.span = s.pinned ? Math.max(1, s.height - s.stage!.offsetHeight) : 0;
+      const h = heroParts.get(s.el);
+      if (h) h.geo = null;
     }
   };
 
@@ -131,7 +216,7 @@ function init() {
       if (s.cur !== t) moving = true;
       if (Math.abs(s.cur - s.shown) > 0.0002 || s.shown < 0) {
         s.shown = s.cur;
-        s.el.style.setProperty('--p', s.cur.toFixed(4));
+        if (s.name !== 'hero') s.el.style.setProperty('--p', s.cur.toFixed(4));
         handlers[s.name]?.(s, s.cur);
       }
     }
@@ -176,9 +261,21 @@ function init() {
     }
   };
 
+  // Hero: "Describe your need" scrolls on to the point where that page is in place
+  // (an anchor link would land on the first screen, which stays put while it plays).
+  const heroScene = scenes.find((s) => s.name === 'hero');
+  const onClick = (e: MouseEvent) => {
+    const a = (e.target as HTMLElement).closest<HTMLElement>('[data-to-describe]');
+    const s = heroScene;
+    if (!a || !s || !s.pinned) return;
+    e.preventDefault();
+    window.scrollTo({ top: s.top + 0.84 * s.span, behavior: 'smooth' });
+  };
+
   measure();
   frame();
   addEventListener('scroll', kick, { passive: true });
+  heroScene?.el.addEventListener('click', onClick);
   addEventListener('resize', relayout);
   addEventListener('load', relayout);
   document.fonts?.ready.then(relayout);
@@ -205,6 +302,7 @@ function init() {
   window.__scenes = {
     destroy() {
       removeEventListener('scroll', kick);
+      heroScene?.el.removeEventListener('click', onClick);
       removeEventListener('resize', relayout);
       removeEventListener('load', relayout);
       document.removeEventListener('focusin', onFocus);
