@@ -49,6 +49,7 @@ Frozen preview links never change after they are published; the main preview lin
 | v40 | `2057311` | Side laptops on the first screen trimmed to about a sixth showing at each edge, and the device icons beside the main laptop back between them | https://claude.ai/artifact/M8cFmqn1orsAbeV8CS7Wia |
 | v41 | `3d23573` | Side laptops removed from the first screen; only the main laptop with the device icons either side | https://claude.ai/artifact/9JyJCyHYYY7eWjhoJhj9Hr |
 | v42 | `60da1ea` | Tilted capsules either side of the first screen's laptop naming what we rent (Rent laptops, MacBooks, Monitors; Desktops, Servers, Mobile phones), each linking to its rental page | https://claude.ai/artifact/2U4LbmA5JRxUm9JRJ2BDCt |
+| v43 | `50c75f9` | Capsules now read 'Rent laptops / MacBooks / monitors / desktops / servers / mobile phones', in the page's own dark colour with a hairline edge and a soft clearing in the icons, arranged in a gentle curve either side | https://claude.ai/artifact/FXWhN4Mnc6DDG2aFvMB6St |
 
 ## Going back to a version
 
