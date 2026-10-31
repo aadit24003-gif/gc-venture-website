@@ -69,7 +69,7 @@ export async function sendCode(input: { purpose: Purpose; channel: Channel; dest
         subject: `${code} is your ${BRAND.name} code`,
         text: `Your code to ${what} is ${code}. It expires in ${TTL_MIN} minutes. If you did not ask for it, ignore this email.`,
         html: layout(`Your code is ${code}`, `<p style="font-size:15px;line-height:1.6">Use this code to ${what}. It expires in ${TTL_MIN} minutes.</p>
-<p style="font-size:34px;letter-spacing:8px;font-weight:bold;color:#0D1321;margin:20px 0">${code}</p>
+<p style="font-size:34px;letter-spacing:8px;font-weight:bold;color:#111111;margin:20px 0">${code}</p>
 <p style="font-size:13px;color:#62666E">If you did not ask for this code, you can ignore this email.</p>`),
       });
     }

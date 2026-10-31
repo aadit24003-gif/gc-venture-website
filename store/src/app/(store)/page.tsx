@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, BadgeCheck, Battery, ClipboardCheck, Cpu, GraduationCap, MousePointerClick, Plane, Receipt, RefreshCcw, ScanLine, ShieldCheck, Video, Wallet } from 'lucide-react';
+import { Battery, ClipboardCheck, GraduationCap, Lock, MousePointerClick, Plane, Receipt, RefreshCcw, ScanLine, ShieldCheck, Video, Wallet } from 'lucide-react';
 import { CHECK_COUNT, CHECKS, GRADES, GRADE_ORDER, LEGAL, POLICY, STUDENT } from '@/lib/config';
 import { allProducts, toCard, type CardProduct } from '@/lib/products';
 import { latestInspection } from '@/lib/inventory';
@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 
 function Rail({ items, wished, label }: { items: CardProduct[]; wished: Set<string>; label: string }) {
   return (
-    <ul aria-label={label} data-reveal className="rail mt-6 auto-cols-[78%] sm:auto-cols-[45%] md:auto-cols-[31%] xl:auto-cols-[calc((100%-48px)/4)]">
+    <ul aria-label={label} data-reveal className="rail mt-8 auto-cols-[78%] sm:auto-cols-[45%] md:auto-cols-[31%] xl:auto-cols-[calc((100%-48px)/4)]">
       {items.map((p, i) => <li key={p.id} data-reveal-item><ProductCard p={p} wished={wished.has(p.id)} priority={i < 2} /></li>)}
     </ul>
   );
@@ -85,146 +85,146 @@ export default async function Home() {
   ];
 
   const book = settings.shipping.bookingEnabled ? rupees(settings.shipping.bookingAmount) : null;
-  const maxSave = Math.max(0, ...deals.map((x) => x.s));
+  const card = (slug: string) => cards.find((c) => c.slug === slug && c.inStock) ?? null;
+  const brandFrom = (b: string) => brands.find((x) => x.brand === b)?.from ?? Infinity;
+  const fromLine = (slug: string, brand: string) => {
+    const c = card(slug);
+    const v = c ? c.fromPrice : brandFrom(brand);
+    return Number.isFinite(v) ? `From ${rupees(v)}` : null;
+  };
+  const cut = (slug: string) => `/products/${slug}/cutout.webp`;
   const steps: [typeof Video, string, string][] = [
     [MousePointerClick, 'Choose your exact laptop', 'Every listing is one real, inspected unit with its own report: battery health, SSD health, grade and every mark noted.'],
     [Wallet, book ? `Book it for ${book}` : 'Place your order', book ? 'Reserve it with a small online payment. It comes off the price, and the laptop is taken off sale for you.' : 'Pay online or choose pay on delivery. The laptop is taken off sale for you.'],
     [Video, 'See it on a video call', 'Before dispatch we video-call you and show this exact laptop, its condition, and the serial number sticker.'],
     [ScanLine, 'Match the serial, then pay', book ? 'When it arrives, check the serial number against your order page. Pay the balance only if it matches.' : 'When it arrives, check the serial number against your order page. If it doesn’t match, don’t accept it.'],
   ];
+  const tiles = [
+    { dark: true, title: 'Dell Latitude', sub: 'Built for the workday. Priced for yours.', from: fromLine('dell-latitude-7440', 'Dell'), href: '/brands/dell', img: cut('dell-latitude-7440'), alt: 'Dell Latitude 7440' },
+    { dark: false, title: 'HP EliteBook', sub: 'Slim aluminium, all-day comfort.', from: fromLine('hp-elitebook-840-g10', 'HP'), href: '/brands/hp', img: cut('hp-elitebook-840-g10'), alt: 'HP EliteBook 840 G10' },
+    { dark: false, title: 'ThinkPad', sub: 'The keyboard everyone misses.', from: fromLine('lenovo-thinkpad-t14-gen-4', 'Lenovo'), href: '/brands/lenovo', img: cut('lenovo-thinkpad-t14-gen-4'), alt: 'Lenovo ThinkPad T14 Gen 4' },
+    { dark: true, title: 'MacBook Air', sub: 'Light. Silent. Ready for anything.', from: fromLine('apple-macbook-air-m3', 'Apple'), href: '/laptops?brand=Apple&q=air', img: cut('apple-macbook-air-m3'), alt: 'Apple MacBook Air' },
+  ];
 
   return (
     <>
       {/* Hero */}
-      <section className="bg-canvas">
-        <div className="wrap grid gap-4 py-5 md:py-6 lg:grid-cols-[1.6fr_1fr]">
-          <div className="relative overflow-hidden rounded-sheet bg-ink text-white">
-            <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent/40 blur-3xl" aria-hidden="true" />
-            <div className="relative grid items-center gap-6 p-7 md:grid-cols-[1.1fr_1fr] md:p-10">
-              <div>
-                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] font-semibold text-gold-hi"><BadgeCheck size={15} aria-hidden="true" /> Imported · Inspected · Guaranteed</p>
-                <h1 className="mt-4 text-[32px] leading-[1.1] text-white sm:text-[40px] xl:text-[46px]">Premium business laptops, <span className="text-gold-hi">checked on video</span> before you pay in full.</h1>
-                <p className="mt-4 max-w-[46ch] text-[16px] text-white/75">ThinkPad, Latitude, EliteBook and MacBook at up to {maxSave || 60}% less than new. {unitsOnSale} inspected laptops in stock, each with its own report.</p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link href="/laptops" className="btn btn-accent btn-lg">Shop laptops <ArrowRight size={18} aria-hidden="true" /></Link>
-                  <a href="#how" className="btn btn-lg bg-white/10 text-white hover:bg-white/20">How it works</a>
-                </div>
-              </div>
-              {heroProduct ? (
-                <Link href={`/laptops/${heroProduct.slug}`} className="group relative block rounded-2xl bg-white p-5">
-                  <Image src={heroProduct.images[0].src} alt={heroProduct.images[0].alt} width={heroProduct.images[0].width} height={heroProduct.images[0].height} priority sizes="(min-width: 1024px) 380px, 90vw" className="mx-auto aspect-[4/3] w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]" />
-                  <span className="mt-2 flex items-end justify-between gap-2 text-ink">
-                    <span><span className="block text-[12.5px] font-semibold text-mute">{heroProduct.brand}</span><b className="text-[15px]">{heroProduct.title.replace(`${heroProduct.brand} `, '')}</b></span>
-                    {heroCard ? <span className="text-right"><span className="block text-[11.5px] text-mute">from</span><span className="price text-[18px]">{rupees(heroCard.fromPrice)}</span></span> : null}
-                  </span>
-                </Link>
-              ) : null}
+      <section className="tile-dark overflow-hidden bg-black text-white" aria-labelledby="hero-h">
+        <div className="wrap pt-14 text-center md:pt-20">
+          <p className="animate-[fade_.8s_both] text-[15px] font-semibold text-gold-hi md:text-[17px]">Imported · Inspected · Guaranteed</p>
+          <h1 id="hero-h" className="mt-2 animate-[rise_.9s_.05s_both] text-[40px] font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-[52px] md:text-[76px]">Business laptops.</h1>
+          <p className="mt-2 animate-[rise_.9s_.12s_both] text-[22px] font-medium leading-snug tracking-[-0.02em] text-white md:text-[30px]">Half the price. Checked on video first.</p>
+          <p className="mt-3 animate-[rise_.9s_.18s_both] text-[16px] text-white/60 md:text-[19px]">ThinkPad, Latitude, EliteBook and MacBook · {unitsOnSale} in stock · up to {Math.max(0, ...deals.map((x) => x.s)) || 60}% off new</p>
+          <div className="mt-6 flex animate-[rise_.9s_.24s_both] flex-wrap justify-center gap-3">
+            <Link href="/laptops" className="btn btn-accent">Shop laptops</Link>
+            <a href="#how" className="btn btn-line">How it works</a>
+          </div>
+          <div className="relative mx-auto mt-10 aspect-[16/10] w-full max-w-[860px] animate-[rise_1.2s_.3s_both] md:mt-14">
+            <Image src={cut('lenovo-thinkpad-x1-carbon-gen-9')} alt="Lenovo ThinkPad X1 Carbon" fill priority sizes="(min-width: 900px) 860px, 100vw" className="object-contain object-bottom" />
+          </div>
+        </div>
+      </section>
+
+      {/* Booking */}
+      <section className="bg-canvas" aria-labelledby="book-h">
+        <div className="wrap py-16 text-center md:py-20">
+          <h2 id="book-h" data-reveal className="text-[38px] font-semibold tracking-[-0.035em] md:text-[60px]">{book ? <>Book it for {book}.</> : <>See it before it ships.</>}</h2>
+          <p data-reveal className="mx-auto mt-2 max-w-[30ch] text-[20px] font-medium leading-snug tracking-[-0.015em] text-ink-2 md:text-[26px]">See your exact laptop on a video call. Pay the rest when it arrives.</p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <a href="#how" className="btn btn-accent">Learn how</a>
+            <Link href="/laptops" className="btn btn-line">Shop now</Link>
+          </div>
+          <ol data-reveal className="mx-auto mt-12 grid max-w-[920px] gap-4 sm:grid-cols-3">
+            {([[Wallet, book ? `Pay ${book} to reserve` : 'Order your laptop'], [Video, 'See it live on video'], [ScanLine, 'Match the serial on delivery']] as [typeof Video, string][]).map(([I, t], i) => (
+              <li key={t} data-reveal-item className="rounded-card bg-white px-6 py-7">
+                <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ink text-white"><I size={24} aria-hidden="true" /></span>
+                <p className="mt-4 text-[13px] font-semibold text-accent-ink">Step {i + 1}</p>
+                <p className="mt-0.5 text-[17px] font-semibold">{t}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* MacBook Pro, full width */}
+      <section className="bg-white" aria-labelledby="mbp-h">
+        <div data-scene="zoom" data-start="1" data-end="0.6" className="wrap overflow-hidden pt-16 text-center md:pt-20">
+          <h2 id="mbp-h" data-reveal className="text-[38px] font-semibold tracking-[-0.035em] md:text-[60px]">MacBook Pro</h2>
+          <p data-reveal className="mt-1 text-[20px] font-medium tracking-[-0.015em] text-ink-2 md:text-[26px]">M-series power. For a lot less.</p>
+          {fromLine('apple-macbook-pro-14-m2-pro', 'Apple') && <p className="mt-2 text-[16px] text-mute">{fromLine('apple-macbook-pro-14-m2-pro', 'Apple')}</p>}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <Link href="/laptops?brand=Apple&q=pro" className="btn btn-accent">Shop MacBook Pro</Link>
+            <Link href="/brands/apple" className="btn btn-line">All MacBooks</Link>
+          </div>
+          <div data-zoom className="relative mx-auto mt-6 aspect-[2.2/1] w-full max-w-[900px]">
+            <Image src={cut('apple-macbook-pro-14-m2-pro')} alt="Apple MacBook Pro 14-inch" fill sizes="(min-width: 900px) 900px, 100vw" className="object-contain object-bottom" />
+          </div>
+        </div>
+      </section>
+
+      {/* Tile grid */}
+      <section className="wrap mt-3 grid gap-3 md:grid-cols-2" aria-label="Shop by brand">
+        {tiles.map((t) => (
+          <div key={t.title} data-scene="zoom" data-start="1" data-end="0.55" className={`flex flex-col overflow-hidden rounded-sheet px-6 pt-12 text-center md:pt-14 ${t.dark ? 'tile-dark bg-black text-white' : 'bg-canvas'}`}>
+            <h2 className={`text-[32px] font-semibold tracking-[-0.03em] md:text-[44px] ${t.dark ? 'text-white' : ''}`}>{t.title}</h2>
+            <p className={`mt-1 text-[17px] font-medium md:text-[20px] ${t.dark ? 'text-white/85' : 'text-ink-2'}`}>{t.sub}</p>
+            {t.from && <p className={`mt-1.5 text-[15px] ${t.dark ? 'text-white/55' : 'text-mute'}`}>{t.from}</p>}
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <Link href={t.href} className="btn btn-accent btn-sm">Shop</Link>
+              <Link href="/compare" className="btn btn-line btn-sm">Compare</Link>
+            </div>
+            <div data-zoom className="relative mx-auto mt-8 aspect-[16/10] w-full max-w-[520px]">
+              <Image src={t.img} alt={t.alt} fill sizes="(min-width: 768px) 520px, 90vw" className="object-contain object-bottom" />
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <Link href={book ? '#how' : '/how-we-test'} className="group relative overflow-hidden rounded-sheet bg-accent p-6 text-white">
-              <Video size={30} aria-hidden="true" />
-              <p className="mt-3 text-[22px] font-extrabold leading-tight">{book ? <>Book any laptop for {book}</> : 'See it on video first'}</p>
-              <p className="mt-1.5 text-[14.5px] text-white/85">{book ? 'We show it to you on a video call. Pay the rest on delivery.' : 'We show you the exact laptop and its serial before dispatch.'}</p>
-              <ol className="mt-4 hidden space-y-2 text-[14px] lg:block">
-                {[book ? `Pay ${book} online to reserve it` : 'Order your exact laptop', 'See it live on a video call', 'Match the serial number on delivery'].map((t, i) => (
-                  <li key={t} className="flex items-center gap-2.5"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20 text-[12px] font-bold">{i + 1}</span>{t}</li>
-                ))}
-              </ol>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-[14.5px] font-bold">How booking works <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-            </Link>
-            <Link href="/students" className="group relative overflow-hidden rounded-sheet border border-line bg-white p-6">
-              <GraduationCap size={30} className="text-accent" aria-hidden="true" />
-              <p className="mt-3 text-[22px] font-extrabold leading-tight">Students get {STUDENT.percent}% off</p>
-              <p className="mt-1.5 text-[14.5px] text-mute">Verify once with your college email or ID. The price applies for a year.</p>
-              <span className="mt-4 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-accent">Verify now <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-            </Link>
-          </div>
-        </div>
+        ))}
+        <Link href="/students" className="tile-dark group flex flex-col items-center justify-center rounded-sheet bg-black px-6 py-14 text-center text-white md:col-span-2">
+          <GraduationCap size={40} className="text-gold-hi" aria-hidden="true" />
+          <p className="mt-3 text-[32px] font-semibold tracking-[-0.03em] md:text-[44px]">Students save {STUDENT.percent}%.</p>
+          <p className="mt-1 text-[17px] text-white/70 md:text-[20px]">Verify once with your college email or ID. The price applies for a year.</p>
+          <span className="btn btn-accent btn-sm mt-5">Verify now</span>
+        </Link>
       </section>
 
-      {/* Trust bar */}
-      <section aria-label="Why buy here" className="border-b border-line bg-white">
-        <ul data-reveal className="wrap grid grid-cols-2 gap-x-6 gap-y-5 py-6 text-[14px] md:grid-cols-3 xl:grid-cols-5">
-          {([
-            [Wallet, book ? `Book for ${book}` : 'Pay your way', book ? 'Balance on delivery' : 'UPI, cards, EMI or on delivery'],
-            [Video, 'Video call before dispatch', 'See your exact laptop'],
-            [ScanLine, 'Match the serial number', 'Check it when it arrives'],
-            [ShieldCheck, `${POLICY.warrantyMonths}-month warranty`, 'Repair, replace or refund'],
-            [RefreshCcw, `${POLICY.returnDays}-day returns`, 'Free pickup'],
-          ] as [typeof Video, string, string][]).map(([I, t, d]) => (
-            <li key={t} data-reveal-item className="flex items-center gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><I size={21} aria-hidden="true" /></span>
-              <span><b className="block text-[14.5px]">{t}</b><span className="text-mute">{d}</span></span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Shop by brand */}
-      <section className="wrap mt-14" aria-labelledby="brands-h">
-        <SectionHead id="brands-h" eyebrow="Shop by brand" title="Top business laptop brands" action={<Link href="/laptops" className="btn-link">All laptops <ArrowRight size={16} aria-hidden="true" /></Link>} />
-        <ul data-reveal className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {brands.map((b) => (
-            <li key={b.brand} data-reveal-item>
-              <Link href={`/brands/${b.brand.toLowerCase()}`} className="group flex items-center gap-4 rounded-card border border-line bg-white p-3 pr-4 transition hover:border-accent hover:shadow-[var(--shadow-lift)]">
-                <span className="well h-20 w-24 shrink-0 rounded-xl p-1.5 sm:h-24 sm:w-28">
-                  {b.img ? <Image src={b.img.src} alt="" width={b.img.width} height={b.img.height} sizes="120px" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" /> : null}
-                </span>
-                <span className="min-w-0">
-                  <b className="block text-[18px]">{b.brand}</b>
-                  <span className="block text-[13px] text-mute">{b.units} in stock</span>
-                  {Number.isFinite(b.from) ? <span className="block text-[13px]">from <b>{rupees(b.from)}</b></span> : null}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {budgets.map((b) => <Link key={b.key} href={`/laptops?budget=${b.key}`} className="chip">{b.label} <span className="text-faint">({b.n})</span></Link>)}
-          {USES.map((u) => <Link key={u.key} href={`/laptops?use=${u.key}`} className="chip">{u.label}</Link>)}
-        </div>
-      </section>
-
-      {/* Deals */}
-      {deals.length > 0 && (
-        <section className="wrap mt-16" aria-labelledby="deals-h">
-          <SectionHead id="deals-h" eyebrow="Deals" title="Biggest savings against new" intro="Compared with each model’s approximate launch price in India." action={<Link href="/deals" className="btn-link">All deals <ArrowRight size={16} aria-hidden="true" /></Link>} />
-          <ul data-reveal className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {deals.map(({ c }) => <li key={c.id} data-reveal-item><ProductCard p={c} wished={wished.has(c.id)} /></li>)}
-          </ul>
+      {/* Featured */}
+      {featured.length > 0 && (
+        <section className="wrap mt-24" aria-labelledby="featured-h">
+          <SectionHead id="featured-h" eyebrow="Our picks this week" title="The latest picks." intro="Proven models with great keyboards that are easy to keep running." action={<Link href="/laptops?sort=rec" className="btn-link">See all ›</Link>} />
+          <Rail items={featured} wished={wished} label="Featured laptops" />
         </section>
       )}
 
       {/* How it works / why trust us */}
-      <section id="how" className="mt-20 scroll-mt-36 bg-canvas py-16" aria-labelledby="how-h">
+      <section id="how" className="mt-24 scroll-mt-24 bg-canvas py-20" aria-labelledby="how-h">
         <div className="wrap">
-          <SectionHead id="how-h" align="center" eyebrow="Why you can trust us" title={book ? <>Book for {book}. <em>We prove it</em> before you pay the rest.</> : <>You see it <em>before it ships</em></>} intro="Buying a used laptop online shouldn’t be a gamble. So the responsibility is ours: you see your exact laptop before it leaves us, and you check it when it reaches you." />
-          <div data-scene="steps" data-start="0.95" data-end="0.5" className="relative mt-12">
+          <SectionHead id="how-h" align="center" eyebrow="Why you can trust us" title={book ? <>Book for {book}. We prove it before you pay the rest.</> : <>You see it before it ships.</>} intro="Buying a used laptop online shouldn’t be a gamble. So the responsibility is ours: you see your exact laptop before it leaves us, and you check it when it reaches you." />
+          <div data-scene="steps" data-start="0.95" data-end="0.5" className="relative mt-14">
             <div className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-0.5 bg-line-2 md:block" aria-hidden="true"><div className="steps-fill h-full bg-accent" /></div>
             <ol data-reveal className="relative grid gap-8 md:grid-cols-4">
               {steps.map(([I, t, d], i) => (
                 <li key={t} data-reveal-item className="text-center">
-                  <span className="relative mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-[0_10px_24px_-10px_rgba(37,99,235,.7)]"><I size={24} aria-hidden="true" /><span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-ink text-[12px] font-bold">{i + 1}</span></span>
-                  <p className="mt-4 text-[18px] font-bold">{t}</p>
+                  <span className="relative mx-auto grid h-14 w-14 place-items-center rounded-full bg-ink text-white"><I size={24} aria-hidden="true" /><span className="absolute -right-1.5 -top-1.5 grid h-6 w-6 place-items-center rounded-full bg-accent text-[12px] font-bold">{i + 1}</span></span>
+                  <p className="mt-4 text-[18px] font-semibold">{t}</p>
                   <p className="mx-auto mt-1.5 max-w-[30ch] text-[14.5px] text-mute">{d}</p>
                 </li>
               ))}
             </ol>
           </div>
-          <div className="mt-14 grid items-center gap-8 lg:grid-cols-[1fr_1.2fr]">
+          <div className="mt-16 grid items-center gap-8 lg:grid-cols-[1fr_1.2fr]">
             {cert ? <div data-scene="drift" className="flex justify-center"><div data-drift className="w-full max-w-[380px]"><UnitCertificate u={cert} /></div></div> : null}
-            <ul data-reveal className="grid gap-4 sm:grid-cols-2">
+            <ul data-reveal className="grid gap-3 sm:grid-cols-2">
               {([
                 [Plane, 'Imported, business-grade', 'All our laptops are imported business models: ThinkPad, Latitude, EliteBook and MacBook, built for years of daily work.'],
                 [ClipboardCheck, `${CHECK_COUNT}-point inspection`, 'Display, battery, keyboard, ports, storage and more, with measured battery and SSD health on every report.'],
                 [ShieldCheck, `${POLICY.warrantyMonths}-month warranty`, 'Registered to your laptop’s serial number. We collect it, repair it or replace it.'],
-                [Receipt, 'GST invoice, secure payment', 'Pay through Razorpay (UPI, cards, EMI). Card details never reach us. A GST invoice comes with every order.'],
+                [RefreshCcw, `${POLICY.returnDays}-day returns`, 'Changed your mind? We pick it up from your door and refund you.'],
+                [Receipt, 'GST invoice', 'A proper GST invoice with every order. Add your GSTIN at checkout for business purchases.'],
+                [Lock, 'Secure payment', 'Pay through Razorpay: UPI, cards, net banking or EMI. Card details never reach us.'],
               ] as [typeof Video, string, string][]).map(([I, t, d]) => (
-                <li key={t} data-reveal-item className="rounded-card border border-line bg-white p-5">
-                  <I size={24} className="text-accent" aria-hidden="true" />
-                  <p className="mt-3 text-[16.5px] font-bold">{t}</p>
-                  <p className="mt-1 text-[14.5px] text-mute">{d}</p>
+                <li key={t} data-reveal-item className="rounded-card bg-white p-5">
+                  <I size={22} className="text-accent" aria-hidden="true" />
+                  <p className="mt-3 text-[16px] font-semibold">{t}</p>
+                  <p className="mt-1 text-[14px] text-mute">{d}</p>
                 </li>
               ))}
             </ul>
@@ -232,57 +232,52 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured */}
-      {featured.length > 0 && (
-        <section className="wrap mt-16" aria-labelledby="featured-h">
-          <SectionHead id="featured-h" eyebrow="Our picks this week" title="Featured laptops" intro="Proven models with great keyboards that are easy to keep running." action={<Link href="/laptops?sort=rec" className="btn-link">See more <ArrowRight size={16} aria-hidden="true" /></Link>} />
-          <Rail items={featured} wished={wished} label="Featured laptops" />
+      {/* Deals */}
+      {deals.length > 0 && (
+        <section className="wrap mt-24" aria-labelledby="deals-h">
+          <SectionHead id="deals-h" eyebrow="Deals" title="Biggest savings against new." intro="Compared with each model’s approximate launch price in India." action={<Link href="/deals" className="btn-link">All deals ›</Link>} />
+          <ul data-reveal className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {deals.map(({ c }) => <li key={c.id} data-reveal-item><ProductCard p={c} wished={wished.has(c.id)} /></li>)}
+          </ul>
         </section>
       )}
 
       {/* Popular (from real views and orders) */}
       {popular.length > 0 && (
-        <section className="wrap mt-16" aria-labelledby="popular-h">
-          <SectionHead id="popular-h" eyebrow="Bestsellers" title="Popular right now" intro="Ranked by what people viewed and bought in the last month." action={<Link href="/laptops?sort=popular" className="btn-link">All popular <ArrowRight size={16} aria-hidden="true" /></Link>} />
+        <section className="wrap mt-24" aria-labelledby="popular-h">
+          <SectionHead id="popular-h" eyebrow="Bestsellers" title="Popular right now." intro="Ranked by what people viewed and bought in the last month." action={<Link href="/laptops?sort=popular" className="btn-link">See all ›</Link>} />
           <Rail items={popular} wished={wished} label="Popular laptops" />
         </section>
       )}
 
       {/* Latest arrivals */}
       {latest.length > 0 && (
-        <section className="wrap mt-16" aria-labelledby="latest-h">
-          <SectionHead id="latest-h" eyebrow="Just in" title="New arrivals" intro="Freshly inspected units, newest first." action={<Link href="/laptops?sort=new" className="btn-link">All new arrivals <ArrowRight size={16} aria-hidden="true" /></Link>} />
+        <section className="wrap mt-24" aria-labelledby="latest-h">
+          <SectionHead id="latest-h" eyebrow="Just in" title="New arrivals." intro="Freshly inspected units, newest first." action={<Link href="/laptops?sort=new" className="btn-link">See all ›</Link>} />
           <Rail items={latest} wished={wished} label="Latest arrivals" />
         </section>
       )}
 
-      {/* Processor */}
-      <section className="wrap mt-16" aria-labelledby="cpu-h">
-        <SectionHead id="cpu-h" eyebrow="Shop by processor" title="Pick your power" />
-        <ul data-reveal className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {procs.map((x) => (
-            <li key={x.key} data-reveal-item>
-              <Link href={`/laptops?${x.q}`} className="group flex h-full flex-col rounded-card border border-line bg-white p-5 transition hover:border-accent hover:shadow-[var(--shadow-lift)]">
-                <Cpu size={24} className="text-accent" aria-hidden="true" />
-                <b className="mt-3 text-[16px]">{x.label}</b>
-                <span className="text-[13.5px] text-mute">{x.note}</span>
-                <span className="mt-auto flex items-center justify-between pt-4 text-[13px] font-semibold">{x.n} {x.n === 1 ? 'model' : 'models'} <ArrowRight size={16} className="text-accent transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+      {/* Quick ways in */}
+      <section className="wrap mt-24 text-center" aria-labelledby="find-h">
+        <h2 id="find-h" data-reveal className="text-[30px] font-semibold tracking-[-0.03em] md:text-[40px]">Find the right one.</h2>
+        <div className="mx-auto mt-6 flex max-w-[980px] flex-wrap justify-center gap-2">
+          {budgets.map((b) => <Link key={b.key} href={`/laptops?budget=${b.key}`} className="chip">{b.label}</Link>)}
+          {USES.map((u) => <Link key={u.key} href={`/laptops?use=${u.key}`} className="chip">{u.label}</Link>)}
+          {procs.map((x) => <Link key={x.key} href={`/laptops?${x.q}`} className="chip">{x.label}</Link>)}
+        </div>
       </section>
 
       {/* Grades */}
-      <section className="wrap mt-16" aria-labelledby="grades-h">
-        <SectionHead id="grades-h" eyebrow="Condition grades" title="Three grades, explained simply" intro="Grades describe looks only. Every grade passes the same checks and gets the same warranty." />
-        <div data-reveal className="mt-6 grid gap-4 md:grid-cols-3">
+      <section className="wrap mt-24" aria-labelledby="grades-h">
+        <SectionHead id="grades-h" align="center" eyebrow="Condition grades" title="Three grades. Explained simply." intro="Grades describe looks only. Every grade passes the same checks and gets the same warranty." />
+        <div data-reveal className="mt-10 grid gap-3 md:grid-cols-3">
           {GRADE_ORDER.map((g) => (
-            <div key={g} data-reveal-item className="rounded-card border border-line bg-white p-6">
-              <div className="flex items-center justify-between gap-3"><p className="text-[22px] font-extrabold">{GRADES[g].label}</p><span className="rounded-lg bg-accent-soft px-2.5 py-1 text-[13px] font-bold text-accent-ink">Grade {GRADES[g].tone}</span></div>
-              <p className="mt-1 font-semibold text-ink-2">{GRADES[g].short}</p>
+            <div key={g} data-reveal-item className="rounded-card bg-canvas p-7">
+              <div className="flex items-center justify-between gap-3"><p className="text-[24px] font-semibold tracking-[-0.02em]">{GRADES[g].label}</p><span className="rounded-full bg-white px-3 py-1 text-[13px] font-semibold">Grade {GRADES[g].tone}</span></div>
+              <p className="mt-1 font-medium text-ink-2">{GRADES[g].short}</p>
               <p className="mt-3 text-[15px] text-mute">{GRADES[g].body}</p>
-              <p className="mt-5 flex items-center justify-between border-t border-line pt-4 text-[14.5px]"><span className="flex items-center gap-2"><Battery size={18} className="text-accent" aria-hidden="true" /> Battery health at least</span><b className="text-[18px]">{GRADES[g].batteryMin}%</b></p>
+              <p className="mt-5 flex items-center justify-between border-t border-line-2 pt-4 text-[14.5px]"><span className="flex items-center gap-2"><Battery size={18} aria-hidden="true" /> Battery health at least</span><b className="text-[18px]">{GRADES[g].batteryMin}%</b></p>
             </div>
           ))}
         </div>
@@ -290,13 +285,13 @@ export default async function Home() {
 
       {/* Testimonials: only real, approved reviews */}
       {reviews.length >= 3 && (
-        <section className="wrap mt-16" aria-labelledby="reviews-h">
-          <SectionHead id="reviews-h" eyebrow="From customers" title="What buyers say" intro="Verified purchases only, published after moderation." />
-          <ul data-reveal className="mt-6 grid gap-4 md:grid-cols-3">
+        <section className="wrap mt-24" aria-labelledby="reviews-h">
+          <SectionHead id="reviews-h" align="center" eyebrow="From customers" title="What buyers say." intro="Verified purchases only, published after moderation." />
+          <ul data-reveal className="mt-10 grid gap-3 md:grid-cols-3">
             {reviews.slice(0, 3).map((r) => (
-              <li key={r.id} data-reveal-item className="flex flex-col rounded-card border border-line bg-white p-6">
+              <li key={r.id} data-reveal-item className="flex flex-col rounded-card bg-canvas p-6">
                 <Stars value={r.rating} />
-                {r.title ? <p className="mt-3 font-bold">{r.title}</p> : null}
+                {r.title ? <p className="mt-3 font-semibold">{r.title}</p> : null}
                 <p className="mt-2 flex-1 text-[15px] text-ink-2">“{r.body}”</p>
                 <p className="mt-4 text-[13.5px] text-mute">{r.authorName}{r.city ? `, ${r.city}` : ''}{r.verified ? ' · Verified purchase' : ''}</p>
               </li>
@@ -305,28 +300,13 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Students */}
-      <section className="wrap mt-16">
-        <div className="grid items-center gap-8 overflow-hidden rounded-sheet bg-accent p-8 text-white md:grid-cols-[1.4fr_1fr] md:p-12">
-          <div>
-            <p className="font-semibold text-white/80">Students</p>
-            <h2 className="mt-2 text-[30px] text-white md:text-[40px]">{STUDENT.percent}% off for a whole year.</h2>
-            <p className="mt-3 max-w-[48ch] text-[16px] text-white/85">Verify once with your college email (instant) or a photo of your student ID, and the discount applies automatically at checkout for {STUDENT.validityMonths} months.</p>
-          </div>
-          <div className="flex flex-wrap gap-3 md:justify-end">
-            <Link href="/students" className="btn btn-lg bg-white text-accent-ink hover:bg-accent-soft">Verify in 2 minutes</Link>
-            <Link href="/category/student" className="btn btn-lg bg-white/15 text-white hover:bg-white/25">Student picks</Link>
-          </div>
-        </div>
-      </section>
-
       {/* FAQ + newsletter */}
-      <section className="wrap mt-16 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-labelledby="faq-h">
+      <section className="wrap mt-24 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-labelledby="faq-h">
         <div>
-          <SectionHead id="faq-h" eyebrow="Questions" title="Good to know" />
+          <SectionHead id="faq-h" eyebrow="Questions" title="Good to know." />
           <p className="mt-3 text-mute">More in the <Link href="/faq" className="link">full FAQ</Link>, or ask us on WhatsApp.</p>
-          <div className="mt-8 rounded-card border border-line bg-canvas p-6">
-            <p className="text-[18px] font-bold">Get new stock alerts</p>
+          <div className="mt-8 rounded-card bg-canvas p-6">
+            <p className="text-[18px] font-semibold">Get new stock alerts</p>
             <p className="mt-1 text-[14.5px] text-mute">Good units sell quickly. We email when fresh stock lands, at most twice a month.</p>
             <div className="mt-4"><NewsletterForm tone="light" source="home" /></div>
           </div>

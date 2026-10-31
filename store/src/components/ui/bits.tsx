@@ -57,7 +57,7 @@ export function SectionHead({ eyebrow, title, intro, action, id, align = 'left' 
     <div data-reveal className={`flex flex-wrap items-end gap-4 ${center ? 'flex-col items-center text-center' : 'justify-between'}`}>
       <div className={`max-w-[720px] ${center ? 'mx-auto' : ''}`}>
         {eyebrow && <p className="eyebrow eyebrow-gold">{eyebrow}</p>}
-        <h2 id={id} className="mt-1.5 text-[26px] md:text-[34px]">{title}</h2>
+        <h2 id={id} className="mt-1.5 text-[30px] font-semibold tracking-[-0.035em] md:text-[44px]">{title}</h2>
         {intro && <p className={`mt-2 text-[16px] text-mute ${center ? 'mx-auto' : ''}`}>{intro}</p>}
       </div>
       {action}

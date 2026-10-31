@@ -14,7 +14,7 @@ export async function ogFonts() {
   const dir = join(process.cwd(), 'src/lib/og-fonts');
   const read = (f: string) => readFile(join(dir, f));
   // the -ext files carry extra Latin letters and currency signs
-  const [display, bold, text, textExt] = await Promise.all([read('jakarta-800.woff'), read('jakarta-700.woff'), read('jakarta-500.woff'), read('jakarta-500-ext.woff')]);
+  const [display, bold, text, textExt] = await Promise.all([read('inter-800.woff'), read('inter-700.woff'), read('inter-500.woff'), read('inter-500-ext.woff')]);
   return [
     { name: 'Display', data: display, style: 'normal' as const, weight: 800 as const },
     { name: 'Bold', data: bold, style: 'normal' as const, weight: 700 as const },
@@ -22,7 +22,7 @@ export async function ogFonts() {
     { name: 'Text', data: textExt, style: 'normal' as const, weight: 500 as const },
   ];}
 
-export const C = { canvas: '#f4f6f9', ivory: '#ffffff', white: '#ffffff', ink: '#0d1321', mute: '#566072', line: '#e5e9f0', accent: '#2563eb', accentInk: '#1e40af', gold: '#ffffff', deal: '#e0442a' };
+export const C = { canvas: '#f5f5f7', ivory: '#ffffff', white: '#ffffff', ink: '#111111', mute: '#6e6e73', line: '#e5e5ea', accent: '#ff5a1f', accentInk: '#c2410c', gold: '#ffffff', deal: '#ff5a1f' };
 
 /** The inspection report card, drawn with plain boxes. */
 export function OgCert({ title, rows, width = 360, seal }: { title: string; rows: [string, string][]; width?: number; seal: string }) {
@@ -30,7 +30,7 @@ export function OgCert({ title, rows, width = 360, seal }: { title: string; rows
     <div style={{ display: 'flex', flexDirection: 'column', width, background: C.white, borderRadius: 20, border: `1.5px solid ${C.line}`, padding: '24px 26px', boxShadow: '0 30px 60px -24px rgba(22,19,15,.35)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', fontFamily: 'Bold', fontSize: 18, color: C.mute, letterSpacing: 1 }}>{title.toUpperCase()}</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 76, height: 76, borderRadius: 38, background: C.accent, border: `4px solid ${C.white}`, boxShadow: `0 0 0 2px ${C.accent}`, fontFamily: 'Bold', fontSize: 17, color: C.white }}>{seal}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 76, height: 76, borderRadius: 38, background: C.ink, border: `4px solid ${C.white}`, boxShadow: `0 0 0 2px ${C.ink}`, fontFamily: 'Bold', fontSize: 17, color: C.white }}>{seal}</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', marginTop: 12 }}>
         {rows.map(([k, v]) => (
@@ -49,11 +49,11 @@ export function OgLogo({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <svg width="52" height="52" viewBox={EMBLEM.viewBox}>
-        <rect width="40" height="40" rx={EMBLEM.tileRadius} fill={C.accent} />
-        <path d={EMBLEM.stroke} fill="none" stroke="#ffffff" strokeWidth={EMBLEM.strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx={EMBLEM.dot.cx} cy={EMBLEM.dot.cy} r={EMBLEM.dot.r} fill="#ffffff" />
+        <rect width="40" height="40" rx={EMBLEM.tileRadius} fill={tone === 'dark' ? C.ink : C.white} />
+        <path d={EMBLEM.stroke} fill="none" stroke={tone === 'dark' ? C.white : C.ink} strokeWidth={EMBLEM.strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={EMBLEM.dot.cx} cy={EMBLEM.dot.cy} r={EMBLEM.dot.r} fill={C.accent} />
       </svg>
-      <span style={{ display: 'flex', fontFamily: 'Display', fontSize: 38, color: tone === 'dark' ? C.ink : C.white, letterSpacing: -1.5 }}>{head}<span style={{ color: C.accent }}>{tail}</span></span>
+      <span style={{ display: 'flex', fontFamily: 'Display', fontSize: 38, color: tone === 'dark' ? C.ink : C.white, letterSpacing: -1.8 }}>{head}<span style={{ color: C.accent }}>{tail}</span></span>
     </div>
   );
 }

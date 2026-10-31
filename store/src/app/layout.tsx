@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import '@fontsource-variable/plus-jakarta-sans/wght.css';
+import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/geist-mono/wght.css';
 import './globals.css';
 import { BRAND } from '@/lib/config';
@@ -7,7 +7,7 @@ import { Toaster } from '@/components/Toaster';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BRAND.url),
-  title: { default: `${BRAND.name}: imported business laptops, checked on video before you pay in full`, template: `%s | ${BRAND.name}` },
+  title: { default: `${BRAND.name}: business laptops at half the price, checked on video first`, template: `%s | ${BRAND.name}` },
   description: BRAND.description,
   openGraph: { siteName: BRAND.name, locale: 'en_IN', type: 'website' },
 };

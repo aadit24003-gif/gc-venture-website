@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronDown, Heart, Menu, Search, ShoppingBag, User, Video, X } from 'lucide-react';
+import { Heart, Menu, Search, ShoppingBag, User, Video, X } from 'lucide-react';
 import { rupees } from '@/lib/format';
 import Logo from './Logo';
 import { BRAND } from '@/lib/config';
@@ -21,15 +21,15 @@ const BRANDS = [
 ] as const;
 
 const NAV = [
-  { href: '/laptops', label: 'All laptops' },
+  { href: '/laptops', label: 'Shop' },
   { href: '/brands/lenovo', label: 'Lenovo' },
   { href: '/brands/dell', label: 'Dell' },
   { href: '/brands/hp', label: 'HP' },
   { href: '/brands/apple', label: 'MacBook' },
-  { href: '/laptops?max=30000', label: 'Under ₹30,000' },
   { href: '/deals', label: 'Deals' },
   { href: '/students', label: 'Students' },
   { href: '/how-we-test', label: 'How we check' },
+  { href: '/support', label: 'Support' },
 ];
 
 const QUICK = [
@@ -47,99 +47,53 @@ export default function Header({ viewer, bookingAmount = null }: { viewer: Viewe
   const { count, setOpen } = useCart();
   const [search, setSearch] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [brands, setBrands] = useState(false);
   const path = usePathname();
-  const brandsRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setMenu(false); setBrands(false); }, [path]);
+  useEffect(() => { setMenu(false); }, [path]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement;
       const typing = t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable;
       if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) { e.preventDefault(); setSearch(true); }
-      if (e.key === 'Escape') setBrands(false);
     };
-    const onClick = (e: MouseEvent) => { if (brandsRef.current && !brandsRef.current.contains(e.target as Node)) setBrands(false); };
     window.addEventListener('keydown', onKey);
-    document.addEventListener('click', onClick);
-    return () => { window.removeEventListener('keydown', onKey); document.removeEventListener('click', onClick); };
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  const icon = 'grid h-11 w-11 place-items-center rounded-full text-white/85 transition-colors hover:text-white';
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
-      <div className="bg-ink text-[13px] text-white/85">
-        <div className="wrap flex h-9 items-center justify-between gap-4">
-          <p className="flex min-w-0 items-center gap-2">
-            <Video size={15} className="shrink-0 text-gold-hi" aria-hidden="true" />
-            <span className="truncate">{bookingAmount != null ? <>Book for <b className="text-white">{rupees(bookingAmount)}</b> · see your exact laptop on video · match the serial on delivery</> : 'See your exact laptop on video before dispatch · match the serial on delivery'}</span>
-          </p>
-          <div className="hidden shrink-0 items-center gap-5 md:flex">
-            <Link href="/track" className="hover:text-white">Track order</Link>
-            <Link href="/support" className="hover:text-white">Help</Link>
-            <Link href="/students" className="font-semibold text-gold-hi hover:text-white">Students: 10% off</Link>
-          </div>
-        </div>
-      </div>
-      <header className="sticky top-0 z-50 border-b border-line bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/85">
-        <div className="wrap flex h-[70px] items-center gap-3 md:gap-5">
-          <button type="button" className="btn btn-quiet btn-icon -ml-2 lg:hidden" aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={22} /></button>
-          <Link href="/" aria-label={`${BRAND.name} home`} className="shrink-0"><Logo compact /></Link>
-
-          <button type="button" onClick={() => setSearch(true)}
-            className="ml-2 hidden h-11 w-full max-w-[560px] flex-1 items-center gap-2.5 rounded-xl border border-line-2 bg-canvas px-4 text-left text-[15px] text-mute transition hover:border-accent md:flex">
-            <Search size={18} aria-hidden="true" /> <span className="flex-1">Search ThinkPad, MacBook Air, 16 GB…</span> <span className="kbd">/</span>
-          </button>
-
-          <div className="ml-auto flex items-center gap-1">
-            <button type="button" className="btn btn-quiet btn-icon md:hidden" aria-label="Search" onClick={() => setSearch(true)}><Search size={21} /></button>
-            <Link href={viewer ? '/account/wishlist' : '/login?next=/account/wishlist'} className="btn btn-quiet btn-icon hidden sm:inline-flex" aria-label="Wishlist"><Heart size={21} /></Link>
-            <Link href={viewer ? (viewer.isStaff ? '/admin' : '/account') : '/login'} className="btn btn-quiet hidden h-11 min-h-0 gap-2 px-3 text-[14.5px] sm:inline-flex" aria-label={viewer ? 'Your account' : 'Sign in'}>
-              <User size={21} aria-hidden="true" />
-              <span className="hidden max-w-[110px] truncate lg:inline">{viewer ? (viewer.isStaff ? 'Admin' : viewer.name?.split(' ')[0] ?? 'Account') : 'Sign in'}</span>
-            </Link>
-            <button type="button" onClick={() => setOpen(true)} className="btn btn-accent relative h-11 min-h-0 gap-2 px-3.5 text-[14.5px]" aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}>
-              <ShoppingBag size={19} aria-hidden="true" />
-              <span className="hidden sm:inline">Cart</span>
-              <span className="num grid h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[12px] font-bold text-accent">{count}</span>
-            </button>
-          </div>
-        </div>
-        <nav aria-label="Main" className="hidden border-t border-line lg:block">
-          <div className="wrap flex h-12 items-center gap-1 text-[14.5px] font-semibold">
-            <div ref={brandsRef} className="relative">
-              <button type="button" aria-expanded={brands} aria-controls="brands-menu" onClick={() => setBrands((v) => !v)}
-                className="-ml-3 inline-flex h-9 items-center gap-1.5 rounded-lg px-3 hover:bg-canvas">
-                <Menu size={17} aria-hidden="true" /> Shop by brand <ChevronDown size={15} className={`transition-transform ${brands ? 'rotate-180' : ''}`} aria-hidden="true" />
-              </button>
-              <AnimatePresence>
-                {brands && (
-                  <motion.div id="brands-menu" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} transition={{ duration: .16 }}
-                    className="absolute left-0 top-11 grid w-[680px] grid-cols-4 gap-1 rounded-2xl border border-line bg-white p-3 font-normal shadow-[var(--shadow-pop)]">
-                    {BRANDS.map((b) => (
-                      <div key={b.slug} className="rounded-xl p-3 hover:bg-canvas">
-                        <Link href={`/brands/${b.slug}`} className="text-[16px] font-bold hover:text-accent">{b.name}</Link>
-                        <ul className="mt-2 space-y-1.5 text-[14px] text-mute">
-                          {b.lines.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-accent">{label}</Link></li>)}
-                        </ul>
-                      </div>
-                    ))}
-                    <div className="col-span-4 mt-1 flex flex-wrap gap-2 border-t border-line px-2 pt-3">
-                      {QUICK.slice(3).map(([label, href]) => <Link key={href} href={href} className="chip !min-h-8 !text-[13px]">{label}</Link>)}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+      <header className="sticky top-0 z-50 bg-black/95 text-white backdrop-blur-xl supports-[backdrop-filter]:bg-black/85">
+        <div className="wrap flex h-14 items-center gap-2">
+          <button type="button" className={`${icon} -ml-3 lg:hidden`} aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={20} /></button>
+          <Link href="/" aria-label={`${BRAND.name} home`} className="shrink-0"><Logo tone="light" compact /></Link>
+          <nav aria-label="Main" className="mx-auto hidden items-center gap-1 lg:flex">
             {NAV.map((n) => (
               <Link key={n.href} href={n.href} aria-current={path === n.href ? 'page' : undefined}
-                className={`inline-flex h-9 items-center whitespace-nowrap rounded-lg px-3 hover:bg-canvas hover:text-accent aria-[current=page]:text-accent ${n.href === '/deals' ? 'text-deal' : ''}`}>
+                className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[13.5px] transition-colors hover:text-white aria-[current=page]:text-white ${n.href === '/deals' ? 'text-gold-hi' : 'text-white/75'}`}>
                 {n.label}
               </Link>
             ))}
+          </nav>
+          <div className="ml-auto flex items-center lg:ml-0">
+            <button type="button" className={icon} aria-label="Search" onClick={() => setSearch(true)}><Search size={19} /></button>
+            <Link href={viewer ? '/account/wishlist' : '/login?next=/account/wishlist'} className={`${icon} hidden sm:grid`} aria-label="Wishlist"><Heart size={19} /></Link>
+            <Link href={viewer ? (viewer.isStaff ? '/admin' : '/account') : '/login'} className={`${icon} hidden sm:grid`} aria-label={viewer ? (viewer.isStaff ? 'Admin' : 'Your account') : 'Sign in'} title={viewer ? (viewer.isStaff ? 'Admin' : viewer.name ?? 'Account') : 'Sign in'}><User size={19} /></Link>
+            <button type="button" onClick={() => setOpen(true)} className={`${icon} relative -mr-2`} aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}>
+              <ShoppingBag size={19} aria-hidden="true" />
+              {count > 0 && <span className="num absolute right-1 top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-accent px-1 text-[11px] font-bold text-white">{count}</span>}
+            </button>
           </div>
-        </nav>
+        </div>
       </header>
+      <div className="bg-canvas text-center text-[14px] text-ink-2">
+        <p className="wrap flex flex-wrap items-center justify-center gap-x-2 py-2.5">
+          <Video size={15} className="hidden text-accent sm:block" aria-hidden="true" />
+          <span>{bookingAmount != null ? <>Book any laptop for <b>{rupees(bookingAmount)}</b>. See it on a video call, pay the rest on delivery.</> : 'See your exact laptop on a video call before it ships.'}</span>
+          <Link href="/#how" className="font-semibold text-accent-ink hover:underline">How it works ›</Link>
+        </p>
+      </div>
 
       <AnimatePresence>
         {menu && (

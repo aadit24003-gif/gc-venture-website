@@ -32,15 +32,15 @@ export async function sendEmail(mail: Email): Promise<void> {
 
 /** Minimal branded layout that renders well in Gmail and Outlook. */
 export function layout(title: string, body: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#F4F6F9;font-family:Helvetica,Arial,sans-serif;color:#0D1321">
+  return `<!doctype html><html><body style="margin:0;background:#F5F5F7;font-family:Helvetica,Arial,sans-serif;color:#111111">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px"><tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E5E9F0">
-<tr><td style="padding:22px 28px;border-bottom:1px solid #E5E9F0;font-size:21px;font-weight:bold;letter-spacing:-0.5px;color:#0D1321">${BRAND.name.toLowerCase().replace(/club$/, '')}<span style="color:#2563EB">${BRAND.name.toLowerCase().endsWith('club') ? 'club' : ''}</span></td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E5E5EA">
+<tr><td style="padding:22px 28px;border-bottom:1px solid #E5E5EA;font-size:21px;font-weight:bold;letter-spacing:-0.5px;color:#111111">${BRAND.name.toLowerCase().replace(/club$/, '')}<span style="color:#FF5A1F">${BRAND.name.toLowerCase().endsWith('club') ? 'club' : ''}</span></td></tr>
 <tr><td style="padding:28px">
-<h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#0D1321">${title}</h1>
+<h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#111111">${title}</h1>
 ${body}
 </td></tr>
-<tr><td style="padding:16px 28px 24px;font-size:12px;color:#566072;border-top:1px solid #E5E9F0">${BRAND.name}: ${BRAND.tagline}. You received this email because of activity on your account or order.</td></tr>
+<tr><td style="padding:16px 28px 24px;font-size:12px;color:#6E6E73;border-top:1px solid #E5E5EA">${BRAND.name}: ${BRAND.tagline}. You received this email because of activity on your account or order.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -51,10 +51,10 @@ export function markdownEmail(md: string): string {
   return md.trim().split(/\n\s*\n/).map((block) => {
     const b = block.trim();
     const only = /^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/.exec(b);
-    if (only) return `<p style="margin:22px 0"><a href="${esc(only[2])}" style="background:#2563EB;color:#ffffff;padding:13px 22px;border-radius:10px;text-decoration:none;font-weight:bold;display:inline-block">${esc(only[1])}</a></p>`;
+    if (only) return `<p style="margin:22px 0"><a href="${esc(only[2])}" style="background:#FF5A1F;color:#ffffff;padding:13px 24px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block">${esc(only[1])}</a></p>`;
     const html = esc(b)
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" style="color:#2563EB;font-weight:bold">$1</a>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" style="color:#C2410C;font-weight:bold">$1</a>')
       .replace(/\n/g, '<br>');
     return `<p style="font-size:15px;line-height:1.6;margin:0 0 14px">${html}</p>`;
   }).join('\n');

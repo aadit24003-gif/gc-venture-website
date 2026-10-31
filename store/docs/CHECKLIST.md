@@ -6,7 +6,7 @@ Status of every part of the brief. **Done** means built and exercised (unit test
 
 **Catalogue and storefront**
 - [x] LappyClub brand: logo, favicon, share images and emails
-- [x] Modern store design (white, ink and blue; Plus Jakarta Sans) with scroll reveals and page transitions; green theme removed everywhere
+- [x] Apple-style design in black, white and orange (Inter), background-free hero photos, scroll effects and page transitions; green theme removed everywhere
 - [x] Book for ₹299 (amount and on/off in Admin → Settings), video call before dispatch (admin panel + customer request link), serial number to match on delivery, balance collected on delivery
 - [x] Official manufacturer photo for all 39 models (Dell, HP, Lenovo PSREF, Apple), cleaned and stored in the repo
 - [x] Home page: navigation, logo, search, hero with a real unit's report, brands, featured, popular (real data only), latest arrivals, deals, budgets, processors, grades, inspection, warranty, why refurbished, testimonials (shown only when ≥3 approved reviews exist), students, FAQ, newsletter, footer

@@ -25,7 +25,7 @@ export default function ProductCard({ p, priority, wished = false }: { p: CardPr
         </div>
         <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-1.5">
           {saved ? <span className="pill pill-accent">{saved}% off</span> : null}
-          {!p.inStock ? <span className="pill pill-done">Sold out</span> : p.unitsOnSale <= 2 ? <span className="pill pill-wait">Only {p.unitsOnSale} left</span> : fresh ? <span className="pill pill-info">New arrival</span> : null}
+          {!p.inStock ? <span className="pill pill-done">Sold out</span> : p.unitsOnSale <= 2 ? <span className="pill pill-wait">Only {p.unitsOnSale} left</span> : fresh ? <span className="pill pill-ink">New arrival</span> : null}
         </div>
         <div className="absolute right-3 top-3 z-10 flex flex-col items-end gap-2">
           <WishButton productId={p.id} title={p.title} initial={wished} />

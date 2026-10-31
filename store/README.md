@@ -92,11 +92,12 @@ Everything marked `[CONFIRM]` in the code is a working default. The full list, w
 
 ## Design
 
-- **Idea:** a modern store that answers "why should I trust you?" up front. Book a laptop with a small amount (₹299 by default, set in Admin → Settings → Shipping), see the exact unit on a video call before dispatch, match the serial number on delivery, then pay the balance. Imported business-grade laptops, each with its own inspection report.
-- **Logo:** `src/components/Logo.tsx`: a blue tile with a bold "L" drawn as an open laptop seen from the side, plus a camera dot; wordmark "lappy" in ink and "club" in blue. The same geometry draws the favicon (`src/app/icon.svg`) and the share images.
-- **Colour:** white and light grey `#F4F6F9`, ink `#0D1321`, one blue `#2563EB` for actions and trust signals, orange-red `#E0442A` only for savings. Status colours only for states.
-- **Type:** Plus Jakarta Sans throughout, Geist Mono for unit codes, serial numbers and measurements. Self-hosted.
-- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): sections and cards rise into place in turn as they scroll in, the "how it works" line fills as you scroll, the sample report drifts, and every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
+- **Idea:** Apple-style storefront in black, white and orange. A slim black navigation bar, a light ribbon with the booking offer, then full-width black and light-grey sections with big centred headlines, two pill buttons (orange filled, orange outline) and large laptop photos. The page answers "why should I trust you?" with the booking flow: book for ₹299, see the exact unit on video, match the serial on delivery, then pay the balance.
+- **Logo:** `src/components/Logo.tsx`: a black tile (white on dark backgrounds) with a bold "L" drawn as an open laptop and an orange camera dot; wordmark "lappy" plus "club" in orange. Favicon `src/app/icon.svg`.
+- **Colour:** white and Apple grey `#F5F5F7`, black `#111111`, orange `#FF5A1F` for buttons, highlights and savings. Status colours only for states.
+- **Type:** Inter throughout, Geist Mono for unit codes, serial numbers and measurements. Self-hosted.
+- **Photos on black:** `scripts/make-cutouts.cjs` removes the white background from a few manufacturer photos (`public/products/<slug>/cutout.webp`) so they sit cleanly on dark sections. Run `node scripts/make-cutouts.cjs <slug>:1` for another model.
+- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): laptop photos grow into place as their section scrolls up, sections and cards rise in turn, the "how it works" line fills, and every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
 
 ## Booking flow
 

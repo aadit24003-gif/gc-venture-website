@@ -14,8 +14,8 @@ export default async function Image() {
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: 600 }}>
           <OgLogo />
           <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', fontFamily: 'Display', fontSize: 52, lineHeight: 1.06, color: C.ink, letterSpacing: -2 }}>Imported business laptops.</div>
-            <div style={{ display: 'flex', fontFamily: 'Display', fontSize: 52, lineHeight: 1.06, color: C.accent, letterSpacing: -2, marginTop: 4 }}>See yours on video first.</div>
+            <div style={{ display: 'flex', fontFamily: 'Display', fontSize: 52, lineHeight: 1.06, color: C.ink, letterSpacing: -2 }}>Business laptops. Half the price.</div>
+            <div style={{ display: 'flex', fontFamily: 'Display', fontSize: 52, lineHeight: 1.06, color: C.accent, letterSpacing: -2, marginTop: 4 }}>Checked on video first.</div>
           </div>
           <div style={{ display: 'flex', fontFamily: 'Text', fontSize: 21, color: C.mute }}>Video check before dispatch · serial match on delivery · {POLICY.warrantyMonths}-month warranty</div>
         </div>

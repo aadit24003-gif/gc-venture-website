@@ -16,8 +16,8 @@ export default async function Footer() {
   const s = await getSettings();
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-24 bg-ink text-white/70">
-      <div className="border-b border-white/10">
+    <footer className="mt-24 bg-canvas text-[13.5px] text-mute">
+      <div className="border-b border-line-2">
         <ul className="wrap grid grid-cols-2 gap-x-6 gap-y-5 py-8 text-[14px] md:grid-cols-4">
           {[
             [Video, 'Video check before dispatch', 'See your exact laptop and its serial'],
@@ -26,52 +26,52 @@ export default async function Footer() {
             [RefreshCcw, `${POLICY.returnDays}-day returns`, 'Free pickup from your door'],
           ].map(([Icon, t, d]) => {
             const I = Icon as typeof Video;
-            return <li key={t as string} className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/10 text-gold-hi"><I size={19} aria-hidden="true" /></span><span><b className="block text-white">{t as string}</b>{d as string}</span></li>;
+            return <li key={t as string} className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-accent"><I size={19} aria-hidden="true" /></span><span><b className="block text-ink">{t as string}</b>{d as string}</span></li>;
           })}
         </ul>
       </div>
-      <div className="wrap grid gap-12 py-14 lg:grid-cols-[1.2fr_2fr]">
+      <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 py-14 lg:grid-cols-[1.2fr_2fr]">
         <div>
-          <Logo tone="light" />
+          <Logo />
           <p className="mt-5 max-w-[40ch] text-[15px] leading-relaxed">Imported business laptops and MacBooks, inspected on {CHECK_COUNT} points and sold as the exact unit you see, with a {POLICY.warrantyMonths}-month warranty.</p>
           <div className="mt-8 max-w-[420px]">
-            <p className="font-bold text-white">Get new stock alerts</p>
+            <p className="font-semibold text-ink">Get new stock alerts</p>
             <p className="mt-1 text-[14px]">Good units sell quickly. We email at most twice a month.</p>
-            <div className="mt-3"><NewsletterForm /></div>
+            <div className="mt-3"><NewsletterForm tone="light" /></div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {COLS.map((c) => (
             <nav key={c.title} aria-label={c.title}>
-              <p className="text-[14px] font-bold text-white">{c.title}</p>
-              <ul className="mt-4 space-y-2.5 text-[14.5px]">
-                {c.links.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-white">{label}</Link></li>)}
+              <p className="font-semibold text-ink">{c.title}</p>
+              <ul className="mt-4 space-y-2.5">
+                {c.links.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-ink">{label}</Link></li>)}
               </ul>
             </nav>
           ))}
           <div>
-            <p className="text-[14px] font-bold text-white">Talk to us</p>
-            <ul className="mt-4 space-y-2.5 text-[14.5px]">
-              <li><a href={`tel:${s.business.phone}`} className="hover:text-white">{formatPhone(s.business.phone)}</a></li>
-              <li><a href={`https://wa.me/${s.business.whatsapp}`} className="hover:text-white" target="_blank" rel="noopener">WhatsApp</a></li>
-              <li><a href={`mailto:${s.business.email}`} className="break-all hover:text-white">{s.business.email}</a></li>
-              <li className="text-white/50">{s.business.hours}</li>
+            <p className="font-semibold text-ink">Talk to us</p>
+            <ul className="mt-4 space-y-2.5">
+              <li><a href={`tel:${s.business.phone}`} className="hover:text-ink">{formatPhone(s.business.phone)}</a></li>
+              <li><a href={`https://wa.me/${s.business.whatsapp}`} className="hover:text-ink" target="_blank" rel="noopener">WhatsApp</a></li>
+              <li><a href={`mailto:${s.business.email}`} className="break-all hover:text-ink">{s.business.email}</a></li>
+              <li className="text-faint">{s.business.hours}</li>
             </ul>
           </div>
         </div>
       </div>
-      <div className="border-t border-white/10">
+      <div className="border-t border-line-2">
         <div className="wrap flex flex-col gap-4 py-6 text-[13px] md:flex-row md:items-center md:justify-between">
           <p>© {year} {s.business.legalName}{s.business.gstin ? ` · GSTIN ${s.business.gstin}` : ''}. {BRAND.name} is not affiliated with Dell, HP, Lenovo or Apple; product photos are the manufacturers’.</p>
           <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link href="/terms" className="hover:text-white">Terms</Link>
-            <Link href="/privacy" className="hover:text-white">Privacy</Link>
-            <Link href="/returns" className="hover:text-white">Refunds</Link>
-            <Link href="/grievance" className="hover:text-white">Grievance officer</Link>
-            <a href={LEGAL.rentals.url} className="hover:text-white" target="_blank" rel="noopener">Renting? {LEGAL.rentals.name}</a>
+            <Link href="/terms" className="hover:text-ink">Terms</Link>
+            <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+            <Link href="/returns" className="hover:text-ink">Refunds</Link>
+            <Link href="/grievance" className="hover:text-ink">Grievance officer</Link>
+            <a href={LEGAL.rentals.url} className="hover:text-ink" target="_blank" rel="noopener">Renting? {LEGAL.rentals.name}</a>
           </nav>
         </div>
-        <p className="wrap pb-6 text-[12.5px] text-white/45">Payments secured by Razorpay: UPI, cards, net banking, wallets and EMI. Card details never reach our servers. GST invoice with every order. {STUDENT.percent}% off for verified students.</p>
+        <p className="wrap pb-6 text-[12.5px] text-faint">Payments secured by Razorpay: UPI, cards, net banking, wallets and EMI. Card details never reach our servers. GST invoice with every order. {STUDENT.percent}% off for verified students.</p>
       </div>
     </footer>
   );
