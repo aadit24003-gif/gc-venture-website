@@ -17,19 +17,8 @@ export type Order = typeof orders.$inferSelect;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type OrderEvent = typeof orderEvents.$inferSelect;
 
-export const STATUS: Record<string, { label: string; tone: 'wait' | 'ok' | 'done' | 'bad' }> = {
-  awaiting_payment: { label: 'Waiting for payment', tone: 'wait' },
-  payment_failed: { label: 'Payment failed', tone: 'bad' },
-  confirmed: { label: 'Confirmed', tone: 'ok' },
-  packed: { label: 'Packed', tone: 'ok' },
-  shipped: { label: 'Shipped', tone: 'ok' },
-  delivered: { label: 'Delivered', tone: 'done' },
-  cancelled: { label: 'Cancelled', tone: 'bad' },
-  returned: { label: 'Returned', tone: 'bad' },
-};
-export const TIMELINE = ['confirmed', 'packed', 'shipped', 'delivered'] as const;
-/** Statuses an admin can move an order to. */
-export const ADMIN_STATUSES = ['confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'] as const;
+export { STATUS, TIMELINE, ADMIN_STATUSES } from './order-status';
+import { ADMIN_STATUSES } from './order-status';
 
 /** Online orders not paid within this many minutes are cancelled and their stock released. */
 const HOLD_MINUTES = 30;
@@ -203,7 +192,8 @@ export async function setStatus(orderId: string, status: (typeof ADMIN_STATUSES)
   const [o] = await d.update(orders).set(patch).where(eq(orders.id, orderId)).returning();
   if (!o) return;
   if (status === 'delivered' && o.paymentMethod === 'cod') await d.update(orders).set({ paymentStatus: 'paid', paidAt: new Date() }).where(eq(orders.id, orderId));
-  await d.insert(orderEvents).values({ orderId, status, note: extra.note || null, byUserId });
+  const shipNote = status === 'shipped' && (o.courier || o.trackingNumber) ? [o.courier, o.trackingNumber && `tracking ${o.trackingNumber}`].filter(Boolean).join(', ') : null;
+  await d.insert(orderEvents).values({ orderId, status, note: [shipNote, extra.note].filter(Boolean).join('. ') || null, byUserId });
   if (status === 'shipped' || status === 'delivered') await sendStatusEmail(o).catch((e) => console.error('status email', e));
 }
 

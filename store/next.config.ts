@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // PGlite (local database) loads its WebAssembly from its own folder, so it must not be bundled.
   serverExternalPackages: ['@electric-sql/pglite', 'sharp'],
   poweredByHeader: false,
+  // The database migrations are read at runtime on first start, so ship them with every function.
+  outputFileTracingIncludes: { '/**/*': ['./drizzle/**/*'] },
   turbopack: { root: path.join(import.meta.dirname) },
   experimental: {
     serverActions: { bodySizeLimit: '12mb' },

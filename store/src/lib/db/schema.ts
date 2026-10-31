@@ -221,3 +221,18 @@ export const studentVerifications = pgTable('student_verifications', {
   filesDeletedAt: timestamp({ withTimezone: true }),
   createdAt: now(),
 }, (t) => [index('student_user').on(t.userId), index('student_status').on(t.status, t.createdAt)]);
+
+/* ── Contact form ──────────────────────────────────────────── */
+
+/** Messages from the contact form, kept so none is lost if email delivery fails. */
+export const messages = pgTable('messages', {
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  contact: text().notNull(),
+  topic: text().notNull(),
+  body: text().notNull(),
+  userId: uuid(),
+  ip: text(),
+  handled: boolean().notNull().default(false),
+  createdAt: now(),
+}, (t) => [index('messages_created').on(t.createdAt)]);

@@ -1,4 +1,5 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNotNull, isNull, lt } from 'drizzle-orm';
+import { deletePrivate } from './providers/storage';
 import { db } from './db';
 import { studentVerifications } from './db/schema';
 import { STUDENT } from './config';
@@ -40,4 +41,18 @@ export async function hasOpenRequest(userId: string) {
   const rows = await d.select({ id: studentVerifications.id }).from(studentVerifications)
     .where(and(eq(studentVerifications.userId, userId), eq(studentVerifications.status, 'pending'))).limit(1);
   return rows.length > 0;
+}
+
+/** Deletes ID photos for requests decided more than STUDENT.idRetentionDays ago. */
+export async function purgeStudentFiles() {
+  const d = await db();
+  const cutoff = new Date(Date.now() - STUDENT.idRetentionDays * 86_400_000);
+  const rows = await d.select().from(studentVerifications)
+    .where(and(isNotNull(studentVerifications.reviewedAt), lt(studentVerifications.reviewedAt, cutoff), isNull(studentVerifications.filesDeletedAt), isNotNull(studentVerifications.idFrontKey)));
+  for (const r of rows) {
+    if (r.idFrontKey) await deletePrivate(r.idFrontKey).catch(() => {});
+    if (r.idBackKey) await deletePrivate(r.idBackKey).catch(() => {});
+    await d.update(studentVerifications).set({ filesDeletedAt: new Date(), idFrontKey: null, idBackKey: null }).where(eq(studentVerifications.id, r.id));
+  }
+  return { ok: true as const, deleted: rows.length };
 }

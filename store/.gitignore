@@ -8,3 +8,4 @@ out/
 next-env.d.ts
 test-results/
 scratch/
+!.env.example

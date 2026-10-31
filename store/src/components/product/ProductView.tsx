@@ -107,7 +107,7 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
             <motion.div key={view} initial={{ opacity: 0, rotateX: view === 'lid' ? -20 : 20 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} style={{ perspective: 800 }}>
               {view === 'front'
                 ? <LaptopArt art={p.art} brand={p.brand} slug={p.slug} className="mx-auto w-full max-w-[560px]" title={`${p.title}, illustration`} />
-                : <LidMarks colour={p.art.colour} grade={grade} brand={p.brand} className="mx-auto w-full max-w-[520px]" />}
+                : <LidMarks colour={p.art.colour} grade={grade} brand={p.brand} className="mx-auto w-full max-w-[520px]" annotate />}
             </motion.div>
           </AnimatePresence>
           <p className="mt-2 text-center text-[13px] text-mute">

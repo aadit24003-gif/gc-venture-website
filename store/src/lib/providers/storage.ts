@@ -19,7 +19,7 @@ const supa = () =>
     : null;
 
 async function localDir() {
-  for (const base of [path.join(dataDir(), 'uploads'), path.join(os.tmpdir(), 'store-uploads')]) {
+  for (const base of [path.join(/*turbopackIgnore: true*/ dataDir(), 'uploads'), path.join(/*turbopackIgnore: true*/ os.tmpdir(), 'store-uploads')]) {
     try {
       await fs.mkdir(base, { recursive: true });
       return base;
@@ -57,7 +57,7 @@ export async function putPrivate(key: string, data: Buffer, contentType: string)
     if (!res.ok) throw new Error(`Upload failed (${res.status}): ${await res.text()}`);
     return;
   }
-  const file = path.join(await localDir(), safe(key));
+  const file = path.join(/*turbopackIgnore: true*/ await localDir(), safe(key));
   await fs.mkdir(path.dirname(file), { recursive: true });
   await fs.writeFile(file, data);
 }
@@ -72,7 +72,7 @@ export async function getPrivate(key: string): Promise<Buffer | null> {
     return Buffer.from(await res.arrayBuffer());
   }
   try {
-    return await fs.readFile(path.join(await localDir(), safe(key)));
+    return await fs.readFile(path.join(/*turbopackIgnore: true*/ await localDir(), safe(key)));
   } catch {
     return null;
   }
@@ -88,5 +88,5 @@ export async function deletePrivate(key: string): Promise<void> {
     });
     return;
   }
-  await fs.rm(path.join(await localDir(), safe(key)), { force: true });
+  await fs.rm(path.join(/*turbopackIgnore: true*/ await localDir(), safe(key)), { force: true });
 }
