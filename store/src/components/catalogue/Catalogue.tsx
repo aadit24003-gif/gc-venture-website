@@ -109,7 +109,8 @@ export default function Catalogue({ items, initial }: { items: CardProduct[]; in
           <div className="sticky top-24 max-h-[calc(100dvh-110px)] overflow-y-auto pb-6 pr-2 [scrollbar-width:thin]">{panel}</div>
         </aside>
 
-        <section aria-labelledby="results-count">
+        <section aria-labelledby="results-h">
+          <h2 id="results-h" className="sr-only">Laptops</h2>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p id="results-count" className="text-[15px] text-mute" aria-live="polite">
               <span className="font-semibold text-spruce">{results.length}</span> {results.length === 1 ? 'laptop' : 'laptops'}

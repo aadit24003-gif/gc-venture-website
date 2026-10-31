@@ -20,6 +20,7 @@
   --color-tag-soft: #fbedc2;
   --color-pass: #237a52;
   --color-pass-soft: #d5ecdf;
+  --color-pass-deep: #16573a; /* readable on the tag yellow */
   --color-alert: #a8401a;
   --color-alert-soft: #f6e1d6;
 
@@ -46,6 +47,7 @@
     line-height: 1.55;
     font-feature-settings: 'ss01', 'tnum' 0;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip; /* decorative tags may hang past the edge on small screens */
     text-rendering: optimizeLegibility;
   }
   h1, h2, h3, h4 {

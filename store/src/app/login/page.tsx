@@ -27,8 +27,8 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </ul>
         <div className="qc-shadow absolute -bottom-6 right-10 rotate-[8deg]">
           <div className="qc-tag [--hole:var(--color-spruce)] [--tag-w:220px] text-center">
-            <p className="display text-[15px] font-bold">Signed in</p>
-            <p className="price mt-1 text-[34px] leading-none">in 30 s</p>
+            <p className="display text-[15px] font-bold">Sign-in takes</p>
+            <p className="price mt-1 text-[38px] leading-none">30 s</p>
             <p className="mt-2 pb-8 text-[13px] font-semibold">No password needed</p>
           </div>
         </div>

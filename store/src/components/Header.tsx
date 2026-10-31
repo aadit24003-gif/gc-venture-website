@@ -8,7 +8,7 @@ import { Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import Logo from './Logo';
 import { useCart } from './cart/CartContext';
 import SearchDialog from './SearchDialog';
-import { STUDENT } from '@/lib/config';
+import { BRAND, STUDENT } from '@/lib/config';
 
 const NAV = [
   { href: '/laptops', label: 'All laptops' },
@@ -63,13 +63,14 @@ export default function Header({ viewer }: { viewer: { name: string | null; isAd
       <header
         className={`sticky top-0 z-50 pt-3 transition-transform duration-300 ease-[var(--ease-out-soft)] ${hidden && !menu ? '-translate-y-[110%]' : ''}`}
       >
+        <a href="#main" className="btn btn-tag sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100]">Skip to content</a>
         <div
           className={`wrap flex h-[62px] items-center gap-3 rounded-[20px] pl-4 pr-2 transition-[background-color,box-shadow,backdrop-filter] duration-300 md:pl-5 ${
             raised || menu ? 'bg-white/80 shadow-[0_10px_30px_-14px_rgba(15,61,51,.35)] backdrop-blur-xl backdrop-saturate-150' : 'bg-white/40 backdrop-blur-md'
           }`}
           style={{ boxShadow: raised ? undefined : 'inset 0 0 0 1px rgba(15,61,51,.08)' }}
         >
-          <Link href="/" className="shrink-0 rounded-lg" aria-label="Home">
+          <Link href="/" className="shrink-0 rounded-lg" aria-label={`${BRAND.name} home`}>
             <Logo />
           </Link>
 
@@ -92,18 +93,17 @@ export default function Header({ viewer }: { viewer: { name: string | null; isAd
               type="button"
               onClick={() => setSearch(true)}
               className="flex h-11 items-center gap-2 rounded-xl px-3 text-[15px] text-mute transition-colors hover:bg-spruce/[.06] hover:text-spruce md:min-w-[200px] md:bg-bench/80 md:shadow-[inset_0_0_0_1px_rgba(15,61,51,.08)]"
-              aria-label="Search laptops"
             >
               <Search size={19} strokeWidth={2} />
-              <span className="hidden md:inline">Search laptops</span>
-              <kbd className="ml-auto hidden rounded-md font-sans bg-white px-1.5 py-0.5 text-[11.5px] font-medium text-mute shadow-[0_0_0_1px_rgba(15,61,51,.1)] md:inline">Ctrl K</kbd>
+              <span className="sr-only md:not-sr-only">Search laptops</span>
+              <kbd aria-hidden className="ml-auto hidden rounded-md font-sans bg-white px-1.5 py-0.5 text-[11.5px] font-medium text-mute shadow-[0_0_0_1px_rgba(15,61,51,.1)] md:inline">Ctrl K</kbd>
             </button>
             <Link
               href={viewer ? (viewer.isAdmin ? '/admin' : '/account') : '/login'}
               className="flex h-11 items-center gap-2 rounded-xl px-3 text-[15px] font-medium text-ink transition-colors hover:bg-spruce/[.06]"
             >
               <User size={19} strokeWidth={2} aria-hidden />
-              <span className="hidden sm:inline">{viewer ? (viewer.isAdmin ? 'Admin' : viewer.name?.split(' ')[0] || 'Account') : 'Sign in'}</span>
+              <span className="sr-only sm:not-sr-only">{viewer ? (viewer.isAdmin ? 'Admin' : viewer.name?.split(' ')[0] || 'Account') : 'Sign in'}</span>
             </Link>
             <button
               type="button"

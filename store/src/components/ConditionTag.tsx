@@ -21,7 +21,7 @@ export default function ConditionTag({ grade, sku, className = '', hole }: { gra
       <dl className="mt-3 divide-y divide-spruce/15 border-y border-spruce/15 text-[13.5px]">
         {rows.map(([k, v]) => (
           <div key={k} className="flex items-baseline justify-between gap-3 py-[7px]">
-            <dt className="text-spruce/75">{k}</dt>
+            <dt className="text-spruce/90">{k}</dt>
             <dd className="text-right font-semibold">{v}</dd>
           </div>
         ))}

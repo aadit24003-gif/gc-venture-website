@@ -4,6 +4,8 @@ A fast, static website for **IT Rental Solutions** (itrentals.in): laptop, deskt
 
 Built with [Astro](https://astro.build). It outputs plain HTML/CSS/JS plus one small PHP file for forms, so it runs on the existing cPanel/GoDaddy-style hosting with no server changes.
 
+> **Also in this repository:** `store/` is a separate online store for certified refurbished laptops (working name "Encore"), with sign-in, Razorpay checkout, student verification and an admin area. See [store/README.md](store/README.md). The rental site below is unchanged by it.
+
 ---
 
 ## What's on the site

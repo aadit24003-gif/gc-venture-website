@@ -39,7 +39,7 @@ export default async function StudentsPage() {
 
   return (
     <div className="pb-10">
-      <section className="wrap grid items-center gap-14 pb-16 pt-10 md:pt-16 lg:grid-cols-[1.05fr_1fr]">
+      <section className="wrap grid items-center gap-14 overflow-x-clip pb-16 pt-10 md:pt-16 lg:grid-cols-[1.05fr_1fr] [&>*]:min-w-0">
         <div>
           <h1 className="max-w-[13ch] text-[46px] leading-[1.02] md:text-[72px]">Students pay {STUDENT.percent}% less on every laptop.</h1>
           <p className="mt-5 max-w-[52ch] text-[18px] text-mute">

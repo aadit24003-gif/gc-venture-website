@@ -62,7 +62,7 @@ export default async function Home() {
           </ul>
         </div>
         {hero && (
-          <div className="pb-20 pr-4 sm:pb-8 sm:pr-12 lg:pr-16">
+          <div className="pb-36 sm:pb-8 sm:pr-12 lg:pr-16">
             <HeroScan slug={hero.slug} title={hero.title} brand={hero.brand} art={hero.art} grade={heroGrade} price={heroPrice} />
           </div>
         )}
@@ -74,12 +74,12 @@ export default async function Home() {
         <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {brands.map((b) => (
             <li key={b.brand}>
-              <Link href={`/laptops?brand=${b.brand}`} className="group flex h-full items-center justify-between gap-4 rounded-[24px] bg-white px-5 py-5 transition-shadow hover:shadow-[0_20px_40px_-26px_rgba(15,61,51,.5)] md:px-6">
+              <Link href={`/laptops?brand=${b.brand}`} className="group flex h-full flex-col-reverse items-start justify-between gap-3 rounded-[24px] bg-white px-5 py-5 transition-shadow hover:shadow-[0_20px_40px_-26px_rgba(15,61,51,.5)] sm:flex-row sm:items-center sm:gap-4 md:px-6">
                 <span>
                   <span className="display block text-[22px] font-semibold text-spruce">{b.brand === 'Apple' ? 'MacBook' : b.brand}</span>
                   <span className="text-[14px] text-mute">{b.count} models{b.from ? `, from ${rupees(b.from)}` : ''}</span>
                 </span>
-                <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden className="shrink-0 text-spruce/80 transition-transform duration-300 group-hover:scale-110"><path d={BRAND_MARKS[b.brand.toLowerCase() as keyof typeof BRAND_MARKS]} fill="currentColor" /></svg>
+                <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden className="h-7 w-7 shrink-0 text-spruce/80 sm:h-[34px] sm:w-[34px] transition-transform duration-300 group-hover:scale-110"><path d={BRAND_MARKS[b.brand.toLowerCase() as keyof typeof BRAND_MARKS]} fill="currentColor" /></svg>
               </Link>
             </li>
           ))}
@@ -154,7 +154,9 @@ export default async function Home() {
             <p className="mt-4 text-[18px] text-spruce/85">Verify once with your college email or a photo of your ID. The discount applies to every order for a year.</p>
             <Link href="/students" className="btn btn-primary btn-lg mt-8">Get your student price</Link>
           </div>
-          <p aria-hidden className="price pointer-events-none absolute -bottom-10 right-4 select-none text-[220px] leading-none text-spruce/[.08] md:text-[320px]">{STUDENT.percent}%</p>
+          <svg aria-hidden className="pointer-events-none absolute -bottom-12 right-2 h-[230px] w-[460px] md:h-[330px] md:w-[640px]" viewBox="0 0 640 330">
+            <text x="640" y="300" textAnchor="end" fontSize="330" fontWeight="700" fill="#0f3d33" fillOpacity=".08" style={{ fontFamily: 'var(--font-display)', fontVariationSettings: "'wdth' 82" }}>{STUDENT.percent}%</text>
+          </svg>
         </div>
       </section>
 

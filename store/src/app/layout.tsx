@@ -40,14 +40,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en-IN" className={`${bricolage.variable} ${instrument.variable}`}>
       <body className="min-h-dvh flex flex-col">
-        <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] btn btn-tag">Skip to content</a>
         <CartProvider>
           {demo && (
-            <div className="bg-spruce text-[13.5px] text-white/85">
+            <aside aria-label="Demo mode" className="bg-spruce text-[13.5px] text-white/85">
               <p className="wrap py-2 text-center">
                 Demo mode: sign-in codes appear on screen{razorpayConfigured() ? '' : ' and payments are simulated'}. Nothing is charged.
               </p>
-            </div>
+            </aside>
           )}
           <Header viewer={viewer ? { name: viewer.user.name, isAdmin: viewer.isAdmin } : null} />
           <main id="main" className="flex-1">{children}</main>

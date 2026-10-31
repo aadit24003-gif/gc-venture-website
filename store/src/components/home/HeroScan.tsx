@@ -63,7 +63,7 @@ export default function HeroScan({ slug, title, brand, art, grade, price }: Prop
         </div>
       </div>
 
-      <div className="absolute -bottom-10 right-0 origin-top sm:-bottom-6 sm:right-[-4%] md:right-[-8%]">
+      <div className="absolute -bottom-36 right-0 origin-top sm:-bottom-6 sm:right-[-4%] md:right-[-8%]">
         <span className="absolute left-1/2 top-[-38px] h-10 w-px bg-spruce/35" aria-hidden />
         <motion.div
           className="qc-shadow origin-top"
@@ -71,14 +71,14 @@ export default function HeroScan({ slug, title, brand, art, grade, price }: Prop
           animate={done ? { rotate: [null, 7, 2.5] } : { rotate: -2 }}
           transition={{ duration: 0.9, ease: 'easeOut' }}
         >
-          <div className="qc-tag [--tag-w:236px] md:[--tag-w:252px]">
+          <div className="qc-tag [--tag-w:214px] sm:[--tag-w:236px] md:[--tag-w:252px]">
             <p className="display text-center text-[17px] font-bold leading-none">Condition report</p>
             <dl className="mt-3 border-y border-spruce/15 text-[13px]">
               {rows.map((r) => {
                 const shown = t >= r.at;
                 return (
                   <div key={r.k} className="flex items-baseline justify-between gap-3 border-b border-spruce/10 py-[6px] last:border-0">
-                    <dt className="text-spruce/75">{r.k}</dt>
+                    <dt className="text-spruce/90">{r.k}</dt>
                     <motion.dd className="text-right font-semibold" initial={false} animate={{ opacity: shown ? 1 : 0, x: shown ? 0 : 6 }} transition={{ duration: 0.25 }}>{r.v}</motion.dd>
                   </div>
                 );
@@ -86,10 +86,10 @@ export default function HeroScan({ slug, title, brand, art, grade, price }: Prop
             </dl>
             <div className="mt-3 flex items-end justify-between">
               <div>
-                <p className="text-[11.5px] text-spruce/75">Checks passed</p>
+                <p className="text-[11.5px] text-spruce/90">Checks passed</p>
                 <p className="price text-[30px] leading-none">{checks}<span className="text-[17px] text-spruce/60">/{CHECK_COUNT}</span></p>
               </div>
-              <motion.div initial={false} animate={{ opacity: done ? 1 : 0, scale: done ? 1 : 1.8, rotate: -8 }} transition={{ type: 'spring', stiffness: 380, damping: 16 }} className="rounded-lg border-[2.5px] border-pass px-2 py-1 text-pass">
+              <motion.div initial={false} animate={{ opacity: done ? 1 : 0, scale: done ? 1 : 1.8, rotate: -8 }} transition={{ type: 'spring', stiffness: 380, damping: 16 }} className="rounded-lg border-[2.5px] border-pass-deep px-2 py-1 text-pass-deep">
                 <span className="display text-[16px] font-extrabold leading-none">{g.label}</span>
               </motion.div>
             </div>
@@ -97,7 +97,7 @@ export default function HeroScan({ slug, title, brand, art, grade, price }: Prop
         </motion.div>
       </div>
 
-      <p className="mt-3 max-w-[52%] text-[13.5px] text-mute sm:max-w-[58%]">
+      <p className="mt-3 max-w-[38%] text-[13px] leading-snug text-mute sm:max-w-[58%] sm:text-[13.5px]">
         <Link href={`/laptops/${slug}?grade=${grade}`} className="font-medium text-spruce underline underline-offset-2">{title}</Link>, {g.label.toLowerCase()} grade, {rupees(price)}
       </p>
     </div>

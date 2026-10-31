@@ -161,7 +161,7 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
               if (!v) return null;
               const out = v.stock <= 0;
               return (
-                <label key={g} className={`relative cursor-pointer rounded-2xl border-[1.5px] bg-white p-3 transition-colors has-[:checked]:border-spruce has-[:checked]:bg-white has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-tag-2 ${out ? 'border-dashed border-line opacity-70' : 'border-line hover:border-spruce/50'}`}>
+                <label key={g} className={`relative cursor-pointer rounded-2xl border-[1.5px] bg-white p-3 transition-colors has-[:checked]:border-spruce has-[:checked]:bg-white has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-tag-2 ${out ? 'border-dashed border-line bg-bench/60' : 'border-line hover:border-spruce/50'}`}>
                   <input type="radio" name="grade" value={g} checked={grade === g} onChange={() => setGrade(g)} className="sr-only" />
                   <span className="block text-[15px] font-semibold text-spruce">{GRADES[g].label}</span>
                   <span className="mt-0.5 block text-[12.5px] leading-snug text-mute">{GRADES[g].short}</span>

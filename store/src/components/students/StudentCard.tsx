@@ -23,7 +23,7 @@ export default function StudentCard() {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-2 border-t border-dashed border-line px-6 py-3">
+        <div className="flex items-center gap-2 overflow-hidden border-t border-dashed border-line px-6 py-3">
           {Array.from({ length: 34 }, (_, i) => <span key={i} className="h-5 bg-spruce/70" style={{ width: i % 3 ? 1.5 : 3 }} />)}
         </div>
         <div className="stamp absolute bottom-[70px] right-7 rotate-[-12deg] rounded-xl border-[3px] border-pass px-3 py-1.5 text-pass">
