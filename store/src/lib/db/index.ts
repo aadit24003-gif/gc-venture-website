@@ -10,6 +10,7 @@
 import path from 'node:path';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import * as schema from './schema';
+export type { DB as Database };
 import { dataDir } from '../data-dir';
 
 export type DB = PostgresJsDatabase<typeof schema>;
@@ -70,9 +71,10 @@ async function setupPostgres(url: string, instance: DB) {
 }
 
 async function seedIfEmpty(instance: DB) {
-  const { seedCatalogue } = await import('./seed');
+  const { seedCatalogue, ensureSetup } = await import('./seed');
   const existing = await instance.select({ id: schema.products.id }).from(schema.products).limit(1);
   if (existing.length === 0) await seedCatalogue(instance);
+  await ensureSetup(instance);
 }
 
 export { schema };

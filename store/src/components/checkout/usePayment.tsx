@@ -32,15 +32,15 @@ function loadScript(): Promise<boolean> {
 export function usePayment() {
   const [demo, setDemo] = useState<{ number: string; amount: number; resolve: (o: Outcome) => void } | null>(null);
 
-  const pay = useCallback(async (number: string): Promise<{ outcome: Outcome; error?: string }> => {
-    const start = await beginPayment(number);
+  const pay = useCallback(async (number: string, key?: string | null): Promise<{ outcome: Outcome; error?: string }> => {
+    const start = await beginPayment(number, key);
     if (!start.ok) return { outcome: 'failed', error: start.error };
 
     if (start.mode === 'demo') {
       const outcome = await new Promise<Outcome>((resolve) => setDemo({ number, amount: start.amount, resolve }));
       setDemo(null);
       if (outcome === 'dismissed') return { outcome };
-      const r = await completeDemoPayment(number, outcome === 'paid' ? 'success' : 'failure');
+      const r = await completeDemoPayment(number, outcome === 'paid' ? 'success' : 'failure', key);
       if (!r.ok) return { outcome: 'failed', error: r.error };
       return { outcome, error: outcome === 'failed' ? 'The payment didn’t go through (simulated). Try again.' : undefined };
     }
@@ -56,16 +56,16 @@ export function usePayment() {
         name: start.name,
         description: start.description,
         prefill: start.prefill,
-        theme: { color: '#0F3D33' },
+        theme: { color: '#0E0F12' },
         handler: async (resp: RazorpayResponse) => {
           settled = true;
-          const r = await confirmRazorpayPayment(number, resp);
+          const r = await confirmRazorpayPayment(number, resp, key);
           resolve(r.ok ? { outcome: 'paid' } : { outcome: 'failed', error: r.error });
         },
         modal: { ondismiss: () => { if (!settled) resolve({ outcome: 'dismissed' }); }, confirm_close: true },
       });
       rzp.on('payment.failed', (resp) => {
-        void reportPaymentFailure(number, resp.error?.description ?? 'Payment failed');
+        void reportPaymentFailure(number, resp.error?.description ?? 'Payment failed', key);
       });
       rzp.open();
     });
@@ -74,22 +74,22 @@ export function usePayment() {
   const sheet = (
     <AnimatePresence>
       {demo && (
-        <motion.div className="fixed inset-0 z-[95] flex items-end justify-center bg-spruce/50 backdrop-blur-sm sm:items-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <motion.div className="fixed inset-0 z-[95] flex items-end justify-center bg-ink/50 backdrop-blur-sm sm:items-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div
             role="dialog" aria-modal="true" aria-labelledby="demo-pay-title"
             initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
             className="w-full max-w-[420px] rounded-t-[28px] bg-white p-6 sm:rounded-[28px]"
           >
-            <p className="inline-block rounded-md bg-tag px-2 py-1 text-[12px] font-semibold text-spruce">Demo payment</p>
+            <p className="inline-block rounded-md bg-accent px-2 py-1 text-[12px] font-semibold text-ink">Demo payment</p>
             <h2 id="demo-pay-title" className="mt-3 text-[26px]">Pay {rupees(demo.amount)}</h2>
             <p className="mt-2 text-[14.5px] text-mute">Razorpay keys aren’t set up yet, so this window stands in for the real one. No money moves. Choose what should happen:</p>
             <div className="mt-5 space-y-2">
               {[{ icon: Smartphone, label: 'UPI' }, { icon: CreditCard, label: 'Card' }].map(({ icon: I, label }) => (
-                <button key={label} type="button" className="flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-line px-4 py-3.5 text-left hover:border-spruce" onClick={() => demo.resolve('paid')}>
-                  <I size={20} className="text-spruce" /> <span className="flex-1 font-semibold text-spruce">Pay with {label}</span> <span className="text-[13px] text-pass">succeeds</span>
+                <button key={label} type="button" className="flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-line px-4 py-3.5 text-left hover:border-ink" onClick={() => demo.resolve('paid')}>
+                  <I size={20} className="text-ink" /> <span className="flex-1 font-semibold text-ink">Pay with {label}</span> <span className="text-[13px] text-ok">succeeds</span>
                 </button>
               ))}
-              <button type="button" className="flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-line px-4 py-3.5 text-left hover:border-alert" onClick={() => demo.resolve('failed')}>
+              <button type="button" className="flex w-full items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-line px-4 py-3.5 text-left hover:border-bad" onClick={() => demo.resolve('failed')}>
                 <span className="flex-1 font-semibold text-ink">Simulate a failed payment</span>
               </button>
             </div>

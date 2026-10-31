@@ -86,9 +86,10 @@ async function removeStrayMarks(buf) {
     (c.x1 < main.x0 - pad || c.x0 > main.x1 + pad || c.y1 < main.y0 - pad || c.y0 > main.y1 + pad));
   if (!stray.length) return buf;
   const out = Buffer.from(data);
+  // Whiten each stray cell plus one cell around it, so faint anti-aliased edges go too.
   for (const c of stray) for (const k of c.cells) {
     const cx = (k % cw) * C, cy = ((k / cw) | 0) * C;
-    for (let y = cy; y < Math.min(cy + C, H); y++) for (let x = cx; x < Math.min(cx + C, W); x++) {
+    for (let y = Math.max(0, cy - C); y < Math.min(cy + 2 * C, H); y++) for (let x = Math.max(0, cx - C); x < Math.min(cx + 2 * C, W); x++) {
       const i = (y * W + x) * 3; out[i] = out[i + 1] = out[i + 2] = 255;
     }
   }

@@ -8,14 +8,14 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Search, X } from 'lucide-react';
 import type { CardProduct } from '@/lib/products';
 import { rupees, gb } from '@/lib/format';
-import LaptopArt from './LaptopArt';
+import ProductImage from './ui/ProductImage';
 
 let cached: CardProduct[] | null = null;
 
-const SUGGEST = ['ThinkPad', 'MacBook Air', '16 GB', 'Under 30000', 'Latitude 7', '12th Gen'];
+const SUGGEST = ['ThinkPad', 'MacBook Air', '16 GB', 'Under 30000', 'Latitude 7', 'Thunderbolt'];
 
 function score(p: CardProduct, q: string): number {
-  const hay = `${p.title} ${p.family} ${p.cpuShort} ${p.ramGb}gb ${p.ramGb} gb ${p.screenIn}" ${p.year} ${p.uses.join(' ')}`.toLowerCase();
+  const hay = `${p.title} ${p.family} ${p.cpu} ${p.cpuShort} ${p.ramGb}gb ${p.ramGb} gb ${p.screenIn}" ${p.year} ${p.uses.join(' ')} ${p.tags.join(' ')}`.toLowerCase();
   const under = q.match(/under\s*₹?\s*([\d,]+)/i);
   if (under) {
     const cap = Number(under[1].replace(/,/g, '')) * 100;
@@ -71,7 +71,7 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[80] flex items-start justify-center bg-spruce/40 px-3 pt-[10vh] backdrop-blur-sm"
+          className="fixed inset-0 z-[80] flex items-start justify-center bg-ink/40 px-3 pt-[10vh] backdrop-blur-sm"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
         >
@@ -79,7 +79,7 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
             role="dialog" aria-modal="true" aria-label="Search laptops"
             initial={{ y: -14, scale: 0.98, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} exit={{ y: -8, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-            className="w-full max-w-[640px] overflow-hidden rounded-[24px] bg-white shadow-[0_40px_80px_-30px_rgba(15,61,51,.6)]"
+            className="w-full max-w-[640px] overflow-hidden rounded-[24px] bg-white shadow-[0_40px_80px_-30px_rgba(14,15,18,.5)]"
             onKeyDown={(e) => {
               if (e.key === 'Escape') onClose();
               if (e.key === 'ArrowDown') { e.preventDefault(); setSel((s) => Math.min(results.length - 1, s + 1)); }
@@ -101,7 +101,7 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
                 aria-controls="search-results"
                 aria-activedescendant={results[sel] ? `sr-${results[sel].id}` : undefined}
               />
-              <button type="button" onClick={onClose} className="rounded-lg p-2 text-mute hover:bg-bench hover:text-spruce" aria-label="Close search"><X size={20} /></button>
+              <button type="button" onClick={onClose} className="rounded-lg p-2 text-mute hover:bg-canvas hover:text-ink" aria-label="Close search"><X size={20} /></button>
             </div>
             {!q && (
               <div className="flex flex-wrap gap-2 px-5 pt-4">
@@ -123,14 +123,14 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
                     href={`/laptops/${p.slug}`}
                     onClick={onClose}
                     onMouseEnter={() => setSel(i)}
-                    className={`flex items-center gap-4 rounded-2xl px-3 py-2.5 ${i === sel ? 'bg-bench' : ''}`}
+                    className={`flex items-center gap-4 rounded-2xl px-3 py-2.5 ${i === sel ? 'bg-canvas' : ''}`}
                   >
-                    <LaptopArt art={p.art} brand={p.brand} slug={p.slug} className="w-[72px] shrink-0" flat />
+                    <span className="well h-[54px] w-[72px] shrink-0 rounded-lg border border-line p-1"><ProductImage image={p.image} art={p.art} brand={p.brand} slug={p.slug} title={p.title} sizes="72px" /></span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-spruce">{p.title}</span>
+                      <span className="block truncate font-semibold text-ink">{p.title}</span>
                       <span className="block truncate text-[14px] text-mute">{p.cpuShort}, {gb(p.ramGb)}, {gb(p.ssdGb)}, {p.screenIn}″</span>
                     </span>
-                    <span className="price shrink-0 text-[18px]">{rupees(p.fromPrice)}</span>
+                    <span className="shrink-0 text-right"><span className="price block text-[17px]">{rupees(p.fromPrice)}</span><span className="block text-[12px] text-mute">{p.inStock ? `${p.unitsOnSale} on sale` : 'Sold out'}</span></span>
                   </Link>
                 </li>
               ))}

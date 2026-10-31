@@ -136,6 +136,40 @@ function uses(r: Row, price: number): string[] {
   return [...u];
 }
 
+export const BRAND_INFO: { slug: string; name: string; description: string }[] = [
+  { slug: 'dell', name: 'Dell', description: 'Latitude business laptops: sturdy, easy to repair and upgrade, with full-size ports on the 5-series and light aluminium bodies on the 7-series.' },
+  { slug: 'hp', name: 'HP', description: 'EliteBook and ProBook business laptops: aluminium builds, good speakers and comfortable keyboards, from the value ProBook to the premium EliteBook.' },
+  { slug: 'lenovo', name: 'Lenovo', description: 'ThinkPads: the keyboard people keep for years, the red TrackPoint, and builds tested against military standards.' },
+  { slug: 'apple', name: 'Apple', description: 'MacBook Air and MacBook Pro with Apple silicon: silent, cool and long-lasting, with years of macOS updates ahead.' },
+];
+
+export const CATEGORY_INFO: { slug: string; name: string; description: string }[] = [
+  { slug: 'business', name: 'Business laptops', description: 'Dell Latitude, HP EliteBook and Lenovo ThinkPad: built for years of daily work, with the ports offices need.' },
+  { slug: 'macbooks', name: 'MacBooks', description: 'MacBook Air and Pro, Intel and Apple silicon.' },
+  { slug: 'ultralight', name: 'Ultralight', description: 'At or under 1.3 kg, for carrying all day.' },
+  { slug: 'student', name: 'Student picks', description: 'Reliable laptops for coursework and coding at student-friendly prices.' },
+  { slug: 'developers', name: 'For developers', description: 'Fast processors and 16 GB or room to upgrade, for IDEs, containers and virtual machines.' },
+  { slug: 'creators', name: 'For creators', description: 'Sharper, taller or colour-accurate screens for photo, design and video work.' },
+];
+
+/** Category slugs and tags for a model, worked out from its specs. */
+export function classify(p: { brand: string; weightKg: number | null; uses: string[]; ramGb: number; maxRamGb?: number; cpuGen: number | null; screenRes: string; ports: string[]; highlights: string[]; touch: boolean }) {
+  const cats = new Set<string>();
+  if (p.brand === 'Apple') cats.add('macbooks'); else cats.add('business');
+  if ((p.weightKg ?? 9) <= 1.3) cats.add('ultralight');
+  if (p.uses.includes('study')) cats.add('student');
+  if (p.uses.includes('code') && (p.ramGb >= 16 || (p.maxRamGb ?? 0) >= 32 || p.brand === 'Apple')) cats.add('developers');
+  if (p.uses.includes('design')) cats.add('creators');
+  const tags = new Set<string>();
+  if (p.ports.some((x) => /thunderbolt|tb/i.test(x))) tags.add('thunderbolt');
+  if (p.highlights.some((h) => /backlit/i.test(h)) || p.brand === 'Apple') tags.add('backlit');
+  if (/1920×1200|2560×16|3024|3072|16:10/.test(p.screenRes) || p.highlights.some((h) => /16:10/.test(h))) tags.add('16:10');
+  if (p.ports.some((x) => /ethernet/i.test(x))) tags.add('ethernet');
+  if (p.touch) tags.add('touch');
+  if ((p.cpuGen ?? 0) >= 11 || p.brand === 'Apple') tags.add('windows-11-ready');
+  return { categories: [...cats], tags: [...tags] };
+}
+
 export type SeedProduct = ReturnType<typeof buildCatalogue>[number];
 
 export function buildCatalogue() {
@@ -145,6 +179,7 @@ export function buildCatalogue() {
     const [genPrice, genNew] = r.gen ? BASE_BY_GEN[r.gen] ?? [30_000, 1_10_000] : [0, 0];
     const excellent = r.fixed ? r.fixed.price : tidy(genPrice * r.line);
     const newPrice = r.fixed ? r.fixed.newPrice : Math.round((genNew * r.line) / 1000) * 1000;
+    const portsList = r.ports.map((x) => (x === 'tb' ? 'Thunderbolt' : x));
     const cpuShort = r.brand === 'Apple' ? r.cpu.split(',')[0].replace('Apple ', '') : r.cpu.replace('Intel Core ', 'Core ').replace(/-.*$/, '') + (r.gen && r.gen < 15 ? ` ${r.gen}th Gen` : '');
     return {
       product: {
@@ -157,6 +192,7 @@ export function buildCatalogue() {
         newPrice: paise(newPrice), uses: uses(r, excellent), highlights: r.notes,
         description: r.description, images: [], art: r.art,
         featured: !!r.featured, active: true, sort: i,
+        ...classify({ brand: r.brand, weightKg: r.weight, uses: uses(r, excellent), ramGb: r.ram, maxRamGb: r.maxRam, cpuGen: r.gen, screenRes: r.res, ports: portsList, highlights: r.notes, touch: !!r.touch }),
       },
       variants: GRADE_ORDER.map((g, gi) => ({
         productId: slug, grade: g,

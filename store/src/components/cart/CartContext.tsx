@@ -1,93 +1,74 @@
 'use client';
 
 /**
- * The cart lives in the browser (localStorage) so it survives reloads and works
- * before sign-in. Prices here are a preview; checkout recomputes everything on the server.
+ * The cart lives on the server (see lib/cart.ts). This context holds the latest copy for the
+ * header count and the drawer, and calls server actions to change it.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { ArtSpec } from '@/lib/db/schema';
-import type { GradeKey } from '@/lib/config';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { CartView } from '@/lib/cart';
+import { addToCartAction, removeCartAction, updateCartAction, refreshCartAction } from '@/app/cart/actions';
 
-export type CartLine = {
-  key: string;
-  productId: string;
-  slug: string;
-  title: string;
-  brand: string;
-  art: ArtSpec;
-  grade: GradeKey;
-  ramGb: number;
-  ssdGb: number;
-  warrantyMonths: number;
-  qty: number;
-  unit: number;
-  maxQty: number;
-};
-
+type Sel = { ramGb: number; ssdGb: number; warrantyMonths: number };
 type Ctx = {
-  lines: CartLine[];
+  cart: CartView;
   count: number;
-  subtotal: number;
-  ready: boolean;
   open: boolean;
+  busy: boolean;
   setOpen: (v: boolean) => void;
-  add: (l: Omit<CartLine, 'key' | 'qty'> & { qty?: number }, opts?: { open?: boolean }) => void;
-  setQty: (key: string, qty: number) => void;
-  remove: (key: string) => void;
-  clear: () => void;
+  add: (unitId: string, sel: Sel, opts?: { open?: boolean }) => Promise<{ ok: boolean; error?: string }>;
+  update: (itemId: number, sel: Sel) => Promise<{ ok: boolean; error?: string }>;
+  remove: (itemId: number) => Promise<void>;
+  refresh: () => Promise<void>;
+  has: (unitId: string) => boolean;
 };
 
 const CartCtx = createContext<Ctx | null>(null);
-const STORE = 'cart:v1';
 
-export const lineKey = (l: Pick<CartLine, 'productId' | 'grade' | 'ramGb' | 'ssdGb' | 'warrantyMonths'>) =>
-  `${l.productId}|${l.grade}|${l.ramGb}|${l.ssdGb}|${l.warrantyMonths}`;
-
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [lines, setLines] = useState<CartLine[]>([]);
-  const [ready, setReady] = useState(false);
+export function CartProvider({ initial, children }: { initial: CartView; children: React.ReactNode }) {
+  const [cart, setCart] = useState<CartView>(initial);
   const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
+  const add = useCallback<Ctx['add']>(async (unitId, sel, opts) => {
+    setBusy(true);
     try {
-      const raw = localStorage.getItem(STORE);
-      if (raw) setLines(JSON.parse(raw));
-    } catch { /* private mode or bad data: start empty */ }
-    setReady(true);
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === STORE) {
-        try { setLines(e.newValue ? JSON.parse(e.newValue) : []); } catch { /* ignore */ }
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
+      const r = await addToCartAction(unitId, sel);
+      if (!r.ok) return { ok: false, error: r.error };
+      setCart(r.cart);
+      if (opts?.open !== false) setOpen(true);
+      router.refresh();
+      return { ok: true };
+    } finally { setBusy(false); }
+  }, [router]);
 
-  useEffect(() => {
-    if (!ready) return;
-    try { localStorage.setItem(STORE, JSON.stringify(lines)); } catch { /* ignore */ }
-  }, [lines, ready]);
+  const update = useCallback<Ctx['update']>(async (itemId, sel) => {
+    setBusy(true);
+    try {
+      const r = await updateCartAction(itemId, sel);
+      if (!r.ok) return { ok: false, error: r.error };
+      setCart(r.cart);
+      router.refresh();
+      return { ok: true };
+    } finally { setBusy(false); }
+  }, [router]);
 
-  const add = useCallback<Ctx['add']>((l, opts) => {
-    const key = lineKey(l);
-    setLines((prev) => {
-      const found = prev.find((x) => x.key === key);
-      if (found) return prev.map((x) => (x.key === key ? { ...x, qty: Math.min(x.maxQty, x.qty + (l.qty ?? 1)), unit: l.unit } : x));
-      return [...prev, { ...l, key, qty: Math.min(l.maxQty, l.qty ?? 1) }];
-    });
-    if (opts?.open !== false) setOpen(true);
-  }, []);
-  const setQty = useCallback((key: string, qty: number) => {
-    setLines((prev) => prev.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.min(x.maxQty, qty)) } : x)));
-  }, []);
-  const remove = useCallback((key: string) => setLines((prev) => prev.filter((x) => x.key !== key)), []);
-  const clear = useCallback(() => setLines([]), []);
+  const remove = useCallback(async (itemId: number) => {
+    setBusy(true);
+    try {
+      const r = await removeCartAction(itemId);
+      if (r.ok) setCart(r.cart);
+      router.refresh();
+    } finally { setBusy(false); }
+  }, [router]);
+
+  const refresh = useCallback(async () => setCart(await refreshCartAction()), []);
 
   const value = useMemo<Ctx>(() => ({
-    lines, ready, open, setOpen, add, setQty, remove, clear,
-    count: lines.reduce((n, l) => n + l.qty, 0),
-    subtotal: lines.reduce((n, l) => n + l.qty * l.unit, 0),
-  }), [lines, ready, open, add, setQty, remove, clear]);
+    cart, count: cart.count, open, busy, setOpen, add, update, remove, refresh,
+    has: (unitId) => cart.lines.some((l) => l.unitId === unitId),
+  }), [cart, open, busy, add, update, remove, refresh]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }

@@ -7,22 +7,17 @@ import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { otps } from '../db/schema';
 import { BRAND, isDemo } from '../config';
+import { authSecret } from './secret';
 import { sendOtpSms, smsConfigured } from '../providers/sms';
 import { emailConfigured, layout, sendEmail } from '../providers/email';
 
-export type Purpose = 'login' | 'student_email';
+export type Purpose = 'login' | 'student_email' | 'verify_phone';
 export type Channel = 'sms' | 'email';
 
 const TTL_MIN = 10;
 const MAX_TRIES = 5;
 
-function secret() {
-  const s = process.env.AUTH_SECRET;
-  if (s) return s;
-  if (process.env.NODE_ENV === 'production' && !isDemo()) throw new Error('AUTH_SECRET is not set');
-  return 'dev-only-secret-change-me';
-}
-const hash = (dest: string, code: string) => crypto.createHmac('sha256', secret()).update(`${dest}:${code}`).digest('hex');
+const hash = (dest: string, code: string) => crypto.createHmac('sha256', authSecret()).update(`${dest}:${code}`).digest('hex');
 
 /** Normalises an Indian mobile number or an email address. Returns null if neither. */
 export function parseDestination(raw: string): { channel: Channel; destination: string } | null {
@@ -68,14 +63,14 @@ export async function sendCode(input: { purpose: Purpose; channel: Channel; dest
   try {
     if (input.channel === 'sms') await sendOtpSms(input.destination, code);
     else {
-      const what = input.purpose === 'login' ? `sign in to ${BRAND.name}` : 'confirm your college email';
+      const what = input.purpose === 'login' ? `sign in to ${BRAND.name}` : input.purpose === 'verify_phone' ? 'confirm your number' : 'confirm your college email';
       await sendEmail({
         to: input.destination,
         subject: `${code} is your ${BRAND.name} code`,
         text: `Your code to ${what} is ${code}. It expires in ${TTL_MIN} minutes. If you did not ask for it, ignore this email.`,
         html: layout(`Your code is ${code}`, `<p style="font-size:15px;line-height:1.6">Use this code to ${what}. It expires in ${TTL_MIN} minutes.</p>
-<p style="font-size:34px;letter-spacing:8px;font-weight:bold;color:#0F3D33;margin:20px 0">${code}</p>
-<p style="font-size:13px;color:#5C6B66">If you did not ask for this code, you can ignore this email.</p>`),
+<p style="font-size:34px;letter-spacing:8px;font-weight:bold;color:#101114;margin:20px 0">${code}</p>
+<p style="font-size:13px;color:#62666E">If you did not ask for this code, you can ignore this email.</p>`),
       });
     }
   } catch (e) {
