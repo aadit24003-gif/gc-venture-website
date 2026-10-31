@@ -346,3 +346,56 @@ html.scenes [data-scene='zoom'] [data-zoom] {
   opacity: calc(0.35 + var(--p, 1) * 0.65);
   will-change: transform;
 }
+
+/* ── Glass ─────────────────────────────────────────────────────────────── */
+@layer components {
+  .glass-dark {
+    background: linear-gradient(160deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .025) 55%, rgba(255, 255, 255, .05));
+    border: 1px solid rgba(255, 255, 255, .12);
+    -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 40px 80px -48px rgba(0, 0, 0, .9);
+  }
+  .glass-light {
+    background: linear-gradient(160deg, rgba(255, 255, 255, .94), rgba(246, 246, 248, .80));
+    border: 1px solid rgba(255, 255, 255, .7);
+    -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+    box-shadow: inset 0 1px 0 #fff, 0 40px 80px -48px rgba(0, 0, 0, .85);
+  }
+  /* A soft light that follows the pointer across glass panels (position set by Scenes.tsx). */
+  .spot { isolation: isolate; }
+  .spot::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit; opacity: 0;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .14), transparent 60%);
+    transition: opacity .4s;
+  }
+  .glass-light.spot::before { background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 90, 31, .10), transparent 60%); }
+  .spot:hover::before { opacity: 1; }
+  .spot > * { position: relative; z-index: 1; }
+
+  /* Light sweeping across a button on hover. */
+  .shine { position: relative; overflow: hidden; }
+  .shine::after {
+    content: ''; position: absolute; inset: 0; transform: translateX(-120%) skewX(-20deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+    transition: transform .8s var(--ease-out-soft);
+  }
+  .shine:hover::after { transform: translateX(120%) skewX(-20deg); }
+
+  /* Glowing blobs that drift slowly behind the glass. */
+  .orb { position: absolute; z-index: 0; border-radius: 50%; filter: blur(90px); pointer-events: none; animation: orb 20s ease-in-out infinite alternate; }
+  .orb-2 { animation-duration: 26s; animation-delay: -6s; }
+  .orb-3 { animation-duration: 32s; animation-delay: -12s; }
+}
+@keyframes orb { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(60px, 40px, 0) scale(1.12); } 100% { transform: translate3d(-40px, 70px, 0) scale(.95); } }
+@media (prefers-reduced-motion: reduce) { .orb { animation: none; } }
+
+/* Every filled button gets the light sweep on hover. */
+@layer components {
+  .btn-accent, .btn-primary { position: relative; overflow: hidden; isolation: isolate; }
+  .btn-accent::after, .btn-primary::after {
+    content: ''; position: absolute; inset: 0; z-index: -1; transform: translateX(-120%) skewX(-20deg); pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent);
+    transition: transform .8s var(--ease-out-soft);
+  }
+  .btn-accent:hover::after, .btn-primary:hover::after { transform: translateX(120%) skewX(-20deg); }
+}

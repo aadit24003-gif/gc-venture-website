@@ -87,11 +87,11 @@ export default function Header({ viewer, bookingAmount = null }: { viewer: Viewe
           </div>
         </div>
       </header>
-      <div className="bg-canvas text-center text-[14px] text-ink-2">
+      <div className="border-b border-white/10 bg-[#0f0f11] text-center text-[14px] text-white/75">
         <p className="wrap flex flex-wrap items-center justify-center gap-x-2 py-2.5">
           <Video size={15} className="hidden text-accent sm:block" aria-hidden="true" />
-          <span>{bookingAmount != null ? <>Book any laptop for <b>{rupees(bookingAmount)}</b>. See it on a video call, pay the rest on delivery.</> : 'See your exact laptop on a video call before it ships.'}</span>
-          <Link href="/#how" className="font-semibold text-accent-ink hover:underline">How it works ›</Link>
+          <span>{bookingAmount != null ? <>Book any laptop for <b className="text-white">{rupees(bookingAmount)}</b>. See it on a video call, pay the rest on delivery.</> : 'See your exact laptop on a video call before it ships.'}</span>
+          <Link href="/#how" className="font-semibold text-gold-hi hover:underline">How it works ›</Link>
         </p>
       </div>
 

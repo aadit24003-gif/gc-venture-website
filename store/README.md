@@ -92,12 +92,12 @@ Everything marked `[CONFIRM]` in the code is a working default. The full list, w
 
 ## Design
 
-- **Idea:** Apple-style storefront in black, white and orange. A slim black navigation bar, a light ribbon with the booking offer, then full-width black and light-grey sections with big centred headlines, two pill buttons (orange filled, orange outline) and large laptop photos. The page answers "why should I trust you?" with the booking flow: book for ₹299, see the exact unit on video, match the serial on delivery, then pay the balance.
+- **Idea:** Apple-style storefront in black, white and orange, with glass. A slim black navigation bar and a dark ribbon with the booking offer lead into a dark stage with slowly drifting orange glows: a short headline (business-grade laptops at low prices), then frosted-glass brand tiles (Dell Latitude, HP EliteBook, ThinkPad, MacBook Air, students) with big background-free laptop photos. The next scroll answers "why trust us?" in five glass steps: choose your model, book it for ₹299, have a look on video, match the serial number, then finalise. The page answers "why should I trust you?" with the booking flow: book for ₹299, see the exact unit on video, match the serial on delivery, then pay the balance.
 - **Logo:** `src/components/Logo.tsx`: a black tile (white on dark backgrounds) with a bold "L" drawn as an open laptop and an orange camera dot; wordmark "lappy" plus "club" in orange. Favicon `src/app/icon.svg`.
 - **Colour:** white and Apple grey `#F5F5F7`, black `#111111`, orange `#FF5A1F` for buttons, highlights and savings. Status colours only for states.
 - **Type:** Inter throughout, Geist Mono for unit codes, serial numbers and measurements. Self-hosted.
 - **Photos on black:** `scripts/make-cutouts.cjs` removes the white background from a few manufacturer photos (`public/products/<slug>/cutout.webp`) so they sit cleanly on dark sections. Run `node scripts/make-cutouts.cjs <slug>:1` for another model.
-- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): laptop photos grow into place as their section scrolls up, sections and cards rise in turn, the "how it works" line fills, and every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
+- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): laptop photos grow into place as their tile scrolls up and lift on hover, a soft light follows the pointer across glass panels, glows drift behind the glass, the savings figure counts up, filled buttons get a light sweep on hover, sections and cards rise in turn, the steps line fills as you scroll, and every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
 
 ## Booking flow
 

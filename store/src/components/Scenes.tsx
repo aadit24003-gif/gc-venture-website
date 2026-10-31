@@ -15,6 +15,8 @@ import { useEffect } from 'react';
  * - data-scene="ticks": list items inside get the class "done" one by one.
  * - [data-reveal]: gets "is-in" once it enters the window (its [data-reveal-item]
  *   children follow in turn; lines of a [data-reveal="lines"] heading slide up).
+ * - [data-count]: counts up from 0 the first time it is seen.
+ * - [data-spot]: a light follows the pointer across it (--mx, --my).
  *
  * Everything is gated on <html class="scenes">, which is never added when the visitor
  * prefers reduced motion: without it every element shows its finished layout.
@@ -58,6 +60,36 @@ function init(): () => void {
       io.unobserve(el);
     }
   }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
+
+  /* Numbers that count up the first time they come into view ([data-count]). */
+  const counters = [...document.querySelectorAll<HTMLElement>('[data-count]')];
+  const countIo = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const el = e.target as HTMLElement;
+      countIo.unobserve(el);
+      const to = Number(el.dataset.count);
+      if (!Number.isFinite(to)) continue;
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const k = Math.min(1, (t - t0) / 1400);
+        el.textContent = String(Math.round(to * (1 - Math.pow(1 - k, 3))));
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+  }, { threshold: 0.6 });
+  counters.forEach((el) => countIo.observe(el));
+
+  /* A soft light that follows the pointer across glass panels ([data-spot]). */
+  const onMove = (ev: PointerEvent) => {
+    const el = (ev.target as HTMLElement).closest<HTMLElement>('[data-spot]');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${ev.clientX - r.left}px`);
+    el.style.setProperty('--my', `${ev.clientY - r.top}px`);
+  };
+  document.addEventListener('pointermove', onMove, { passive: true });
   reveals.forEach((el) => {
     // already on screen at load: show at once, with the entrance animation
     io.observe(el);
@@ -69,7 +101,7 @@ function init(): () => void {
     pinned: false, top: 0, height: 0, span: 0,
     start: parseFloat(el.dataset.start ?? '0.9'), end: parseFloat(el.dataset.end ?? '0.4'), cur: -1, shown: -1,
   }));
-  if (!scenes.length) return () => io.disconnect();
+  if (!scenes.length) return () => { io.disconnect(); countIo.disconnect(); document.removeEventListener('pointermove', onMove); };
 
   // clientHeight, not innerHeight: steadier on phones while the address bar moves
   const viewH = () => document.documentElement.clientHeight || innerHeight;
@@ -140,6 +172,8 @@ function init(): () => void {
 
   return () => {
     io.disconnect();
+    countIo.disconnect();
+    document.removeEventListener('pointermove', onMove);
     ro.disconnect();
     removeEventListener('scroll', kick);
     removeEventListener('resize', relayout);

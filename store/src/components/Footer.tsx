@@ -18,7 +18,7 @@ export default async function Footer() {
   return (
     <footer className="mt-24 bg-canvas text-[13.5px] text-mute">
       <div className="border-b border-line-2">
-        <ul className="wrap grid grid-cols-2 gap-x-6 gap-y-5 py-8 text-[14px] md:grid-cols-4">
+        <ul data-reveal className="wrap grid grid-cols-2 gap-x-6 gap-y-5 py-8 text-[14px] md:grid-cols-4">
           {[
             [Video, 'Video check before dispatch', 'See your exact laptop and its serial'],
             [ScanLine, 'Match the serial on delivery', 'Don’t accept it if it doesn’t match'],
@@ -26,7 +26,7 @@ export default async function Footer() {
             [RefreshCcw, `${POLICY.returnDays}-day returns`, 'Free pickup from your door'],
           ].map(([Icon, t, d]) => {
             const I = Icon as typeof Video;
-            return <li key={t as string} className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-accent"><I size={19} aria-hidden="true" /></span><span><b className="block text-ink">{t as string}</b>{d as string}</span></li>;
+            return <li key={t as string} data-reveal-item className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-accent"><I size={19} aria-hidden="true" /></span><span><b className="block text-ink">{t as string}</b>{d as string}</span></li>;
           })}
         </ul>
       </div>
