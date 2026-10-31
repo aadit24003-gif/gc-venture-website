@@ -2,16 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { confirmManualRefund, issueRefund, reconcilePayment, saveAdminNote, updateOrderStatus } from '../actions';
+import { confirmManualRefund, issueRefund, reconcilePayment, saveAdminNote, shipWithShiprocket, updateOrderStatus } from '../actions';
 import { toast } from '@/components/Toaster';
 import { STATUS } from '@/lib/order-status';
 
 type Props = {
   order: { id: string; status: string; adminNote: string | null; carrier: string | null; awb: string | null; trackingUrl: string | null; online: boolean; paid: boolean };
-  next: string[]; refundable: number; manualRefunds: { id: string; amount: string }[]; canManage: boolean; canRefund: boolean;
+  next: string[]; refundable: number; manualRefunds: { id: string; amount: string }[]; canManage: boolean; canRefund: boolean; shiprocket?: boolean;
 };
 
-export default function OrderControls({ order, next, refundable, manualRefunds, canManage, canRefund }: Props) {
+export default function OrderControls({ order, next, refundable, manualRefunds, canManage, canRefund, shiprocket }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [status, setStatus] = useState(next.find((s) => s !== 'cancelled') ?? next[0] ?? '');
@@ -50,6 +50,7 @@ export default function OrderControls({ order, next, refundable, manualRefunds, 
             onClick={() => { if (status === 'cancelled' && !confirm(`Cancel this order, put its units back on sale${order.paid && order.online ? ' and refund the customer in full' : ''}?`)) return; run(() => updateOrderStatus({ orderId: order.id, status: status as never, carrier, awb, trackingUrl: url, note, location: loc }), `Marked ${STATUS[status]?.label.toLowerCase()}`); }}>
             {pending ? 'Saving…' : `Mark ${STATUS[status]?.label.toLowerCase() ?? status}`}
           </button>
+          {status === 'shipped' && shiprocket && <button type="button" className="btn btn-ghost btn-sm mt-2 w-full" disabled={pending} onClick={() => run(() => shipWithShiprocket(order.id))}>Book with Shiprocket instead (AWB and label)</button>}
           {status === 'shipped' && <p className="hint">The customer gets the tracking details by email{' '}and SMS/WhatsApp if set up.</p>}
           {status === 'delivered' && <p className="hint">Starts each laptop’s warranty and, for pay on delivery, records the payment as collected.</p>}
         </section>

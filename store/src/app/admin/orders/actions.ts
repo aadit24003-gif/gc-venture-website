@@ -80,3 +80,22 @@ export async function reconcilePayment(orderId: string): Promise<R> {
   revalidatePath('/admin/orders', 'layout');
   return done ? { ok: true, message: 'Payment found and the order is confirmed.' } : { ok: false, error: 'Payment found, but the order was already cancelled. Refund it or contact the customer.' };
 }
+
+/** Books the shipment with Shiprocket (when configured) and marks the order shipped. */
+export async function shipWithShiprocket(orderId: string): Promise<R> {
+  const v = await staffCan('orders.manage');
+  if (!v) return deny;
+  const { shiprocketConfigured, createShiprocketShipment } = await import('@/lib/shipping');
+  if (!shiprocketConfigured()) return { ok: false, error: 'Shiprocket is not connected. Add SHIPROCKET_EMAIL and SHIPROCKET_PASSWORD, or enter the AWB by hand.' };
+  const d = await db();
+  const [o] = await d.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!o || o.status !== 'packed') return { ok: false, error: 'Mark the order packed first.' };
+  try {
+    const s = await createShiprocketShipment(o);
+    const r = await setStatus(o.id, 'shipped', { carrier: s.carrier, awb: s.awb, trackingUrl: s.trackingUrl, note: s.labelUrl ? `Label: ${s.labelUrl}` : undefined }, v);
+    revalidatePath('/admin/orders', 'layout');
+    return r.ok ? { ok: true, message: `Booked with ${s.carrier}, AWB ${s.awb}.${s.labelUrl ? ' Label link is in the history.' : ''}` } : r;
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message.slice(0, 300) : 'Shiprocket failed.' };
+  }
+}

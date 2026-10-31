@@ -11,13 +11,14 @@ const GROUPS: { title: string; items: [string, string][] }[] = [
     ['Where do your laptops come from?', 'Mostly from companies replacing their fleets every three to four years, and from our own rental business. Every one is checked for theft records and locks before we take it.'],
     ['Is refurbished the same as second-hand?', `No. Every laptop is tested on ${CHECK_COUNT} points, repaired with matching parts where needed, cleaned, wiped and reinstalled, then graded and covered by a ${POLICY.warrantyMonths}-month warranty.`],
     ['What do the grades mean?', 'Pristine looks close to new, Excellent has light marks you see up close, Good has visible wear and costs less. All grades work exactly the same.'],
-    ['Will I get the exact laptop in the picture?', 'The picture is an illustration of the model. Ask on WhatsApp and we send photos of the unit before it ships.'],
+    ['Will I get the exact laptop I choose?', 'Yes. Every listing is a specific unit with its own ID, grade, measured battery and SSD health, cosmetic notes and inspection report. The photos at the top of a model’s page are the manufacturer’s; ask on WhatsApp if you’d like photos of your unit before it ships.'],
     ['Can I add memory or storage?', 'Yes, on models with free slots; choose it on the product page and we fit and test it before dispatch.'],
   ] },
   { title: 'Orders and delivery', items: [
     ['How long does delivery take?', 'Two to four working days to most cities, up to a week elsewhere, after one to two days to re-test and pack. Delivery is free and insured.'],
-    ['How do I track my order?', 'Sign in and open Your account, or use the link in your confirmation email. You also get the courier’s tracking number when it ships.'],
-    ['Can I cancel?', 'Yes, any time before it ships, for a full refund.'],
+    ['How do I track my order?', 'Open it from your account, from the link in your confirmation email, or on the Track an order page with your order number and email or phone. It shows eight steps, from final inspection to delivery, and the courier’s tracking number once it ships.'],
+    ['Can I buy without an account?', 'Yes. Check out as a guest with your email and phone; you can create an account later with the same email and your orders appear in it.'],
+    ['Can I cancel?', 'Yes, from the order page, until we start packing; online payments are refunded automatically.'],
   ] },
   { title: 'Payments', items: [
     ['How can I pay?', `UPI, debit and credit cards, net banking and wallets through Razorpay; card EMI from 3 to 12 months; or pay on delivery for orders up to ${rupees(POLICY.cod.maxOrder)}.`],

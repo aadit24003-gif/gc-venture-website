@@ -31,7 +31,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: p.seoTitle || `Refurbished ${p.title} (${p.cpuShort}, ${gb(p.ramGb)}, ${gb(p.ssdGb)})`,
     description: p.seoDescription || `${p.title}, certified refurbished, from ${rupees(c.fromPrice)}. ${c.unitsOnSale} inspected ${c.unitsOnSale === 1 ? 'unit' : 'units'} with measured battery health. ${POLICY.warrantyMonths}-month warranty.`,
     alternates: { canonical: `/laptops/${p.slug}` },
-    openGraph: p.images[0] ? { images: [{ url: p.images[0].src, width: p.images[0].width, height: p.images[0].height }] } : undefined,
   };
 }
 

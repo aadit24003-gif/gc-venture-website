@@ -12,6 +12,7 @@ import { GRADES, type GradeKey } from '@/lib/config';
 import { formatDate, formatPhone, gb, rupees } from '@/lib/format';
 import { PageHead, Panel } from '../../ui';
 import OrderControls from './OrderControls';
+import { shiprocketConfigured } from '@/lib/shipping';
 
 export default async function AdminOrder({ params }: { params: Promise<{ number: string }> }) {
   const v = await requireStaff('orders.view');
@@ -100,7 +101,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ number:
             order={{ id: o.id, status: o.status, adminNote: o.adminNote, carrier: o.courier ?? ship?.carrier ?? null, awb: o.trackingNumber ?? ship?.awb ?? null, trackingUrl: o.trackingUrl ?? ship?.trackingUrl ?? null, online: o.paymentMethod === 'razorpay' || o.paymentMethod === 'demo', paid: o.paymentStatus === 'paid' }}
             next={NEXT_STATUS[o.status] ?? []} refundable={canRefundAmt}
             manualRefunds={refunds.filter((r) => r.status === 'manual').map((r) => ({ id: r.id, amount: `${rupees(r.amount)} · ${r.reason}` }))}
-            canManage={v.can('orders.manage')} canRefund={v.can('refunds.manage')}
+            canManage={v.can('orders.manage')} canRefund={v.can('refunds.manage')} shiprocket={shiprocketConfigured()}
           />
           <Panel title="Ship to">
             <p className="text-[14px] leading-relaxed"><b>{o.address.name}</b>, {formatPhone(o.address.phone)}<br />{o.address.line1}{o.address.line2 ? `, ${o.address.line2}` : ''}{o.address.landmark ? `, near ${o.address.landmark}` : ''}<br />{o.address.city}, {o.address.state} {o.address.pincode}</p>

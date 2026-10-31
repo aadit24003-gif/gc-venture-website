@@ -6,6 +6,7 @@ import { countView } from '@/lib/products';
 import { recordView } from '@/lib/shopping';
 import { deliveryWindow, shortDate } from '@/lib/delivery';
 import { getSettings } from '@/lib/settings';
+import { serviceability } from '@/lib/shipping';
 
 /** Counts a product page view and remembers it as recently viewed. */
 export async function trackView(productId: string) {
@@ -29,5 +30,9 @@ export async function checkPincode(pin: string): Promise<PinResult> {
   if (s.shipping.blockedPinPrefixes.some((x) => p.startsWith(x))) return { ok: false, error: 'Sorry, we don’t deliver to this PIN code yet.' };
   const w = deliveryWindow(p);
   if (!w) return { ok: false, error: 'Enter a 6-digit PIN code.' };
-  return { ok: true, window: `${shortDate(w.from)} – ${shortDate(w.to)}`, cod: s.shipping.codEnabled, free: s.shipping.flatFee === 0 };
+  // With Shiprocket connected, ask the couriers; otherwise use the regional estimate.
+  const sr = await serviceability(s.shipping.pickupPincode, p, false);
+  if (sr && !sr.serviceable) return { ok: false, error: 'Couriers don’t deliver to this PIN code yet. Contact us and we’ll find a way.' };
+  const codOk = s.shipping.codEnabled && (sr ? (await serviceability(s.shipping.pickupPincode, p, true))?.cod ?? true : true);
+  return { ok: true, window: `${shortDate(w.from)} – ${shortDate(w.to)}`, cod: codOk, free: s.shipping.flatFee === 0 };
 }
