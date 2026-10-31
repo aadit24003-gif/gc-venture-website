@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Check, Lock, Receipt, ShieldCheck, Truck } from 'lucide-react';
-import { BRAND, CHECK_COUNT, CHECKS, GRADES, GRADE_ORDER, LEGAL, POLICY, STUDENT } from '@/lib/config';
+import { ArrowRight, BadgeCheck, Battery, ClipboardCheck, Cpu, GraduationCap, MousePointerClick, Plane, Receipt, RefreshCcw, ScanLine, ShieldCheck, Video, Wallet } from 'lucide-react';
+import { CHECK_COUNT, CHECKS, GRADES, GRADE_ORDER, LEGAL, POLICY, STUDENT } from '@/lib/config';
 import { allProducts, toCard, type CardProduct } from '@/lib/products';
 import { latestInspection } from '@/lib/inventory';
 import { featuredReviews } from '@/lib/reviews';
 import { getViewer } from '@/lib/auth/session';
 import { wishlistIds } from '@/lib/shopping';
-import { BUDGETS, GENS, priceFor } from '@/lib/filters';
+import { BUDGETS, GENS, USES, priceFor } from '@/lib/filters';
 import { rupees } from '@/lib/format';
 import { savedPct } from '@/lib/pricing';
 import { getSettings } from '@/lib/settings';
@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic';
 
 function Rail({ items, wished, label }: { items: CardProduct[]; wished: Set<string>; label: string }) {
   return (
-    <ul aria-label={label} data-reveal className="rail mt-12 auto-cols-[78%] sm:auto-cols-[45%] md:auto-cols-[31%] xl:auto-cols-[calc((100%-60px)/4)]">
+    <ul aria-label={label} data-reveal className="rail mt-6 auto-cols-[78%] sm:auto-cols-[45%] md:auto-cols-[31%] xl:auto-cols-[calc((100%-48px)/4)]">
       {items.map((p, i) => <li key={p.id} data-reveal-item><ProductCard p={p} wished={wished.has(p.id)} priority={i < 2} /></li>)}
     </ul>
   );
@@ -47,6 +47,7 @@ export default async function Home() {
     };
   }
 
+  const heroCard = heroProduct ? cards.find((c) => c.id === heroProduct.id) ?? null : null;
   const featured = inStock.filter((c) => c.featured).slice(0, 8);
   const popularPool = [...inStock].sort((a, b) => b.popularity - a.popularity);
   const hasPopularity = popularPool.filter((c) => c.popularity > 0).length >= 4;
@@ -67,7 +68,14 @@ export default async function Home() {
     { key: 'm', label: 'Apple M-series', note: 'Silent, all-day battery', q: 'cpu=apple' },
   ].map((x) => ({ ...x, n: inStock.filter((c) => (x.key === 'm' ? /^m\d/.test(c.cpuTier) : x.key === '10' ? [10, 11].includes(c.cpuGen ?? 0) : x.key === '12' ? [12, 13].includes(c.cpuGen ?? 0) : GENS.find((g) => g.key === x.key)!.test(c))).length }));
 
+  const bookAmt = settings.shipping.bookingEnabled ? rupees(settings.shipping.bookingAmount) : null;
   const faq: [string, string][] = [
+    ...(bookAmt ? [
+      [`How does booking for ${bookAmt} work?`, `Choose “Book now” at checkout and pay ${bookAmt} online. The laptop is taken off sale for you and the ${bookAmt} comes off its price. Before dispatch we video-call you and show this exact laptop, its condition and its serial number. You pay the balance on delivery, after matching the serial number.`],
+      ['What if I don’t like what I see on the video call?', `Cancel before we dispatch it and your ${bookAmt} is refunded in full.`],
+    ] as [string, string][] : []),
+    ['Are your laptops imported?', 'Yes. All our laptops are imported business-grade models (Lenovo ThinkPad, Dell Latitude, HP EliteBook and Apple MacBook), inspected and graded by us before they are listed.'],
+    ['How do I know I’ll get the laptop I paid for?', 'Your order page shows the serial number of your exact unit. We show it to you on a video call before dispatch, and you can check it against the sticker under the laptop on delivery. If it doesn’t match, don’t accept the delivery.'],
     ['Is refurbished the same as second-hand?', `No. A second-hand laptop is sold as it is. Each of ours is tested on ${CHECK_COUNT} points, repaired with matching parts where needed, deep cleaned, wiped and reinstalled, graded, and covered by a ${POLICY.warrantyMonths}-month warranty.`],
     ['Will I get the exact laptop I see?', 'Yes. Every listing is a specific unit with its own ID, grade, measured battery and SSD health and cosmetic notes. The photos at the top of a model’s page are the manufacturer’s; your unit’s condition is described in its report.'],
     ['What does the warranty cover?', `Any hardware fault that isn’t caused by a drop, liquid or tampering, for ${POLICY.warrantyMonths} months from delivery. We collect it, repair it or replace it.`],
@@ -76,307 +84,221 @@ export default async function Home() {
     ['Do you sell to companies?', `Yes, with a GST invoice: add your GSTIN at checkout. For larger projects, see business orders, or rent from our sister company ${LEGAL.rentals.name}.`],
   ];
 
-  const brandLines = ['ThinkPad', 'Latitude', 'EliteBook', 'MacBook', 'X1 Carbon', 'ProBook', 'MacBook Pro', 'Lenovo', 'Dell', 'HP', 'Apple'];
+  const book = settings.shipping.bookingEnabled ? rupees(settings.shipping.bookingAmount) : null;
+  const maxSave = Math.max(0, ...deals.map((x) => x.s));
+  const steps: [typeof Video, string, string][] = [
+    [MousePointerClick, 'Choose your exact laptop', 'Every listing is one real, inspected unit with its own report: battery health, SSD health, grade and every mark noted.'],
+    [Wallet, book ? `Book it for ${book}` : 'Place your order', book ? 'Reserve it with a small online payment. It comes off the price, and the laptop is taken off sale for you.' : 'Pay online or choose pay on delivery. The laptop is taken off sale for you.'],
+    [Video, 'See it on a video call', 'Before dispatch we video-call you and show this exact laptop, its condition, and the serial number sticker.'],
+    [ScanLine, 'Match the serial, then pay', book ? 'When it arrives, check the serial number against your order page. Pay the balance only if it matches.' : 'When it arrives, check the serial number against your order page. If it doesn’t match, don’t accept it.'],
+  ];
 
   return (
     <>
-      {/* Hero: pinned while the laptop comes forward and the words lift away (scroll scene, as on GC Venture) */}
-      <section data-scene="hero" className="hero-scene grain" aria-labelledby="hero-h">
-        <div className="stage relative bg-[radial-gradient(120%_90%_at_70%_10%,#ffffff_0%,var(--color-ivory)_45%,var(--color-canvas)_100%)]">
-          <div className="wrap grid min-h-[calc(100svh-76px)] items-center gap-10 py-12 lg:grid-cols-[1fr_1.15fr] lg:py-8">
-            <div data-hero-copy className="relative z-10">
-              <p className="eyebrow eyebrow-gold flex animate-[fade_1s_.1s_both] items-center gap-3"><span className="h-px w-8 bg-accent" aria-hidden="true" />Certified pre-owned · {unitsOnSale} laptops in the collection</p>
-              <h1 id="hero-h" className="mt-5 text-[46px] leading-[0.98] sm:text-[64px] xl:text-[78px]">
-                <span className="block overflow-hidden pb-1"><span className="block animate-[line-up_1.3s_var(--ease-lux)_.15s_both]">Exceptional</span></span>
-                <span className="block overflow-hidden pb-1"><span className="block animate-[line-up_1.3s_var(--ease-lux)_.27s_both]">laptops, <em className="text-accent-ink">honestly</em></span></span>
-                <span className="block overflow-hidden pb-2"><span className="block animate-[line-up_1.3s_var(--ease-lux)_.39s_both]">restored.</span></span>
-              </h1>
-              <p className="mt-6 max-w-[48ch] animate-[rise_1.1s_var(--ease-lux)_.55s_both] text-[17px] leading-relaxed text-ink-2">
-                ThinkPad, Latitude, EliteBook and MacBook, each inspected on {CHECK_COUNT} points and sold as the exact unit you’ll receive: its grade, its measured battery health and every mark noted.
-              </p>
-              <div className="mt-8 flex animate-[rise_1.1s_var(--ease-lux)_.7s_both] flex-wrap items-center gap-x-8 gap-y-4">
-                <Link href="/laptops" className="btn btn-primary btn-lg">Explore the collection</Link>
-                <Link href="/how-we-test" className="btn-link">Our standard <ArrowRight size={14} aria-hidden="true" /></Link>
+      {/* Hero */}
+      <section className="bg-canvas">
+        <div className="wrap grid gap-4 py-5 md:py-6 lg:grid-cols-[1.6fr_1fr]">
+          <div className="relative overflow-hidden rounded-sheet bg-ink text-white">
+            <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent/40 blur-3xl" aria-hidden="true" />
+            <div className="relative grid items-center gap-6 p-7 md:grid-cols-[1.1fr_1fr] md:p-10">
+              <div>
+                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[13px] font-semibold text-gold-hi"><BadgeCheck size={15} aria-hidden="true" /> Imported · Inspected · Guaranteed</p>
+                <h1 className="mt-4 text-[32px] leading-[1.1] text-white sm:text-[40px] xl:text-[46px]">Premium business laptops, <span className="text-gold-hi">checked on video</span> before you pay in full.</h1>
+                <p className="mt-4 max-w-[46ch] text-[16px] text-white/75">ThinkPad, Latitude, EliteBook and MacBook at up to {maxSave || 60}% less than new. {unitsOnSale} inspected laptops in stock, each with its own report.</p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <Link href="/laptops" className="btn btn-accent btn-lg">Shop laptops <ArrowRight size={18} aria-hidden="true" /></Link>
+                  <a href="#how" className="btn btn-lg bg-white/10 text-white hover:bg-white/20">How it works</a>
+                </div>
               </div>
-              <dl className="mt-10 grid max-w-[520px] animate-[fade_1.2s_.9s_both] grid-cols-3 gap-6 border-t border-line-2 pt-6">
-                {[[`${POLICY.warrantyMonths} months`, 'Warranty'], [`${POLICY.returnDays} days`, 'Free returns'], [`${CHECK_COUNT} points`, 'Inspection']].map(([a, b]) => (
-                  <div key={b}><dt className="eyebrow !text-[10px]">{b}</dt><dd className="display mt-1.5 text-[24px]">{a}</dd></div>
-                ))}
-              </dl>
+              {heroProduct ? (
+                <Link href={`/laptops/${heroProduct.slug}`} className="group relative block rounded-2xl bg-white p-5">
+                  <Image src={heroProduct.images[0].src} alt={heroProduct.images[0].alt} width={heroProduct.images[0].width} height={heroProduct.images[0].height} priority sizes="(min-width: 1024px) 380px, 90vw" className="mx-auto aspect-[4/3] w-full object-contain transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <span className="mt-2 flex items-end justify-between gap-2 text-ink">
+                    <span><span className="block text-[12.5px] font-semibold text-mute">{heroProduct.brand}</span><b className="text-[15px]">{heroProduct.title.replace(`${heroProduct.brand} `, '')}</b></span>
+                    {heroCard ? <span className="text-right"><span className="block text-[11.5px] text-mute">from</span><span className="price text-[18px]">{rupees(heroCard.fromPrice)}</span></span> : null}
+                  </span>
+                </Link>
+              ) : null}
             </div>
-            {heroProduct && cert ? (
-              <div className="relative mx-auto w-full max-w-[680px]">
-                <div data-hero-photo className="origin-center">
-                  <div className="well relative aspect-[5/4] animate-[rise_1.4s_var(--ease-lux)_.2s_both] rounded-sheet bg-white p-10 shadow-[var(--shadow-pop)] ring-1 ring-line">
-                    <Image src={heroProduct.images[0].src} alt={heroProduct.images[0].alt} width={heroProduct.images[0].width} height={heroProduct.images[0].height} priority sizes="(min-width: 1024px) 620px, 90vw" className="h-full w-full object-contain" />
-                    <Link href={`/laptops/${heroProduct.slug}`} className="absolute left-6 top-6 text-[10.5px] font-medium uppercase tracking-[0.2em] text-mute hover:text-ink">{heroProduct.title} <span aria-hidden="true">→</span></Link>
-                  </div>
-                </div>
-                <div data-hero-cert className="relative z-10 -mt-20 ml-auto mr-[-6px] w-[86%] max-w-[340px] sm:-mt-28 sm:mr-[-24px] lg:-mt-36">
-                  <UnitCertificate u={cert} compact />
-                </div>
-              </div>
-            ) : null}
           </div>
-          <p data-hero-cue aria-hidden="true" className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-mute lg:flex">
-            Scroll<span className="block h-10 w-px origin-top animate-[scan_2.4s_ease-in-out_infinite] bg-ink/40" />
-          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <Link href={book ? '#how' : '/how-we-test'} className="group relative overflow-hidden rounded-sheet bg-accent p-6 text-white">
+              <Video size={30} aria-hidden="true" />
+              <p className="mt-3 text-[22px] font-extrabold leading-tight">{book ? <>Book any laptop for {book}</> : 'See it on video first'}</p>
+              <p className="mt-1.5 text-[14.5px] text-white/85">{book ? 'We show it to you on a video call. Pay the rest on delivery.' : 'We show you the exact laptop and its serial before dispatch.'}</p>
+              <ol className="mt-4 hidden space-y-2 text-[14px] lg:block">
+                {[book ? `Pay ${book} online to reserve it` : 'Order your exact laptop', 'See it live on a video call', 'Match the serial number on delivery'].map((t, i) => (
+                  <li key={t} className="flex items-center gap-2.5"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20 text-[12px] font-bold">{i + 1}</span>{t}</li>
+                ))}
+              </ol>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-[14.5px] font-bold">How booking works <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </Link>
+            <Link href="/students" className="group relative overflow-hidden rounded-sheet border border-line bg-white p-6">
+              <GraduationCap size={30} className="text-accent" aria-hidden="true" />
+              <p className="mt-3 text-[22px] font-extrabold leading-tight">Students get {STUDENT.percent}% off</p>
+              <p className="mt-1.5 text-[14.5px] text-mute">Verify once with your college email or ID. The price applies for a year.</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 text-[14.5px] font-bold text-accent">Verify now <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <div className="hero-after">
-        {/* The promise: rises over the hero */}
-        <section aria-labelledby="promise-h" className="bg-ink text-ivory/70">
-          <div className="wrap py-16 md:py-20">
-            <h2 id="promise-h" className="sr-only">The {BRAND.name} promise</h2>
-            <ul data-reveal className="grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                ['I', `${POLICY.warrantyMonths}-month warranty`, 'Repair, replacement or refund, in writing, tied to your laptop’s serial number.'],
-                ['II', 'The exact unit you see', 'Every listing is one real laptop with its own report. No stock photos of “similar” units.'],
-                ['III', `${POLICY.returnDays}-day returns`, 'Changed your mind? We collect it from your door and refund you in full.'],
-                ['IV', 'Secure, invoiced payment', `UPI, cards and EMI through Razorpay, with a GST invoice on every order${settings.shipping.codEnabled ? ', or pay on delivery' : ''}.`],
-              ].map(([n, t, d]) => (
-                <li key={t} data-reveal-item className="border-t border-ivory/15 pt-6">
-                  <span className="numeral text-[22px]">{n}</span>
-                  <p className="display mt-3 text-[24px] text-ivory">{t}</p>
-                  <p className="mt-2 text-[14.5px] leading-relaxed">{d}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* Marquee of the lines we restore */}
-        <div aria-hidden="true" className="overflow-hidden border-b border-line bg-ivory py-7">
-          <div className="marquee">
-            {[0, 1].map((k) => (
-              <div key={k} className="flex shrink-0 items-center">
-                {brandLines.map((b) => <span key={b} className="display flex items-center whitespace-nowrap px-8 text-[34px] italic text-ink/80 md:text-[44px]">{b}<span className="ml-16 inline-block h-1.5 w-1.5 rotate-45 bg-accent" /></span>)}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Shop by brand */}
-      <section className="wrap mt-28" aria-labelledby="brands-h">
-        <SectionHead id="brands-h" eyebrow="The houses" title={<>Four makers, <em>chosen</em> for longevity</>} action={<Link href="/laptops" className="btn-link">Shop all <ArrowRight size={14} aria-hidden="true" /></Link>} />
-        <ul data-reveal className="mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4">
-          {brands.map((b) => (
-            <li key={b.brand} data-reveal-item>
-              <Link href={`/brands/${b.brand.toLowerCase()}`} className="group block">
-                <div className="well aspect-[4/5] rounded-card bg-white p-8 ring-1 ring-line transition-shadow duration-500 group-hover:shadow-[var(--shadow-lift)]">
-                  {b.img ? <Image src={b.img.src} alt="" width={b.img.width} height={b.img.height} sizes="(min-width:1024px) 320px, 45vw" className="h-full w-full object-contain transition-transform duration-[1.2s] ease-[var(--ease-lux)] group-hover:scale-[1.06]" /> : null}
-                </div>
-                <div className="mt-4 flex items-end justify-between gap-3">
-                  <div><p className="display text-[26px] leading-none">{b.brand}</p><p className="mt-2 text-[12.5px] text-mute">{b.units} {b.units === 1 ? 'unit' : 'units'} in the collection</p></div>
-                  {Number.isFinite(b.from) ? <p className="text-right text-[11px] uppercase tracking-[0.14em] text-mute">from<br /><span className="price text-[15px] normal-case tracking-normal text-ink">{rupees(b.from)}</span></p> : null}
-                </div>
-              </Link>
+      {/* Trust bar */}
+      <section aria-label="Why buy here" className="border-b border-line bg-white">
+        <ul data-reveal className="wrap grid grid-cols-2 gap-x-6 gap-y-5 py-6 text-[14px] md:grid-cols-3 xl:grid-cols-5">
+          {([
+            [Wallet, book ? `Book for ${book}` : 'Pay your way', book ? 'Balance on delivery' : 'UPI, cards, EMI or on delivery'],
+            [Video, 'Video call before dispatch', 'See your exact laptop'],
+            [ScanLine, 'Match the serial number', 'Check it when it arrives'],
+            [ShieldCheck, `${POLICY.warrantyMonths}-month warranty`, 'Repair, replace or refund'],
+            [RefreshCcw, `${POLICY.returnDays}-day returns`, 'Free pickup'],
+          ] as [typeof Video, string, string][]).map(([I, t, d]) => (
+            <li key={t} data-reveal-item className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><I size={21} aria-hidden="true" /></span>
+              <span><b className="block text-[14.5px]">{t}</b><span className="text-mute">{d}</span></span>
             </li>
           ))}
         </ul>
       </section>
 
+      {/* Shop by brand */}
+      <section className="wrap mt-14" aria-labelledby="brands-h">
+        <SectionHead id="brands-h" eyebrow="Shop by brand" title="Top business laptop brands" action={<Link href="/laptops" className="btn-link">All laptops <ArrowRight size={16} aria-hidden="true" /></Link>} />
+        <ul data-reveal className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {brands.map((b) => (
+            <li key={b.brand} data-reveal-item>
+              <Link href={`/brands/${b.brand.toLowerCase()}`} className="group flex items-center gap-4 rounded-card border border-line bg-white p-3 pr-4 transition hover:border-accent hover:shadow-[var(--shadow-lift)]">
+                <span className="well h-20 w-24 shrink-0 rounded-xl p-1.5 sm:h-24 sm:w-28">
+                  {b.img ? <Image src={b.img.src} alt="" width={b.img.width} height={b.img.height} sizes="120px" className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105" /> : null}
+                </span>
+                <span className="min-w-0">
+                  <b className="block text-[18px]">{b.brand}</b>
+                  <span className="block text-[13px] text-mute">{b.units} in stock</span>
+                  {Number.isFinite(b.from) ? <span className="block text-[13px]">from <b>{rupees(b.from)}</b></span> : null}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {budgets.map((b) => <Link key={b.key} href={`/laptops?budget=${b.key}`} className="chip">{b.label} <span className="text-faint">({b.n})</span></Link>)}
+          {USES.map((u) => <Link key={u.key} href={`/laptops?use=${u.key}`} className="chip">{u.label}</Link>)}
+        </div>
+      </section>
+
+      {/* Deals */}
+      {deals.length > 0 && (
+        <section className="wrap mt-16" aria-labelledby="deals-h">
+          <SectionHead id="deals-h" eyebrow="Deals" title="Biggest savings against new" intro="Compared with each model’s approximate launch price in India." action={<Link href="/deals" className="btn-link">All deals <ArrowRight size={16} aria-hidden="true" /></Link>} />
+          <ul data-reveal className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {deals.map(({ c }) => <li key={c.id} data-reveal-item><ProductCard p={c} wished={wished.has(c.id)} /></li>)}
+          </ul>
+        </section>
+      )}
+
+      {/* How it works / why trust us */}
+      <section id="how" className="mt-20 scroll-mt-36 bg-canvas py-16" aria-labelledby="how-h">
+        <div className="wrap">
+          <SectionHead id="how-h" align="center" eyebrow="Why you can trust us" title={book ? <>Book for {book}. <em>We prove it</em> before you pay the rest.</> : <>You see it <em>before it ships</em></>} intro="Buying a used laptop online shouldn’t be a gamble. So the responsibility is ours: you see your exact laptop before it leaves us, and you check it when it reaches you." />
+          <div data-scene="steps" data-start="0.95" data-end="0.5" className="relative mt-12">
+            <div className="absolute left-[12.5%] right-[12.5%] top-7 hidden h-0.5 bg-line-2 md:block" aria-hidden="true"><div className="steps-fill h-full bg-accent" /></div>
+            <ol data-reveal className="relative grid gap-8 md:grid-cols-4">
+              {steps.map(([I, t, d], i) => (
+                <li key={t} data-reveal-item className="text-center">
+                  <span className="relative mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-accent text-white shadow-[0_10px_24px_-10px_rgba(37,99,235,.7)]"><I size={24} aria-hidden="true" /><span className="absolute -right-2 -top-2 grid h-6 w-6 place-items-center rounded-full bg-ink text-[12px] font-bold">{i + 1}</span></span>
+                  <p className="mt-4 text-[18px] font-bold">{t}</p>
+                  <p className="mx-auto mt-1.5 max-w-[30ch] text-[14.5px] text-mute">{d}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className="mt-14 grid items-center gap-8 lg:grid-cols-[1fr_1.2fr]">
+            {cert ? <div data-scene="drift" className="flex justify-center"><div data-drift className="w-full max-w-[380px]"><UnitCertificate u={cert} /></div></div> : null}
+            <ul data-reveal className="grid gap-4 sm:grid-cols-2">
+              {([
+                [Plane, 'Imported, business-grade', 'All our laptops are imported business models: ThinkPad, Latitude, EliteBook and MacBook, built for years of daily work.'],
+                [ClipboardCheck, `${CHECK_COUNT}-point inspection`, 'Display, battery, keyboard, ports, storage and more, with measured battery and SSD health on every report.'],
+                [ShieldCheck, `${POLICY.warrantyMonths}-month warranty`, 'Registered to your laptop’s serial number. We collect it, repair it or replace it.'],
+                [Receipt, 'GST invoice, secure payment', 'Pay through Razorpay (UPI, cards, EMI). Card details never reach us. A GST invoice comes with every order.'],
+              ] as [typeof Video, string, string][]).map(([I, t, d]) => (
+                <li key={t} data-reveal-item className="rounded-card border border-line bg-white p-5">
+                  <I size={24} className="text-accent" aria-hidden="true" />
+                  <p className="mt-3 text-[16.5px] font-bold">{t}</p>
+                  <p className="mt-1 text-[14.5px] text-mute">{d}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* Featured */}
       {featured.length > 0 && (
-        <section className="wrap mt-32" aria-labelledby="featured-h">
-          <SectionHead id="featured-h" eyebrow="Our picks this week" title={<>The <em>edit</em></>} intro="Models we would buy ourselves: proven builds, superb keyboards, easy to keep running for years." action={<Link href="/laptops?sort=rec" className="btn-link">See more <ArrowRight size={14} aria-hidden="true" /></Link>} />
+        <section className="wrap mt-16" aria-labelledby="featured-h">
+          <SectionHead id="featured-h" eyebrow="Our picks this week" title="Featured laptops" intro="Proven models with great keyboards that are easy to keep running." action={<Link href="/laptops?sort=rec" className="btn-link">See more <ArrowRight size={16} aria-hidden="true" /></Link>} />
           <Rail items={featured} wished={wished} label="Featured laptops" />
         </section>
       )}
 
       {/* Popular (from real views and orders) */}
       {popular.length > 0 && (
-        <section className="wrap mt-32" aria-labelledby="popular-h">
-          <SectionHead id="popular-h" eyebrow="Most sought after" title="Popular right now" intro="Ranked by what people viewed and bought in the last month." action={<Link href="/laptops?sort=popular" className="btn-link">All popular <ArrowRight size={14} aria-hidden="true" /></Link>} />
+        <section className="wrap mt-16" aria-labelledby="popular-h">
+          <SectionHead id="popular-h" eyebrow="Bestsellers" title="Popular right now" intro="Ranked by what people viewed and bought in the last month." action={<Link href="/laptops?sort=popular" className="btn-link">All popular <ArrowRight size={16} aria-hidden="true" /></Link>} />
           <Rail items={popular} wished={wished} label="Popular laptops" />
         </section>
       )}
 
-      {/* Inspection: the checklist ticks off as it moves up the screen */}
-      <section className="band-ink mt-32" aria-labelledby="inspect-h">
-        <div data-scene="ticks" data-start="0.85" data-end="0.55" className="wrap grid gap-14 py-24 lg:grid-cols-[1fr_1.25fr] lg:py-32">
-          <div className="lg:sticky lg:top-36 lg:self-start">
-            <p className="eyebrow !text-gold-hi flex items-center gap-3"><span className="h-px w-8 bg-accent" aria-hidden="true" />The {BRAND.name} standard</p>
-            <h2 id="inspect-h" data-reveal="lines" className="mt-5 text-[42px] md:text-[60px]">
-              <span className="line"><span>{CHECK_COUNT} checks.</span></span>
-              <span className="line"><span><em className="text-gold-hi">Measured,</em> not guessed.</span></span>
-            </h2>
-            <p className="mt-6 max-w-[48ch] text-[16.5px] leading-relaxed">Every laptop goes through the same bench routine. What we measure goes on its report, and the report goes on its listing, so the laptop you choose is the one that arrives.</p>
-            <div className="mt-10 max-w-[420px]">
-              <p className="flex items-baseline justify-between text-[12px] uppercase tracking-[0.2em]"><span>Checks passed</span><span className="display text-[34px] normal-case tracking-normal text-ivory"><span data-tick-n>{CHECK_COUNT}</span><span className="text-ivory/40"> / {CHECK_COUNT}</span></span></p>
-              <div className="mt-3 h-px bg-ivory/15"><div className="ticks-progress h-px bg-accent" /></div>
-            </div>
-            <Link href="/how-we-test" className="btn btn-accent mt-10">See every check <ArrowRight size={15} aria-hidden="true" /></Link>
-          </div>
-          <div className="ticks grid gap-x-10 gap-y-10 sm:grid-cols-2">
-            {CHECKS.map((g) => (
-              <div key={g.group}>
-                <p className="display border-b border-ivory/15 pb-3 text-[22px] text-ivory">{g.group}</p>
-                <ul className="mt-4 space-y-3 text-[14px]">
-                  {g.items.map((it) => (
-                    <li key={it} data-tick className="flex items-start gap-3">
-                      <span className="tick mt-0.5 grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full border border-accent bg-accent text-ink"><Check size={11} strokeWidth={2.5} aria-hidden="true" /></span>
-                      <span className="tick-label">{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* The unit passport */}
-      {cert ? (
-        <section className="wrap mt-32 grid items-center gap-14 lg:grid-cols-[1fr_1fr]" aria-labelledby="passport-h">
-          <div data-scene="drift" className="relative order-2 overflow-hidden rounded-sheet bg-canvas p-8 sm:p-14 lg:order-1">
-            <div data-drift className="mx-auto max-w-[380px]"><UnitCertificate u={cert} /></div>
-          </div>
-          <div className="order-1 lg:order-2">
-            <SectionHead id="passport-h" eyebrow="Every laptop has a passport" title={<>Know <em>exactly</em> what you are buying</>} />
-            <ul data-reveal className="mt-10 space-y-7">
-              {[
-                ['Its own report', 'Measured battery and SSD health, charge cycles, every check and who inspected it, on a public page.'],
-                ['Its own grade', 'Pristine, Excellent or Good, describing looks only, with every visible mark written down.'],
-                ['Its own serial', 'Your warranty is registered to the serial number printed on your invoice.'],
-              ].map(([t, d], i) => (
-                <li key={t} data-reveal-item className="flex gap-6 border-t border-line pt-6">
-                  <span className="numeral w-8 shrink-0 text-[26px] leading-none">0{i + 1}</span>
-                  <span><b className="display block text-[22px] font-normal">{t}</b><span className="mt-1 block text-[15px] leading-relaxed text-mute">{d}</span></span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-
       {/* Latest arrivals */}
       {latest.length > 0 && (
-        <section className="wrap mt-32" aria-labelledby="latest-h">
-          <SectionHead id="latest-h" eyebrow="Just certified" title="Latest arrivals" intro="Freshly inspected units, newest first." action={<Link href="/laptops?sort=new" className="btn-link">All new arrivals <ArrowRight size={14} aria-hidden="true" /></Link>} />
+        <section className="wrap mt-16" aria-labelledby="latest-h">
+          <SectionHead id="latest-h" eyebrow="Just in" title="New arrivals" intro="Freshly inspected units, newest first." action={<Link href="/laptops?sort=new" className="btn-link">All new arrivals <ArrowRight size={16} aria-hidden="true" /></Link>} />
           <Rail items={latest} wished={wished} label="Latest arrivals" />
         </section>
       )}
 
-      {/* Deals */}
-      {deals.length > 0 && (
-        <section className="mt-32 bg-canvas py-24" aria-labelledby="deals-h">
-          <div className="wrap">
-            <SectionHead id="deals-h" eyebrow="Exceptional value" title={<>The finest <em>savings</em> against new</>} intro="Compared with each model’s approximate launch price in India." action={<Link href="/deals" className="btn btn-primary">All deals</Link>} />
-            <ul data-reveal className="mt-12 grid gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-              {deals.map(({ c }) => <li key={c.id} data-reveal-item><ProductCard p={c} wished={wished.has(c.id)} /></li>)}
-            </ul>
-          </div>
-        </section>
-      )}
-
-      {/* Budget + processor */}
-      <section className="wrap mt-32 grid gap-16 lg:grid-cols-2" aria-label="Shop by budget and processor">
-        <div>
-          <SectionHead eyebrow="By budget" title="What would you spend?" />
-          <ul data-reveal className="mt-10 border-t border-line">
-            {budgets.map((b) => (
-              <li key={b.key} data-reveal-item>
-                <Link href={`/laptops?budget=${b.key}`} className="group flex items-baseline justify-between gap-4 border-b border-line py-5">
-                  <span className="display text-[30px] transition-transform duration-500 ease-[var(--ease-lux)] group-hover:translate-x-2 md:text-[36px]">{b.label}</span>
-                  <span className="flex shrink-0 items-center gap-3 text-[12px] uppercase tracking-[0.16em] text-mute">{b.n} {b.n === 1 ? 'model' : 'models'} <ArrowRight size={14} className="transition-transform duration-500 group-hover:translate-x-1" aria-hidden="true" /></span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <SectionHead eyebrow="By processor" title="Choose your power" />
-          <ul data-reveal className="mt-10 border-t border-line">
-            {procs.map((x) => (
-              <li key={x.key} data-reveal-item>
-                <Link href={`/laptops?${x.q}`} className="group flex items-center gap-5 border-b border-line py-5">
-                  <span className="flex-1 transition-transform duration-500 ease-[var(--ease-lux)] group-hover:translate-x-2"><b className="display block text-[22px] font-normal">{x.label}</b><span className="text-[13.5px] text-mute">{x.note}</span></span>
-                  <span className="text-[12px] uppercase tracking-[0.16em] text-mute">{x.n} {x.n === 1 ? 'model' : 'models'}</span>
-                  <ArrowRight size={14} className="transition-transform duration-500 group-hover:translate-x-1" aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* Grades */}
-      <section className="wrap mt-32" aria-labelledby="grades-h">
-        <SectionHead id="grades-h" align="center" eyebrow="Condition grades" title={<>Three grades, <em>described plainly</em></>} intro="Grades describe looks only. Every grade passes the same checks and carries the same warranty." />
-        <div data-reveal className="mt-14 grid gap-px overflow-hidden rounded-card bg-line ring-1 ring-line md:grid-cols-3">
-          {GRADE_ORDER.map((g) => (
-            <div key={g} data-reveal-item className="bg-white p-8 md:p-10">
-              <div className="flex items-baseline justify-between"><p className="display text-[34px]">{GRADES[g].label}</p><span className="numeral text-[28px]">{GRADES[g].tone}</span></div>
-              <p className="mt-2 text-[12px] uppercase tracking-[0.16em] text-accent-ink">{GRADES[g].short}</p>
-              <p className="mt-5 text-[15px] leading-relaxed text-mute">{GRADES[g].body}</p>
-              <p className="mt-8 flex items-center justify-between border-t border-line pt-5 text-[13px] text-mute">Battery health at least <b className="display text-[22px] font-normal text-ink">{GRADES[g].batteryMin}%</b></p>
-            </div>
+      {/* Processor */}
+      <section className="wrap mt-16" aria-labelledby="cpu-h">
+        <SectionHead id="cpu-h" eyebrow="Shop by processor" title="Pick your power" />
+        <ul data-reveal className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {procs.map((x) => (
+            <li key={x.key} data-reveal-item>
+              <Link href={`/laptops?${x.q}`} className="group flex h-full flex-col rounded-card border border-line bg-white p-5 transition hover:border-accent hover:shadow-[var(--shadow-lift)]">
+                <Cpu size={24} className="text-accent" aria-hidden="true" />
+                <b className="mt-3 text-[16px]">{x.label}</b>
+                <span className="text-[13.5px] text-mute">{x.note}</span>
+                <span className="mt-auto flex items-center justify-between pt-4 text-[13px] font-semibold">{x.n} {x.n === 1 ? 'model' : 'models'} <ArrowRight size={16} className="text-accent transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+              </Link>
+            </li>
           ))}
-        </div>
-      </section>
-
-      {/* After you buy */}
-      <section className="wrap mt-32" aria-labelledby="warranty-h">
-        <SectionHead id="warranty-h" eyebrow="After you buy" title={<>Covered from the <em>day it arrives</em></>} />
-        <div data-reveal className="mt-12 grid gap-px overflow-hidden rounded-card bg-line ring-1 ring-line sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            [`${POLICY.warrantyMonths}`, 'months', 'Warranty on every laptop, including the battery if its health falls below 50%.', '/warranty'],
-            [`${POLICY.warrantyExtensions.at(-1)?.months ?? 24}`, 'months', `Extend to two years for ${rupees(POLICY.warrantyExtensions.at(-1)?.price ?? 0)} when you buy.`, '/warranty'],
-            [`${POLICY.returnDays}`, 'days', 'Return it for any reason. We pick it up and refund you.', '/returns'],
-            ['48', 'hours', 'Report a fault or transit damage and we replace it.', '/returns'],
-          ].map(([a, unit, b, href]) => (
-            <Link key={a + b} href={href} data-reveal-item className="group bg-white p-8 transition-colors hover:bg-ivory">
-              <p className="flex items-baseline gap-2"><span className="display text-[60px] leading-none">{a}</span><span className="text-[12px] uppercase tracking-[0.18em] text-accent-ink">{unit}</span></p>
-              <p className="mt-5 text-[14.5px] leading-relaxed text-mute">{b}</p>
-            </Link>
-          ))}
-        </div>
-        <ul className="mt-10 flex flex-wrap justify-center gap-x-10 gap-y-4 text-[12px] uppercase tracking-[0.16em] text-mute">
-          {[[ShieldCheck, 'Warranty registered to your serial'], [Truck, settings.shipping.flatFee === 0 ? 'Free insured delivery' : 'Insured delivery'], [Lock, 'Payments secured by Razorpay'], [Receipt, 'GST invoice with every order']].map(([Icon, t]) => {
-            const I = Icon as typeof ShieldCheck;
-            return <li key={t as string} className="flex items-center gap-2.5"><I size={16} strokeWidth={1.5} className="text-accent-ink" aria-hidden="true" />{t as string}</li>;
-          })}
         </ul>
       </section>
 
-      {/* Why refurbished */}
-      <section className="wrap mt-32" aria-labelledby="why-h">
-        <div className="grid gap-14 border-y border-line py-20 lg:grid-cols-[1fr_1.4fr]">
-          <div>
-            <p className="eyebrow eyebrow-gold">Why pre-owned</p>
-            <h2 id="why-h" data-reveal="lines" className="mt-5 text-[38px] md:text-[54px]">
-              <span className="line"><span>Better laptop.</span></span>
-              <span className="line"><span><em>Smaller</em> bill.</span></span>
-              <span className="line"><span>Less waste.</span></span>
-            </h2>
-          </div>
-          <ul data-reveal className="grid gap-10 sm:grid-cols-2">
-            {[
-              ['Pay 40–70% less', 'A two-year-old business laptop costs a fraction of its launch price and outlasts a new budget model.'],
-              ['Built for offices', 'Magnesium and aluminium bodies, spill-resistant keyboards and parts you can actually replace.'],
-              ['Keep it out of landfill', 'Making a laptop produces most of its lifetime emissions. Using one longer is the greener choice.'],
-              ['Covered like new', `${POLICY.warrantyMonths}-month warranty, ${POLICY.returnDays}-day returns and a real person on WhatsApp if anything goes wrong.`],
-            ].map(([t, d], i) => (
-              <li key={t} data-reveal-item><span className="numeral text-[22px]">0{i + 1}</span><p className="display mt-2 text-[24px]">{t}</p><p className="mt-2 text-[15px] leading-relaxed text-mute">{d}</p></li>
-            ))}
-          </ul>
+      {/* Grades */}
+      <section className="wrap mt-16" aria-labelledby="grades-h">
+        <SectionHead id="grades-h" eyebrow="Condition grades" title="Three grades, explained simply" intro="Grades describe looks only. Every grade passes the same checks and gets the same warranty." />
+        <div data-reveal className="mt-6 grid gap-4 md:grid-cols-3">
+          {GRADE_ORDER.map((g) => (
+            <div key={g} data-reveal-item className="rounded-card border border-line bg-white p-6">
+              <div className="flex items-center justify-between gap-3"><p className="text-[22px] font-extrabold">{GRADES[g].label}</p><span className="rounded-lg bg-accent-soft px-2.5 py-1 text-[13px] font-bold text-accent-ink">Grade {GRADES[g].tone}</span></div>
+              <p className="mt-1 font-semibold text-ink-2">{GRADES[g].short}</p>
+              <p className="mt-3 text-[15px] text-mute">{GRADES[g].body}</p>
+              <p className="mt-5 flex items-center justify-between border-t border-line pt-4 text-[14.5px]"><span className="flex items-center gap-2"><Battery size={18} className="text-accent" aria-hidden="true" /> Battery health at least</span><b className="text-[18px]">{GRADES[g].batteryMin}%</b></p>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Testimonials: only real, approved reviews */}
       {reviews.length >= 3 && (
-        <section className="wrap mt-32" aria-labelledby="reviews-h">
-          <SectionHead id="reviews-h" align="center" eyebrow="From our clients" title="In their words" intro="Verified purchases only, published after moderation." />
-          <ul data-reveal className="mt-14 grid gap-5 md:grid-cols-3">
+        <section className="wrap mt-16" aria-labelledby="reviews-h">
+          <SectionHead id="reviews-h" eyebrow="From customers" title="What buyers say" intro="Verified purchases only, published after moderation." />
+          <ul data-reveal className="mt-6 grid gap-4 md:grid-cols-3">
             {reviews.slice(0, 3).map((r) => (
-              <li key={r.id} data-reveal-item className="flex flex-col rounded-card bg-white p-8 ring-1 ring-line">
-                <Stars value={r.rating} size={13} />
-                {r.title ? <p className="display mt-5 text-[22px]">{r.title}</p> : null}
-                <p className="display mt-3 flex-1 text-[18px] italic leading-relaxed text-ink-2">“{r.body}”</p>
-                <p className="mt-6 text-[11.5px] uppercase tracking-[0.16em] text-mute">{r.authorName}{r.city ? `, ${r.city}` : ''}{r.verified ? ' · Verified purchase' : ''}</p>
+              <li key={r.id} data-reveal-item className="flex flex-col rounded-card border border-line bg-white p-6">
+                <Stars value={r.rating} />
+                {r.title ? <p className="mt-3 font-bold">{r.title}</p> : null}
+                <p className="mt-2 flex-1 text-[15px] text-ink-2">“{r.body}”</p>
+                <p className="mt-4 text-[13.5px] text-mute">{r.authorName}{r.city ? `, ${r.city}` : ''}{r.verified ? ' · Verified purchase' : ''}</p>
               </li>
             ))}
           </ul>
@@ -384,32 +306,29 @@ export default async function Home() {
       )}
 
       {/* Students */}
-      <section className="wrap mt-32">
-        <div className="band-ink grain relative grid items-center gap-10 overflow-hidden rounded-sheet p-10 md:grid-cols-[1.4fr_1fr] md:p-16">
+      <section className="wrap mt-16">
+        <div className="grid items-center gap-8 overflow-hidden rounded-sheet bg-accent p-8 text-white md:grid-cols-[1.4fr_1fr] md:p-12">
           <div>
-            <p className="eyebrow !text-gold-hi">For students</p>
-            <h2 data-reveal="lines" className="mt-4 text-[38px] md:text-[56px]">
-              <span className="line"><span>{STUDENT.percent}% off,</span></span>
-              <span className="line"><span><em className="text-gold-hi">for a whole year.</em></span></span>
-            </h2>
-            <p className="mt-5 max-w-[48ch] text-[16px] leading-relaxed">Verify once with your college email (instant) or a photo of your student ID, and the discount applies automatically at checkout for {STUDENT.validityMonths} months.</p>
+            <p className="font-semibold text-white/80">Students</p>
+            <h2 className="mt-2 text-[30px] text-white md:text-[40px]">{STUDENT.percent}% off for a whole year.</h2>
+            <p className="mt-3 max-w-[48ch] text-[16px] text-white/85">Verify once with your college email (instant) or a photo of your student ID, and the discount applies automatically at checkout for {STUDENT.validityMonths} months.</p>
           </div>
-          <div className="flex flex-wrap gap-4 md:justify-end">
-            <Link href="/students" className="btn btn-accent btn-lg">Verify in 2 minutes</Link>
-            <Link href="/category/student" className="btn btn-lg text-ivory shadow-[inset_0_0_0_1px_rgba(250,248,243,.35)] hover:bg-ivory hover:text-ink">Student picks</Link>
+          <div className="flex flex-wrap gap-3 md:justify-end">
+            <Link href="/students" className="btn btn-lg bg-white text-accent-ink hover:bg-accent-soft">Verify in 2 minutes</Link>
+            <Link href="/category/student" className="btn btn-lg bg-white/15 text-white hover:bg-white/25">Student picks</Link>
           </div>
         </div>
       </section>
 
       {/* FAQ + newsletter */}
-      <section className="wrap mt-32 grid grid-cols-[minmax(0,1fr)] gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-labelledby="faq-h">
+      <section className="wrap mt-16 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-labelledby="faq-h">
         <div>
           <SectionHead id="faq-h" eyebrow="Questions" title="Good to know" />
-          <p className="mt-5 text-mute">More in the <Link href="/faq" className="link">full FAQ</Link>, or ask us on WhatsApp.</p>
-          <div className="mt-12 border-t border-line pt-8">
-            <p className="display text-[26px]">The private list</p>
-            <p className="mt-2 text-[14.5px] text-mute">The best units go first. Hear when new laptops are certified, at most twice a month.</p>
-            <div className="mt-5"><NewsletterForm tone="light" source="home" /></div>
+          <p className="mt-3 text-mute">More in the <Link href="/faq" className="link">full FAQ</Link>, or ask us on WhatsApp.</p>
+          <div className="mt-8 rounded-card border border-line bg-canvas p-6">
+            <p className="text-[18px] font-bold">Get new stock alerts</p>
+            <p className="mt-1 text-[14.5px] text-mute">Good units sell quickly. We email when fresh stock lands, at most twice a month.</p>
+            <div className="mt-4"><NewsletterForm tone="light" source="home" /></div>
           </div>
         </div>
         <Faq items={faq} />

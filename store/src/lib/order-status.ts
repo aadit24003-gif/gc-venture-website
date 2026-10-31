@@ -63,6 +63,7 @@ export const PAYMENT_STATUS: Record<string, { label: string; tone: Tone }> = {
   paid: { label: 'Paid', tone: 'done' },
   failed: { label: 'Failed', tone: 'bad' },
   cod_due: { label: 'Pay on delivery', tone: 'wait' },
+  part_paid: { label: 'Booked, balance on delivery', tone: 'wait' },
   refunded: { label: 'Refunded', tone: 'info' },
   partially_refunded: { label: 'Partly refunded', tone: 'info' },
 };

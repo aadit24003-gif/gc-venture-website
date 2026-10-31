@@ -43,7 +43,7 @@ export async function allProducts(): Promise<ProductFull[]> {
     d.select({ productId: productViews.productId, n: sql<number>`sum(${productViews.views})::int` }).from(productViews).where(gte(productViews.day, since30)).groupBy(productViews.productId),
     d.select({ productId: orderItems.productId, n: sql<number>`sum(${orderItems.qty})::int` }).from(orderItems)
       .innerJoin(orders, eq(orders.id, orderItems.orderId))
-      .where(and(gte(orders.createdAt, since90), inArray(orders.paymentStatus, ['paid', 'cod_due']))).groupBy(orderItems.productId),
+      .where(and(gte(orders.createdAt, since90), inArray(orders.paymentStatus, ['paid', 'cod_due', 'part_paid']))).groupBy(orderItems.productId),
     d.select({ productId: reviews.productId, avg: sql<number>`avg(${reviews.rating})::float`, n: sql<number>`count(*)::int` }).from(reviews)
       .where(eq(reviews.status, 'approved')).groupBy(reviews.productId),
   ]);

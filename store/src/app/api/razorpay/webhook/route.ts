@@ -6,7 +6,7 @@
 import { and, eq } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { orders, refunds, webhookEvents } from '@/lib/db/schema';
-import { handleLatePayment, markPaid, markPaymentFailed, markRefundProcessed } from '@/lib/orders';
+import { handleLatePayment, markPaid, markPaymentFailed, markRefundProcessed, dueOnline } from '@/lib/orders';
 import { verifyWebhookSignature } from '@/lib/providers/razorpay';
 
 export const dynamic = 'force-dynamic';
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   if (pay?.order_id) {
     const [o] = await d.select().from(orders).where(eq(orders.razorpayOrderId, pay.order_id)).limit(1);
     if (o) {
-      if (body.event === 'payment.captured' && pay.amount === o.total) {
+      if (body.event === 'payment.captured' && pay.amount === dueOnline(o)) {
         const info = { provider: 'razorpay', paymentId: pay.id, providerOrderId: pay.order_id, method: pay.method ?? null, raw: pay };
         const done = await markPaid(o.id, info, 'Payment confirmed by Razorpay');
         if (!done && o.status === 'cancelled') await handleLatePayment(o.id, { paymentId: pay.id, providerOrderId: pay.order_id, method: pay.method, amount: pay.amount, raw: pay });

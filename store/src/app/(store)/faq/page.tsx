@@ -3,17 +3,26 @@ import Link from 'next/link';
 import { CHECK_COUNT, POLICY, STUDENT } from '@/lib/config';
 import { rupees } from '@/lib/format';
 import Faq from '@/components/Faq';
+import { getSettings } from '@/lib/settings';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = { title: 'Questions and answers', description: 'Refurbished laptops, grades, warranty, delivery, payments and the student discount, answered.' };
 
-const GROUPS: { title: string; items: [string, string][] }[] = [
+const groups = (booking: string | null, codMax: number): { title: string; items: [string, string][] }[] => [
   { title: 'The laptops', items: [
-    ['Where do your laptops come from?', 'Mostly from companies replacing their fleets every three to four years, and from our own rental business. Every one is checked for theft records and locks before we take it.'],
+    ['Where do your laptops come from?', 'All our laptops are imported business-grade models: Lenovo ThinkPad, Dell Latitude, HP EliteBook and Apple MacBook. Every one is checked for theft records and locks before we list it.'],
     ['Is refurbished the same as second-hand?', `No. Every laptop is tested on ${CHECK_COUNT} points, repaired with matching parts where needed, cleaned, wiped and reinstalled, then graded and covered by a ${POLICY.warrantyMonths}-month warranty.`],
     ['What do the grades mean?', 'Pristine looks close to new, Excellent has light marks you see up close, Good has visible wear and costs less. All grades work exactly the same.'],
-    ['Will I get the exact laptop I choose?', 'Yes. Every listing is a specific unit with its own ID, grade, measured battery and SSD health, cosmetic notes and inspection report. The photos at the top of a model’s page are the manufacturer’s; ask on WhatsApp if you’d like photos of your unit before it ships.'],
+    ['Will I get the exact laptop I choose?', 'Yes. Every listing is a specific unit with its own ID, grade, measured battery and SSD health, cosmetic notes and inspection report. The photos at the top of a model’s page are the manufacturer’s. Before dispatch we show you your unit on a video call, and its serial number is on your order page so you can match it on delivery.'],
     ['Can I add memory or storage?', 'Yes, on models with free slots; choose it on the product page and we fit and test it before dispatch.'],
   ] },
+  ...(booking ? [{ title: 'Booking and the video call', items: [
+    [`How does booking for ${booking} work?`, `Choose “Book now” at checkout and pay ${booking} online. The laptop is taken off sale for you and the amount comes off its price. Before dispatch we video-call you and show this exact laptop, its condition and its serial number. You pay the balance on delivery, in cash or UPI, after matching the serial number.`],
+    ['What happens on the video call?', 'We call you on WhatsApp video from our workshop, show the laptop from every side, switch it on, and show the serial number sticker. Ask us anything. You can also request the call yourself from your order page.'],
+    ['What if I don’t like what I see?', `Cancel from your order page before we dispatch it and your ${booking} is refunded in full.`],
+    ['How do I match the serial number?', 'Your order page shows the serial number of your exact laptop. When the courier hands it over, compare it with the sticker under the laptop. If it doesn’t match, don’t accept the delivery and call us.'],
+  ] as [string, string][] }] : []),
   { title: 'Orders and delivery', items: [
     ['How long does delivery take?', 'Two to four working days to most cities, up to a week elsewhere, after one to two days to re-test and pack. Delivery is free and insured.'],
     ['How do I track my order?', 'Open it from your account, from the link in your confirmation email, or on the Track an order page with your order number and email or phone. It shows eight steps, from final inspection to delivery, and the courier’s tracking number once it ships.'],
@@ -21,7 +30,7 @@ const GROUPS: { title: string; items: [string, string][] }[] = [
     ['Can I cancel?', 'Yes, from the order page, until we start packing; online payments are refunded automatically.'],
   ] },
   { title: 'Payments', items: [
-    ['How can I pay?', `UPI, debit and credit cards, net banking and wallets through Razorpay; card EMI from 3 to 12 months; or pay on delivery for orders up to ${rupees(POLICY.cod.maxOrder)}.`],
+    ['How can I pay?', `UPI, debit and credit cards, net banking and wallets through Razorpay; card EMI from 3 to 12 months; or pay on delivery for orders up to ${rupees(codMax)}.`],
     ['Do I get a GST invoice?', 'Yes. Add your GSTIN at checkout for a business invoice. The invoice is in your account once the order is paid.'],
   ] },
   { title: 'Students', items: [
@@ -34,7 +43,9 @@ const GROUPS: { title: string; items: [string, string][] }[] = [
   ] },
 ];
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const s = await getSettings();
+  const GROUPS = groups(s.shipping.bookingEnabled ? rupees(s.shipping.bookingAmount) : null, s.shipping.codMax);
   return (
     <div className="wrap pb-10 pt-10 md:pt-16">
       <h1 className="text-[44px] md:text-[64px]">Questions and answers</h1>

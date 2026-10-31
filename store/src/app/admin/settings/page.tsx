@@ -48,6 +48,8 @@ export default async function Settings() {
             <label className="flex items-center gap-2 text-[14px] sm:col-span-3"><input type="checkbox" name="codEnabled" className="check" defaultChecked={sh.codEnabled} /> Offer pay on delivery</label>
             <F name="codFee" label="Pay-on-delivery fee ₹" value={r(sh.codFee)} mono />
             <F name="codMax" label="Pay on delivery up to ₹" value={r(sh.codMax)} mono />
+            <label className="flex items-center gap-2 text-[14px] sm:col-span-2"><input type="checkbox" name="bookingEnabled" className="check" defaultChecked={sh.bookingEnabled} /> Offer “book now, pay the rest on delivery” (video call before dispatch)</label>
+            <F name="bookingAmount" label="Booking amount ₹" value={r(sh.bookingAmount)} mono />
             <F name="blockedPinPrefixes" label="PIN codes you don’t deliver to" value={sh.blockedPinPrefixes.join(', ')} mono hint="Prefixes, comma-separated, e.g. 744, 682555" />
           </div>
         </ActionForm>

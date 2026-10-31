@@ -10,7 +10,7 @@ import { OPEN_SERVICE } from './service';
 export type Range = { from: Date; to: Date };
 
 /** Revenue-bearing orders: paid online, pay-on-delivery confirmed, or delivered. */
-const COUNTED = ['paid', 'cod_due', 'partially_refunded', 'refunded'];
+const COUNTED = ['paid', 'cod_due', 'part_paid', 'partially_refunded', 'refunded'];
 
 const istDay = (col: unknown) => sql<string>`to_char((${col} at time zone 'Asia/Kolkata'), 'YYYY-MM-DD')`;
 

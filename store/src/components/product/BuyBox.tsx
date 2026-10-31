@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { BadgeCheck, Battery, Check, HardDrive, MapPin, Minus, Plus, Share2, ShieldCheck, Truck } from 'lucide-react';
+import { BadgeCheck, Battery, Check, HardDrive, MapPin, Minus, Plus, Share2, ShieldCheck, Truck, Video } from 'lucide-react';
 import { GRADES, GRADE_ORDER, POLICY, STUDENT, whatsappLink, type GradeKey } from '@/lib/config';
 import type { PublicUnit } from '@/lib/inventory';
 import type { UpgradeOption } from '@/lib/db/schema';
@@ -18,7 +18,7 @@ import AnimatedNumber from '../AnimatedNumber';
 
 type P = { id: string; slug: string; title: string; brand: string; newPrice: number | null; ramOptions: UpgradeOption[]; ssdOptions: UpgradeOption[]; gradePrices: { grade: GradeKey; price: number }[] };
 
-export default function BuyBox({ p, units, student, initialUnit }: { p: P; units: PublicUnit[]; student: 'approved' | 'none' | 'pending'; initialUnit?: string | null }) {
+export default function BuyBox({ p, units, student, initialUnit, booking = null }: { p: P; units: PublicUnit[]; student: 'approved' | 'none' | 'pending'; initialUnit?: string | null; /** booking amount in paise, null when booking is off */ booking?: number | null }) {
   const router = useRouter();
   const { add, has, busy } = useCart();
   const grades = GRADE_ORDER.filter((g) => units.some((u) => u.grade === g) || p.gradePrices.some((x) => x.grade === g));
@@ -243,6 +243,13 @@ export default function BuyBox({ p, units, student, initialUnit }: { p: P; units
           )}
         </AnimatePresence>
       </form>
+
+      {booking != null && unit && (
+        <div className="mt-5 flex gap-3 rounded-xl border border-accent/30 bg-accent-soft/60 p-4 text-[14px]">
+          <Video size={20} className="mt-0.5 shrink-0 text-accent-ink" aria-hidden="true" />
+          <p><b>Book it for {rupees(booking)}.</b> Choose “Book now” at checkout. We video-call you to show this exact laptop and its serial number, and you pay the rest on delivery after matching it.</p>
+        </div>
+      )}
 
       <ul className="mt-5 space-y-2 text-[13.5px] text-ink-2">
         <li className="flex gap-2"><ShieldCheck size={17} className="shrink-0" aria-hidden="true" /> {POLICY.warrantyMonths}-month warranty, repair or replace</li>

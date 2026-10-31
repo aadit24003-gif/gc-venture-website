@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { and, eq, inArray } from 'drizzle-orm';
-import { CheckCircle2, FileText, Package, Truck } from 'lucide-react';
+import { CheckCircle2, FileText, Package, ScanLine, Truck, Video } from 'lucide-react';
 import { getViewer } from '@/lib/auth/session';
-import { canViewOrder, orderByNumber } from '@/lib/orders';
+import { canViewOrder, dueOnline, orderByNumber } from '@/lib/orders';
+import { getSettings } from '@/lib/settings';
 import { CANCELLABLE_BY_CUSTOMER, PAYMENT_STATUS, STATUS } from '@/lib/order-status';
 import { eligibility, KIND_LABEL, SERVICE_STATUS, type ServiceKind } from '@/lib/service';
 import { db } from '@/lib/db';
@@ -30,6 +31,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   if (!canViewOrder(viewer ? { user: viewer.user } : null, o, key) && !viewer?.can('orders.view')) notFound();
 
   const d = await db();
+  const settings = await getSettings();
   const ws = await d.select().from(warranties).where(eq(warranties.orderId, o.id));
   const myReviews = viewer && items.length ? await d.select({ productId: reviews.productId }).from(reviews).where(and(eq(reviews.userId, viewer.user.id), inArray(reviews.productId, items.map((i) => i.productId)))) : [];
   const reviewed = new Set(myReviews.map((r) => r.productId));
@@ -69,7 +71,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         ) : (
           <StatusTimeline status={o.status} placedAt={o.createdAt.toISOString()} events={events.map((e) => ({ status: e.status, at: e.createdAt.toISOString() }))} />
         )}
-        {unpaid && <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-5"><PayAgain number={o.number} amount={o.total} guestKey={key} /><span className="text-[13.5px] text-mute">Unpaid orders are cancelled 30 minutes after they’re placed.</span></div>}
+        {unpaid && <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-line pt-5"><PayAgain number={o.number} amount={dueOnline(o)} guestKey={key} /><span className="text-[13.5px] text-mute">Unpaid orders are cancelled 30 minutes after they’re placed.</span></div>}
         {ship?.awb && (
           <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-line pt-5 text-[14.5px]">
             <Truck size={20} aria-hidden="true" />
@@ -86,6 +88,36 @@ export default async function OrderPage({ params, searchParams }: Props) {
           </details>
         )}
       </section>
+
+      {!unpaid && o.status !== 'cancelled' && (
+        <section className="card mt-6 grid gap-6 p-6 md:grid-cols-2" aria-labelledby="verify-h">
+          <h2 id="verify-h" className="sr-only">See it before you pay in full</h2>
+          <div className="flex gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-ink"><Video size={21} aria-hidden="true" /></span>
+            <div className="text-[14.5px]">
+              <p className="font-semibold">Video call: see your laptop</p>
+              {o.videoCallAt ? (
+                <p className="mt-1 text-mute">We showed you this laptop and its serial number on video on {formatDate(o.videoCallAt, true)}.</p>
+              ) : ['delivered', 'shipped', 'in_transit', 'out_for_delivery'].includes(o.status) ? (
+                <p className="mt-1 text-mute">Want to see it again or have a question? Message us on WhatsApp.</p>
+              ) : (
+                <p className="mt-1 text-mute">Before we dispatch, we video-call you on {formatPhone(o.phone ?? o.address.phone)} and show this exact laptop, its condition and its serial number.</p>
+              )}
+              <a href={`https://wa.me/${settings.business.whatsapp}?text=${encodeURIComponent(`Hi, I'd like a video call to see my laptop for order ${o.number}.`)}`} target="_blank" rel="noopener" className="btn btn-ghost btn-sm mt-3">Request a video call on WhatsApp</a>
+            </div>
+          </div>
+          <div className="flex gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent-ink"><ScanLine size={21} aria-hidden="true" /></span>
+            <div className="text-[14.5px]">
+              <p className="font-semibold">Match the serial number on delivery</p>
+              <p className="mt-1 text-mute">Check it against the sticker under the laptop{o.paymentStatus === 'part_paid' ? `, then pay the remaining ${rupees(o.total - o.bookingAmount)}` : ''}. If it doesn’t match, don’t accept the delivery.</p>
+              <ul className="mt-2 space-y-1">
+                {items.filter((i) => i.serialNumber).map((i) => <li key={i.id}><span className="text-mute">{i.title}:</span> <span className="mono font-semibold">{i.serialNumber}</span></li>)}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="card p-6" aria-labelledby="items-h">
@@ -127,21 +159,27 @@ export default async function OrderPage({ params, searchParams }: Props) {
           </section>
           <section className="card p-6 text-[14.5px]" aria-labelledby="pay-h">
             <h2 id="pay-h" className="text-[20px]">Payment</h2>
-            <p className="mt-3">{o.paymentMethod === 'cod' ? 'Pay on delivery' : o.paymentMethod === 'demo' ? 'Online (demo)' : 'Online through Razorpay'} · <StatusPill label={pay.label} tone={pay.tone} /></p>
+            <p className="mt-3">{o.bookingAmount > 0 ? 'Booked online, balance on delivery' : o.paymentMethod === 'cod' ? 'Pay on delivery' : o.paymentMethod === 'demo' ? 'Online (demo)' : 'Online through Razorpay'} · <StatusPill label={pay.label} tone={pay.tone} /></p>
+            {o.bookingAmount > 0 && (
+              <dl className="mt-3 space-y-1 rounded-xl bg-canvas p-3">
+                <div className="flex justify-between"><dt className="text-mute">Booking amount</dt><dd className="num">{rupees(o.bookingAmount)}{['part_paid', 'paid', 'partially_refunded', 'refunded'].includes(o.paymentStatus) ? ' paid' : ''}</dd></div>
+                <div className="flex justify-between"><dt className="text-mute">On delivery</dt><dd className="num">{rupees(o.total - o.bookingAmount)}{o.paymentStatus === 'paid' ? ' paid' : ''}</dd></div>
+              </dl>
+            )}
             {payments.filter((p) => p.method).map((p) => <p key={p.id} className="mt-1 text-mute">Paid by {p.method?.toUpperCase()}</p>)}
             {refunds.length > 0 && (
               <ul className="mt-3 space-y-2">
                 {refunds.map((r) => <li key={r.id} className="rounded-xl bg-canvas p-3"><b>Refund {rupees(r.amount)}</b> · {r.status === 'processed' ? `sent ${formatDate(r.processedAt)}` : r.status === 'manual' ? 'being paid by bank transfer' : r.status === 'failed' ? 'failed, we’ll retry' : 'in progress'}<br /><span className="text-[13px] text-mute">{r.reason}</span></li>)}
               </ul>
             )}
-            {o.paymentStatus !== 'pending' && o.paymentStatus !== 'failed' && o.paymentStatus !== 'cod_due' && (
+            {!['pending', 'failed', 'cod_due', 'part_paid'].includes(o.paymentStatus) && (
               <Link href={`/orders/${o.number}/invoice${key ? `?key=${key}` : ''}`} className="btn btn-ghost btn-sm mt-4"><FileText size={15} /> Invoice</Link>
             )}
           </section>
           {CANCELLABLE_BY_CUSTOMER.includes(o.status) && (
             <section className="card p-6" aria-label="Cancel">
               <p className="mb-3 text-[14px] text-mute">Changed your mind? You can cancel until we start packing.</p>
-              <CancelOrder number={o.number} guestKey={key} paid={o.paymentStatus === 'paid'} />
+              <CancelOrder number={o.number} guestKey={key} paid={o.paymentStatus === 'paid' || o.paymentStatus === 'part_paid'} />
             </section>
           )}
         </div>

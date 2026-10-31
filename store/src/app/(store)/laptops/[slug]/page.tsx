@@ -13,6 +13,7 @@ import { formatDate, gb, rupees } from '@/lib/format';
 import { USES } from '@/lib/filters';
 import Gallery from '@/components/product/Gallery';
 import BuyBox from '@/components/product/BuyBox';
+import { getSettings } from '@/lib/settings';
 import ViewTracker from '@/components/product/ViewTracker';
 import ProductCard from '@/components/ProductCard';
 import WishButton from '@/components/WishButton';
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params, searchParams }: Props) {
-  const [{ slug }, sp, viewer] = await Promise.all([params, searchParams, getViewer()]);
+  const [{ slug }, sp, viewer, settings] = await Promise.all([params, searchParams, getViewer(), getSettings()]);
   const p = await getProduct(slug);
   if (!p) notFound();
   const [similar, related, student, reviews, rating, all] = await Promise.all([
@@ -110,6 +111,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
               <BuyBox
                 p={{ id: p.id, slug: p.slug, title: p.title, brand: p.brand, newPrice: p.newPrice, ramOptions: p.ramOptions, ssdOptions: p.ssdOptions, gradePrices: p.variants.filter((v) => v.active).map((v) => ({ grade: v.grade as keyof typeof GRADES, price: v.price })) }}
                 units={p.units} student={student.state === 'approved' ? 'approved' : student.state === 'pending' ? 'pending' : 'none'} initialUnit={sp.unit ?? null}
+                booking={settings.shipping.bookingEnabled ? settings.shipping.bookingAmount : null}
               />
             </div>
           </div>

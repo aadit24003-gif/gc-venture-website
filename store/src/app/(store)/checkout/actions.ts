@@ -6,7 +6,7 @@ import { db } from '@/lib/db';
 import { addresses, orders, users } from '@/lib/db/schema';
 import { getViewer } from '@/lib/auth/session';
 import { BRAND, isDemo } from '@/lib/config';
-import { canViewOrder, createOrder, guestKey, markPaid, markPaymentFailed, quote, type Order } from '@/lib/orders';
+import { canViewOrder, createOrder, dueOnline, guestKey, markPaid, markPaymentFailed, quote, type Order } from '@/lib/orders';
 import { checkoutLines, removeUnitsFromCart } from '@/lib/cart';
 import { createRazorpayOrder, razorpayConfigured, razorpayKeyId, verifyPaymentSignature } from '@/lib/providers/razorpay';
 import { STATES, isGstin } from '@/lib/india';
@@ -40,7 +40,7 @@ const Place = z.object({
   address: Address.nullable(),
   saveAddress: z.boolean(),
   email: z.string().trim().toLowerCase().email('Enter a valid email for your receipt and updates.').or(z.literal('')).nullable(),
-  method: z.enum(['online', 'cod']),
+  method: z.enum(['online', 'cod', 'book']),
   coupon: z.string().trim().max(40).nullable(),
   gstin: z.string().trim().toUpperCase().refine((g) => !g || isGstin(g), 'That GSTIN doesn’t look right (15 characters, e.g. 06ABCDE1234F1Z5).').nullable(),
   acceptTerms: z.literal(true, { message: 'Please accept the terms of sale.' }),
@@ -85,7 +85,7 @@ export async function placeOrder(input: PlaceInput): Promise<PlaceResult> {
   if (!items.length) return { ok: false, error: 'Your cart is empty or its laptops were just sold. Review your cart.' };
   const res = await createOrder({
     userId: v?.user.id ?? null, items, address, email, phone: address.phone,
-    method, couponCode: p.coupon, gstin: p.gstin || null, name: address.name,
+    method, couponCode: p.coupon, gstin: p.gstin || null, name: address.name, book: p.method === 'book',
   });
   if (!res.ok) return res;
   await removeUnitsFromCart(items.map((i) => i.unitId));
@@ -111,25 +111,25 @@ async function ownOrder(number: string, key?: string | null): Promise<Order | nu
 export async function beginPayment(number: string, key?: string | null): Promise<PaymentStart> {
   const o = await ownOrder(number, key);
   if (!o) return { ok: false, error: 'Order not found.' };
-  if (o.paymentStatus === 'paid') return { ok: false, error: 'This order is already paid.' };
+  if (o.paymentStatus === 'paid' || o.paymentStatus === 'part_paid') return { ok: false, error: 'This order is already paid.' };
   if (!['awaiting_payment', 'payment_failed'].includes(o.status)) return { ok: false, error: 'This order can no longer be paid. Place a new order.' };
 
   if (!razorpayConfigured()) {
     if (!isDemo()) return { ok: false, error: 'Online payment is not switched on yet.' };
-    return { ok: true, mode: 'demo', amount: o.total };
+    return { ok: true, mode: 'demo', amount: dueOnline(o) };
   }
   const d = await db();
   let rzpId = o.razorpayOrderId;
   if (!rzpId) {
-    const r = await createRazorpayOrder({ amount: o.total, receipt: o.number, notes: { order: o.number } });
+    const r = await createRazorpayOrder({ amount: dueOnline(o), receipt: o.number, notes: { order: o.number, ...(o.bookingAmount ? { kind: 'booking' } : {}) } });
     rzpId = r.id;
     await d.update(orders).set({ razorpayOrderId: rzpId, paymentMethod: 'razorpay' }).where(eq(orders.id, o.id));
     const { payments } = await import('@/lib/db/schema');
     await d.update(payments).set({ provider: 'razorpay', providerOrderId: rzpId, updatedAt: new Date() }).where(and(eq(payments.orderId, o.id), eq(payments.status, 'created')));
   }
   return {
-    ok: true, mode: 'razorpay', keyId: razorpayKeyId(), rzpOrderId: rzpId, amount: o.total,
-    name: BRAND.name, description: `Order ${o.number}`,
+    ok: true, mode: 'razorpay', keyId: razorpayKeyId(), rzpOrderId: rzpId, amount: dueOnline(o),
+    name: BRAND.name, description: o.bookingAmount ? `Booking for order ${o.number}` : `Order ${o.number}`,
     prefill: { name: o.address.name, email: o.email ?? undefined, contact: `+91${o.phone}` },
   };
 }

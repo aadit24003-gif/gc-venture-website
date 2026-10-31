@@ -28,7 +28,7 @@ export async function saveShipping(fd: FormData) {
   const v = await staffCan('settings.manage');
   if (!v) return { ok: false, error: 'Only super admins can change settings.' };
   const r = await saveSettings('shipping', {
-    flatFee: paise(fd, 'flatFee'), freeAbove: paise(fd, 'freeAbove'), codEnabled: fd.get('codEnabled') === 'on', codFee: paise(fd, 'codFee'), codMax: paise(fd, 'codMax'),
+    flatFee: paise(fd, 'flatFee'), freeAbove: paise(fd, 'freeAbove'), codEnabled: fd.get('codEnabled') === 'on', codFee: paise(fd, 'codFee'), codMax: paise(fd, 'codMax'), bookingEnabled: fd.get('bookingEnabled') === 'on', bookingAmount: paise(fd, 'bookingAmount'),
     dispatchMin: Number(s(fd, 'dispatchMin')), dispatchMax: Number(s(fd, 'dispatchMax')),
     blockedPinPrefixes: s(fd, 'blockedPinPrefixes').split(/[\s,]+/).filter(Boolean), provider: s(fd, 'provider'), pickupPincode: s(fd, 'pickupPincode'),
   }, v.user.id);

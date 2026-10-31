@@ -30,6 +30,9 @@ export const ShippingSchema = z.object({
   codEnabled: z.boolean(),
   codFee: z.number().int().min(0),
   codMax: z.number().int().min(0),
+  /** Book with a small online payment; the balance is collected on delivery. */
+  bookingEnabled: z.boolean(),
+  bookingAmount: z.number().int().min(100), // paise
   dispatchMin: z.number().int().min(0).max(30),
   dispatchMax: z.number().int().min(0).max(30),
   /** PIN code prefixes you do not deliver to, e.g. "744" (Andaman). */
@@ -72,6 +75,8 @@ export const DEFAULT_SETTINGS: Settings = {
     codEnabled: POLICY.cod.enabled,
     codFee: POLICY.cod.fee,
     codMax: POLICY.cod.maxOrder,
+    bookingEnabled: POLICY.booking.enabled,
+    bookingAmount: POLICY.booking.amount,
     dispatchMin: POLICY.dispatchDays.min,
     dispatchMax: POLICY.dispatchDays.max,
     blockedPinPrefixes: [],

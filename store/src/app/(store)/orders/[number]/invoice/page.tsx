@@ -21,7 +21,7 @@ export default async function InvoicePage({ params, searchParams }: { params: Pr
   if (!data) notFound();
   const { order: o, items } = data;
   if (!canViewOrder(viewer ? { user: viewer.user } : null, o, key) && !viewer?.can('orders.view')) notFound();
-  if (['pending', 'failed', 'cod_due'].includes(o.paymentStatus)) notFound();
+  if (['pending', 'failed', 'cod_due', 'part_paid'].includes(o.paymentStatus)) notFound();
   const tax = gstFromInclusive(o.total, s.tax, o.address.state);
   const lineTax = (amount: number) => gstFromInclusive(amount, s.tax, o.address.state);
   return (

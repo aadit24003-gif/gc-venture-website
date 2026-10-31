@@ -12,6 +12,8 @@ import { GRADES, type GradeKey } from '@/lib/config';
 import { formatDate, formatPhone, gb, rupees } from '@/lib/format';
 import { PageHead, Panel } from '../../ui';
 import OrderControls from './OrderControls';
+import { RunButton } from '@/components/admin/ActionForm';
+import { markVideoCall } from '../actions';
 import { shiprocketConfigured } from '@/lib/shipping';
 
 export default async function AdminOrder({ params }: { params: Promise<{ number: string }> }) {
@@ -36,6 +38,18 @@ export default async function AdminOrder({ params }: { params: Promise<{ number:
         actions={<><Link href={`/admin/orders/${o.number}/label`} className="btn btn-ghost btn-sm"><Printer size={15} /> Packing slip</Link><Link href={`/orders/${o.number}/invoice`} className="btn btn-ghost btn-sm">Invoice</Link><Link href={`/orders/${o.number}`} className="btn btn-ghost btn-sm">Customer view</Link></>} />
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-6">
+          {!['awaiting_payment', 'payment_failed', 'cancelled'].includes(o.status) && (
+            <Panel title="Video call before dispatch">
+              {o.bookingAmount > 0 && <p className="mb-3 rounded-lg bg-accent-soft p-3 text-[14px]"><b>Booking order.</b> {rupees(o.bookingAmount)} paid online; collect <b>{rupees(o.total - o.bookingAmount)}</b> on delivery.</p>}
+              <div className="flex flex-wrap items-center justify-between gap-3 text-[14px]">
+                <p>{o.videoCallAt ? <>Done {formatDate(o.videoCallAt, true)}.</> : <>Call {o.address.name} on WhatsApp video, show the laptop, its condition and the serial sticker{items.length > 1 ? 's' : ''} ({items.map((i) => i.serialNumber).filter(Boolean).join(', ')}).</>}</p>
+                <div className="flex gap-2">
+                  <a href={`https://wa.me/91${(o.phone ?? o.address.phone).slice(-10)}`} target="_blank" rel="noopener" className="btn btn-ghost btn-sm">Open WhatsApp</a>
+                  {v.can('orders.manage') && <RunButton action={markVideoCall.bind(null, o.id)} label={o.videoCallAt ? 'Record another call' : 'Mark video call done'} className="btn btn-primary btn-sm" />}
+                </div>
+              </div>
+            </Panel>
+          )}
           <Panel title="Laptops to pick">
             <ul className="divide-y divide-line">
               {items.map((i) => {
@@ -98,7 +112,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ number:
 
         <div className="space-y-6">
           <OrderControls
-            order={{ id: o.id, status: o.status, adminNote: o.adminNote, carrier: o.courier ?? ship?.carrier ?? null, awb: o.trackingNumber ?? ship?.awb ?? null, trackingUrl: o.trackingUrl ?? ship?.trackingUrl ?? null, online: o.paymentMethod === 'razorpay' || o.paymentMethod === 'demo', paid: o.paymentStatus === 'paid' }}
+            order={{ id: o.id, status: o.status, adminNote: o.adminNote, carrier: o.courier ?? ship?.carrier ?? null, awb: o.trackingNumber ?? ship?.awb ?? null, trackingUrl: o.trackingUrl ?? ship?.trackingUrl ?? null, online: o.paymentMethod === 'razorpay' || o.paymentMethod === 'demo', paid: o.paymentStatus === 'paid' || o.paymentStatus === 'part_paid' }}
             next={NEXT_STATUS[o.status] ?? []} refundable={canRefundAmt}
             manualRefunds={refunds.filter((r) => r.status === 'manual').map((r) => ({ id: r.id, amount: `${rupees(r.amount)} · ${r.reason}` }))}
             canManage={v.can('orders.manage')} canRefund={v.can('refunds.manage')} shiprocket={shiprocketConfigured()}

@@ -1,12 +1,13 @@
 # Build checklist
 
-Status of every part of the brief. **Done** means built and exercised (unit tests, the 25-step browser test, or a manual run in demo mode). **Built, untested live** means the code exists but can't be proven until you add the account keys. **Blocked on you** needs a decision or an account only you can provide.
+Status of every part of the brief. **Done** means built and exercised (unit tests, the 26-step browser test, or a manual run in demo mode). **Built, untested live** means the code exists but can't be proven until you add the account keys. **Blocked on you** needs a decision or an account only you can provide.
 
 ## Done
 
 **Catalogue and storefront**
 - [x] LappyClub brand: logo, favicon, share images and emails
-- [x] Luxury design system (ivory, ink and champagne gold; Bodoni Moda and Jost) with scroll scenes and page transitions; green theme removed everywhere
+- [x] Modern store design (white, ink and blue; Plus Jakarta Sans) with scroll reveals and page transitions; green theme removed everywhere
+- [x] Book for ₹299 (amount and on/off in Admin → Settings), video call before dispatch (admin panel + customer request link), serial number to match on delivery, balance collected on delivery
 - [x] Official manufacturer photo for all 39 models (Dell, HP, Lenovo PSREF, Apple), cleaned and stored in the repo
 - [x] Home page: navigation, logo, search, hero with a real unit's report, brands, featured, popular (real data only), latest arrivals, deals, budgets, processors, grades, inspection, warranty, why refurbished, testimonials (shown only when ≥3 approved reviews exist), students, FAQ, newsletter, footer
 - [x] Catalogue with brand, price, grade, processor, generation, memory, storage, screen, use and availability filters; 7 sorts; URL-shareable; mobile filter sheet
@@ -56,7 +57,7 @@ Status of every part of the brief. **Done** means built and exercised (unit test
 - [x] Sitemap (pages, brands, categories, models with images, posts), robots, canonical URLs, share images per model
 - [x] Security headers, http-only cookies, hashed tokens, private file storage, Markdown rendered without raw HTML
 - [x] Health check `/api/health`
-- [x] 25 unit tests, 25-step browser test, clean production build
+- [x] 25 unit tests, 26-step browser test (including booking and the video call), clean production build
 
 ## Built, untested live (needs your keys)
 - [ ] Razorpay live payments, refunds and webhooks (tested with signatures and in demo mode only)
@@ -85,6 +86,7 @@ Values marked `[CONFIRM]` in code or settings.
 | Every grade price and the "price when new" figures | Admin → Laptop models |
 | Real stock: receive units with serials, costs and inspections | Admin → Inventory units (demo units disappear when `DEMO_MODE` is off on a fresh database) |
 | Warranty (12 months), extension (24 months for ₹2,499), returns (10 days), dispatch (1–2 days) | `POLICY` in `src/lib/config.ts` |
+| Booking amount (₹299) and that it is refunded in full if cancelled before dispatch; add the booking clause to your Terms if your database was created before this change | Admin → Settings → Shipping; Admin → Pages and blog → Terms |
 | Grade battery minimums, the 32 checks, "NIST 800-88" wiping claim | `GRADES`, `CHECKS` in `src/lib/config.ts` |
 | Delivery fee, COD limit and fee | Admin → Settings → Shipping |
 | Student discount rules | `STUDENT` in `src/lib/config.ts` |

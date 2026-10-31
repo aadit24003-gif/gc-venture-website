@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { BadgePercent, Banknote, Check, Lock, MapPin, Plus, ShieldCheck, Wallet } from 'lucide-react';
+import { BadgePercent, Banknote, Check, Lock, MapPin, Plus, ShieldCheck, Video, Wallet } from 'lucide-react';
 import { useCart } from '../cart/CartContext';
 import LoginFlow from '../auth/LoginFlow';
 import ProductImage from '../ui/ProductImage';
@@ -27,8 +27,10 @@ function Field({ id, label, err, children, className = '' }: { id: string; label
   return <div className={className}><label htmlFor={id} className="label">{label}</label>{children}{err && <p className="error-text" id={`${id}-err`}>{err}</p>}</div>;
 }
 
-export default function CheckoutClient({ viewer, addresses, student, onlineReady }: {
+export default function CheckoutClient({ viewer, addresses, student, onlineReady, booking }: {
   viewer: Viewer; addresses: Saved[]; student: 'approved' | 'pending' | 'rejected' | 'none'; onlineReady: boolean;
+  /** Book with a small online payment; the rest is paid on delivery. Amount in paise. */
+  booking: { enabled: boolean; amount: number };
 }) {
   const router = useRouter();
   const { cart, refresh } = useCart();
@@ -41,7 +43,8 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
   const [email, setEmail] = useState(viewer?.email ?? '');
   const [gstOpen, setGstOpen] = useState(false);
   const [gstin, setGstin] = useState('');
-  const [method, setMethod] = useState<'online' | 'cod'>(onlineReady ? 'online' : 'cod');
+  const canBook = booking.enabled && onlineReady;
+  const [method, setMethod] = useState<'online' | 'cod' | 'book'>(canBook ? 'book' : onlineReady ? 'online' : 'cod');
   const [couponInput, setCouponInput] = useState('');
   const [coupon, setCoupon] = useState<string | null>(null);
   const [terms, setTerms] = useState(false);
@@ -125,6 +128,7 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
   }
 
   const t = q?.totals;
+  const payNow = t ? (method === 'book' ? Math.min(booking.amount, t.total) : t.total) : 0;
   return (
     <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
       <div className="space-y-6">
@@ -191,15 +195,26 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
         {/* 3. Payment */}
         <section className="card p-6" aria-labelledby="p-h">
           <h2 id="p-h" className="text-[20px]"><span className="mono mr-2 text-[13px] text-mute">03</span>Payment</h2>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Payment method">
-            <label className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${method === 'online' ? 'border-ink ring-1 ring-ink' : 'border-line-2'} ${onlineReady ? '' : 'opacity-50'}`}>
-              <input type="radio" name="method" className="check mt-1" checked={method === 'online'} disabled={!onlineReady} onChange={() => setMethod('online')} />
-              <span><b className="flex items-center gap-2"><Wallet size={17} aria-hidden="true" /> Pay online</b><span className="text-[13.5px] text-mute">UPI, cards, net banking, wallets, card EMI</span></span>
-            </label>
-            <label className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${method === 'cod' ? 'border-ink ring-1 ring-ink' : 'border-line-2'} ${q && !q.codAllowed ? 'opacity-50' : ''}`}>
-              <input type="radio" name="method" className="check mt-1" checked={method === 'cod'} disabled={!!q && !q.codAllowed} onChange={() => setMethod('cod')} />
-              <span><b className="flex items-center gap-2"><Banknote size={17} aria-hidden="true" /> Pay on delivery</b><span className="text-[13.5px] text-mute">{q && !q.codAllowed ? `Only for orders up to ${rupees(q.codMax)}` : 'Cash or UPI to the courier'}</span></span>
-            </label>
+          <div className="mt-4 grid gap-2" role="radiogroup" aria-label="Payment method">
+            {canBook && (
+              <label className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${method === 'book' ? 'border-accent bg-accent-soft/60 ring-1 ring-accent' : 'border-line-2'}`}>
+                <input type="radio" name="method" className="check mt-1" checked={method === 'book'} onChange={() => setMethod('book')} />
+                <span className="flex-1">
+                  <b className="flex flex-wrap items-center gap-2"><Video size={17} aria-hidden="true" /> Book now for {rupees(booking.amount)} <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-semibold text-white">Recommended</span></b>
+                  <span className="mt-1 block text-[13.5px] text-mute">Pay {rupees(booking.amount)} now. Before dispatch we video-call you and show this exact laptop and its serial number. Pay the remaining {t ? rupees(Math.max(0, t.total - booking.amount)) : 'amount'} on delivery, after you match the serial number.</span>
+                </span>
+              </label>
+            )}
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${method === 'online' ? 'border-ink ring-1 ring-ink' : 'border-line-2'} ${onlineReady ? '' : 'opacity-50'}`}>
+                <input type="radio" name="method" className="check mt-1" checked={method === 'online'} disabled={!onlineReady} onChange={() => setMethod('online')} />
+                <span><b className="flex items-center gap-2"><Wallet size={17} aria-hidden="true" /> Pay online in full</b><span className="text-[13.5px] text-mute">UPI, cards, net banking, wallets, card EMI</span></span>
+              </label>
+              <label className={`flex cursor-pointer gap-3 rounded-xl border p-4 ${method === 'cod' ? 'border-ink ring-1 ring-ink' : 'border-line-2'} ${q && !q.codAllowed ? 'opacity-50' : ''}`}>
+                <input type="radio" name="method" className="check mt-1" checked={method === 'cod'} disabled={!!q && !q.codAllowed} onChange={() => setMethod('cod')} />
+                <span><b className="flex items-center gap-2"><Banknote size={17} aria-hidden="true" /> Pay on delivery</b><span className="text-[13.5px] text-mute">{q && !q.codAllowed ? `Only for orders up to ${rupees(q.codMax)}` : 'Cash or UPI to the courier'}</span></span>
+              </label>
+            </div>
           </div>
           <p className="mt-3 flex items-center gap-2 text-[13px] text-mute"><Lock size={14} aria-hidden="true" /> Payments are processed by Razorpay. We never see or store card details.</p>
         </section>
@@ -239,6 +254,12 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
               <div className="flex justify-between"><dt className="text-mute">Delivery</dt><dd className="num">{t.shippingFee ? rupees(t.shippingFee) : 'Free'}</dd></div>
               {t.codFee > 0 && <div className="flex justify-between"><dt className="text-mute">Pay-on-delivery fee</dt><dd className="num">{rupees(t.codFee)}</dd></div>}
               <div className="flex items-baseline justify-between border-t border-line pt-3"><dt className="font-semibold">Total</dt><dd className="price text-[26px]">{rupees(t.total)}</dd></div>
+              {method === 'book' && (
+                <div className="space-y-1.5 rounded-xl bg-accent-soft/60 p-3 text-[14px]">
+                  <div className="flex justify-between"><dt className="font-semibold">Pay now to book</dt><dd className="num font-semibold">{rupees(payNow)}</dd></div>
+                  <div className="flex justify-between"><dt className="text-mute">On delivery, after you match the serial</dt><dd className="num">{rupees(t.total - payNow)}</dd></div>
+                </div>
+              )}
               {q && q.tax.tax > 0 && <p className="text-right text-[12px] text-mute">Includes GST of {rupees(q.tax.tax)} ({q.tax.interState ? `IGST ${q.tax.rate}%` : `CGST + SGST ${q.tax.rate}%`})</p>}
               {q && q.tax.scheme === 'margin' && <p className="text-right text-[12px] text-mute">Prices include GST</p>}
               {t.couponNote && q?.couponValid !== false && <p className="text-[12.5px] text-mute">{t.couponNote}</p>}
@@ -255,7 +276,7 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
             {error && <motion.p ref={errRef} tabIndex={-1} role="alert" initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-xl bg-bad-soft p-3 text-[14px] text-bad">{error.text}</motion.p>}
           </AnimatePresence>
           <button type="button" className="btn btn-primary btn-lg mt-4 w-full" disabled={placing || !t || (!ok.length && !pendingOrder)} onClick={place}>
-            {placing ? 'Working…' : pendingOrder ? `Pay ${t ? rupees(t.total) : ''}` : method === 'cod' ? 'Place order' : `Pay ${t ? rupees(t.total) : ''}`}
+            {placing ? 'Working…' : method === 'book' && !pendingOrder ? `Book for ${rupees(payNow)}` : pendingOrder ? `Pay ${t ? rupees(payNow) : ''}` : method === 'cod' ? 'Place order' : `Pay ${t ? rupees(t.total) : ''}`}
           </button>
           <ul className="mt-4 space-y-1.5 text-[12.5px] text-mute">
             <li className="flex gap-2"><ShieldCheck size={15} aria-hidden="true" /> Laptops are reserved for you when you place the order.</li>

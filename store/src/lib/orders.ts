@@ -109,7 +109,7 @@ export async function findCoupon(code: string | null | undefined, who: Who): Pro
       who.phone ? eq(orders.phone, who.phone) : undefined,
     ].filter(Boolean);
     if (conds.length) {
-      const [{ n }] = await d.select({ n: sql<number>`count(*)::int` }).from(orders).where(and(or(...conds), inArray(orders.paymentStatus, ['paid', 'cod_due'])));
+      const [{ n }] = await d.select({ n: sql<number>`count(*)::int` }).from(orders).where(and(or(...conds), inArray(orders.paymentStatus, ['paid', 'cod_due', 'part_paid'])));
       if (n > 0) return { coupon: null, error: 'This code is for first orders only.' };
     }
   }
@@ -153,15 +153,20 @@ export async function releaseStaleOrders() {
 export async function createOrder(input: {
   userId: string | null; items: CheckoutItem[]; address: OrderAddress; email: string | null; phone: string;
   method: 'razorpay' | 'cod' | 'demo'; couponCode: string | null; gstin: string | null; name: string;
+  /** Book with a small online payment now; the rest is paid on delivery. */
+  book?: boolean;
 }): Promise<{ ok: true; order: Order } | { ok: false; error: string }> {
   await releaseStaleOrders();
   const cod = input.method === 'cod';
+  const book = !!input.book && !cod;
   const who: Who = { userId: input.userId, email: input.email, phone: input.phone };
   const q = await quote(who, input.items, input.couponCode, cod, input.address.state);
   if (!q.ok) return q;
   const s = await getSettings();
   if (s.shipping.blockedPinPrefixes.some((p) => input.address.pincode.startsWith(p))) return { ok: false, error: 'Sorry, we don’t deliver to this PIN code yet.' };
   if (cod && !q.codAllowed) return { ok: false, error: `Pay on delivery is available for orders up to ${rupees(s.shipping.codMax)}. Choose online payment.` };
+  if (book && !s.shipping.bookingEnabled) return { ok: false, error: 'Booking isn’t available right now. Pay online or on delivery.' };
+  const bookingAmount = book ? Math.min(s.shipping.bookingAmount, q.totals.total) : 0;
   const d = await db();
   try {
     const order = await d.transaction(async (tx) => {
@@ -171,7 +176,7 @@ export async function createOrder(input: {
         paymentMethod: input.method, paymentStatus: cod ? 'cod_due' : 'pending',
         subtotal: q.totals.subtotal, studentDiscount: q.totals.studentDiscount,
         couponCode: q.totals.couponCode, couponDiscount: q.totals.couponDiscount,
-        shippingFee: q.totals.shippingFee, codFee: q.totals.codFee, total: q.totals.total, taxAmount: q.tax.tax,
+        shippingFee: q.totals.shippingFee, codFee: q.totals.codFee, total: q.totals.total, taxAmount: q.tax.tax, bookingAmount,
         email: input.email, phone: input.phone, address: input.address, gstin: input.gstin, updatedAt: new Date(),
       }).returning();
       await reserveUnits(tx, q.lines.map((l) => l.unitId), o.id, cod ? null : new Date(Date.now() + HOLD_MINUTES * 60_000));
@@ -181,8 +186,8 @@ export async function createOrder(input: {
         studentDiscount: q.totals.lineStudent[i] ?? 0,
         unitId: l.unitId, unitCode: l.unitCode, serialNumber: l.serialNumber, batteryHealth: l.batteryHealth,
       })));
-      await tx.insert(payments).values({ orderId: o.id, provider: input.method, amount: o.total, status: cod ? 'cod_due' : 'created', method: cod ? 'cod' : null });
-      await tx.insert(orderEvents).values({ orderId: o.id, status: 'placed', note: cod ? 'Placed with pay on delivery' : 'Placed, waiting for payment' });
+      await tx.insert(payments).values({ orderId: o.id, provider: input.method, amount: dueOnline(o), status: cod ? 'cod_due' : 'created', method: cod ? 'cod' : null });
+      await tx.insert(orderEvents).values({ orderId: o.id, status: 'placed', note: cod ? 'Placed with pay on delivery' : book ? `Placed, waiting for the ${rupees(bookingAmount)} booking payment` : 'Placed, waiting for payment' });
       if (cod) {
         await tx.insert(orderEvents).values({ orderId: o.id, status: 'confirmed', note: 'Confirmed for pay on delivery' });
         await sellUnits(tx, o.id);
@@ -208,8 +213,11 @@ export async function createOrder(input: {
 export async function markPaid(orderId: string, p: { provider: string; paymentId: string | null; providerOrderId?: string | null; method?: string | null; raw?: unknown }, note = 'Payment received'): Promise<boolean> {
   const d = await db();
   const ok = await d.transaction(async (tx) => {
+    const [cur] = await tx.select({ total: orders.total, bookingAmount: orders.bookingAmount }).from(orders).where(eq(orders.id, orderId)).limit(1);
+    if (!cur) return false;
+    const booking = cur.bookingAmount > 0;
     const res = await tx.update(orders)
-      .set({ paymentStatus: 'paid', status: 'confirmed', razorpayPaymentId: p.paymentId, paidAt: new Date(), updatedAt: new Date() })
+      .set({ paymentStatus: booking ? 'part_paid' : 'paid', status: 'confirmed', razorpayPaymentId: p.paymentId, paidAt: new Date(), updatedAt: new Date() })
       .where(and(eq(orders.id, orderId), inArray(orders.status, ['awaiting_payment', 'payment_failed'])))
       .returning({ id: orders.id });
     if (!res.length) return false;
@@ -217,12 +225,12 @@ export async function markPaid(orderId: string, p: { provider: string; paymentId
     if (existing) {
       await tx.update(payments).set({ status: 'captured', providerPaymentId: p.paymentId, providerOrderId: p.providerOrderId ?? existing.providerOrderId, method: p.method ?? existing.method, raw: p.raw ?? null, updatedAt: new Date() }).where(eq(payments.id, existing.id));
     } else {
-      const [o] = await tx.select({ total: orders.total }).from(orders).where(eq(orders.id, orderId));
-      await tx.insert(payments).values({ orderId, provider: p.provider, providerOrderId: p.providerOrderId ?? null, providerPaymentId: p.paymentId, amount: o.total, status: 'captured', method: p.method ?? null, raw: p.raw ?? null });
+      await tx.insert(payments).values({ orderId, provider: p.provider, providerOrderId: p.providerOrderId ?? null, providerPaymentId: p.paymentId, amount: dueOnline(cur), status: 'captured', method: p.method ?? null, raw: p.raw ?? null });
     }
+    if (booking) await tx.insert(payments).values({ orderId, provider: 'cod', amount: cur.total - cur.bookingAmount, status: 'cod_due', method: 'cod' });
     // Units that were released (order paid after the hold expired) are re-reserved if still free.
     await sellUnits(tx, orderId);
-    await tx.insert(orderEvents).values({ orderId, status: 'confirmed', note });
+    await tx.insert(orderEvents).values({ orderId, status: 'confirmed', note: booking ? `Booking amount of ${rupees(cur.bookingAmount)} received; ${rupees(cur.total - cur.bookingAmount)} to pay on delivery` : note });
     return true;
   });
   if (ok) { invalidateProducts(); await afterConfirmed(orderId); }
@@ -260,9 +268,10 @@ export async function cancelOrder(orderId: string, reason: string, actor: Actor,
   invalidateProducts();
   if (actor) await audit(actor, 'order.cancel', 'order', o.number, { reason });
   let refundNote = o.paymentMethod === 'cod' ? 'Nothing was charged.' : 'Nothing was charged.';
-  if (o.paymentStatus === 'paid') {
-    const r = await refundOrder(orderId, o.total - o.refundedAmount, `Order cancelled: ${reason}`, actor);
-    refundNote = r.ok ? `Your refund of ${rupees(o.total - o.refundedAmount)} has been started; banks take 5 to 7 working days.` : 'We will refund you in full and confirm by email.';
+  const owed = ['paid', 'part_paid', 'partially_refunded'].includes(o.paymentStatus) ? await refundable(orderId) : 0;
+  if (owed > 0) {
+    const r = await refundOrder(orderId, owed, `Order cancelled: ${reason}`, actor);
+    refundNote = r.ok ? `Your refund of ${rupees(owed)} has been started; banks take 5 to 7 working days.` : 'We will refund you in full and confirm by email.';
   }
   if (!opts.silent) await notify('order_cancelled', { email: o.email }, { name: o.address.name, order_number: o.number, reason, refund_note: refundNote, order_url: orderUrl(o) }, o.number);
   return { ok: true };
@@ -285,7 +294,7 @@ export async function setStatus(
     const patch: Partial<Order> = { status, updatedAt: now };
     if (status === 'shipped') Object.assign(patch, { shippedAt: now, courier: extra.carrier || null, trackingNumber: extra.awb!.trim(), trackingUrl: extra.trackingUrl || null });
     if (status === 'delivered') patch.deliveredAt = now;
-    if (status === 'delivered' && cur.paymentMethod === 'cod' && cur.paymentStatus === 'cod_due') Object.assign(patch, { paymentStatus: 'paid', paidAt: now });
+    if (status === 'delivered' && ((cur.paymentMethod === 'cod' && cur.paymentStatus === 'cod_due') || cur.paymentStatus === 'part_paid')) Object.assign(patch, { paymentStatus: 'paid', paidAt: now });
     const [row] = await tx.update(orders).set(patch).where(eq(orders.id, orderId)).returning();
 
     // Shipment record
@@ -300,7 +309,7 @@ export async function setStatus(
     }
 
     if (status === 'delivered') {
-      if (cur.paymentMethod === 'cod') await tx.update(payments).set({ status: 'cod_collected', updatedAt: now }).where(and(eq(payments.orderId, orderId), eq(payments.status, 'cod_due')));
+      if (cur.paymentMethod === 'cod' || cur.bookingAmount > 0) await tx.update(payments).set({ status: 'cod_collected', updatedAt: now }).where(and(eq(payments.orderId, orderId), eq(payments.status, 'cod_due')));
       const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
       for (const it of items) {
         const ends = new Date(now);
@@ -334,7 +343,20 @@ export async function refundable(orderId: string) {
   const [o] = await d.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!o || o.paymentStatus === 'pending' || o.paymentStatus === 'failed' || o.paymentStatus === 'cod_due') return 0;
   const [{ sum }] = await d.select({ sum: sql<number>`coalesce(sum(${refunds.amount}),0)::int` }).from(refunds).where(and(eq(refunds.orderId, orderId), ne(refunds.status, 'failed')));
-  return Math.max(0, o.total - sum);
+  return Math.max(0, (await amountPaid(orderId)) - sum);
+}
+
+/** What the customer pays online now: the booking amount for a booking order, otherwise the total. */
+export function dueOnline(o: { total: number; bookingAmount: number }) {
+  return o.bookingAmount > 0 ? o.bookingAmount : o.total;
+}
+
+/** Money actually received on an order (online and on delivery), before refunds. */
+export async function amountPaid(orderId: string) {
+  const d = await db();
+  const [{ sum }] = await d.select({ sum: sql<number>`coalesce(sum(${payments.amount}),0)::int` }).from(payments)
+    .where(and(eq(payments.orderId, orderId), inArray(payments.status, ['captured', 'partially_refunded', 'refunded', 'cod_collected'])));
+  return sum;
 }
 
 /**
@@ -348,7 +370,12 @@ export async function refundOrder(orderId: string, amount: number, reason: strin
   const max = await refundable(orderId);
   if (!(amount > 0)) return { ok: false, error: 'Enter an amount to refund.' };
   if (amount > max) return { ok: false, error: `At most ${rupees(max)} can be refunded on this order.` };
-  const [pay] = await d.select().from(payments).where(and(eq(payments.orderId, orderId), inArray(payments.status, ['captured', 'partially_refunded', 'cod_collected']))).limit(1);
+  // A booking order has two payments (online booking, balance on delivery): refund through the
+  // online one when it can cover the amount, otherwise record a manual refund.
+  const rows = await d.select().from(payments).where(and(eq(payments.orderId, orderId), inArray(payments.status, ['captured', 'partially_refunded', 'cod_collected']))).orderBy(payments.createdAt);
+  const byRow = await d.select({ pid: refunds.paymentId, sum: sql<number>`coalesce(sum(${refunds.amount}),0)::int` }).from(refunds).where(and(eq(refunds.orderId, orderId), ne(refunds.status, 'failed'))).groupBy(refunds.paymentId);
+  const left = (r: typeof rows[number]) => r.amount - (byRow.find((x) => x.pid === r.id)?.sum ?? 0);
+  const pay = rows.find((r) => r.provider === 'razorpay' && left(r) >= amount) ?? rows.find((r) => left(r) >= amount) ?? rows[0];
 
   let status = 'manual';
   let providerRefundId: string | null = null;
@@ -366,9 +393,9 @@ export async function refundOrder(orderId: string, amount: number, reason: strin
   const refund = await d.transaction(async (tx) => {
     const [r] = await tx.insert(refunds).values({ orderId, paymentId: pay?.id ?? null, serviceRequestId: serviceRequestId ?? null, amount, reason, status, providerRefundId, byUserId: actor?.user.id ?? null, processedAt: status === 'processed' ? new Date() : null }).returning();
     const refundedAmount = o.refundedAmount + amount;
-    const full = refundedAmount >= o.total;
+    const full = refundedAmount >= o.total || amount >= max;
     await tx.update(orders).set({ refundedAmount, paymentStatus: full ? 'refunded' : 'partially_refunded', updatedAt: new Date() }).where(eq(orders.id, orderId));
-    if (pay) await tx.update(payments).set({ status: full ? 'refunded' : 'partially_refunded', updatedAt: new Date() }).where(eq(payments.id, pay.id));
+    if (pay) await tx.update(payments).set({ status: left(pay) - amount <= 0 ? 'refunded' : 'partially_refunded', updatedAt: new Date() }).where(eq(payments.id, pay.id));
     await tx.insert(orderEvents).values({ orderId, status: o.status, note: `Refund of ${rupees(amount)} ${status === 'manual' ? 'recorded (pay by bank transfer or UPI)' : status === 'processed' ? 'sent' : 'started'}: ${reason}`, byUserId: actor?.user.id ?? null });
     return r;
   });
@@ -396,11 +423,12 @@ async function afterConfirmed(orderId: string) {
   if (!o) return;
   const items = await d.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   const list = items.map((i) => `${i.title}: ${GRADES[i.grade as GradeKey]?.label ?? i.grade} grade, ${gb(i.ramGb)} memory, ${gb(i.ssdGb)} SSD, unit ${i.unitCode ?? ''} (${rupees(i.unitPrice)})`).join('\n');
-  const payment = o.paymentMethod === 'cod' ? 'to pay on delivery' : 'paid';
+  const balance = rupees(o.total - o.bookingAmount);
+  const payment = o.bookingAmount > 0 ? `booked with ${rupees(o.bookingAmount)}; ${balance} to pay on delivery, after you match the serial number` : o.paymentMethod === 'cod' ? 'to pay on delivery' : 'paid';
   await notify('order_confirmed', { email: o.email, phone: o.phone }, { name: o.address.name, order_number: o.number, items: list, total: rupees(o.total), payment, order_url: orderUrl(o) }, o.number);
   const inbox = process.env.ORDER_INBOX ?? process.env.CONTACT_INBOX ?? (await getSettings()).business.email;
   await notify('staff_new_order', { email: inbox }, {
-    order_number: o.number, items: list, total: rupees(o.total), payment: o.paymentMethod === 'cod' ? 'to collect on delivery' : 'paid online',
+    order_number: o.number, items: list, total: rupees(o.total), payment: o.bookingAmount > 0 ? `BOOKING: ${rupees(o.bookingAmount)} paid online, collect ${balance} on delivery. Video call the customer before dispatch.` : o.paymentMethod === 'cod' ? 'to collect on delivery' : 'paid online',
     ship_to: `${o.address.name}, ${o.address.city} ${o.address.pincode}`, admin_url: `${BRAND.url}/admin/orders/${o.number}`,
   }, o.number);
 }
@@ -474,7 +502,8 @@ export async function handleLatePayment(orderId: string, p: { paymentId: string;
     } catch {
       return false;
     }
-    await tx.update(orders).set({ status: 'confirmed', paymentStatus: 'paid', paidAt: new Date(), razorpayPaymentId: p.paymentId, cancelledAt: null, cancelReason: null, updatedAt: new Date() }).where(eq(orders.id, orderId));
+    if (o.bookingAmount > 0) await tx.insert(payments).values({ orderId, provider: 'cod', amount: o.total - o.bookingAmount, status: 'cod_due', method: 'cod' });
+    await tx.update(orders).set({ status: 'confirmed', paymentStatus: o.bookingAmount > 0 ? 'part_paid' : 'paid', paidAt: new Date(), razorpayPaymentId: p.paymentId, cancelledAt: null, cancelReason: null, updatedAt: new Date() }).where(eq(orders.id, orderId));
     await tx.insert(payments).values({ orderId, provider: 'razorpay', providerOrderId: p.providerOrderId, providerPaymentId: p.paymentId, amount: p.amount, status: 'captured', method: p.method ?? null, raw: p.raw ?? null }).onConflictDoNothing();
     await sellUnits(tx, orderId);
     await tx.insert(orderEvents).values({ orderId, status: 'confirmed', note: 'Paid after the hold expired; the laptop was still available, so the order was restored' });

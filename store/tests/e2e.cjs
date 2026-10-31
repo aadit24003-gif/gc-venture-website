@@ -5,7 +5,8 @@
  *   2. node tests/e2e.cjs               (needs Playwright: npm i -D playwright && npx playwright install chromium)
  *
  * Walks through, as real browsers:
- *   guest: browse, filter, pick a specific unit, cart, guest checkout, simulated payment, order page;
+ *   guest: browse, filter, pick a specific unit, cart, guest checkout booked with a small simulated
+ *   payment (balance on delivery), order page with the serial number; admin records the video call;
  *   member: create an account with a password, wishlist, pay on delivery, support ticket;
  *   student: ID upload; admin: approve the student, receive and inspect a new unit and list it,
  *   move the guest order through all fulfilment steps, issue a partial refund;
@@ -95,17 +96,20 @@ async function addFirstUnit(page, slug) {
       await p.waitForSelector('text=Every check');
       await p.close();
     });
-    await step('guest checkout with simulated UPI payment', async () => {
+    await step('guest books a laptop with a small online payment (simulated UPI)', async () => {
       await guest.goto(BASE + '/checkout', { waitUntil: 'networkidle' });
       await guest.fill('#email', `guest${run}@example.com`);
       await fillAddress(guest, { name: 'Guest Buyer', phone: `98${run}12`.slice(0, 10), pin: '560102', city: 'Bengaluru', line1: '12 Test Road, HSR Layout', state: 'Karnataka' });
       await guest.getByLabel(/I agree to the/).check();
-      await guest.click('aside button:has-text("Pay")');
+      await guest.getByRole('radio', { name: /Book now for/ }).check();
+      await guest.click('aside button:has-text("Book for")');
       await guest.click('button:has-text("Pay with UPI")', { timeout: 20000 });
       await guest.waitForURL('**/orders/**', { timeout: 20000 });
       guestUrl = guest.url().replace('&placed=1', '').replace('placed=1&', '');
       guestOrder = new URL(guest.url()).pathname.split('/').pop();
       await guest.waitForSelector('text=Payment confirmed');
+      await guest.waitForSelector('text=Booked, balance on delivery');
+      await guest.waitForSelector('text=Match the serial number on delivery');
     });
     await step('the sold unit is no longer offered', async () => {
       await guest.goto(`${BASE}/laptops/lenovo-thinkpad-t14-gen-2`, { waitUntil: 'networkidle' });
@@ -208,6 +212,12 @@ async function addFirstUnit(page, slug) {
       }
       throw new Error(`unit ${newUnit} not listed`);
     });
+    await step('admin records the video call for the booked order', async () => {
+      await admin.goto(`${BASE}/admin/orders/${guestOrder}`, { waitUntil: 'networkidle' });
+      await admin.waitForSelector('text=Booking order.');
+      await admin.click('button:has-text("Mark video call done")');
+      await admin.waitForSelector('text=Video call recorded');
+    });
     await step('admin moves the guest order through every fulfilment step', async () => {
       await admin.goto(`${BASE}/admin/orders/${guestOrder}`, { waitUntil: 'networkidle' });
       const move = async (label, fill) => {
@@ -228,7 +238,7 @@ async function addFirstUnit(page, slug) {
       await admin.fill('#rf-r', 'Goodwill for a delayed delivery (test)');
       admin.once('dialog', (d) => d.accept());
       await admin.click('button:has-text("Refund ₹500")');
-      await admin.waitForSelector('text=Refund started');
+      await admin.waitForSelector('text=/Refund (started|recorded)/');
     });
 
     /* ── After delivery ─────────────────────────────────────── */

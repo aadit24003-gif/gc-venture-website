@@ -6,13 +6,14 @@ import { addresses } from '@/lib/db/schema';
 import { studentStatus } from '@/lib/students';
 import { isDemo } from '@/lib/config';
 import { razorpayConfigured } from '@/lib/providers/razorpay';
+import { getSettings } from '@/lib/settings';
 import CheckoutClient from '@/components/checkout/CheckoutClient';
 
 export const metadata: Metadata = { title: 'Checkout', robots: { index: false } };
 export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage() {
-  const viewer = await getViewer();
+  const [viewer, settings] = await Promise.all([getViewer(), getSettings()]);
   let saved: (typeof addresses.$inferSelect)[] = [];
   let student: 'approved' | 'pending' | 'rejected' | 'none' = 'none';
   if (viewer) {
@@ -30,6 +31,7 @@ export default async function CheckoutPage() {
         addresses={saved.map((a) => ({ id: a.id, name: a.name, phone: a.phone, line1: a.line1, line2: a.line2, landmark: a.landmark, city: a.city, state: a.state, pincode: a.pincode }))}
         student={student}
         onlineReady={razorpayConfigured() || isDemo()}
+        booking={{ enabled: settings.shipping.bookingEnabled, amount: settings.shipping.bookingAmount }}
       />
     </div>
   );

@@ -26,6 +26,8 @@ Refurbished laptops: previously used, then inspected, repaired where needed, tes
 ## Orders
 Your order is confirmed when payment succeeds, or when you choose pay on delivery and we send the confirmation. Online orders that aren't paid within 30 minutes are cancelled automatically and the laptop goes back on sale. We may cancel an order if the laptop fails its final check before dispatch, if we suspect fraud or bulk resale, or if we can't deliver to the address; you are refunded in full.
 
+**Booking orders.** If you choose to book, you pay a booking amount online and the rest on delivery. The booking amount is part of the price, not an extra charge. Before dispatch we show you the laptop and its serial number on a video call. If you cancel before dispatch, the booking amount is refunded in full. On delivery, check the serial number against your order page before you pay the balance.
+
 ## Student discount
 The {{student_percent}}% student discount is for individuals currently enrolled at a recognised school, college or university, verified with a college email or student ID. It lasts {{student_months}} months, applies to {{student_units}} per order and does not combine with coupons. We may withdraw it and cancel orders if verification details turn out to be false.
 

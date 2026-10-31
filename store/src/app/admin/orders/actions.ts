@@ -4,10 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { orders, payments } from '@/lib/db/schema';
+import { orderEvents, orders, payments } from '@/lib/db/schema';
 import { staffCan } from '@/lib/auth/session';
 import { ADMIN_STATUSES } from '@/lib/order-status';
-import { markPaid, markRefundProcessed, refundOrder, setStatus } from '@/lib/orders';
+import { markPaid, markRefundProcessed, refundOrder, setStatus, dueOnline } from '@/lib/orders';
 import { orderPayments, razorpayConfigured } from '@/lib/providers/razorpay';
 import { audit } from '@/lib/audit';
 
@@ -69,10 +69,10 @@ export async function reconcilePayment(orderId: string): Promise<R> {
   const [o] = await d.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!o?.razorpayOrderId) return { ok: false, error: 'This order never reached Razorpay.' };
   const list = await orderPayments(o.razorpayOrderId);
-  const captured = list.find((p) => p.status === 'captured' && p.amount === o.total);
+  const captured = list.find((p) => p.status === 'captured' && p.amount === dueOnline(o));
   await audit(v, 'payment.reconcile', 'order', o.number, { found: list.map((p) => ({ id: p.id, status: p.status })) });
   if (!captured) return { ok: true, message: list.length ? `Razorpay shows ${list.length} attempt(s), none captured.` : 'Razorpay has no payment for this order.' };
-  if (o.paymentStatus === 'paid') {
+  if (o.paymentStatus === 'paid' || o.paymentStatus === 'part_paid') {
     await d.update(payments).set({ method: captured.method }).where(eq(payments.providerPaymentId, captured.id));
     return { ok: true, message: 'Already marked paid; details refreshed.' };
   }
@@ -98,4 +98,18 @@ export async function shipWithShiprocket(orderId: string): Promise<R> {
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message.slice(0, 300) : 'Shiprocket failed.' };
   }
+}
+
+/** Records that staff showed the customer their laptop and its serial number on a video call. */
+export async function markVideoCall(orderId: string): Promise<R> {
+  const v = await staffCan('orders.manage');
+  if (!v) return deny;
+  if (!z.string().uuid().safeParse(orderId).success) return { ok: false, error: 'Order not found.' };
+  const d = await db();
+  const [o] = await d.update(orders).set({ videoCallAt: new Date(), updatedAt: new Date() }).where(eq(orders.id, orderId)).returning();
+  if (!o) return { ok: false, error: 'Order not found.' };
+  await d.insert(orderEvents).values({ orderId, status: o.status, note: 'Video call done: laptop and serial number shown to the customer', byUserId: v.user.id });
+  await audit(v, 'order.video_call', 'order', o.number, {});
+  revalidatePath(`/admin/orders/${o.number}`);
+  return { ok: true, message: 'Video call recorded.' };
 }

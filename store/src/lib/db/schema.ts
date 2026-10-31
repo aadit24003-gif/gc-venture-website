@@ -310,7 +310,7 @@ export const orders = pgTable('orders', {
    */
   status: text().notNull().default('awaiting_payment'),
   paymentMethod: text().notNull(), // razorpay | cod | demo
-  paymentStatus: text().notNull().default('pending'), // pending | paid | failed | refunded | cod_due
+  paymentStatus: text().notNull().default('pending'), // pending | paid | part_paid | failed | refunded | cod_due
   subtotal: integer().notNull(),
   studentDiscount: integer().notNull().default(0),
   couponCode: text(),
@@ -318,6 +318,13 @@ export const orders = pgTable('orders', {
   shippingFee: integer().notNull().default(0),
   codFee: integer().notNull().default(0),
   total: integer().notNull(),
+  /**
+   * Booking orders: the amount paid online to reserve the laptop (0 for a normal order). The
+   * rest of the total is collected on delivery, after the customer has seen the unit on video.
+   */
+  bookingAmount: integer().notNull().default(0),
+  /** When staff showed the customer their laptop (and its serial number) on a video call. */
+  videoCallAt: timestamp({ withTimezone: true }),
   /** GST contained in the total (prices include tax). */
   taxAmount: integer().notNull().default(0),
   refundedAmount: integer().notNull().default(0),

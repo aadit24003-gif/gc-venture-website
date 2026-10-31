@@ -49,7 +49,7 @@ export async function createShiprocketShipment(o: Order): Promise<{ carrier: str
   const d = await db();
   const items = await d.select().from(orderItems).where(eq(orderItems.orderId, o.id));
   const [first, ...rest] = o.address.name.split(' ');
-  const cod = o.paymentMethod === 'cod' && o.paymentStatus !== 'paid';
+  const cod = (o.paymentMethod === 'cod' && o.paymentStatus !== 'paid') || o.paymentStatus === 'part_paid';
   const created = await call<{ order_id: number; shipment_id: number }>('/orders/create/adhoc', {
     method: 'POST',
     body: JSON.stringify({
@@ -59,7 +59,7 @@ export async function createShiprocketShipment(o: Order): Promise<{ carrier: str
       billing_city: o.address.city, billing_pincode: o.address.pincode, billing_state: o.address.state, billing_country: 'India',
       billing_email: o.email ?? '', billing_phone: o.address.phone, shipping_is_billing: true,
       order_items: items.map((i) => ({ name: i.title, sku: i.unitCode ?? i.productId, units: i.qty, selling_price: Math.round((i.unitPrice - i.studentDiscount) / 100), hsn: 8471 })),
-      payment_method: cod ? 'COD' : 'Prepaid', sub_total: Math.round(o.total / 100),
+      payment_method: cod ? 'COD' : 'Prepaid', sub_total: Math.round((o.total - (cod ? o.bookingAmount : 0)) / 100), // COD collects only the balance on booking orders
       length: 40, breadth: 30, height: 8, weight: Math.max(2.5, items.length * 2.5),
     }),
   });

@@ -21,7 +21,7 @@ More detail:
 | Product | `/laptops/<model>` | Official manufacturer photos; grade tabs; **choose the exact unit** (battery %, cycles, SSD %, cosmetic notes, report link); memory/storage upgrades; warranty extension; quantity up to the units available; EMI table; PIN code delivery check; share; wishlist; compare; specs; verified reviews; similar, more from the brand, recently viewed; Product JSON-LD (rating only when real reviews exist) |
 | Unit report | `/units/<code>` | Every check with its result, measured values, parts replaced, inspector and date |
 | Cart | drawer and `/cart` | Stored in the database (guests by cookie, merged on sign-in); edit configuration per unit; sold units flagged |
-| Checkout | `/checkout` | Guest or signed in; saved addresses; PIN auto-fill; GSTIN; coupons; student discount; delivery and COD fees from settings; GST shown; Razorpay or pay on delivery; terms consent |
+| Checkout | `/checkout` | Guest or signed in; saved addresses; PIN auto-fill; GSTIN; coupons; student discount; delivery and COD fees from settings; GST shown; book with ₹299 (balance on delivery), Razorpay in full, or pay on delivery; terms consent |
 | Order | `/orders/<number>` | 8-step tracker, shipment updates, payments and refunds, invoice with GST breakdown, cancel (auto-refund), returns/replacements/warranty/complaints with photos, reviews. Guests open it with a private link |
 | Accounts | `/login`, `/register`, `/forgot`, `/reset/…`, `/verify-email/…`, `/track` | One-time code (SMS or email) or password; email confirmation; password reset; guest order lookup |
 | Customer dashboard | `/account/…` | Overview, orders, returns and repairs, warranty, wishlist, recently viewed, addresses, support conversations, profile and security |
@@ -61,7 +61,7 @@ No accounts or keys are needed. Without them the store runs in **demo mode**: th
 | `npm run build` | Production build |
 | `npm run typecheck` | TypeScript check |
 | `npm run test:unit` | 25 checks: prices, upgrades, coupons, shipping, GST, signatures, passwords, roles, order flow, filters, Markdown safety |
-| `npm run test:e2e` | 25 browser steps through guest and member purchases, admin inventory and fulfilment, refunds, returns, reviews, tickets and student verification (needs the dev server and Playwright) |
+| `npm run test:e2e` | 26 browser steps through a booked guest purchase with the video call, a member purchase, admin inventory and fulfilment, refunds, returns, reviews, tickets and student verification (needs the dev server and Playwright) |
 | `npm run db:generate` | New migration after changing `src/lib/db/schema.ts` |
 | `npm run db:setup` | Migrate and seed the database in `DATABASE_URL` |
 
@@ -92,8 +92,16 @@ Everything marked `[CONFIRM]` in the code is a working default. The full list, w
 
 ## Design
 
-- **Idea:** quiet luxury with proof. Generous whitespace and editorial type, with the trust carried by facts: every unit has its own "passport" (inspection report), the promise band (warranty, exact unit, returns, secure invoiced payment) sits right under the hero, and the checklist ticks off as you scroll.
-- **Logo:** `src/components/Logo.tsx`. A Bodoni "L" drawn as an open laptop (thick stem = lid, hairline base = deck) inside the open "C" of the club, with a gold clasp. The same geometry draws the favicon (`src/app/icon.svg`) and the share images.
-- **Colour:** ivory `#FAF8F3` and bone `#F4F0E8` surfaces, warm ink `#16130F`, one champagne-gold accent `#B8935A` (emblem, seals, hairlines, savings). Photos sit on pure white. Status colours only for states.
-- **Type:** Bodoni Moda (optical sizes) for headings, Jost for text, labels and prices, Geist Mono for unit codes and measurements. All self-hosted.
-- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): the hero is pinned while the laptop comes forward and the words lift away, then the promise band rises over it; headings slide up line by line; sections and cards rise in turn; the 32-point checklist ticks as it moves up the screen; images drift against the scroll; every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
+- **Idea:** a modern store that answers "why should I trust you?" up front. Book a laptop with a small amount (₹299 by default, set in Admin → Settings → Shipping), see the exact unit on a video call before dispatch, match the serial number on delivery, then pay the balance. Imported business-grade laptops, each with its own inspection report.
+- **Logo:** `src/components/Logo.tsx`: a blue tile with a bold "L" drawn as an open laptop seen from the side, plus a camera dot; wordmark "lappy" in ink and "club" in blue. The same geometry draws the favicon (`src/app/icon.svg`) and the share images.
+- **Colour:** white and light grey `#F4F6F9`, ink `#0D1321`, one blue `#2563EB` for actions and trust signals, orange-red `#E0442A` only for savings. Status colours only for states.
+- **Type:** Plus Jakarta Sans throughout, Geist Mono for unit codes, serial numbers and measurements. Self-hosted.
+- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): sections and cards rise into place in turn as they scroll in, the "how it works" line fills as you scroll, the sample report drifts, and every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.
+
+## Booking flow
+
+1. Checkout offers **Book now for ₹299** (default), **Pay online in full** or **Pay on delivery**.
+2. A booking order is paid online for the booking amount only. It shows as "Booked, balance on delivery"; the unit is sold to the customer.
+3. Admin → Orders → the order shows a **Video call before dispatch** panel: open WhatsApp, show the laptop and its serial sticker, then press **Mark video call done** (logged in the order history and shown to the customer).
+4. The customer's order page shows the serial number to match on delivery and the balance due. The packing label and Shiprocket collect only the balance.
+5. Marking the order delivered records the balance as collected. Cancelling before dispatch refunds the booking amount automatically.

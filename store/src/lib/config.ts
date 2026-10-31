@@ -11,11 +11,11 @@ export const BRAND = {
   name: 'LappyClub',
   /** Two letters that start every order number (LC-261031-ABCD). */
   orderPrefix: 'LC',
-  tagline: 'Certified pre-owned laptops, restored and guaranteed',
+  tagline: 'Imported business laptops, inspected and guaranteed',
   /** [CONFIRM] Production address of the store, without a trailing slash. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3100',
   description:
-    'Certified refurbished Dell, HP, Lenovo and Apple laptops with a measured condition report, warranty, free delivery across India and 10% off for students.',
+    'Imported, certified refurbished Dell, HP, Lenovo and Apple laptops. Book with a small token amount, see your exact laptop on a video call, match the serial number on delivery. 12-month warranty.',
 } as const;
 
 export const CONTACT = {
@@ -56,6 +56,12 @@ export const POLICY = {
   shippingFee: 0,
   /** [CONFIRM] Cash on delivery. Orders above maxOrder must be paid online. */
   cod: { enabled: true, fee: 0, maxOrder: 60_000_00 },
+  /**
+   * [CONFIRM] Book a laptop online for a small amount, see it on a video call, pay the rest on
+   * delivery after matching the serial number. The booking amount is part of the price, not extra,
+   * and is refunded in full if the order is cancelled before dispatch.
+   */
+  booking: { enabled: true, amount: 299_00 },
   /** [CONFIRM] Card EMI estimate shown on product pages (interest is set by the customer's bank). */
   emi: { annualRate: 0.15, tenures: [3, 6, 9, 12], minOrder: 3_000_00 },
 } as const;
