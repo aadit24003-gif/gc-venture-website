@@ -53,7 +53,7 @@ No accounts or keys are needed. Without them the store runs in **demo mode**: th
 
 To open `/admin` locally, put `ADMIN_EMAILS=you@example.com` in `store/.env.local`, restart, and sign in with that email.
 
-Other commands: `npm run build`, `npm run typecheck`, `npm run test:e2e` (a browser run through a purchase, a student verification and the admin; needs Playwright and the dev server running), `npm run db:generate` (after changing `src/lib/db/schema.ts`), `npm run db:setup` (migrate and seed the database in `DATABASE_URL`).
+Other commands: `npm run build`, `npm run typecheck`, `npm run test:unit` (price rules, coupons, EMI, Razorpay signatures, sign-in parsing), `npm run test:e2e` (a browser run through a purchase, a student verification and the admin; needs Playwright and the dev server running), `npm run db:generate` (after changing `src/lib/db/schema.ts`), `npm run db:setup` (migrate and seed the database in `DATABASE_URL`).
 
 ---
 

@@ -31,7 +31,7 @@ type Ctx = {
   ready: boolean;
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (l: Omit<CartLine, 'key' | 'qty'> & { qty?: number }) => void;
+  add: (l: Omit<CartLine, 'key' | 'qty'> & { qty?: number }, opts?: { open?: boolean }) => void;
   setQty: (key: string, qty: number) => void;
   remove: (key: string) => void;
   clear: () => void;
@@ -68,14 +68,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try { localStorage.setItem(STORE, JSON.stringify(lines)); } catch { /* ignore */ }
   }, [lines, ready]);
 
-  const add = useCallback<Ctx['add']>((l) => {
+  const add = useCallback<Ctx['add']>((l, opts) => {
     const key = lineKey(l);
     setLines((prev) => {
       const found = prev.find((x) => x.key === key);
       if (found) return prev.map((x) => (x.key === key ? { ...x, qty: Math.min(x.maxQty, x.qty + (l.qty ?? 1)), unit: l.unit } : x));
       return [...prev, { ...l, key, qty: Math.min(l.maxQty, l.qty ?? 1) }];
     });
-    setOpen(true);
+    if (opts?.open !== false) setOpen(true);
   }, []);
   const setQty = useCallback((key: string, qty: number) => {
     setLines((prev) => prev.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.min(x.maxQty, qty)) } : x)));

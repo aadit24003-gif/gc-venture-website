@@ -218,7 +218,7 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
           <button type="button" className="btn btn-primary btn-lg flex-1" disabled={soldOut} onClick={() => add(line())}>
             {soldOut ? `${GRADES[grade].label} is sold out` : 'Add to cart'}
           </button>
-          <button type="button" className="btn btn-tag btn-lg flex-1" disabled={soldOut} onClick={() => { add(line()); router.push('/checkout'); }}>
+          <button type="button" className="btn btn-tag btn-lg flex-1" disabled={soldOut} onClick={() => { add(line(), { open: false }); router.push('/checkout'); }}>
             Buy now
           </button>
         </div>

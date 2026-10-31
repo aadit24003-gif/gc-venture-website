@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'motion/react';
 import { Minus, Plus, ShieldCheck, Trash2, X } from 'lucide-react';
 import { useCart } from './CartContext';
@@ -11,6 +12,8 @@ import { gb, rupees } from '@/lib/format';
 
 export default function CartDrawer() {
   const { open, setOpen, lines, setQty, remove, subtotal, count } = useCart();
+  const path = usePathname();
+  useEffect(() => { setOpen(false); }, [path, setOpen]);
 
   useEffect(() => {
     if (!open) return;

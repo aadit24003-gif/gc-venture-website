@@ -44,6 +44,8 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
   const [placing, startPlacing] = useTransition();
   const [, startQuote] = useTransition();
   const errRef = useRef<HTMLParagraphElement>(null);
+  const payRef = useRef<HTMLButtonElement>(null);
+  const [payVisible, setPayVisible] = useState(true);
 
   // Signing in happens on this page; fill in what the account already knows.
   useEffect(() => {
@@ -63,6 +65,14 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
       setQ({ totals: r.totals, student: r.student, couponValid: r.couponValid });
     });
   }, [cartInput, coupon, method, ready, lines.length]);
+
+  useEffect(() => {
+    const el = payRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setPayVisible(e.isIntersecting), { threshold: 0.2 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ready, lines.length]);
 
   const subtotalPreview = lines.reduce((n, l) => n + l.unit * l.qty, 0);
   const total = q?.totals.total ?? subtotalPreview;
@@ -282,13 +292,24 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
             <p ref={errRef} className="mt-4 text-[14.5px] text-alert" role="alert">Check the highlighted field: {error.text}</p>
           )}
 
-          <button type="button" onClick={submit} className="btn btn-primary btn-lg mt-5 w-full" disabled={!viewer || placing || !!quoteError}>
+          <button ref={payRef} type="button" onClick={submit} className="btn btn-primary btn-lg mt-5 w-full" disabled={!viewer || placing || !!quoteError}>
             <Lock size={17} /> {placing ? 'Working…' : pendingOrder ? `Pay ${rupees(total)}` : method === 'cod' ? 'Place order' : `Pay ${rupees(total)}`}
           </button>
           {window_ && <p className="mt-3 flex items-center gap-2 text-[14px] text-mute"><MapPin size={15} /> Arrives {shortDate(window_.from)} to {shortDate(window_.to)}</p>}
           <p className="mt-2 flex items-center gap-2 text-[14px] text-mute"><ShieldCheck size={15} /> {POLICY.warrantyMonths}-month warranty and {POLICY.returnDays}-day returns</p>
         </div>
       </aside>
+      {viewer && !payVisible && (
+        <div className="fixed inset-x-3 bottom-3 z-40 flex items-center gap-3 rounded-[20px] bg-white/90 p-2.5 pl-4 shadow-[0_20px_50px_-20px_rgba(15,61,51,.55)] backdrop-blur-xl lg:hidden">
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] text-mute">Total{t?.studentDiscount ? ', student price' : ''}</p>
+            <p className="price text-[21px] leading-tight">{rupees(total)}</p>
+          </div>
+          <button type="button" onClick={submit} className="btn btn-primary" disabled={placing || !!quoteError}>
+            <Lock size={16} /> {placing ? 'Working…' : method === 'cod' ? 'Place order' : 'Pay'}
+          </button>
+        </div>
+      )}
       {sheet}
     </div>
   );
