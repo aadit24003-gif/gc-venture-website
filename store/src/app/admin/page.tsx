@@ -68,7 +68,7 @@ export default async function Overview({ searchParams }: { searchParams: Promise
           ['Student IDs to check', q.students, '/admin/students', 'students.review'],
           ['Units in the workshop', q.inWorkshop, '/admin/inventory?status=workshop', 'inventory.manage'],
         ].filter(([, , , p]) => can(p as Parameters<typeof v.can>[0])).map(([label, n, href]) => (
-          <Link key={href as string} href={href as string} className="group rounded-[16px] border border-line bg-white p-4 transition hover:border-ink">
+          <Link key={href as string} href={href as string} className="group rounded-card border border-line bg-white p-4 transition hover:border-ink">
             <p className="text-[12.5px] text-mute">{label}</p>
             <p className="mt-1 flex items-center justify-between"><span className="price text-[26px]">{n}</span><ArrowRight size={16} className="text-faint transition group-hover:translate-x-0.5 group-hover:text-ink" aria-hidden="true" /></p>
           </Link>

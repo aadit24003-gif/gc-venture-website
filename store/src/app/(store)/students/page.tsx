@@ -61,7 +61,7 @@ export default async function StudentsPage() {
             ['Verify', 'College email: approved instantly. Student ID photo: checked within one working day.'],
             [`Save ${STUDENT.percent}%`, `Applied automatically at checkout for ${STUDENT.validityMonths} months, with the ${POLICY.warrantyMonths}-month warranty as usual.`],
           ].map(([t, b], i) => (
-            <li key={t} className="rounded-[26px] bg-white p-6">
+            <li key={t} className="rounded-sheet bg-white p-6">
               <span className="display flex h-10 w-10 items-center justify-center rounded-full bg-tag text-[18px] font-bold text-spruce">{i + 1}</span>
               <p className="mt-4 text-[20px] font-semibold text-spruce display">{t}</p>
               <p className="mt-1 text-[15.5px] text-mute">{b}</p>
@@ -89,7 +89,7 @@ export default async function StudentsPage() {
           <ul className="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
             {picks.map((p) => (
               <li key={p.id}>
-                <Link href={`/laptops/${p.slug}`} className="flex items-center gap-4 rounded-[24px] bg-white p-4 transition-shadow hover:shadow-[0_20px_40px_-26px_rgba(15,61,51,.5)]">
+                <Link href={`/laptops/${p.slug}`} className="flex items-center gap-4 rounded-sheet bg-white p-4 transition-shadow hover:shadow-[0_20px_40px_-26px_rgba(15,61,51,.5)]">
                   <span className="w-[110px] shrink-0 rounded-2xl bg-bench p-2"><LaptopArt art={p.art} brand={p.brand} slug={p.slug} flat /></span>
                   <span className="min-w-0">
                     <span className="block font-semibold text-spruce">{p.title}</span>
@@ -109,7 +109,7 @@ export default async function StudentsPage() {
 
       <section className="wrap mt-20 grid gap-8 lg:grid-cols-[0.8fr_1.2fr]" aria-labelledby="sfaq-h">
         <h2 id="sfaq-h" className="text-[34px]">Questions students ask</h2>
-        <div className="divide-y divide-line rounded-[28px] bg-white px-6">
+        <div className="divide-y divide-line rounded-sheet bg-white px-6">
           {FAQ.map(([q, a]) => (
             <details key={q} className="group py-5">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[17px] font-semibold text-spruce">

@@ -6,6 +6,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { BRAND } from './config';
+import { EMBLEM } from '@/components/Logo';
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
@@ -13,24 +14,24 @@ export async function ogFonts() {
   const dir = join(process.cwd(), 'src/lib/og-fonts');
   const read = (f: string) => readFile(join(dir, f));
   // the -ext files carry extra Latin letters and currency signs
-  const [display, displayExt, text, textExt] = await Promise.all([read('funnel-display-700.woff'), read('funnel-display-700-ext.woff'), read('funnel-sans-500.woff'), read('funnel-sans-500-ext.woff')]);
+  const [display, displayItalic, text, textExt] = await Promise.all([read('bodoni-500.woff'), read('bodoni-500-italic.woff'), read('jost-500.woff'), read('jost-500-ext.woff')]);
   return [
-    { name: 'Display', data: display, style: 'normal' as const, weight: 700 as const },
-    { name: 'Display', data: displayExt, style: 'normal' as const, weight: 700 as const },
+    { name: 'Display', data: display, style: 'normal' as const, weight: 500 as const },
+    { name: 'Display', data: displayItalic, style: 'italic' as const, weight: 500 as const },
     { name: 'Text', data: text, style: 'normal' as const, weight: 500 as const },
     { name: 'Text', data: textExt, style: 'normal' as const, weight: 500 as const },
   ];
 }
 
-export const C = { canvas: '#f3f4f6', white: '#ffffff', ink: '#0e0f12', mute: '#5b606a', line: '#e3e5e9', accent: '#f5a524', accentInk: '#8a5200' };
+export const C = { canvas: '#f4f0e8', ivory: '#faf8f3', white: '#ffffff', ink: '#16130f', mute: '#6f685e', line: '#e8e2d6', accent: '#b8935a', accentInk: '#77592b', gold: '#dcc49a' };
 
 /** The inspection report card, drawn with plain boxes. */
 export function OgCert({ title, rows, width = 360, seal }: { title: string; rows: [string, string][]; width?: number; seal: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', width, background: C.white, borderRadius: 22, border: `1.5px solid ${C.line}`, padding: '24px 26px', boxShadow: '0 30px 60px -24px rgba(14,15,18,.35)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', width, background: C.white, borderRadius: 8, border: `1.5px solid ${C.line}`, padding: '24px 26px', boxShadow: '0 30px 60px -24px rgba(22,19,15,.35)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', fontFamily: 'Text', fontSize: 17, color: C.mute, letterSpacing: 1.5 }}>{title.toUpperCase()}</div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 74, height: 74, borderRadius: 37, background: C.accent, border: `4px solid ${C.white}`, boxShadow: `0 0 0 2px ${C.ink}`, fontFamily: 'Display', fontSize: 17, color: C.ink }}>{seal}</div>
+        <div style={{ display: 'flex', fontFamily: 'Text', fontSize: 15, color: C.accentInk, letterSpacing: 3.5 }}>{title.toUpperCase()}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 76, height: 76, borderRadius: 38, background: C.ink, border: `3px solid ${C.ink}`, boxShadow: `inset 0 0 0 1.5px ${C.accent}`, fontFamily: 'Text', fontSize: 16, color: C.gold }}>{seal}</div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', marginTop: 12 }}>
         {rows.map(([k, v]) => (
@@ -43,11 +44,16 @@ export function OgCert({ title, rows, width = 360, seal }: { title: string; rows
   );
 }
 
-export function OgLogo() {
+export function OgLogo({ tone = 'dark' }: { tone?: 'dark' | 'light' }) {
+  const ink = tone === 'dark' ? C.ink : C.ivory;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <svg width="36" height="36" viewBox="0 0 26 26"><circle cx="13" cy="13" r="13" fill={C.ink} /><circle cx="13" cy="13" r="8.6" fill={C.accent} /><path d="M9 13.2l2.7 2.7L17.2 10.4" fill="none" stroke={C.ink} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      <span style={{ display: 'flex', fontFamily: 'Display', fontSize: 34, color: C.ink, letterSpacing: -1.2 }}>{BRAND.name.toLowerCase()}<span style={{ color: C.accent }}>.</span></span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <svg width="48" height="48" viewBox={EMBLEM.viewBox}>
+        <path d={EMBLEM.ring} fill="none" stroke={C.accent} strokeWidth="1.5" strokeLinecap="round" />
+        {EMBLEM.letter.map((d) => <path key={d} d={d} fill={ink} />)}
+        <circle cx={EMBLEM.clasp.cx} cy={EMBLEM.clasp.cy} r={EMBLEM.clasp.r} fill={C.accent} />
+      </svg>
+      <span style={{ display: 'flex', fontFamily: 'Display', fontSize: 30, color: ink, letterSpacing: 7 }}>{BRAND.name.toUpperCase()}</span>
     </div>
   );
 }

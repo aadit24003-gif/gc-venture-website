@@ -21,10 +21,10 @@ export default function NewsletterForm({ tone = 'dark', source = 'footer' }: { t
       }}
     >
       <label htmlFor={`nl-${source}`} className="sr-only">Email address</label>
-      <div className={`flex gap-2 rounded-2xl p-1.5 ${dark ? 'bg-white/10' : 'border border-line bg-white'}`}>
+      <div className={`flex items-end gap-3 border-b pb-1 transition-colors ${dark ? 'border-ivory/30 focus-within:border-gold-hi' : 'border-ink/30 focus-within:border-ink'}`}>
         <input id={`nl-${source}`} type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email"
-          className={`h-11 min-w-0 flex-1 bg-transparent px-3 outline-none ${dark ? 'text-white placeholder:text-white/50' : 'placeholder:text-faint'}`} />
-        <button type="submit" disabled={pending} className="btn btn-accent h-11 min-h-0">{pending ? 'Adding…' : 'Subscribe'}</button>
+          className={`h-11 min-w-0 flex-1 bg-transparent text-[15px] outline-none ${dark ? 'text-ivory placeholder:text-ivory/40' : 'placeholder:text-faint'}`} />
+        <button type="submit" disabled={pending} className={`btn-link mb-2 shrink-0 ${dark ? 'text-gold-hi' : 'text-ink'}`}>{pending ? 'Adding…' : 'Subscribe'}</button>
       </div>
       <p role="status" className={`mt-2 min-h-[20px] text-[13px] ${msg ? (msg.ok ? (dark ? 'text-white/80' : 'text-ok') : 'text-[#ff8a8f]') : ''}`}>{msg?.text}</p>
     </form>

@@ -18,7 +18,7 @@ export default function CompareTray() {
           aria-label="Compare laptops"
           initial={{ y: 120 }} animate={{ y: 0 }} exit={{ y: 120 }}
           transition={{ type: 'spring', stiffness: 380, damping: 36 }}
-          className="fixed inset-x-3 bottom-3 z-[45] mx-auto flex max-w-[860px] flex-wrap items-center gap-2 rounded-[22px] bg-spruce p-2.5 pl-4 text-white shadow-[0_20px_50px_-20px_rgba(15,61,51,.7)]"
+          className="fixed inset-x-3 bottom-3 z-[45] mx-auto flex max-w-[860px] flex-wrap items-center gap-2 rounded-sheet bg-spruce p-2.5 pl-4 text-white shadow-[0_20px_50px_-20px_rgba(15,61,51,.7)]"
         >
           <span className="mr-1 text-[14px] text-white/75">Compare {list.length}/{COMPARE_MAX}</span>
           <ul className="flex min-w-0 flex-1 flex-wrap gap-1.5">

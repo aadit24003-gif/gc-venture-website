@@ -25,7 +25,7 @@ export default async function Post({ params }: Props) {
       <Link href="/blog" className="text-[14px] text-mute hover:text-ink">← Guides and news</Link>
       <h1 className="mt-4 text-[36px] leading-[1.05] md:text-[50px]">{p.title}</h1>
       <p className="mt-3 text-[14px] text-mute">{p.authorName} · {formatDate(p.publishedAt ?? p.updatedAt)}{p.status !== 'published' ? ' · draft (only staff can see this)' : ''}</p>
-      {p.cover && <div className="well mt-8 aspect-[16/9] rounded-[24px] border border-line p-8"><Image src={p.cover} alt="" width={1200} height={675} priority className="h-full w-full object-contain" /></div>}
+      {p.cover && <div className="well mt-8 aspect-[16/9] rounded-sheet border border-line p-8"><Image src={p.cover} alt="" width={1200} height={675} priority className="h-full w-full object-contain" /></div>}
       <div className="prose-policy mt-10"><Markdown text={p.body} /></div>
       {p.tags.length > 0 && <p className="mt-10 flex flex-wrap gap-2">{p.tags.map((t) => <span key={t} className="pill pill-done">{t}</span>)}</p>}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ '@context': 'https://schema.org', '@type': 'Article', headline: p.title, datePublished: p.publishedAt?.toISOString(), dateModified: p.updatedAt.toISOString(), author: { '@type': 'Person', name: p.authorName }, publisher: { '@type': 'Organization', name: BRAND.name }, image: p.cover ? `${BRAND.url}${p.cover}` : undefined, mainEntityOfPage: `${BRAND.url}/blog/${p.slug}` }).replace(/</g, '\\u003c') }} />

@@ -44,7 +44,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
   return (
     <div className="wrap max-w-[1100px] pb-16 pt-8 md:pt-12">
       {sp.placed && (
-        <div className="mb-8 flex gap-4 rounded-[20px] border border-line bg-canvas p-6">
+        <div className="mb-8 flex gap-4 rounded-card border border-line bg-canvas p-6">
           <CheckCircle2 size={28} className="shrink-0" aria-hidden="true" />
           <div>
             <p className="text-[20px] font-semibold">{unpaid ? 'Order saved. Complete the payment to confirm it.' : 'Thank you. Your order is confirmed.'}</p>

@@ -51,7 +51,7 @@ export default async function UnitReport({ params }: Props) {
       </div>
 
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_1.3fr]">
-        <div className="well aspect-[4/3] rounded-[20px] border border-line p-6"><ProductImage image={p.images[0]} art={p.art} brand={p.brand} slug={p.slug} title={p.title} /></div>
+        <div className="well aspect-[4/3] rounded-card border border-line p-6"><ProductImage image={p.images[0]} art={p.art} brand={p.brand} slug={p.slug} title={p.title} /></div>
         <div className="cert p-6" style={{ ['--cert-bg' as string]: '#fff' }}>
           <div className="flex items-start justify-between gap-3">
             <div><GradeBadge grade={grade} /><p className="mt-2 text-[14px] text-mute">{GRADES[grade].body}</p></div>
@@ -87,7 +87,7 @@ export default async function UnitReport({ params }: Props) {
           {insp.summary && <p className="mt-2 text-mute">{insp.summary}</p>}
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {groups.map((g) => (
-              <div key={g} className="rounded-[18px] border border-line bg-white p-5">
+              <div key={g} className="rounded-card border border-line bg-white p-5">
                 <p className="font-semibold">{g}</p>
                 <ul className="mt-3 space-y-2 text-[14px]">
                   {insp.checks.filter((c) => c.group === g).map((c) => (

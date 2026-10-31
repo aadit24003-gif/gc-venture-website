@@ -1,6 +1,6 @@
 /**
  * Email delivery through Resend (https://resend.com).
- * Set RESEND_API_KEY and EMAIL_FROM (e.g. "Encore <orders@yourdomain.in>").
+ * Set RESEND_API_KEY and EMAIL_FROM (e.g. "LappyClub <orders@yourdomain.in>").
  * Without a key, emails are printed to the server log (demo mode only).
  */
 import { BRAND } from '../config';
@@ -32,15 +32,15 @@ export async function sendEmail(mail: Email): Promise<void> {
 
 /** Minimal branded layout that renders well in Gmail and Outlook. */
 export function layout(title: string, body: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#F2F3F5;font-family:Arial,Helvetica,sans-serif;color:#101114">
+  return `<!doctype html><html><body style="margin:0;background:#F4F0E8;font-family:Helvetica,Arial,sans-serif;color:#16130F">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px"><tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #E3E5E8">
-<tr><td style="padding:22px 28px;border-bottom:1px solid #E3E5E8;font-size:19px;font-weight:bold;letter-spacing:-0.3px;color:#101114">${BRAND.name}<span style="color:#F5A524">.</span></td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:6px;overflow:hidden;border:1px solid #E8E2D6">
+<tr><td style="padding:24px 28px;background:#16130F;border-bottom:2px solid #B8935A;font-family:Didot,'Bodoni 72',Georgia,serif;font-size:18px;letter-spacing:5px;text-transform:uppercase;color:#FAF8F3">${BRAND.name}</td></tr>
 <tr><td style="padding:28px">
-<h1 style="margin:0 0 16px;font-size:22px;line-height:1.3;color:#101114">${title}</h1>
+<h1 style="margin:0 0 16px;font-family:Didot,'Bodoni 72',Georgia,serif;font-weight:normal;font-size:26px;line-height:1.25;color:#16130F">${title}</h1>
 ${body}
 </td></tr>
-<tr><td style="padding:16px 28px 24px;font-size:12px;color:#62666E">${BRAND.name}: ${BRAND.tagline}. You received this email because of activity on your account or order.</td></tr>
+<tr><td style="padding:16px 28px 24px;font-size:12px;color:#6F685E;border-top:1px solid #E8E2D6">${BRAND.name}: ${BRAND.tagline}. You received this email because of activity on your account or order.</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -51,10 +51,10 @@ export function markdownEmail(md: string): string {
   return md.trim().split(/\n\s*\n/).map((block) => {
     const b = block.trim();
     const only = /^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/.exec(b);
-    if (only) return `<p style="margin:22px 0"><a href="${esc(only[2])}" style="background:#101114;color:#ffffff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:bold;display:inline-block">${esc(only[1])}</a></p>`;
+    if (only) return `<p style="margin:22px 0"><a href="${esc(only[2])}" style="background:#16130F;color:#FAF8F3;padding:14px 24px;border-radius:2px;text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;display:inline-block">${esc(only[1])}</a></p>`;
     const html = esc(b)
       .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" style="color:#101114;font-weight:bold">$1</a>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" style="color:#16130F;font-weight:bold">$1</a>')
       .replace(/\n/g, '<br>');
     return `<p style="font-size:15px;line-height:1.6;margin:0 0 14px">${html}</p>`;
   }).join('\n');

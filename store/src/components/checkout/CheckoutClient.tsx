@@ -117,7 +117,7 @@ export default function CheckoutClient({ viewer, addresses, student, onlineReady
 
   if (!cart.lines.length && !pendingOrder) {
     return (
-      <div className="mt-10 rounded-[20px] border border-dashed border-line-2 p-10 text-center">
+      <div className="mt-10 rounded-card border border-dashed border-line-2 p-10 text-center">
         <p className="text-[18px] font-semibold">Your cart is empty</p>
         <Link href="/laptops" className="btn btn-primary mt-5">Shop laptops</Link>
       </div>

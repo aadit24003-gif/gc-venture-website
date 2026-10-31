@@ -78,7 +78,7 @@ export function usePayment() {
           <motion.div
             role="dialog" aria-modal="true" aria-labelledby="demo-pay-title"
             initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
-            className="w-full max-w-[420px] rounded-t-[28px] bg-white p-6 sm:rounded-[28px]"
+            className="w-full max-w-[420px] rounded-t-sheet bg-white p-6 sm:rounded-sheet"
           >
             <p className="inline-block rounded-md bg-accent px-2 py-1 text-[12px] font-semibold text-ink">Demo payment</p>
             <h2 id="demo-pay-title" className="mt-3 text-[26px]">Pay {rupees(demo.amount)}</h2>

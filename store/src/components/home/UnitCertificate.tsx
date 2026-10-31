@@ -48,7 +48,7 @@ export default function UnitCertificate({ u, compact = false }: { u: CertUnit; c
         <p className="mx-5 mb-4 flex gap-2 rounded-xl bg-canvas px-3 py-2.5 text-[13px] text-ink-2"><Check size={15} className="mt-0.5 shrink-0" aria-hidden="true" /> {u.cosmeticNotes}</p>
       )}
       {!compact && (
-        <Link href={`/units/${u.code}`} className="block border-t border-line px-5 py-3 text-[13px] font-semibold hover:bg-canvas rounded-b-[18px]">See the full report →</Link>
+        <Link href={`/units/${u.code}`} className="block border-t border-line px-5 py-3 text-[13px] font-semibold hover:bg-canvas rounded-b-card">See the full report →</Link>
       )}
     </div>
   );

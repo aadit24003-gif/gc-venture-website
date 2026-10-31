@@ -23,7 +23,7 @@ export default async function Thread({ params }: { params: Promise<{ number: str
       <p className="mono mt-1 text-[13px] text-mute">{t.ticket.number} · {TICKET_CATEGORIES[t.ticket.category] ?? t.ticket.category}</p>
       <ol className="mt-6 space-y-3">
         {t.messages.filter((m) => !m.internal).map((m) => (
-          <li key={m.id} className={`rounded-[18px] p-4 ${m.fromStaff ? 'mr-8 bg-canvas' : 'ml-8 border border-line bg-white'}`}>
+          <li key={m.id} className={`rounded-card p-4 ${m.fromStaff ? 'mr-8 bg-canvas' : 'ml-8 border border-line bg-white'}`}>
             <p className="text-[12.5px] text-mute">{m.fromStaff ? `${BRAND.name} support` : 'You'} · {formatDate(m.createdAt, true)}</p>
             <p className="mt-1 whitespace-pre-line text-[15px]">{m.body}</p>
           </li>

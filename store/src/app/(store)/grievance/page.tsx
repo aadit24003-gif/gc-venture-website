@@ -12,7 +12,7 @@ export default async function Grievance() {
     <div className="wrap-narrow pb-16 pt-10 md:pt-14">
       <p className="eyebrow">Consumer Protection (E-Commerce) Rules, 2020</p>
       <h1 className="mt-3 text-[38px] md:text-[52px]">Grievance officer</h1>
-      <div className="prose-policy mt-8 rounded-[24px] border border-line bg-white p-6 md:p-10">
+      <div className="prose-policy mt-8 rounded-sheet border border-line bg-white p-6 md:p-10">
         <p>If something has gone wrong and our support team hasn’t resolved it, write to our grievance officer. We acknowledge every complaint within 48 hours and resolve it within one month.</p>
         <h2>Contact</h2>
         <ul>

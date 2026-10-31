@@ -61,7 +61,7 @@ export default async function ComparePage({ searchParams }: { searchParams: Prom
         <h1 className="text-[40px] md:text-[52px]">Compare laptops</h1>
         <CompareClear />
       </div>
-      <div className="mt-8 overflow-x-auto rounded-[28px] bg-white">
+      <div className="mt-8 overflow-x-auto rounded-sheet bg-white">
         <table className="w-full min-w-[720px] table-fixed text-[15px]">
           <caption className="sr-only">Specifications side by side</caption>
           <thead>

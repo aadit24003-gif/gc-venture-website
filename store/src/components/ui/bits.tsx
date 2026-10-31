@@ -32,7 +32,7 @@ export function Meter({ value, label, min }: { value: number | null; label: stri
 export function GradeBadge({ grade, size = 'md' }: { grade: GradeKey; size?: 'sm' | 'md' }) {
   const g = GRADES[grade];
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-[8px] bg-canvas font-semibold text-ink ${size === 'sm' ? 'h-6 px-2 text-[12px]' : 'h-7 px-2.5 text-[13px]'}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-sm border border-line-2 font-medium uppercase tracking-[0.12em] text-ink ${size === 'sm' ? 'h-6 px-2 text-[12px]' : 'h-7 px-2.5 text-[13px]'}`}>
       <span className="mono text-[11px] text-mute">{g.tone}</span>{g.label}
     </span>
   );
@@ -51,13 +51,14 @@ export function Price({ value, was, className = '' }: { value: number; was?: num
   );
 }
 
-export function SectionHead({ eyebrow, title, intro, action, id }: { eyebrow?: string; title: string; intro?: string; action?: React.ReactNode; id?: string }) {
+export function SectionHead({ eyebrow, title, intro, action, id, align = 'left' }: { eyebrow?: string; title: React.ReactNode; intro?: string; action?: React.ReactNode; id?: string; align?: 'left' | 'center' }) {
+  const center = align === 'center';
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div className="max-w-[720px]">
-        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-        <h2 id={id} className="mt-2 text-[30px] md:text-[40px]">{title}</h2>
-        {intro && <p className="mt-3 text-[16.5px] text-mute">{intro}</p>}
+    <div data-reveal className={`flex flex-wrap items-end gap-6 ${center ? 'flex-col items-center text-center' : 'justify-between'}`}>
+      <div className={`max-w-[760px] ${center ? 'mx-auto' : ''}`}>
+        {eyebrow && <p className={`eyebrow eyebrow-gold flex items-center gap-3 ${center ? 'justify-center' : ''}`}><span className="h-px w-8 bg-accent" aria-hidden="true" />{eyebrow}{center ? <span className="h-px w-8 bg-accent" aria-hidden="true" /> : null}</p>}
+        <h2 id={id} className="mt-4 text-[36px] md:text-[52px]">{title}</h2>
+        {intro && <p className={`mt-4 max-w-[58ch] text-[16.5px] leading-relaxed text-mute ${center ? 'mx-auto' : ''}`}>{intro}</p>}
       </div>
       {action}
     </div>

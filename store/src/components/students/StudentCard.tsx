@@ -5,7 +5,7 @@ export default function StudentCard() {
   const year = new Date().getFullYear();
   return (
     <div className="relative mx-auto w-full max-w-[460px] [perspective:1200px]" aria-hidden>
-      <div className="student-card relative rotate-[-4deg] overflow-hidden rounded-[26px] bg-white shadow-[0_40px_80px_-40px_rgba(15,61,51,.55),0_2px_0_rgba(15,61,51,.05)]">
+      <div className="student-card relative rotate-[-4deg] overflow-hidden rounded-sheet bg-white shadow-[0_40px_80px_-40px_rgba(15,61,51,.55),0_2px_0_rgba(15,61,51,.05)]">
         <div className="flex items-center justify-between bg-spruce px-6 py-4 text-white">
           <span className="display text-[17px] font-bold">Student identity card</span>
           <span className="text-[13px] text-white/70">{year}–{String(year + 1).slice(2)}</span>

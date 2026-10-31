@@ -41,10 +41,10 @@ export default async function CmsPage({ slug, aside }: { slug: string; aside?: R
             <ul className="mt-3 space-y-2 text-[14px]">{toc.map((h) => <li key={h.id}><a href={`#${h.id}`} className="text-mute hover:text-ink">{h.text}</a></li>)}</ul>
           </div>
         </nav>
-        <article className="prose-policy rounded-[24px] border border-line bg-white p-6 md:p-10"><Markdown text={p.body} /></article>
+        <article className="prose-policy rounded-sheet border border-line bg-white p-6 md:p-10"><Markdown text={p.body} /></article>
         <aside className="space-y-4 lg:sticky lg:top-[132px] lg:self-start">
           {aside}
-          <nav aria-label="Other policies" className="rounded-[20px] border border-line bg-white p-5">
+          <nav aria-label="Other policies" className="rounded-card border border-line bg-white p-5">
             <p className="eyebrow">Other policies</p>
             <ul className="mt-3 space-y-2 text-[14.5px]">{POLICY_LINKS.filter((l) => l.href !== `/${slug}`).map((l) => <li key={l.href}><Link href={l.href} className="hover:underline">{l.label}</Link></li>)}</ul>
           </nav>

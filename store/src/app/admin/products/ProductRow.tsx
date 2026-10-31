@@ -33,7 +33,7 @@ export default function ProductRow({ p, variants }: { p: P; variants: V[] }) {
   });
 
   return (
-    <li className={`rounded-[18px] border border-line bg-white p-5 ${active ? '' : 'opacity-70'}`}>
+    <li className={`rounded-card border border-line bg-white p-5 ${active ? '' : 'opacity-70'}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <Link href={`/admin/products/${p.id}`} className="font-semibold text-ink hover:underline">{p.title}</Link>

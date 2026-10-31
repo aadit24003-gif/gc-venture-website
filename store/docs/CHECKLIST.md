@@ -5,7 +5,8 @@ Status of every part of the brief. **Done** means built and exercised (unit test
 ## Done
 
 **Catalogue and storefront**
-- [x] New design system (white studio look, saffron accent, Funnel type); green theme removed everywhere
+- [x] LappyClub brand: logo, favicon, share images and emails
+- [x] Luxury design system (ivory, ink and champagne gold; Bodoni Moda and Jost) with scroll scenes and page transitions; green theme removed everywhere
 - [x] Official manufacturer photo for all 39 models (Dell, HP, Lenovo PSREF, Apple), cleaned and stored in the repo
 - [x] Home page: navigation, logo, search, hero with a real unit's report, brands, featured, popular (real data only), latest arrivals, deals, budgets, processors, grades, inspection, warranty, why refurbished, testimonials (shown only when ≥3 approved reviews exist), students, FAQ, newsletter, footer
 - [x] Catalogue with brand, price, grade, processor, generation, memory, storage, screen, use and availability filters; 7 sorts; URL-shareable; mobile filter sheet
@@ -77,7 +78,7 @@ Values marked `[CONFIRM]` in code or settings.
 
 | Decision | Where |
 |---|---|
-| Store name and domain | `BRAND` in `src/lib/config.ts`; `NEXT_PUBLIC_SITE_URL` |
+| Domain (name is LappyClub) | `NEXT_PUBLIC_SITE_URL`; the name lives in `BRAND` in `src/lib/config.ts` |
 | Registered business name, GSTIN, CIN, addresses | Admin → Settings → Business |
 | Grievance officer name | Admin → Settings → Business (required by the E-Commerce Rules) |
 | GST scheme for refurbished laptops (regular 18% or margin) | Admin → Settings → GST (ask your accountant) |

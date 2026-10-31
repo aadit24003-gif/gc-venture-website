@@ -7,9 +7,11 @@
  */
 
 export const BRAND = {
-  /** [CONFIRM] Working name until the final one is chosen. Change it here only. */
-  name: 'Encore',
-  tagline: 'Certified refurbished laptops',
+  /** Store name. Change it here only: every page, email and share image picks it up. */
+  name: 'LappyClub',
+  /** Two letters that start every order number (LC-261031-ABCD). */
+  orderPrefix: 'LC',
+  tagline: 'Certified pre-owned laptops, restored and guaranteed',
   /** [CONFIRM] Production address of the store, without a trailing slash. */
   url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3100',
   description:

@@ -16,7 +16,7 @@ export default function CartPage({ picks }: { picks: CardProduct[] }) {
   if (!cart.lines.length) {
     return (
       <>
-        <div className="mt-8 rounded-[20px] border border-dashed border-line-2 p-10 text-center">
+        <div className="mt-8 rounded-card border border-dashed border-line-2 p-10 text-center">
           <p className="text-[18px] font-semibold">Nothing here yet</p>
           <p className="mt-1 text-mute">Each laptop is a specific inspected unit. Choose the one you want on its page.</p>
           <Link href="/laptops" className="btn btn-primary mt-5">Shop laptops</Link>

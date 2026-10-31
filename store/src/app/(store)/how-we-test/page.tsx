@@ -26,7 +26,7 @@ export default function HowWeTest() {
           ['Test', `${CHECK_COUNT} checks across screen, battery, storage, ports, keys, camera and software.`],
           ['Grade and pack', 'Graded on looks alone, deep cleaned, wiped, reinstalled and packed with a charger.'],
         ].map(([t, b], i) => (
-          <li key={t} className="rounded-[24px] bg-white p-6">
+          <li key={t} className="rounded-sheet bg-white p-6">
             <span className="display flex h-10 w-10 items-center justify-center rounded-full bg-tag text-[18px] font-bold text-spruce">{i + 1}</span>
             <p className="display mt-4 text-[20px] font-semibold text-spruce">{t}</p>
             <p className="mt-1 text-[15px] text-mute">{b}</p>
@@ -59,7 +59,7 @@ export default function HowWeTest() {
           {GRADE_ORDER.map((k) => {
             const g = GRADES[k];
             return (
-              <li key={k} className="rounded-[28px] bg-white p-6">
+              <li key={k} className="rounded-sheet bg-white p-6">
                 <div className="rounded-2xl bg-bench p-3"><LidMarks colour="graphite" grade={k} brand="Dell" className="w-full" annotate /></div>
                 <h3 className="mt-5 text-[26px]">{g.label}</h3>
                 <p className="mt-1 font-semibold text-ink">{g.short}</p>
@@ -75,11 +75,11 @@ export default function HowWeTest() {
       </section>
 
       <section className="wrap mt-20 grid gap-6 md:grid-cols-2" aria-label="Data and packing">
-        <div className="rounded-[28px] bg-white p-7">
+        <div className="rounded-sheet bg-white p-7">
           <h2 className="text-[26px]">Your data, and the last owner’s</h2>
           <p className="mt-3 text-[16px] leading-relaxed text-mute">Every drive is wiped to the NIST 800-88 standard before testing, and Windows or macOS is installed fresh and activated. We check there is no BIOS password, company management (MDM) or Apple iCloud lock, so the laptop is entirely yours.</p>
         </div>
-        <div className="rounded-[28px] bg-white p-7">
+        <div className="rounded-sheet bg-white p-7">
           <h2 className="text-[26px]">In the box</h2>
           <p className="mt-3 text-[16px] leading-relaxed text-mute">The laptop, a matching charger, and the invoice by email. It ships in a padded box with tamper tape, insured until it reaches you. If the box arrives damaged, record a short video while opening it and tell us within 48 hours.</p>
         </div>

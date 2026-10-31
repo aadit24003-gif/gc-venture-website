@@ -15,7 +15,7 @@ export default async function Recent() {
     <div>
       <h1 className="text-[32px]">Recently viewed</h1>
       {items.length === 0 ? (
-        <div className="mt-8 rounded-[20px] border border-dashed border-line-2 p-10 text-center"><p className="text-mute">Laptops you look at will appear here.</p><Link href="/laptops" className="btn btn-primary mt-4">Browse laptops</Link></div>
+        <div className="mt-8 rounded-card border border-dashed border-line-2 p-10 text-center"><p className="text-mute">Laptops you look at will appear here.</p><Link href="/laptops" className="btn btn-primary mt-4">Browse laptops</Link></div>
       ) : (
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{items.map((p) => <li key={p.id}><ProductCard p={p} wished={wished.includes(p.id)} /></li>)}</ul>
       )}

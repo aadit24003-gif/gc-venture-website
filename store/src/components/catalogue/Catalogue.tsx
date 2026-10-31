@@ -158,7 +158,7 @@ export default function Catalogue({ items, initial, base = {}, wished = [] }: { 
           </ul>
         )}
         {results.length === 0 ? (
-          <div className="mt-8 rounded-[20px] border border-dashed border-line-2 p-10 text-center">
+          <div className="mt-8 rounded-card border border-dashed border-line-2 p-10 text-center">
             <p className="text-[17px] font-semibold">Nothing matches all of that</p>
             <p className="mt-1 text-mute">Remove a filter{!f.soldOut ? ', or include sold-out models' : ''}.</p>
             <div className="mt-5 flex justify-center gap-2">
@@ -184,7 +184,7 @@ export default function Catalogue({ items, initial, base = {}, wished = [] }: { 
           <div className="fixed inset-0 z-[90] lg:hidden">
             <motion.button type="button" tabIndex={-1} aria-label="Close filters" className="absolute inset-0 bg-ink/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSheet(false)} />
             <motion.div role="dialog" aria-modal="true" aria-label="Filters" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-              className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-[24px] bg-white">
+              className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-sheet bg-white">
               <div className="flex items-center justify-between border-b border-line px-5 py-4"><p className="text-[18px] font-semibold">Filters</p><button type="button" className="btn btn-quiet btn-icon" aria-label="Close filters" onClick={() => setSheet(false)}><X size={20} /></button></div>
               <div className="flex-1 overflow-y-auto px-5">{panel}</div>
               <div className="grid grid-cols-2 gap-2 border-t border-line p-4">

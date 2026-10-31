@@ -21,19 +21,19 @@ export default async function Contact() {
             { icon: Phone, label: 'Call', value: formatPhone(b.phone), href: `tel:${b.phone}`, note: b.hours },
             { icon: Mail, label: 'Email', value: b.email, href: `mailto:${b.email}`, note: 'We reply within one working day.' },
           ].map(({ icon: I, label, value, href, note }) => (
-            <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener" className="flex items-center gap-4 rounded-[20px] border border-line bg-white p-5 transition hover:border-ink">
+            <a key={label} href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener" className="flex items-center gap-4 rounded-card border border-line bg-white p-5 transition hover:border-ink">
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-ink"><I size={22} /></span>
               <span><span className="block text-[14px] text-mute">{label}</span><span className="block text-[18px] font-semibold text-ink">{value}</span><span className="block text-[13.5px] text-mute">{note}</span></span>
             </a>
           ))}
-          <div className="rounded-[20px] border border-line bg-white p-5">
+          <div className="rounded-card border border-line bg-white p-5">
             <p className="text-[14px] text-mute">Offices (by appointment)</p>
             {LEGAL.addresses.map((a) => (
               <p key={a.city} className="mt-2 text-[15px]"><b>{a.city}</b><br />{a.lines.join(', ')}</p>
             ))}
           </div>
         </div>
-        <section className="rounded-[24px] border border-line bg-white p-6 md:p-10" aria-labelledby="form-h">
+        <section className="rounded-sheet border border-line bg-white p-6 md:p-10" aria-labelledby="form-h">
           <h2 id="form-h" className="text-[28px]">Send a message</h2>
           <div className="mt-6"><ContactForm /></div>
         </section>

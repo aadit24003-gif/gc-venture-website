@@ -16,7 +16,7 @@ export default async function Orders() {
       <h1 className="text-[32px]">Orders</h1>
       {!v.user.emailVerifiedAt && v.user.email && <p className="mt-2 text-[14px] text-mute">Guest orders placed with {v.user.email} appear here once you confirm that email.</p>}
       {orders.length === 0 ? (
-        <div className="mt-6 rounded-[20px] border border-dashed border-line-2 p-10 text-center"><p className="font-semibold">No orders yet</p><Link href="/laptops" className="btn btn-primary mt-4">Shop laptops</Link></div>
+        <div className="mt-6 rounded-card border border-dashed border-line-2 p-10 text-center"><p className="font-semibold">No orders yet</p><Link href="/laptops" className="btn btn-primary mt-4">Shop laptops</Link></div>
       ) : (
         <ul className="mt-6 space-y-3">
           {orders.map((o) => (

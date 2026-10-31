@@ -20,12 +20,12 @@ export default async function Account({ searchParams }: { searchParams: Promise<
   const active = orders.filter((o) => !['delivered', 'cancelled', 'returned'].includes(o.status));
   return (
     <div>
-      {sp.welcome && <p className="mb-6 rounded-[16px] bg-canvas p-4 text-[15px]">Welcome{v.user.name ? `, ${v.user.name.split(' ')[0]}` : ''}! Your account is ready.</p>}
-      {sp.notice === 'password' && <p className="mb-6 rounded-[16px] bg-ok-soft p-4 text-[15px] text-ok">Your new password is saved.</p>}
-      {sp.notice === 'admin' && <p className="mb-6 rounded-[16px] bg-canvas p-4 text-[15px]">That page is for staff only.</p>}
+      {sp.welcome && <p className="mb-6 rounded-card bg-canvas p-4 text-[15px]">Welcome{v.user.name ? `, ${v.user.name.split(' ')[0]}` : ''}! Your account is ready.</p>}
+      {sp.notice === 'password' && <p className="mb-6 rounded-card bg-ok-soft p-4 text-[15px] text-ok">Your new password is saved.</p>}
+      {sp.notice === 'admin' && <p className="mb-6 rounded-card bg-canvas p-4 text-[15px]">That page is for staff only.</p>}
       <h1 className="text-[32px] md:text-[40px]">Hi{v.user.name ? `, ${v.user.name.split(' ')[0]}` : ''}</h1>
       {v.user.email && !v.user.emailVerifiedAt && (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[16px] border border-line bg-accent-soft p-4 text-[14.5px]">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-accent-soft p-4 text-[14.5px]">
           <span>Confirm <b>{v.user.email}</b> so receipts reach you and you can reset your password.</span>
           <ResendVerification />
         </div>

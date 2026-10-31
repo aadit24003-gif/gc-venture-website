@@ -48,7 +48,7 @@ export default function VerifyStudent({ initial }: { initial: State }) {
           We couldn’t verify your last request{initial.reason ? `: ${initial.reason}` : '.'} You can try again below.
         </p>
       )}
-      <div role="tablist" aria-label="How to verify" className="grid grid-cols-2 gap-2 rounded-[20px] bg-bench p-1.5">
+      <div role="tablist" aria-label="How to verify" className="grid grid-cols-2 gap-2 rounded-card bg-bench p-1.5">
         {([
           { k: 'email', icon: Mail, title: 'College email', note: 'Instant' },
           { k: 'id', icon: IdCard, title: 'Student ID photo', note: 'Within 1 working day' },
@@ -175,7 +175,7 @@ function IdRoute({ onDone }: { onDone: () => void }) {
       </div>
       <div className="mt-5 grid gap-4 sm:grid-cols-2">
         {(['front', 'back'] as const).map((side) => (
-          <label key={side} htmlFor={`id-${side}`} className={`relative flex min-h-[170px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-[20px] border-2 border-dashed bg-bench text-center transition-colors hover:border-spruce has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-tag-2 ${error?.field === side ? 'border-alert' : 'border-line'}`}>
+          <label key={side} htmlFor={`id-${side}`} className={`relative flex min-h-[170px] cursor-pointer flex-col items-center justify-center overflow-hidden rounded-card border-2 border-dashed bg-bench text-center transition-colors hover:border-spruce has-[:focus-visible]:outline has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-tag-2 ${error?.field === side ? 'border-alert' : 'border-line'}`}>
             {previews[side] ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={previews[side]} alt={`Preview of the ${side} of your ID`} className="absolute inset-0 h-full w-full object-cover" />

@@ -32,7 +32,7 @@ export default function OrderControls({ order, next, refundable, manualRefunds, 
   return (
     <div className="space-y-5">
       {canManage && next.length > 0 && (
-        <section className="rounded-[18px] border border-line bg-white p-5">
+        <section className="rounded-card border border-line bg-white p-5">
           <h2 className="text-[17px]">Move the order on</h2>
           <div className="mt-3 flex flex-wrap gap-2" role="radiogroup" aria-label="Next status">
             {next.map((s) => <button key={s} type="button" className="chip !min-h-8 !text-[13px]" aria-pressed={status === s} onClick={() => setStatus(s)}>{STATUS[s]?.label ?? s}</button>)}
@@ -57,7 +57,7 @@ export default function OrderControls({ order, next, refundable, manualRefunds, 
       )}
 
       {canRefund && refundable > 0 && (
-        <section className="rounded-[18px] border border-line bg-white p-5">
+        <section className="rounded-card border border-line bg-white p-5">
           <h2 className="text-[17px]">Refund</h2>
           <p className="mt-1 text-[13px] text-mute">Up to ₹{Math.round(refundable / 100).toLocaleString('en-IN')} can be refunded. {order.online ? 'Online payments go back through Razorpay.' : 'Pay-on-delivery refunds are recorded here and paid by bank transfer or UPI.'}</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-[140px_1fr]">
@@ -68,7 +68,7 @@ export default function OrderControls({ order, next, refundable, manualRefunds, 
         </section>
       )}
       {canRefund && manualRefunds.length > 0 && (
-        <section className="rounded-[18px] border border-line bg-warn-soft p-5">
+        <section className="rounded-card border border-line bg-warn-soft p-5">
           <h2 className="text-[17px]">Manual refunds to pay</h2>
           <ul className="mt-2 space-y-2">{manualRefunds.map((m) => <li key={m.id} className="flex items-center justify-between gap-3 text-[14px]"><span>{m.amount}</span><button type="button" className="btn btn-ghost btn-sm" disabled={pending} onClick={() => run(() => confirmManualRefund(m.id))}>Mark as sent</button></li>)}</ul>
         </section>
@@ -76,7 +76,7 @@ export default function OrderControls({ order, next, refundable, manualRefunds, 
       {canManage && order.online && !order.paid && (
         <button type="button" className="btn btn-ghost btn-sm" disabled={pending} onClick={() => run(() => reconcilePayment(order.id))}>Check payment with Razorpay</button>
       )}
-      <section className="rounded-[18px] border border-line bg-white p-5">
+      <section className="rounded-card border border-line bg-white p-5">
         <label htmlFor="an" className="text-[17px] font-semibold">Private note</label>
         <textarea id="an" className="field mt-2" value={adminNote} onChange={(e) => setAdminNote(e.target.value)} placeholder="Only staff see this" />
         <button type="button" className="btn btn-ghost btn-sm mt-2" disabled={pending} onClick={() => run(() => saveAdminNote(order.id, adminNote))}>Save note</button>

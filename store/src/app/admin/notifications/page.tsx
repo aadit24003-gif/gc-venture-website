@@ -28,7 +28,7 @@ export default async function Notifications() {
           const t = TEMPLATES[key] as { name: string; vars: string[] } & Partial<Record<Channel, { subject?: string; body: string }>>;
           const chans = (['email', 'sms', 'whatsapp'] as Channel[]).filter((c) => t[c]);
           return (
-            <details key={key} className="rounded-[16px] border border-line bg-white p-4">
+            <details key={key} className="rounded-card border border-line bg-white p-4">
               <summary className="flex cursor-pointer flex-wrap items-center justify-between gap-2"><b>{t.name}</b><span className="flex gap-1.5">{chans.map((c) => { const row = rows.find((r) => r.key === key && r.channel === c); const on = row ? row.enabled : c === 'email'; return <span key={c} className={`pill ${on ? 'pill-ok' : 'pill-done'}`}>{CH[c]} {on ? 'on' : 'off'}</span>; })}</span></summary>
               <p className="mt-2 text-[12.5px] text-mute">Placeholders: {t.vars.map((x) => `{{${x}}}`).join(' ')}</p>
               <div className="mt-3 grid gap-4 lg:grid-cols-3">

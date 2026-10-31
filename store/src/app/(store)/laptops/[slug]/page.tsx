@@ -126,7 +126,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
           </ul>
           <p className="mt-6 text-[14.5px] text-mute">Good for: {p.uses.map((u) => USES.find((x) => x.key === u)?.label).filter(Boolean).join(', ')}.</p>
           <h2 className="mt-14 text-[28px]" id="specs-h">Specifications</h2>
-          <dl className="mt-4 divide-y divide-line rounded-[20px] border border-line bg-white">
+          <dl className="mt-4 divide-y divide-line rounded-card border border-line bg-white">
             {specs.map(([k, v]) => (
               <div key={k} className="grid grid-cols-[150px_1fr] gap-4 px-5 py-3.5 text-[14.5px] sm:grid-cols-[200px_1fr]"><dt className="text-mute">{k}</dt><dd>{v}</dd></div>
             ))}
@@ -134,19 +134,19 @@ export default async function ProductPage({ params, searchParams }: Props) {
           <p className="mt-3 text-[13px] text-mute">Specifications are the model’s standard configuration. Each unit’s memory and storage are shown on its listing and report.</p>
         </section>
         <aside className="space-y-4">
-          <div className="rounded-[20px] border border-line bg-canvas p-6">
+          <div className="rounded-card border border-line bg-canvas p-6">
             <p className="eyebrow">Every unit</p>
             <p className="mt-2 text-[22px] font-semibold">{CHECK_COUNT} checks before listing, one more before shipping</p>
             <p className="mt-2 text-[14.5px] text-mute">Battery and SSD health are measured, not estimated. Parts swapped during refurbishment are logged on the unit’s report.</p>
             <Link href="/how-we-test" className="btn btn-ghost btn-sm mt-4">How we test</Link>
           </div>
-          <div className="rounded-[20px] border border-line bg-white p-6">
+          <div className="rounded-card border border-line bg-white p-6">
             <p className="font-semibold">Grades for this model</p>
             <ul className="mt-3 space-y-3 text-[14px]">
               {(['pristine', 'excellent', 'good'] as const).map((g) => <li key={g}><b>{GRADES[g].label}:</b> <span className="text-mute">{GRADES[g].body}</span></li>)}
             </ul>
           </div>
-          <div className="rounded-[20px] border border-line bg-white p-6 text-[14px]">
+          <div className="rounded-card border border-line bg-white p-6 text-[14px]">
             <p className="font-semibold">Warranty and returns</p>
             <p className="mt-2 text-mute">{POLICY.warrantyMonths}-month warranty from delivery, extendable to {POLICY.warrantyExtensions.at(-1)?.months} months. Return within {POLICY.returnDays} days for a refund.</p>
             <p className="mt-3 flex gap-4"><Link href="/warranty" className="link">Warranty</Link><Link href="/returns" className="link">Returns</Link></p>
@@ -159,7 +159,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
         <SectionHead id="reviews-h" title="Reviews" intro="Only customers who received this model can review it. We publish every review that follows our guidelines, good or bad." />
         {rating ? (
           <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
-            <div className="rounded-[20px] border border-line bg-white p-6">
+            <div className="rounded-card border border-line bg-white p-6">
               <p className="price text-[48px] leading-none">{rating.avg}</p>
               <Stars value={rating.avg} size={18} />
               <p className="mt-1 text-[13.5px] text-mute">{rating.count} verified {rating.count === 1 ? 'review' : 'reviews'}</p>
@@ -171,7 +171,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             </div>
             <ul className="space-y-4">
               {reviews.map((r) => (
-                <li key={r.id} className="rounded-[20px] border border-line bg-white p-6">
+                <li key={r.id} className="rounded-card border border-line bg-white p-6">
                   <div className="flex flex-wrap items-center justify-between gap-2"><Stars value={r.rating} /><span className="text-[13px] text-mute">{formatDate(r.createdAt)}</span></div>
                   {r.title && <p className="mt-2 font-semibold">{r.title}</p>}
                   <p className="mt-1.5 text-[15px] text-ink-2">{r.body}</p>
@@ -182,7 +182,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
             </ul>
           </div>
         ) : (
-          <p className="mt-6 rounded-[20px] border border-dashed border-line-2 p-6 text-mute">No reviews yet. Customers can review this model from their account after it’s delivered.</p>
+          <p className="mt-6 rounded-card border border-dashed border-line-2 p-6 text-mute">No reviews yet. Customers can review this model from their account after it’s delivered.</p>
         )}
       </section>
 

@@ -138,7 +138,7 @@ function newNumber() {
   const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   const alphabet = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   const tail = Array.from(crypto.randomBytes(4), (b) => alphabet[b % alphabet.length]).join('');
-  return `${BRAND.name.slice(0, 2).toUpperCase()}-${ymd}-${tail}`;
+  return `${BRAND.orderPrefix}-${ymd}-${tail}`;
 }
 
 /** Cancels online orders left unpaid and puts their units back on sale. Cheap; called before new orders. */

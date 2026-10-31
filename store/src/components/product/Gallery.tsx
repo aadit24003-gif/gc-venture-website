@@ -7,11 +7,11 @@ import LaptopArt from '../LaptopArt';
 
 export default function Gallery({ images, art, brand, slug, title }: { images: ProductImage[]; art: ArtSpec; brand: string; slug: string; title: string }) {
   const [i, setI] = useState(0);
-  if (!images.length) return <div className="well aspect-[4/3] rounded-[24px] border border-line p-10"><LaptopArt art={art} brand={brand} slug={slug} title={title} /></div>;
+  if (!images.length) return <div className="well aspect-[4/3] rounded-sheet border border-line p-10"><LaptopArt art={art} brand={brand} slug={slug} title={title} /></div>;
   const cur = images[Math.min(i, images.length - 1)];
   return (
     <div>
-      <div className="well relative aspect-[4/3] overflow-hidden rounded-[24px] border border-line p-6 md:p-10">
+      <div className="well relative aspect-[4/3] overflow-hidden rounded-sheet border border-line p-6 md:p-10">
         <Image key={cur.src} src={cur.src} alt={cur.alt || title} width={cur.width} height={cur.height} priority sizes="(min-width: 1024px) 640px, 100vw" className="h-full w-full animate-[fade_.3s_ease] object-contain" />
         <span className="absolute bottom-3 left-3 rounded-md bg-canvas px-2 py-1 text-[11.5px] text-mute">Manufacturer’s photo of the model</span>
       </div>

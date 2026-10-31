@@ -1,7 +1,7 @@
 /** Questions and answers as native disclosure widgets, with FAQPage structured data. */
 export default function Faq({ items, schema = true }: { items: [string, string][]; schema?: boolean }) {
   return (
-    <div className="divide-y divide-line rounded-[20px] border border-line bg-white px-6">
+    <div className="divide-y divide-line rounded-card border border-line bg-white px-6">
       {items.map(([q, a]) => (
         <details key={q} className="group py-5">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[16.5px] font-semibold text-ink [&::-webkit-details-marker]:hidden">

@@ -16,7 +16,7 @@ export default function About() {
         </div>
         <aside className="space-y-3">
           {[['2013', `${LEGAL.rentals.name} founded`], [String(CHECK_COUNT), 'checks on every laptop'], [`${POLICY.warrantyMonths} months`, 'warranty, with free pickup']].map(([n, l]) => (
-            <div key={l} className="rounded-[24px] bg-white p-6"><p className="price text-[42px] leading-none">{n}</p><p className="mt-2 text-mute">{l}</p></div>
+            <div key={l} className="rounded-sheet bg-white p-6"><p className="price text-[42px] leading-none">{n}</p><p className="mt-2 text-mute">{l}</p></div>
           ))}
         </aside>
       </div>

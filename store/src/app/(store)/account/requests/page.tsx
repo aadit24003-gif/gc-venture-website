@@ -21,7 +21,7 @@ export default async function Requests() {
         <div className="mt-5 flex flex-wrap gap-2">{delivered.slice(0, 6).map((o) => <Link key={o.id} href={`/orders/${o.number}#help-h`} className="chip">Start one for {o.number}</Link>)}</div>
       )}
       {list.length === 0 ? (
-        <p className="mt-8 rounded-[20px] border border-dashed border-line-2 p-8 text-center text-mute">No requests yet.</p>
+        <p className="mt-8 rounded-card border border-dashed border-line-2 p-8 text-center text-mute">No requests yet.</p>
       ) : (
         <ul className="mt-6 space-y-3">
           {list.map((r) => (

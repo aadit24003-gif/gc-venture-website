@@ -39,7 +39,7 @@ export default async function Coupons() {
               <td className={td}>
                 <div className="flex gap-2"><CouponToggle code={c.code} active={c.active} />
                   <details className="relative"><summary className="btn btn-ghost btn-sm list-none">Edit</summary>
-                    <div className="absolute right-0 z-20 mt-2 w-[min(760px,90vw)] rounded-[16px] border border-line bg-white p-5 shadow-[var(--shadow-pop)]">
+                    <div className="absolute right-0 z-20 mt-2 w-[min(760px,90vw)] rounded-card border border-line bg-white p-5 shadow-[var(--shadow-pop)]">
                       <CouponForm isNew={false} products={prods} brands={[...BRANDS]} initial={{ code: c.code, kind: c.kind as 'percent' | 'flat', value: c.kind === 'percent' ? c.value : c.value / 100, minSubtotal: c.minSubtotal / 100, maxDiscount: c.maxDiscount ? c.maxDiscount / 100 : null, usageLimit: c.usageLimit, perUserLimit: c.perUserLimit, firstOrderOnly: c.firstOrderOnly, productIds: c.productIds, brands: c.brands, startsAt: day(c.startsAt), endsAt: day(c.endsAt), note: c.note, active: c.active }} />
                     </div>
                   </details>

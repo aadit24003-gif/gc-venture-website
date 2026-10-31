@@ -22,7 +22,7 @@ export default async function TicketAdmin({ params }: { params: Promise<{ number
         intro={<span className="flex flex-wrap items-center gap-2"><span className={`pill pill-${TICKET_STATUS[t.ticket.status]?.tone ?? 'info'}`}>{TICKET_STATUS[t.ticket.status]?.label}</span><span className="mono">{t.ticket.number}</span> · {TICKET_CATEGORIES[t.ticket.category]} · {t.ticket.name}, {t.ticket.contact}{o && <> · order <Link href={`/admin/orders/${o.number}`} className="mono underline">{o.number}</Link></>}{t.ticket.userId && <> · <Link href={`/admin/customers/${t.ticket.userId}`} className="underline">customer</Link></>}</span>} />
       <ol className="space-y-3">
         {t.messages.map((m) => (
-          <li key={m.id} className={`rounded-[16px] p-4 ${m.internal ? 'border border-warn/30 bg-warn-soft' : m.fromStaff ? 'ml-10 bg-white border border-line' : 'mr-10 bg-canvas-2'}`}>
+          <li key={m.id} className={`rounded-card p-4 ${m.internal ? 'border border-warn/30 bg-warn-soft' : m.fromStaff ? 'ml-10 bg-white border border-line' : 'mr-10 bg-canvas-2'}`}>
             <p className="text-[12.5px] text-mute">{m.fromStaff ? (m.internal ? 'Internal note' : 'Staff reply') : t.ticket.name} · {formatDate(m.createdAt, true)}</p>
             <p className="mt-1 whitespace-pre-line text-[14.5px]">{m.body}</p>
           </li>

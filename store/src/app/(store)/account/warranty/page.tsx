@@ -21,7 +21,7 @@ export default async function Warranty() {
       <h1 className="text-[32px]">Warranty</h1>
       <p className="mt-2 max-w-[60ch] text-mute">Every laptop has a {POLICY.warrantyMonths}-month warranty from delivery, tied to its serial number. To claim, open the laptop below and describe the fault; we arrange a free pickup. <Link href="/warranty" className="underline">What’s covered</Link></p>
       {ws.length === 0 ? (
-        <p className="mt-8 rounded-[20px] border border-dashed border-line-2 p-8 text-center text-mute">Warranties start when a laptop is delivered. None yet.</p>
+        <p className="mt-8 rounded-card border border-dashed border-line-2 p-8 text-center text-mute">Warranties start when a laptop is delivered. None yet.</p>
       ) : (
         <ul className="mt-6 grid gap-4 md:grid-cols-2">
           {ws.map((w) => {

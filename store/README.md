@@ -1,4 +1,4 @@
-# Refurbished laptop store (working name "Encore")
+# LappyClub: certified pre-owned laptop store
 
 An online store for certified refurbished laptops, run alongside IT Rentals. Every laptop on sale is a **specific, inspected unit** with its own grade, measured battery and SSD health, cosmetic notes and public inspection report, so what the customer chooses is what ships.
 
@@ -92,7 +92,8 @@ Everything marked `[CONFIRM]` in the code is a working default. The full list, w
 
 ## Design
 
-- **Idea:** the inspection report. Manufacturer photos sit on white "studio" surfaces; each unit carries a perforated certificate with its measured battery and SSD health and a saffron seal showing checks passed.
-- **Colour:** white surfaces on cool grey `#F3F4F6`, near-black ink `#0E0F12`, one saffron accent `#F5A524` (savings, seals, highlights). Status colours only for states.
-- **Type:** Funnel Display for headings and prices, Funnel Sans for text, Geist Mono for unit codes, serials and measurements. All self-hosted.
-- **Motion:** restrained: card lift on hover, catalogue reflow, drawers and sheets, price changes. Reduced-motion settings are respected.
+- **Idea:** quiet luxury with proof. Generous whitespace and editorial type, with the trust carried by facts: every unit has its own "passport" (inspection report), the promise band (warranty, exact unit, returns, secure invoiced payment) sits right under the hero, and the checklist ticks off as you scroll.
+- **Logo:** `src/components/Logo.tsx`. A Bodoni "L" drawn as an open laptop (thick stem = lid, hairline base = deck) inside the open "C" of the club, with a gold clasp. The same geometry draws the favicon (`src/app/icon.svg`) and the share images.
+- **Colour:** ivory `#FAF8F3` and bone `#F4F0E8` surfaces, warm ink `#16130F`, one champagne-gold accent `#B8935A` (emblem, seals, hairlines, savings). Photos sit on pure white. Status colours only for states.
+- **Type:** Bodoni Moda (optical sizes) for headings, Jost for text, labels and prices, Geist Mono for unit codes and measurements. All self-hosted.
+- **Motion** (`src/components/Scenes.tsx`, ported from the GC Venture site's scroll scenes): the hero is pinned while the laptop comes forward and the words lift away, then the promise band rises over it; headings slide up line by line; sections and cards rise in turn; the 32-point checklist ticks as it moves up the screen; images drift against the scroll; every page enters with a soft rise. Nothing moves for visitors who ask for reduced motion, and everything is visible without JavaScript.

@@ -27,12 +27,12 @@ export default async function AdminStudents() {
       <p className="mt-2 max-w-[70ch] text-mute">Approve when the name, college and a current validity date are readable and match the details. Photos are deleted {STUDENT.idRetentionDays} days after a decision.</p>
 
       <h2 className="mt-8 text-[24px]">Waiting for a decision ({pending.length})</h2>
-      {pending.length === 0 ? <p className="mt-3 rounded-[18px] border border-line bg-white p-6 text-mute">Nothing to check. New requests appear here.</p> : (
+      {pending.length === 0 ? <p className="mt-3 rounded-card border border-line bg-white p-6 text-mute">Nothing to check. New requests appear here.</p> : (
         <ul className="mt-4 space-y-4">
           {pending.map((r) => {
             const u = who(r.userId);
             return (
-              <li key={r.id} className="rounded-[18px] border border-line bg-white grid gap-6 p-6 lg:grid-cols-[1fr_1.2fr]">
+              <li key={r.id} className="rounded-card border border-line bg-white grid gap-6 p-6 lg:grid-cols-[1fr_1.2fr]">
                 <div>
                   <p className="text-[20px] font-semibold text-ink display">{r.fullName}</p>
                   <dl className="mt-3 space-y-1.5 text-[14.5px]">
@@ -69,7 +69,7 @@ export default async function AdminStudents() {
       )}
 
       <h2 className="mt-10 text-[24px]">Recent decisions</h2>
-      <div className="rounded-[18px] border border-line bg-white mt-4 overflow-x-auto p-2" tabIndex={0} role="region" aria-label="Recent decisions, scrollable">
+      <div className="rounded-card border border-line bg-white mt-4 overflow-x-auto p-2" tabIndex={0} role="region" aria-label="Recent decisions, scrollable">
         {recent.length === 0 ? <p className="p-5 text-mute">None yet.</p> : (
           <table className="w-full min-w-[640px] text-[14.5px]">
             <tbody>

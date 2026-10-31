@@ -202,7 +202,7 @@ export default function BuyBox({ p, units, student, initialUnit }: { p: P; units
 
           {/* Actions */}
           <div className="mt-6 flex items-center gap-3">
-            <div className="flex h-[54px] items-center rounded-[14px] border border-line-2" role="group" aria-label="Quantity">
+            <div className="flex h-[54px] items-center rounded-card border border-line-2" role="group" aria-label="Quantity">
               <button type="button" className="grid h-full w-11 place-items-center disabled:opacity-30" aria-label="One fewer" disabled={qty <= 1} onClick={() => setQty((q) => q - 1)}><Minus size={16} /></button>
               <span className="mono w-6 text-center" aria-live="polite">{qty}</span>
               <button type="button" className="grid h-full w-11 place-items-center disabled:opacity-30" aria-label="One more" disabled={qty >= maxQty} onClick={() => setQty((q) => q + 1)}><Plus size={16} /></button>

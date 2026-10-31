@@ -15,7 +15,7 @@ export function PageHead({ title, intro, actions, back }: { title: string; intro
 
 export function Panel({ title, children, actions, className = '' }: { title?: string; children: React.ReactNode; actions?: React.ReactNode; className?: string }) {
   return (
-    <section className={`rounded-[18px] border border-line bg-white p-5 ${className}`}>
+    <section className={`rounded-card border border-line bg-white p-5 ${className}`}>
       {(title || actions) && <div className="mb-4 flex flex-wrap items-center justify-between gap-3">{title && <h2 className="text-[17px]">{title}</h2>}{actions}</div>}
       {children}
     </section>
@@ -24,7 +24,7 @@ export function Panel({ title, children, actions, className = '' }: { title?: st
 
 export function Kpi({ label, value, sub }: { label: string; value: React.ReactNode; sub?: React.ReactNode }) {
   return (
-    <div className="rounded-[16px] border border-line bg-white p-4">
+    <div className="rounded-card border border-line bg-white p-4">
       <p className="text-[12.5px] text-mute">{label}</p>
       <p className="price mt-1 text-[24px] leading-tight">{value}</p>
       {sub && <p className="mt-1 text-[12px] text-mute">{sub}</p>}
@@ -35,7 +35,7 @@ export function Kpi({ label, value, sub }: { label: string; value: React.ReactNo
 /** Data table wrapper with horizontal scroll on small screens. */
 export function Table({ head, children, empty }: { head: React.ReactNode[]; children: React.ReactNode; empty?: string | false }) {
   return (
-    <div className="overflow-x-auto rounded-[16px] border border-line bg-white" tabIndex={0} role="region" aria-label="Table">
+    <div className="overflow-x-auto rounded-card border border-line bg-white" tabIndex={0} role="region" aria-label="Table">
       <table className="w-full min-w-[720px] text-[13.5px]">
         <thead className="border-b border-line bg-canvas/60 text-left text-[12px] uppercase tracking-[0.04em] text-mute">
           <tr>{head.map((h, i) => <th key={i} className="whitespace-nowrap px-4 py-2.5 font-medium">{h}</th>)}</tr>

@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChevronDown, Heart, Menu, Search, ShoppingBag, User, X } from 'lucide-react';
 import Logo from './Logo';
+import { BRAND, POLICY, STUDENT } from '@/lib/config';
 import SearchDialog from './SearchDialog';
 import { useCart } from './cart/CartContext';
 
@@ -19,11 +20,18 @@ const BRANDS = [
 ] as const;
 
 const NAV = [
-  { href: '/laptops', label: 'All laptops' },
+  { href: '/laptops', label: 'Shop all' },
   { href: '/deals', label: 'Deals' },
-  { href: '/students', label: 'Students' },
-  { href: '/how-we-test', label: 'How we test' },
+  { href: '/how-we-test', label: 'Our standard' },
   { href: '/business', label: 'Business' },
+];
+
+/** The announcement bar cycles through these (the first is repeated at the end so the loop is seamless). */
+const PROMISES = [
+  `${POLICY.warrantyMonths}-month warranty on every laptop`,
+  `${POLICY.returnDays}-day returns with free pickup`,
+  `${STUDENT.percent}% off for verified students`,
+  `${POLICY.warrantyMonths}-month warranty on every laptop`,
 ];
 
 const QUICK = [
@@ -61,99 +69,104 @@ export default function Header({ viewer }: { viewer: Viewer }) {
 
   return (
     <>
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
-      <div className="bg-ink text-[12.5px] text-white/80">
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-sm focus:bg-white focus:px-4 focus:py-2">Skip to content</a>
+      <div className="bg-ink text-[11px] uppercase tracking-[0.2em] text-ivory/75">
         <div className="wrap flex h-9 items-center justify-between gap-4">
-          <p className="truncate"><span className="text-accent">●</span> Every unit inspected and listed with its measured battery health</p>
-          <div className="hidden items-center gap-5 md:flex">
-            <Link href="/track" className="hover:text-white">Track order</Link>
-            <Link href="/support" className="hover:text-white">Help</Link>
-            <Link href="/students" className="hover:text-white">10% off for students</Link>
+          <div className="relative h-4 min-w-0 flex-1 overflow-hidden md:max-w-[440px]">
+            <ul className="animate-[ticker_12s_var(--ease-lux)_infinite] motion-reduce:animate-none">
+              {PROMISES.map((t, i) => <li key={i} className="flex h-4 items-center truncate leading-4" aria-hidden={i === PROMISES.length - 1 ? true : undefined}><span className="mr-2.5 inline-block h-1 w-1 rotate-45 bg-accent" aria-hidden="true" />{t}</li>)}
+            </ul>
+          </div>
+          <div className="hidden items-center gap-7 md:flex">
+            <Link href="/track" className="hover:text-ivory">Track order</Link>
+            <Link href="/support" className="hover:text-ivory">Client care</Link>
+            <Link href="/students" className="text-gold-hi hover:text-ivory">Students: 10% off</Link>
           </div>
         </div>
       </div>
-      <header className="sticky top-0 z-50 border-b border-line bg-white/90 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80">
-        <div className="wrap flex h-[68px] items-center gap-4">
-          <button type="button" className="btn btn-quiet btn-icon -ml-2 lg:hidden" aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={22} /></button>
-          <Link href="/" aria-label="Home" className="shrink-0"><Logo /></Link>
-
-          <nav aria-label="Main" className="ml-4 hidden items-center gap-1 lg:flex">
-            <div ref={brandsRef} className="relative">
-              <button type="button" aria-expanded={brands} aria-controls="brands-menu" onClick={() => setBrands((v) => !v)}
-                className="inline-flex h-10 items-center gap-1 rounded-lg px-3 text-[14.5px] font-medium hover:bg-canvas">
-                Brands <ChevronDown size={15} className={`transition-transform ${brands ? 'rotate-180' : ''}`} aria-hidden="true" />
-              </button>
-              <AnimatePresence>
-                {brands && (
-                  <motion.div id="brands-menu" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} transition={{ duration: .16 }}
-                    className="absolute left-0 top-12 grid w-[640px] grid-cols-4 gap-1 rounded-2xl border border-line bg-white p-3 shadow-[var(--shadow-pop)]">
-                    {BRANDS.map((b) => (
-                      <div key={b.slug} className="rounded-xl p-3 hover:bg-canvas">
-                        <Link href={`/brands/${b.slug}`} className="display text-[17px] font-semibold hover:underline">{b.name}</Link>
-                        <ul className="mt-2 space-y-1.5 text-[13.5px] text-mute">
-                          {b.lines.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-ink">{label}</Link></li>)}
-                        </ul>
+      <header className="sticky top-0 z-50 border-b border-line bg-ivory/90 backdrop-blur-xl supports-[backdrop-filter]:bg-ivory/80">
+        <div className="wrap grid h-[76px] grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div className="flex items-center gap-1">
+            <button type="button" className="btn btn-quiet btn-icon -ml-2 xl:hidden" aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={21} strokeWidth={1.5} /></button>
+            <nav aria-label="Main" className="-ml-3 hidden items-center xl:flex">
+              <div ref={brandsRef}>
+                <button type="button" aria-expanded={brands} aria-controls="brands-menu" onClick={() => setBrands((v) => !v)}
+                  className="inline-flex h-10 items-center gap-1 px-3 text-[11.5px] font-medium uppercase tracking-[0.18em] hover:text-accent-ink">
+                  Brands <ChevronDown size={13} className={`transition-transform duration-300 ${brands ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </button>
+                <AnimatePresence>
+                  {brands && (
+                    <motion.div id="brands-menu" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: .35, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute inset-x-0 top-full border-b border-line bg-ivory shadow-[var(--shadow-lift)]">
+                      <div className="wrap grid grid-cols-[repeat(4,1fr)_1.2fr] gap-10 py-10">
+                        {BRANDS.map((b) => (
+                          <div key={b.slug}>
+                            <Link href={`/brands/${b.slug}`} className="display text-[26px] hover:text-accent-ink">{b.name}</Link>
+                            <ul className="mt-4 space-y-2.5 text-[14px] text-mute">
+                              {b.lines.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-ink">{label}</Link></li>)}
+                            </ul>
+                          </div>
+                        ))}
+                        <div className="border-l border-line pl-10">
+                          <p className="eyebrow eyebrow-gold">Shortcuts</p>
+                          <ul className="mt-4 space-y-2.5 text-[14px] text-mute">
+                            {QUICK.map(([label, href]) => <li key={href}><Link href={href} className="hover:text-ink">{label}</Link></li>)}
+                          </ul>
+                        </div>
                       </div>
-                    ))}
-                    <div className="col-span-4 mt-1 flex flex-wrap gap-2 border-t border-line px-2 pt-3">
-                      {QUICK.slice(3).map(([label, href]) => <Link key={href} href={href} className="chip !min-h-8 !text-[13px]">{label}</Link>)}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            {NAV.map((n) => (
-              <Link key={n.href} href={n.href} aria-current={path === n.href ? 'page' : undefined}
-                className="inline-flex h-10 items-center rounded-lg px-3 text-[14.5px] font-medium hover:bg-canvas aria-[current=page]:text-ink aria-[current=page]:underline aria-[current=page]:underline-offset-8">
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-
-          <button type="button" onClick={() => setSearch(true)}
-            className="ml-auto hidden h-11 w-full max-w-[340px] items-center gap-2.5 rounded-xl border border-line-2 bg-canvas/60 px-3.5 text-left text-[14.5px] text-mute transition hover:border-ink md:flex">
-            <Search size={17} aria-hidden="true" /> <span className="flex-1">Search ThinkPad, M1, 16 GB…</span> <span className="kbd">/</span>
-          </button>
-
-          <div className="ml-auto flex items-center gap-0.5 md:ml-2">
-            <button type="button" className="btn btn-quiet btn-icon md:hidden" aria-label="Search" onClick={() => setSearch(true)}><Search size={21} /></button>
-            <Link href={viewer ? '/account/wishlist' : '/login?next=/account/wishlist'} className="btn btn-quiet btn-icon hidden sm:inline-flex" aria-label="Wishlist"><Heart size={21} /></Link>
-            <Link href={viewer ? (viewer.isStaff ? '/admin' : '/account') : '/login'} className="btn btn-quiet h-10 gap-2 px-2.5 text-[14px]" aria-label={viewer ? 'Your account' : 'Sign in'}>
-              <User size={21} aria-hidden="true" />
-              <span className="hidden max-w-[110px] truncate xl:inline">{viewer ? (viewer.isStaff ? 'Admin' : viewer.name?.split(' ')[0] ?? 'Account') : 'Sign in'}</span>
-            </Link>
-            <button type="button" onClick={() => setOpen(true)} className="btn btn-primary relative h-10 gap-2 px-3.5 text-[14px]" aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}>
-              <ShoppingBag size={18} aria-hidden="true" />
-              <span className="num">{count}</span>
-            </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              {NAV.map((n) => (
+                <Link key={n.href} href={n.href} aria-current={path === n.href ? 'page' : undefined}
+                  className="relative inline-flex h-10 items-center px-3 text-[11.5px] font-medium uppercase tracking-[0.18em] hover:text-accent-ink aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:bottom-1 aria-[current=page]:after:h-px aria-[current=page]:after:bg-accent">
+                  {n.label}
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
-        <div className="hidden border-t border-line lg:block">
-          <div className="wrap flex h-11 items-center gap-6 overflow-x-auto text-[13.5px] text-mute">
-            {QUICK.map(([label, href]) => <Link key={href} href={href} className="whitespace-nowrap hover:text-ink">{label}</Link>)}
+
+          <Link href="/" aria-label={`${BRAND.name} home`} className="shrink-0"><Logo compact /></Link>
+
+          <div className="flex items-center justify-end gap-0.5">
+            <button type="button" onClick={() => setSearch(true)} aria-label="Search"
+              className="btn btn-quiet h-10 min-h-0 gap-2 px-2 text-[11.5px] tracking-[0.18em] sm:px-2.5">
+              <Search size={19} strokeWidth={1.5} aria-hidden="true" /> <span className="hidden 2xl:inline">Search</span>
+            </button>
+            <Link href={viewer ? '/account/wishlist' : '/login?next=/account/wishlist'} className="btn btn-quiet btn-icon hidden sm:inline-flex" aria-label="Wishlist"><Heart size={19} strokeWidth={1.5} /></Link>
+            <Link href={viewer ? (viewer.isStaff ? '/admin' : '/account') : '/login'} className="btn btn-quiet hidden h-10 min-h-0 gap-2 px-2.5 text-[11.5px] tracking-[0.18em] sm:inline-flex" aria-label={viewer ? 'Your account' : 'Sign in'}>
+              <User size={19} strokeWidth={1.5} aria-hidden="true" />
+              <span className="hidden max-w-[110px] truncate lg:inline">{viewer ? (viewer.isStaff ? 'Admin' : viewer.name?.split(' ')[0] ?? 'Account') : 'Sign in'}</span>
+            </Link>
+            <button type="button" onClick={() => setOpen(true)} className="btn btn-quiet relative -mr-2 h-10 min-h-0 gap-2 px-2 text-[11.5px] tracking-[0.18em] sm:mr-0 sm:px-2.5" aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}>
+              <ShoppingBag size={19} strokeWidth={1.5} aria-hidden="true" />
+              <span className="hidden lg:inline">Bag</span>
+              <span className={`num grid h-5 min-w-5 place-items-center rounded-full px-1 text-[10.5px] tracking-normal ${count ? 'bg-ink text-ivory' : 'bg-canvas-2 text-mute'}`}>{count}</span>
+            </button>
           </div>
         </div>
       </header>
 
       <AnimatePresence>
         {menu && (
-          <div className="fixed inset-0 z-[90] lg:hidden">
-            <motion.button type="button" aria-label="Close menu" tabIndex={-1} className="absolute inset-0 bg-ink/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMenu(false)} />
+          <div className="fixed inset-0 z-[90] xl:hidden">
+            <motion.button type="button" aria-label="Close menu" tabIndex={-1} className="absolute inset-0 bg-ink/50 backdrop-blur-[2px]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMenu(false)} />
             <motion.nav aria-label="Menu" initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-              className="absolute left-0 top-0 flex h-full w-[86%] max-w-[360px] flex-col overflow-y-auto bg-white p-5">
-              <div className="flex items-center justify-between"><Logo /><button type="button" className="btn btn-quiet btn-icon" aria-label="Close menu" onClick={() => setMenu(false)}><X size={22} /></button></div>
-              <ul className="mt-6 space-y-1">
-                {NAV.map((n) => <li key={n.href}><Link href={n.href} className="block rounded-xl px-3 py-3 text-[17px] font-semibold hover:bg-canvas">{n.label}</Link></li>)}
+              className="absolute left-0 top-0 flex h-full w-[88%] max-w-[380px] flex-col overflow-y-auto bg-ivory p-6">
+              <div className="flex items-center justify-between"><Logo compact /><button type="button" className="btn btn-quiet btn-icon" aria-label="Close menu" onClick={() => setMenu(false)}><X size={22} /></button></div>
+              <ul className="mt-6">
+                {[...NAV, { href: '/students', label: 'Students' }].map((n) => <li key={n.href}><Link href={n.href} className="display block border-b border-line py-3.5 text-[26px] leading-tight">{n.label}</Link></li>)}
               </ul>
-              <p className="eyebrow mt-6 px-3">Brands</p>
+              <p className="eyebrow eyebrow-gold mt-8">Brands</p>
               <ul className="mt-2 grid grid-cols-2 gap-2">
-                {BRANDS.map((b) => <li key={b.slug}><Link href={`/brands/${b.slug}`} className="block rounded-xl border border-line px-3 py-3 font-semibold">{b.name}</Link></li>)}
+                {BRANDS.map((b) => <li key={b.slug}><Link href={`/brands/${b.slug}`} className="block border border-line px-3 py-3 text-[15px] font-medium">{b.name}</Link></li>)}
               </ul>
-              <p className="eyebrow mt-6 px-3">Shortcuts</p>
+              <p className="eyebrow eyebrow-gold mt-8">Shortcuts</p>
               <div className="mt-2 flex flex-wrap gap-2">{QUICK.map(([label, href]) => <Link key={href} href={href} className="chip">{label}</Link>)}</div>
               <div className="mt-auto space-y-2 pt-6 text-[15px]">
                 <Link href="/track" className="block px-3 py-1.5">Track an order</Link>
-                <Link href="/support" className="block px-3 py-1.5">Help and support</Link>
+                <Link href="/support" className="block px-3 py-1.5">Client care</Link>
                 <Link href={viewer ? '/account' : '/login'} className="btn btn-primary mt-2 w-full">{viewer ? 'Your account' : 'Sign in or create account'}</Link>
               </div>
             </motion.nav>

@@ -79,7 +79,7 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
             role="dialog" aria-modal="true" aria-label="Search laptops"
             initial={{ y: -14, scale: 0.98, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} exit={{ y: -8, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-            className="w-full max-w-[640px] overflow-hidden rounded-[24px] bg-white shadow-[0_40px_80px_-30px_rgba(14,15,18,.5)]"
+            className="w-full max-w-[640px] overflow-hidden rounded-sheet bg-white shadow-[0_40px_80px_-30px_rgba(14,15,18,.5)]"
             onKeyDown={(e) => {
               if (e.key === 'Escape') onClose();
               if (e.key === 'ArrowDown') { e.preventDefault(); setSel((s) => Math.min(results.length - 1, s + 1)); }
