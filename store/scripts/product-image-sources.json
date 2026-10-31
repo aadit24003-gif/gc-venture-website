@@ -65,14 +65,14 @@
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00055lf110_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
         ],
         [
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
-        ],
-        [
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
         ]
       ]
     },
@@ -89,11 +89,6 @@
     "dell-latitude-5430": {
       "credit": "Dell Technologies (dell.com)",
       "images": [
-        [
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
-          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=jpg"
-        ],
         [
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=png-alpha&wid=1400",
           "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=png-alpha&wid=1000",
@@ -168,6 +163,9 @@
       "credit": "HP Inc. (hp.com)",
       "images": [
         [
+          "https://hp.widen.net/content/e35sllcig1/png/e35sllcig1.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/e35sllcig1/png/e35sllcig1.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/e35sllcig1/png/e35sllcig1.png?w=400&h=400&dpi=72&color=ffffff00",
           "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=1400&h=1400&dpi=72&color=ffffff00",
           "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=800&h=800&dpi=72&color=ffffff00",
           "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=400&h=400&dpi=72&color=ffffff00"
@@ -238,17 +236,17 @@
       "credit": "Lenovo (psref.lenovo.com)",
       "images": [
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_01.png",
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_03.png",
           "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_t480.jpg"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_02.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_03.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_04.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_04.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_01.png"
         ]
       ]
     },
@@ -273,17 +271,17 @@
       "credit": "Lenovo (psref.lenovo.com)",
       "images": [
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_01.png",
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_03.png",
           "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_x390.jpg"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_02.png"
-        ],
-        [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_03.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_01.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_04.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_02.png"
         ]
       ]
     },
@@ -295,10 +293,10 @@
           "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_t490.jpg"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_02.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_03.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_03.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_02.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_04.png"
@@ -309,10 +307,10 @@
       "credit": "Lenovo (psref.lenovo.com)",
       "images": [
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_01.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_02.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_02.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_01.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_03.png"
@@ -329,13 +327,13 @@
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_01.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_02.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_04.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_03.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_04.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_02.png"
         ]
       ]
     },
@@ -343,16 +341,16 @@
       "credit": "Lenovo (psref.lenovo.com)",
       "images": [
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_01.png"
-        ],
-        [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_02.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_03.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_01.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_04.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_03.png"
         ]
       ]
     },
@@ -360,16 +358,16 @@
       "credit": "Lenovo (psref.lenovo.com)",
       "images": [
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_01.png"
-        ],
-        [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_02.png"
-        ],
-        [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_03.png"
         ],
         [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_01.png"
+        ],
+        [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_04.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_02.png"
         ]
       ]
     },
@@ -380,10 +378,10 @@
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_01.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_02.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_03.png"
         ],
         [
-          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_03.png"
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_02.png"
         ],
         [
           "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_04.png"
