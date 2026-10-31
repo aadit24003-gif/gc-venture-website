@@ -1,0 +1,501 @@
+{
+  "note": "Official manufacturer product photos per exact model. Each entry in images is one photo slot: a list of candidate URLs tried in order. Rebuilt into public/products by scripts/fetch-product-images.mjs.",
+  "models": {
+    "dell-latitude-5490": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5490/non-touch/notebooks-latitude-14-5490-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5490/non-touch/notebooks-latitude-14-5490-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5490/non-touch/notebooks-latitude-14-5490-nt-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-7490": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7490/touch/notebooks-latitude-14-7490t-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7490/touch/notebooks-latitude-14-7490t-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7490/touch/notebooks-latitude-14-7490t-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-7400": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7400/global-spi/ng/notebook_latitude_14_7400_nt_relsize_500_ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7400/global-spi/ng/notebook_latitude_14_7400_nt_relsize_500_ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7400/global-spi/ng/notebook_latitude_14_7400_nt_relsize_500_ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-5410": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-541x/global-spi/ng/notebook-latitude-14-541x-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-541x/global-spi/ng/notebook-latitude-14-541x-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-541x/global-spi/ng/notebook-latitude-14-541x-nt-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-7410": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7410-touch/global-spi/ng/notebook-latitude-14-7410-t-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7410-touch/global-spi/ng/notebook-latitude-14-7410-t-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7410-touch/global-spi/ng/notebook-latitude-14-7410-t-gray-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-5420": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00000ff090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00000ff090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00000ff090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00055lf110_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00055lf110_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00055lf110_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-7420": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7420/global-spi/ng/touch/notebook-latitude-14-7420-t-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7420/global-spi/ng/touch/notebook-latitude-14-7420-t-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7420/global-spi/ng/touch/notebook-latitude-14-7420-t-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-5430": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-4.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-4.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-4.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-5.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-5.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-5.psd?fmt=jpg"
+        ],
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-6.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-6.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-6.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-7430": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7430/pdp/latitude-7430-500x191.jpg?fmt=png-alpha&wid=500&hei=191",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7430/pdp/latitude-7430-500x191.jpg"
+        ]
+      ]
+    },
+    "dell-latitude-5440": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/images/products/laptops-and-2-in-1s/latitude/14-5440-non-touch/la5440nt-rgb-cnb-00000ff090-gy.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/images/products/laptops-and-2-in-1s/latitude/14-5440-non-touch/la5440nt-rgb-cnb-00000ff090-gy.psd?fmt=jpg&wid=1400"
+        ]
+      ]
+    },
+    "dell-latitude-7440": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7440-laptop-2-in-1/spi/2-in-1-touch-mainstream/ng/notebook-latitude-14-7440-t-ms-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7440-laptop-2-in-1/spi/2-in-1-touch-mainstream/ng/notebook-latitude-14-7440-t-ms-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7440-laptop-2-in-1/spi/2-in-1-touch-mainstream/ng/notebook-latitude-14-7440-t-ms-gray-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "dell-latitude-5450": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        [
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-5450-laptop/spi/touch/ir/ng/notebook-latitude-14-5450-t-ir-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-5450-laptop/spi/touch/ir/ng/notebook-latitude-14-5450-t-ir-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1000",
+          "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-5450-laptop/spi/touch/ir/ng/notebook-latitude-14-5450-t-ir-gray-relsize-500-ng.psd?fmt=jpg"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g5": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/bgrylwhgxq/png/bgrylwhgxq.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/bgrylwhgxq/png/bgrylwhgxq.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/bgrylwhgxq/png/bgrylwhgxq.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g6": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-830-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/kvro8lsayd/png/kvro8lsayd.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/kvro8lsayd/png/kvro8lsayd.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/kvro8lsayd/png/kvro8lsayd.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g7": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/xxlv7oclzr/png/xxlv7oclzr.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/xxlv7oclzr/png/xxlv7oclzr.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/xxlv7oclzr/png/xxlv7oclzr.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/6kmgmrsmzt/png/6kmgmrsmzt.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/6kmgmrsmzt/png/6kmgmrsmzt.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/6kmgmrsmzt/png/6kmgmrsmzt.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-probook-440-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/bvbxinqgc9/png/bvbxinqgc9.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/bvbxinqgc9/png/bvbxinqgc9.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/bvbxinqgc9/png/bvbxinqgc9.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g9": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/osxuw9ypu0/png/osxuw9ypu0.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/osxuw9ypu0/png/osxuw9ypu0.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/osxuw9ypu0/png/osxuw9ypu0.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "hp-elitebook-840-g10": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        [
+          "https://hp.widen.net/content/zc0fv8rwlc/png/zc0fv8rwlc.png?w=1400&h=1400&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/zc0fv8rwlc/png/zc0fv8rwlc.png?w=800&h=800&dpi=72&color=ffffff00",
+          "https://hp.widen.net/content/zc0fv8rwlc/png/zc0fv8rwlc.png?w=400&h=400&dpi=72&color=ffffff00"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t480": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_01.png",
+          "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_t480.jpg"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t480s": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-x390": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_01.png",
+          "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_x390.jpg"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t490": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_01.png",
+          "https://download.lenovo.com/images/ProdImageLaptops/thinkpad_t490.jpg"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-1": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-l14-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t14s-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-x1-carbon-gen-9": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-e14-gen-4": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-3": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-4": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_01.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_02.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_03.png"
+        ],
+        [
+          "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_04.png"
+        ]
+      ]
+    },
+    "apple-macbook-air-m1": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/macbook-air-2020-late-device.jpg"
+        ]
+      ]
+    },
+    "apple-macbook-air-m2": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2022-macbook-air-m2-colors.png"
+        ]
+      ]
+    },
+    "apple-macbook-air-m3": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2024-macbook-air-13in-m3-colors.png"
+        ]
+      ]
+    },
+    "apple-macbook-pro-13-m1": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-2020-late-13in-device.jpg"
+        ]
+      ]
+    },
+    "apple-macbook-pro-14-m1-pro": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-2021-14in.png"
+        ]
+      ]
+    },
+    "apple-macbook-pro-14-m2-pro": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-14in-2023.png"
+        ]
+      ]
+    },
+    "apple-macbook-pro-16-2019": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        [
+          "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-16in-2019.jpg"
+        ]
+      ]
+    }
+  }
+}

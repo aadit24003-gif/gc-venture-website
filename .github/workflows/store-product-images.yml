@@ -1,0 +1,38 @@
+# Downloads the official manufacturer photo of every laptop model in the store
+# (store/scripts/product-image-sources.json), converts them to WebP and commits them
+# to store/public/products. Runs when the sources list or the script changes, or by hand.
+name: Store product images
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - store/scripts/product-image-sources.json
+      - store/scripts/fetch-product-images.mjs
+      - .github/workflows/store-product-images.yml
+permissions:
+  contents: write
+concurrency:
+  group: store-product-images-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install image tools
+        run: mkdir -p /tmp/imgtools && cd /tmp/imgtools && npm init -y >/dev/null && npm i sharp@0.35.5 >/dev/null
+      - name: Download and convert
+        run: NODE_PATH=/tmp/imgtools/node_modules node store/scripts/fetch-product-images.mjs
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add store/public/products
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Store: official product photos for each model"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
