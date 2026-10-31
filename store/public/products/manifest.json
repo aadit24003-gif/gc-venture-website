@@ -1,0 +1,693 @@
+{
+  "generatedAt": "2026-10-31T07:07:14.415Z",
+  "models": {
+    "dell-latitude-5490": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5490/1.webp",
+          "width": 904,
+          "height": 621,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5490/non-touch/notebooks-latitude-14-5490-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7490": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7490/1.webp",
+          "width": 931,
+          "height": 590,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7490/touch/notebooks-latitude-14-7490t-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7400": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7400/1.webp",
+          "width": 911,
+          "height": 575,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7400/global-spi/ng/notebook_latitude_14_7400_nt_relsize_500_ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-5410": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5410/1.webp",
+          "width": 900,
+          "height": 582,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-541x/global-spi/ng/notebook-latitude-14-541x-nt-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7410": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7410/1.webp",
+          "width": 767,
+          "height": 541,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7410-touch/global-spi/ng/notebook-latitude-14-7410-t-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-5420": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5420/1.webp",
+          "width": 1462,
+          "height": 938,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00000ff090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5420/2.webp",
+          "width": 1462,
+          "height": 933,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00055lf110_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5420/3.webp",
+          "width": 1239,
+          "height": 1250,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_00090rp090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5420/4.webp",
+          "width": 1464,
+          "height": 1076,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5420/media-gallery/la5420nt_cnb_90000td090_gy_5000x5000_gettyimages-1254825733.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7420": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7420/1.webp",
+          "width": 796,
+          "height": 561,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7420/global-spi/ng/touch/notebook-latitude-14-7420-t-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-5430": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5430/1.webp",
+          "width": 892,
+          "height": 567,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/spi/ng/notebook-latitude-14-5430-nt-black-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5430/2.webp",
+          "width": 1405,
+          "height": 1031,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-3.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5430/3.webp",
+          "width": 1441,
+          "height": 877,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-4.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5430/4.webp",
+          "width": 1441,
+          "height": 877,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-5.psd?fmt=png-alpha&wid=1400"
+        },
+        {
+          "src": "/products/dell-latitude-5430/5.webp",
+          "width": 1430,
+          "height": 1451,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-5430/media-gallery/laptop-latitude-14-5430-gray-gallery-6.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7430": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7430/1.webp",
+          "width": 362,
+          "height": 245,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/14-7430/pdp/latitude-7430-500x191.jpg?fmt=png-alpha&wid=500&hei=191"
+        }
+      ]
+    },
+    "dell-latitude-5440": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5440/1.webp",
+          "width": 1389,
+          "height": 875,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/images/products/laptops-and-2-in-1s/latitude/14-5440-non-touch/la5440nt-rgb-cnb-00000ff090-gy.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-7440": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-7440/1.webp",
+          "width": 775,
+          "height": 574,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-7440-laptop-2-in-1/spi/2-in-1-touch-mainstream/ng/notebook-latitude-14-7440-t-ms-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "dell-latitude-5450": {
+      "credit": "Dell Technologies (dell.com)",
+      "images": [
+        {
+          "src": "/products/dell-latitude-5450/1.webp",
+          "width": 893,
+          "height": 568,
+          "source": "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/latitude-notebooks/latitude-14-5450-laptop/spi/touch/ir/ng/notebook-latitude-14-5450-t-ir-gray-relsize-500-ng.psd?fmt=png-alpha&wid=1400"
+        }
+      ]
+    },
+    "hp-elitebook-840-g5": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g5/1.webp",
+          "width": 1346,
+          "height": 935,
+          "source": "https://hp.widen.net/content/bgrylwhgxq/png/bgrylwhgxq.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-840-g6": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g6/1.webp",
+          "width": 492,
+          "height": 1079,
+          "source": "https://hp.widen.net/content/qzrpg7sqlf/png/qzrpg7sqlf.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-830-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-830-g8/1.webp",
+          "width": 1350,
+          "height": 889,
+          "source": "https://hp.widen.net/content/kvro8lsayd/png/kvro8lsayd.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-840-g7": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g7/1.webp",
+          "width": 1350,
+          "height": 888,
+          "source": "https://hp.widen.net/content/xxlv7oclzr/png/xxlv7oclzr.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-840-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g8/1.webp",
+          "width": 1350,
+          "height": 889,
+          "source": "https://hp.widen.net/content/6kmgmrsmzt/png/6kmgmrsmzt.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-probook-440-g8": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-probook-440-g8/1.webp",
+          "width": 1319,
+          "height": 887,
+          "source": "https://hp.widen.net/content/bvbxinqgc9/png/bvbxinqgc9.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-840-g9": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g9/1.webp",
+          "width": 1286,
+          "height": 901,
+          "source": "https://hp.widen.net/content/osxuw9ypu0/png/osxuw9ypu0.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "hp-elitebook-840-g10": {
+      "credit": "HP Inc. (hp.com)",
+      "images": [
+        {
+          "src": "/products/hp-elitebook-840-g10/1.webp",
+          "width": 1218,
+          "height": 1034,
+          "source": "https://hp.widen.net/content/zc0fv8rwlc/png/zc0fv8rwlc.png?w=1400&h=1400&dpi=72&color=ffffff00"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t480": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t480/1.webp",
+          "width": 885,
+          "height": 295,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480/2.webp",
+          "width": 560,
+          "height": 531,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480/3.webp",
+          "width": 730,
+          "height": 532,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480/4.webp",
+          "width": 735,
+          "height": 536,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480/Compressedimage/ThinkPad_T480_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t480s": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t480s/1.webp",
+          "width": 766,
+          "height": 522,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480s/2.webp",
+          "width": 960,
+          "height": 499,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480s/3.webp",
+          "width": 717,
+          "height": 529,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t480s/4.webp",
+          "width": 719,
+          "height": 528,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T480s/Compressedimage/ThinkPad_T480s_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-x390": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-x390/1.webp",
+          "width": 791,
+          "height": 534,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x390/2.webp",
+          "width": 944,
+          "height": 426,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x390/3.webp",
+          "width": 851,
+          "height": 548,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x390/4.webp",
+          "width": 851,
+          "height": 547,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X390/Compressedimage/ThinkPad_X390_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t490": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t490/1.webp",
+          "width": 875,
+          "height": 557,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t490/2.webp",
+          "width": 875,
+          "height": 553,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t490/3.webp",
+          "width": 797,
+          "height": 553,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t490/4.webp",
+          "width": 971,
+          "height": 444,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T490/Compressedimage/ThinkPad_T490_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-1": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-1/1.webp",
+          "width": 864,
+          "height": 709,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-1/2.webp",
+          "width": 939,
+          "height": 717,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-1/3.webp",
+          "width": 923,
+          "height": 713,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-1/4.webp",
+          "width": 973,
+          "height": 539,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_1_Intel/Compressedimage/ThinkPad_T14_Gen_1_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-l14-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-l14-gen-2/1.webp",
+          "width": 926,
+          "height": 737,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-l14-gen-2/2.webp",
+          "width": 967,
+          "height": 534,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-l14-gen-2/3.webp",
+          "width": 958,
+          "height": 713,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-l14-gen-2/4.webp",
+          "width": 963,
+          "height": 733,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_L14_Gen_2_Intel/Compressedimage/ThinkPad_L14_Gen_2_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-2/1.webp",
+          "width": 961,
+          "height": 920,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-2/2.webp",
+          "width": 967,
+          "height": 857,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-2/3.webp",
+          "width": 971,
+          "height": 657,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-2/4.webp",
+          "width": 940,
+          "height": 844,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_2_Intel/Compressedimage/ThinkPad_T14_Gen_2_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t14s-gen-2": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t14s-gen-2/1.webp",
+          "width": 870,
+          "height": 910,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14s-gen-2/2.webp",
+          "width": 946,
+          "height": 630,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14s-gen-2/3.webp",
+          "width": 953,
+          "height": 824,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14s-gen-2/4.webp",
+          "width": 954,
+          "height": 825,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14s_Gen_2_Intel/Compressedimage/ThinkPad_T14s_Gen_2_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-x1-carbon-gen-9": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-x1-carbon-gen-9/1.webp",
+          "width": 847,
+          "height": 742,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x1-carbon-gen-9/2.webp",
+          "width": 857,
+          "height": 526,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x1-carbon-gen-9/3.webp",
+          "width": 853,
+          "height": 615,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-x1-carbon-gen-9/4.webp",
+          "width": 853,
+          "height": 614,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_X1_Carbon_Gen_9/Compressedimage/ThinkPad_X1_Carbon_Gen_9_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-e14-gen-4": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-e14-gen-4/1.webp",
+          "width": 963,
+          "height": 903,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-e14-gen-4/2.webp",
+          "width": 960,
+          "height": 910,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-e14-gen-4/3.webp",
+          "width": 962,
+          "height": 911,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-e14-gen-4/4.webp",
+          "width": 957,
+          "height": 780,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_E14_Gen_4_Intel/Compressedimage/ThinkPad_E14_Gen_4_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-3": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-3/1.webp",
+          "width": 958,
+          "height": 922,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-3/2.webp",
+          "width": 958,
+          "height": 924,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-3/3.webp",
+          "width": 958,
+          "height": 654,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-3/4.webp",
+          "width": 958,
+          "height": 655,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_3_Intel/Compressedimage/ThinkPad_T14_Gen_3_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "lenovo-thinkpad-t14-gen-4": {
+      "credit": "Lenovo (psref.lenovo.com)",
+      "images": [
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-4/1.webp",
+          "width": 1664,
+          "height": 1536,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_01.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-4/2.webp",
+          "width": 1664,
+          "height": 1535,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_02.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-4/3.webp",
+          "width": 1664,
+          "height": 513,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_03.png"
+        },
+        {
+          "src": "/products/lenovo-thinkpad-t14-gen-4/4.webp",
+          "width": 1664,
+          "height": 513,
+          "source": "https://psrefstuff.lenovo.com/syspool/Sys/Image/ThinkPad/ThinkPad_T14_Gen_4_Intel/Compressedimage/ThinkPad_T14_Gen_4_Intel_CT1_04.png"
+        }
+      ]
+    },
+    "apple-macbook-air-m1": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-air-m1/1.webp",
+          "width": 1264,
+          "height": 480,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/macbook-air-2020-late-device.jpg"
+        }
+      ]
+    },
+    "apple-macbook-air-m2": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-air-m2/1.webp",
+          "width": 1664,
+          "height": 607,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2022-macbook-air-m2-colors.png"
+        }
+      ]
+    },
+    "apple-macbook-air-m3": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-air-m3/1.webp",
+          "width": 1664,
+          "height": 607,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-air/2024-macbook-air-13in-m3-colors.png"
+        }
+      ]
+    },
+    "apple-macbook-pro-13-m1": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-pro-13-m1/1.webp",
+          "width": 970,
+          "height": 453,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-2020-late-13in-device.jpg"
+        }
+      ]
+    },
+    "apple-macbook-pro-14-m1-pro": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-pro-14-m1-pro/1.webp",
+          "width": 971,
+          "height": 463,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-2021-14in.png"
+        }
+      ]
+    },
+    "apple-macbook-pro-14-m2-pro": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-pro-14-m2-pro/1.webp",
+          "width": 971,
+          "height": 463,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-14in-2023.png"
+        }
+      ]
+    },
+    "apple-macbook-pro-16-2019": {
+      "credit": "Apple Inc. (support.apple.com)",
+      "images": [
+        {
+          "src": "/products/apple-macbook-pro-16-2019/1.webp",
+          "width": 1085,
+          "height": 479,
+          "source": "https://cdsassets.apple.com/live/7WUAS350/images/macbook-pro/macbook-pro-16in-2019.jpg"
+        }
+      ]
+    }
+  },
+  "failures": []
+}
