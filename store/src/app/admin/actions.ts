@@ -7,6 +7,10 @@ import { db } from '@/lib/db';
 import { coupons, messages, orders, products, studentVerifications, users, variants } from '@/lib/db/schema';
 import { requireAdmin } from '@/lib/auth/session';
 import { ADMIN_STATUSES, setStatus } from '@/lib/orders';
+import { razorpayConfigured, refundPayment } from '@/lib/providers/razorpay';
+import { orderEvents } from '@/lib/db/schema';
+import { isDemo } from '@/lib/config';
+import { rupees } from '@/lib/format';
 import { invalidateProducts } from '@/lib/products';
 import { approvedUntilFromNow } from '@/lib/students';
 import { layout, sendEmail } from '@/lib/providers/email';
@@ -32,6 +36,32 @@ export async function updateOrderStatus(input: z.input<typeof StatusInput>) {
   const d = await db();
   const [o] = await d.select({ number: orders.number }).from(orders).where(eq(orders.id, p.data.orderId));
   revalidatePath(`/admin/orders/${o?.number}`);
+  return { ok: true as const };
+}
+
+/** Refunds a paid online order in full: through Razorpay when connected, or recorded only in demo mode. */
+export async function refundOrder(orderId: string) {
+  const admin = await requireAdmin();
+  const d = await db();
+  const [o] = await d.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+  if (!o) return { ok: false as const, error: 'Order not found.' };
+  if (o.paymentStatus !== 'paid') return { ok: false as const, error: 'Only paid orders can be refunded.' };
+  if (!['cancelled', 'returned'].includes(o.status)) return { ok: false as const, error: 'Cancel the order or mark it returned first.' };
+  if (o.paymentMethod === 'cod') return { ok: false as const, error: 'Pay-on-delivery orders are refunded by bank transfer or UPI outside the store. Mark it here once done.' };
+  let note = `Refund of ${rupees(o.total)} started`;
+  if (o.paymentMethod === 'razorpay' && o.razorpayPaymentId && razorpayConfigured()) {
+    try {
+      const r = await refundPayment(o.razorpayPaymentId, o.total, { order: o.number });
+      note += ` (Razorpay ${r.id})`;
+    } catch (e) {
+      return { ok: false as const, error: (e as Error).message };
+    }
+  } else if (!isDemo()) {
+    return { ok: false as const, error: 'Razorpay is not connected, so refunds can’t be sent from here.' };
+  } else note += ' (demo, no money moved)';
+  await d.update(orders).set({ paymentStatus: 'refunded' }).where(eq(orders.id, o.id));
+  await d.insert(orderEvents).values({ orderId: o.id, status: o.status, note, byUserId: admin.user.id });
+  revalidatePath(`/admin/orders/${o.number}`);
   return { ok: true as const };
 }
 

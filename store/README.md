@@ -12,7 +12,7 @@ Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, Motion, Drizzle OR
 |---|---|---|
 | Home | `/` | A test line sweeps a laptop's screen while its condition tag fills in; laptop finder (use and budget, live results); brand tiles; grade explainer with an annotated lid; the checks, ticking as you scroll; savings against new prices; student and business bands; FAQ |
 | Catalogue | `/laptops` | Filters for brand, budget, processor, memory, screen and grade, plus use-case chips; sorting; filters kept in the URL so links can be shared; animated reflow; mobile filter sheet |
-| Product | `/laptops/<model>` | Grade cards (price, stock, battery minimum), memory/storage upgrades, warranty extension, live price, student price, EMI plans, delivery estimate by PIN code, condition report tag, lid view per grade, specs, similar laptops, sticky buy bar on phones, Product structured data |
+| Product | `/laptops/<model>` | Grade cards (price, stock, battery minimum), memory/storage upgrades, a WhatsApp link asking for photos of the unit, warranty extension, live price, student price, EMI plans, delivery estimate by PIN code, condition report tag, lid view per grade, specs, similar laptops, sticky buy bar on phones, Product structured data |
 | Search | Ctrl/⌘ K or `/` | Instant search across models, processors, memory and "under 30000" style budgets |
 | Compare | `/compare` | Pick up to three laptops from any card or product page; a tray collects them; the table marks the best price, memory, weight and year |
 | Link previews | automatic | Every laptop has a generated share image (model, price, savings, condition tag) for WhatsApp, X and LinkedIn; the site has its own |
@@ -22,7 +22,7 @@ Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, Motion, Drizzle OR
 | Orders | `/orders/<number>` | Progress timeline, tracking, items, totals, retry payment, printable invoice |
 | Account | `/account` | Orders, student status, profile, saved addresses |
 | Students | `/students` | Verify by college email code (instant for .ac.in, .edu.in, .edu) or ID photo (checked by staff); status; picks with student prices |
-| Admin | `/admin` | Overview, orders (pack, ship with tracking, deliver, cancel), student ID queue (approve or reject with reason, emails sent), prices and stock per grade, add or edit a laptop with photos, coupons, contact messages |
+| Admin | `/admin` | Overview, orders (pack, ship with tracking, deliver, cancel, refund through Razorpay), an email to you for every new order, student ID queue (approve or reject with reason, emails sent), prices and stock per grade, add or edit a laptop with photos, coupons, contact messages |
 | Help and policy | `/how-we-test`, `/warranty`, `/returns`, `/shipping`, `/terms`, `/privacy`, `/contact`, `/about`, `/faq` | The pages Razorpay checks before activating live payments |
 
 ### How money and stock are handled

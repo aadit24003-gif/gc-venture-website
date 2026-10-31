@@ -39,6 +39,17 @@ export async function orderPayments(rzpOrderId: string): Promise<RzpPayment[]> {
   return body.items ?? [];
 }
 
+/** Full or partial refund of a captured payment (amount in paise). */
+export async function refundPayment(paymentId: string, amount: number, notes: Record<string, string> = {}): Promise<{ id: string; status: string }> {
+  const res = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}/refund`, {
+    method: 'POST',
+    headers: { Authorization: auth(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount, speed: 'normal', notes }),
+  });
+  if (!res.ok) throw new Error(`Razorpay refund failed (${res.status}): ${await res.text()}`);
+  return (await res.json()) as { id: string; status: string };
+}
+
 const safeEqual = (a: string, b: string) => {
   const x = Buffer.from(a);
   const y = Buffer.from(b);

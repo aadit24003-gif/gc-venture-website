@@ -2,11 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { saveAdminNote, updateOrderStatus } from '../../actions';
+import { refundOrder, saveAdminNote, updateOrderStatus } from '../../actions';
 import { toast } from '@/components/Toaster';
 import { STATUS } from '@/lib/order-status';
 
-type O = { id: string; status: string; courier: string | null; trackingNumber: string | null; trackingUrl: string | null; adminNote: string | null };
+type O = { id: string; status: string; courier: string | null; trackingNumber: string | null; trackingUrl: string | null; adminNote: string | null; refundable: boolean; total: string };
 
 const NEXT: Record<string, { status: 'packed' | 'shipped' | 'delivered'; label: string }> = {
   confirmed: { status: 'packed', label: 'Mark packed' },
@@ -53,6 +53,15 @@ export default function OrderControls({ order }: { order: O }) {
         </>
       ) : (
         <p className="mt-3 text-mute">{order.status === 'awaiting_payment' || order.status === 'payment_failed' ? 'Waiting for the customer to pay. Unpaid orders are released after 30 minutes.' : 'Nothing more to do.'}</p>
+      )}
+      {order.refundable && (
+        <div className="mt-5 rounded-2xl bg-alert-soft p-4">
+          <p className="text-[14.5px] text-alert">This order was paid online and is {order.status}. Refund the customer’s {order.total}.</p>
+          <button type="button" className="btn btn-sm mt-3 bg-alert text-white" disabled={pending}
+            onClick={() => start(async () => { const r = await refundOrder(order.id); if (!r.ok) { toast(r.error, 'error'); return; } toast('Refund started'); router.refresh(); })}>
+            Refund {order.total}
+          </button>
+        </div>
       )}
       {(cancellable || order.status === 'delivered') && (
         <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-4">

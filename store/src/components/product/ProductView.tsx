@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { BadgePercent, Banknote, Check, ChevronDown, MapPin, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
+import { BadgePercent, Banknote, Check, ChevronDown, MapPin, MessageCircle, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
 import type { ArtSpec, ProductImage, UpgradeOption } from '@/lib/db/schema';
-import { GRADES, GRADE_ORDER, POLICY, STUDENT, type GradeKey } from '@/lib/config';
+import { GRADES, GRADE_ORDER, POLICY, STUDENT, whatsappLink, type GradeKey } from '@/lib/config';
 import { emiPerMonth, savedPct, studentUnitDiscount, unitPrice } from '@/lib/pricing';
 import { gb, rupees } from '@/lib/format';
 import { deliveryWindow, shortDate } from '@/lib/delivery';
@@ -222,6 +222,11 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
             Buy now
           </button>
         </div>
+
+        <a href={whatsappLink(`Hi, I'm looking at the ${p.title} (${GRADES[grade].label}, ${gb(ram)}, ${gb(ssd)}). Can you send photos of the unit?`)} target="_blank" rel="noopener"
+          className="mt-3 flex items-center justify-center gap-2 text-[15px] font-medium text-spruce underline-offset-4 hover:underline">
+          <MessageCircle size={17} /> Ask for photos of this unit on WhatsApp
+        </a>
 
         {price >= POLICY.emi.minOrder && (
           <div className="mt-4 rounded-2xl bg-white">

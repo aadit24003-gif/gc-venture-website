@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import { and, desc, eq, inArray, lt, sql } from 'drizzle-orm';
 import { db } from './db';
 import { coupons, orderEvents, orderItems, orders, products, users, variants, type OrderAddress } from './db/schema';
-import { BRAND, GRADES, POLICY, type GradeKey } from './config';
+import { BRAND, CONTACT, GRADES, POLICY, type GradeKey } from './config';
 import { isGrade, totals, unitPrice, type Coupon } from './pricing';
 import { isVerifiedStudent } from './students';
 import { formatDate, gb, rupees } from './format';
@@ -230,9 +230,10 @@ async function sendConfirmation(orderId: string) {
   const d = await db();
   const [o] = await d.select().from(orders).where(eq(orders.id, orderId)).limit(1);
   if (!o) return;
+  const items = await d.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+  await notifyStore(o, items).catch((e) => console.error('store notification', e));
   const to = await recipient(o);
   if (!to) return;
-  const items = await d.select().from(orderItems).where(eq(orderItems.orderId, orderId));
   const rows = items.map((i) => `<tr><td style="padding:8px 0;font-size:14px">${i.qty} × ${i.title}<br><span style="color:#5C6B66">${GRADES[i.grade as GradeKey]?.label ?? i.grade} grade, ${gb(i.ramGb)} memory, ${gb(i.ssdGb)} SSD</span></td><td style="padding:8px 0;text-align:right;font-size:14px">${rupees(i.unitPrice * i.qty)}</td></tr>`).join('');
   const discount = o.studentDiscount + o.couponDiscount;
   await sendEmail({
@@ -244,6 +245,18 @@ async function sendConfirmation(orderId: string) {
 ${discount ? `<p style="font-size:14px;margin:4px 0">Discounts: −${rupees(discount)}</p>` : ''}
 <p style="font-size:17px;margin:4px 0"><b>Total ${rupees(o.total)}</b> ${o.paymentMethod === 'cod' ? '(pay on delivery)' : '(paid)'}</p>
 <p style="margin-top:22px"><a href="${BRAND.url}/orders/${o.number}" style="background:#0F3D33;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:bold">Track your order</a></p>`),
+  });
+}
+
+/** Tells the store a new order is ready to pack. Goes to ORDER_INBOX, CONTACT_INBOX or the contact email. */
+async function notifyStore(o: Order, items: OrderItem[]) {
+  const to = process.env.ORDER_INBOX ?? process.env.CONTACT_INBOX ?? CONTACT.email;
+  const list = items.map((i) => `${i.qty} × ${i.title} (${GRADES[i.grade as GradeKey]?.label ?? i.grade}, ${gb(i.ramGb)}, ${gb(i.ssdGb)}, ${i.warrantyMonths}-month warranty)`).join('\n');
+  await sendEmail({
+    to,
+    subject: `New order ${o.number}: ${rupees(o.total)}${o.paymentMethod === 'cod' ? ' (pay on delivery)' : ''}`,
+    text: `${list}\n\nShip to ${o.address.name}, ${o.address.city} ${o.address.pincode}.\nOpen: ${BRAND.url}/admin/orders/${o.number}`,
+    html: layout(`New order ${o.number}`, `<p style="font-size:15px;line-height:1.6;white-space:pre-line">${list}</p><p style="font-size:15px">Ship to <b>${o.address.name}</b>, ${o.address.city} ${o.address.pincode}. Total <b>${rupees(o.total)}</b>, ${o.paymentMethod === 'cod' ? 'to collect on delivery' : 'paid online'}.</p><p><a href="${BRAND.url}/admin/orders/${o.number}" style="color:#0F3D33;font-weight:bold">Open in admin</a></p>`),
   });
 }
 

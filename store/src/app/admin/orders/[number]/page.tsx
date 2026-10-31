@@ -64,7 +64,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ number:
         </div>
 
         <div className="space-y-6">
-          <OrderControls order={{ id: o.id, status: o.status, courier: o.courier, trackingNumber: o.trackingNumber, trackingUrl: o.trackingUrl, adminNote: o.adminNote }} />
+          <OrderControls order={{ id: o.id, status: o.status, courier: o.courier, trackingNumber: o.trackingNumber, trackingUrl: o.trackingUrl, adminNote: o.adminNote, refundable: o.paymentStatus === 'paid' && o.paymentMethod !== 'cod' && ['cancelled', 'returned'].includes(o.status), total: rupees(o.total) }} />
           <section className="sheet p-6 text-[14.5px]" aria-labelledby="cust-h">
             <h2 id="cust-h" className="text-[22px]">Ship to</h2>
             <p className="mt-3 leading-relaxed"><b>{o.address.name}</b>, {formatPhone(o.address.phone)}<br />{o.address.line1}{o.address.line2 ? `, ${o.address.line2}` : ''}{o.address.landmark ? `, near ${o.address.landmark}` : ''}<br />{o.address.city}, {o.address.state} {o.address.pincode}</p>
