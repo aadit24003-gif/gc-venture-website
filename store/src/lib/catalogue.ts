@@ -105,14 +105,17 @@ const paise = (rupees: number) => rupees * 100;
 const RAM_PRICE: Record<number, number> = { 16: 2_500, 24: 4_500, 32: 6_500, 64: 14_000 };
 const SSD_PRICE: Record<number, number> = { 512: 2_000, 1024: 5_500 };
 
-function ramOptions(r: Row): UpgradeOption[] {
-  if (!r.maxRam) return [{ gb: r.ram, price: 0 }];
-  const steps = [8, 16, 32, 64].filter((g) => g >= r.ram && g <= r.maxRam);
-  return steps.map((gb) => ({ gb, price: gb === r.ram ? 0 : paise((RAM_PRICE[gb] ?? 0) - (RAM_PRICE[r.ram] ?? 0)) }));
-}
-function ssdOptions(r: Row): UpgradeOption[] {
-  if (r.brand === 'Apple') return [{ gb: r.ssd, price: 0 }];
-  return [256, 512, 1024].filter((g) => g >= r.ssd).map((gb) => ({ gb, price: gb === r.ssd ? 0 : paise((SSD_PRICE[gb] ?? 0) - (SSD_PRICE[r.ssd] ?? 0)) }));
+/** Memory and storage upgrade choices for a model. maxRam 0 means memory is soldered. */
+export function upgradeOptions(brand: string, ram: number, maxRam: number, ssd: number): { ramOptions: UpgradeOption[]; ssdOptions: UpgradeOption[] } {
+  const ramOptions = !maxRam
+    ? [{ gb: ram, price: 0 }]
+    : [8, 16, 32, 64].filter((g) => g >= ram && g <= maxRam).map((gb) => ({ gb, price: gb === ram ? 0 : paise((RAM_PRICE[gb] ?? 0) - (RAM_PRICE[ram] ?? 0)) }));
+  if (!ramOptions.some((o) => o.gb === ram)) ramOptions.unshift({ gb: ram, price: 0 });
+  const ssdOptions = brand === 'Apple'
+    ? [{ gb: ssd, price: 0 }]
+    : [256, 512, 1024].filter((g) => g >= ssd).map((gb) => ({ gb, price: gb === ssd ? 0 : paise((SSD_PRICE[gb] ?? 0) - (SSD_PRICE[ssd] ?? 0)) }));
+  if (!ssdOptions.some((o) => o.gb === ssd)) ssdOptions.unshift({ gb: ssd, price: 0 });
+  return { ramOptions, ssdOptions };
 }
 
 /** Deterministic stock numbers so every fresh database looks the same. [CONFIRM] */
@@ -150,7 +153,7 @@ export function buildCatalogue() {
         screenIn: r.screen, screenRes: r.res, touch: !!r.touch, weightKg: r.weight,
         os: r.brand === 'Apple' ? 'macOS' : 'Windows 11 Pro',
         ports: r.ports, ramGb: r.ram, ssdGb: r.ssd,
-        ramOptions: ramOptions(r), ssdOptions: ssdOptions(r),
+        ...upgradeOptions(r.brand, r.ram, r.maxRam, r.ssd),
         newPrice: paise(newPrice), uses: uses(r, excellent), highlights: r.notes,
         description: r.description, images: [], art: r.art,
         featured: !!r.featured, active: true, sort: i,

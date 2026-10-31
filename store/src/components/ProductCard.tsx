@@ -17,7 +17,12 @@ export default function ProductCard({ p, priority }: { p: CardProduct; priority?
   return (
     <article className="group relative flex h-full flex-col rounded-[24px] bg-white p-3 transition-shadow duration-300 hover:shadow-[0_24px_50px_-28px_rgba(15,61,51,.45)]">
       <div className="relative overflow-hidden rounded-[18px] bg-bench px-5 pb-3 pt-10">
-        <LaptopArt art={p.art} brand={p.brand} slug={p.slug} className="relative z-0 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1" />
+        {p.images[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={p.images[0].src} alt={p.images[0].alt} loading={priority ? 'eager' : 'lazy'} className="relative z-0 aspect-[480/330] w-full rounded-xl object-contain mix-blend-multiply transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1" />
+        ) : (
+          <LaptopArt art={p.art} brand={p.brand} slug={p.slug} className="relative z-0 w-full transition-transform duration-500 ease-[var(--ease-out-soft)] group-hover:-translate-y-1" />
+        )}
         <div className="qc-shadow absolute right-3 top-0 z-10 origin-top rotate-[3deg] transition-[rotate] duration-500 ease-[var(--ease-spring)] group-hover:rotate-[-3deg]">
           <span className="absolute left-1/2 top-0 h-3 w-px -translate-x-1/2 bg-spruce/40" aria-hidden />
           <div className="qc-tag mt-3 !w-auto min-w-[112px] !px-3 !pb-2.5 !pt-6 text-center" style={{ ['--hole' as string]: 'var(--color-bench)' }}>

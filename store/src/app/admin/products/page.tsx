@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { asc } from 'drizzle-orm';
 import { db } from '@/lib/db';
 import { products, variants } from '@/lib/db/schema';
@@ -12,7 +13,10 @@ export default async function AdminProducts() {
   ]);
   return (
     <div>
-      <h1 className="text-[38px]">Prices and stock</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-[38px]">Prices and stock</h1>
+        <Link href="/admin/products/new" className="btn btn-primary btn-sm">Add a laptop</Link>
+      </div>
       <p className="mt-2 max-w-[72ch] text-mute">Prices are what customers pay for each grade, before upgrades, warranty extensions and discounts. Stock counts go down automatically when an order is placed and back up if it is cancelled.</p>
       <ul className="mt-6 space-y-3">
         {ps.map((p) => (

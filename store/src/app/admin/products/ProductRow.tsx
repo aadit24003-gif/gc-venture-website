@@ -35,7 +35,7 @@ export default function ProductRow({ p, variants }: { p: P; variants: V[] }) {
     <li className={`rounded-[22px] bg-white p-5 ${active ? '' : 'opacity-70'}`}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href={`/laptops/${p.slug}`} className="font-semibold text-spruce hover:underline" target="_blank">{p.title}</Link>
+          <Link href={`/admin/products/${p.id}`} className="font-semibold text-spruce hover:underline">{p.title}</Link>
           <span className="ml-2 text-[13.5px] text-mute">{p.cpuShort}</span>
         </div>
         <div className="flex flex-wrap items-center gap-4 text-[14px]">

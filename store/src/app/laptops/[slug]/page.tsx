@@ -85,7 +85,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
       <ProductView
         p={{
           id: p.id, slug: p.slug, title: p.title, brand: p.brand, model: p.model, year: p.year, summary,
-          art: p.art, newPrice: p.newPrice, ramOptions: p.ramOptions, ssdOptions: p.ssdOptions,
+          art: p.art, newPrice: p.newPrice, images: p.images, ramOptions: p.ramOptions, ssdOptions: p.ssdOptions,
           variants: p.variants.map((v) => ({ grade: v.grade, price: v.price, stock: v.stock, active: v.active })),
         }}
         student={student.state === 'approved' ? 'approved' : student.state === 'pending' ? 'pending' : 'none'}

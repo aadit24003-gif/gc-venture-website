@@ -90,3 +90,60 @@ export async function deletePrivate(key: string): Promise<void> {
   }
   await fs.rm(path.join(/*turbopackIgnore: true*/ await localDir(), safe(key)), { force: true });
 }
+
+/* ── Public files (product photos) ─────────────────────────
+ * Supabase: a public bucket (PUBLIC_BUCKET, default "product-photos"), served from Supabase's CDN.
+ * Local: DATA_DIR/media, served by /media/<key>.
+ */
+const publicBucket = () => process.env.PUBLIC_BUCKET ?? 'product-photos';
+let publicReady = false;
+
+export async function putPublic(key: string, data: Buffer, contentType: string): Promise<string> {
+  const s = supa();
+  const k = safe(key);
+  if (s) {
+    if (!publicReady) {
+      const res = await fetch(`${s.url}/storage/v1/bucket`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${s.key}`, apikey: s.key, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: publicBucket(), name: publicBucket(), public: true, file_size_limit: 10 * 1024 * 1024 }),
+      });
+      if (!res.ok && res.status !== 409 && res.status !== 400) throw new Error(`Storage bucket: ${res.status}`);
+      publicReady = true;
+    }
+    const res = await fetch(`${s.url}/storage/v1/object/${publicBucket()}/${k}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${s.key}`, apikey: s.key, 'Content-Type': contentType, 'x-upsert': 'true', 'cache-control': 'max-age=31536000' },
+      body: new Uint8Array(data),
+    });
+    if (!res.ok) throw new Error(`Upload failed (${res.status}): ${await res.text()}`);
+    return `${s.url}/storage/v1/object/public/${publicBucket()}/${k}`;
+  }
+  const file = path.join(/*turbopackIgnore: true*/ dataDir(), 'media', k);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, data);
+  return `/media/${k}`;
+}
+
+export async function deletePublic(url: string): Promise<void> {
+  const s = supa();
+  if (s && url.startsWith(s.url)) {
+    const k = url.split(`/public/${publicBucket()}/`)[1];
+    if (k) await fetch(`${s.url}/storage/v1/object/${publicBucket()}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${s.key}`, apikey: s.key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prefixes: [k] }),
+    });
+    return;
+  }
+  if (url.startsWith('/media/')) await fs.rm(path.join(/*turbopackIgnore: true*/ dataDir(), 'media', safe(url.slice(7))), { force: true });
+}
+
+/** Reads a locally stored public file (development only). */
+export async function readLocalPublic(key: string): Promise<Buffer | null> {
+  try {
+    return await fs.readFile(path.join(/*turbopackIgnore: true*/ dataDir(), 'media', safe(key)));
+  } catch {
+    return null;
+  }
+}

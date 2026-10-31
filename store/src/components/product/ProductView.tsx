@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { BadgePercent, Banknote, Check, ChevronDown, MapPin, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
-import type { ArtSpec, UpgradeOption } from '@/lib/db/schema';
+import type { ArtSpec, ProductImage, UpgradeOption } from '@/lib/db/schema';
 import { GRADES, GRADE_ORDER, POLICY, STUDENT, type GradeKey } from '@/lib/config';
 import { emiPerMonth, savedPct, studentUnitDiscount, unitPrice } from '@/lib/pricing';
 import { gb, rupees } from '@/lib/format';
@@ -18,7 +18,7 @@ import ConditionTag, { skuFor } from '../ConditionTag';
 
 export type ViewProduct = {
   id: string; slug: string; title: string; brand: string; model: string; year: number | null;
-  summary: string; art: ArtSpec; newPrice: number | null;
+  summary: string; art: ArtSpec; newPrice: number | null; images: ProductImage[];
   ramOptions: UpgradeOption[]; ssdOptions: UpgradeOption[];
   variants: { grade: string; price: number; stock: number; active: boolean }[];
 };
@@ -35,7 +35,8 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
   const [ram, setRam] = useState(p.ramOptions.some((o) => o.gb === initial.ram) ? initial.ram! : p.ramOptions[0].gb);
   const [ssd, setSsd] = useState(p.ssdOptions.some((o) => o.gb === initial.ssd) ? initial.ssd! : p.ssdOptions[0].gb);
   const [warranty, setWarranty] = useState<number>(POLICY.warrantyExtensions[0].months);
-  const [view, setView] = useState<'front' | 'lid'>('front');
+  const [view, setView] = useState<'front' | 'photos' | 'lid'>(p.images.length ? 'photos' : 'front');
+  const [photo, setPhoto] = useState(0);
   const [emiOpen, setEmiOpen] = useState(false);
   const [pin, setPin] = useState('');
   const [pinResult, setPinResult] = useState<{ text: string; ok: boolean; city?: string } | null>(null);
@@ -86,9 +87,9 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
   }
 
   const tabs = useMemo(() => [
-    { key: 'front' as const, label: 'Front' },
+    p.images.length ? { key: 'photos' as const, label: `Photos (${p.images.length})` } : { key: 'front' as const, label: 'Front' },
     { key: 'lid' as const, label: `Lid, ${GRADES[grade].label.toLowerCase()}` },
-  ], [grade]);
+  ], [grade, p.images.length]);
 
   return (
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:gap-14">
@@ -105,13 +106,29 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
           </div>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={view} initial={{ opacity: 0, rotateX: view === 'lid' ? -20 : 20 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} style={{ perspective: 800 }}>
-              {view === 'front'
+              {view === 'photos' && p.images[photo] ? (
+                <div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.images[photo].src} alt={p.images[photo].alt} className="mx-auto aspect-[4/3] w-full max-w-[600px] rounded-2xl object-contain" />
+                  {p.images.length > 1 && (
+                    <div className="mt-4 flex justify-center gap-2">
+                      {p.images.map((im, i) => (
+                        <button key={im.src} type="button" onClick={() => setPhoto(i)} aria-label={`Photo ${i + 1}`} aria-pressed={i === photo}
+                          className="h-14 w-14 overflow-hidden rounded-xl ring-2 ring-transparent aria-pressed:ring-spruce">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={im.src} alt="" className="h-full w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : view === 'front'
                 ? <LaptopArt art={p.art} brand={p.brand} slug={p.slug} className="mx-auto w-full max-w-[560px]" title={`${p.title}, illustration`} />
                 : <LidMarks colour={p.art.colour} grade={grade} brand={p.brand} className="mx-auto w-full max-w-[520px]" annotate />}
             </motion.div>
           </AnimatePresence>
           <p className="mt-2 text-center text-[13px] text-mute">
-            {view === 'front' ? 'Illustration. Photos of the exact unit are sent on WhatsApp before dispatch, on request.' : GRADES[grade].body}
+            {view === 'front' ? 'Illustration. Photos of the exact unit are sent on WhatsApp before dispatch, on request.' : view === 'photos' ? 'Photos from our stock of this model. Ask on WhatsApp for photos of the exact unit.' : GRADES[grade].body}
           </p>
         </div>
         <div className="relative -mt-6 hidden justify-end pr-8 lg:flex">
