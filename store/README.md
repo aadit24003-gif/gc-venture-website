@@ -1,43 +1,48 @@
 # Refurbished laptop store (working name "Encore")
 
-An online store for certified refurbished laptops, run alongside IT Rentals. Customers browse, pick a grade and upgrades, sign in with a one-time code on their mobile or email, pay through Razorpay (or on delivery), and follow their order to the door. Students verify once and get 10% off for a year. Staff run everything from `/admin`.
+An online store for certified refurbished laptops, run alongside IT Rentals. Every laptop on sale is a **specific, inspected unit** with its own grade, measured battery and SSD health, cosmetic notes and public inspection report, so what the customer chooses is what ships.
 
 Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, Motion, Drizzle ORM and PostgreSQL. It lives in `store/` and is separate from the rental site at the repository root.
+
+More detail:
+- [`docs/CHECKLIST.md`](docs/CHECKLIST.md): what is done, what is pending and what is blocked on you
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): how the code is organised and how money, stock and data flow
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md): step-by-step go-live on Supabase + Vercel with Razorpay, Resend, MSG91, WhatsApp and Shiprocket
 
 ---
 
 ## What's in it
 
+**Storefront**
 | Area | URL | What it does |
 |---|---|---|
-| Home | `/` | A test line sweeps a laptop's screen while its condition tag fills in; laptop finder (use and budget, live results); brand tiles; grade explainer with an annotated lid; the checks, ticking as you scroll; savings against new prices; student and business bands; FAQ |
-| Catalogue | `/laptops` | Filters for brand, budget, processor, memory, screen and grade, plus use-case chips; sorting; filters kept in the URL so links can be shared; animated reflow; mobile filter sheet |
-| Product | `/laptops/<model>` | Grade cards (price, stock, battery minimum), memory/storage upgrades, a WhatsApp link asking for photos of the unit, warranty extension, live price, student price, EMI plans, delivery estimate by PIN code, condition report tag, lid view per grade, specs, similar laptops, sticky buy bar on phones, Product structured data |
-| Search | Ctrl/⌘ K or `/` | Instant search across models, processors, memory and "under 30000" style budgets |
-| Compare | `/compare` | Pick up to three laptops from any card or product page; a tray collects them; the table marks the best price, memory, weight and year |
-| Link previews | automatic | Every laptop has a generated share image (model, price, savings, condition tag) for WhatsApp, X and LinkedIn; the site has its own |
-| Cart | drawer | Kept in the browser; quantities limited to stock |
-| Sign in | `/login` | 6-digit code by SMS (MSG91) or email (Resend); no passwords; rate-limited, hashed, 5 tries |
-| Checkout | `/checkout` | Sign in inline, saved addresses, PIN code auto-fill, GSTIN, coupon, student discount, pay online (Razorpay) or on delivery; server recomputes every price |
-| Orders | `/orders/<number>` | Progress timeline, tracking, items, totals, retry payment, printable invoice |
-| Account | `/account` | Orders, student status, profile, saved addresses |
-| Students | `/students` | Verify by college email code (instant for .ac.in, .edu.in, .edu) or ID photo (checked by staff); status; picks with student prices |
-| Admin | `/admin` | Overview, orders (pack, ship with tracking, deliver, cancel, refund through Razorpay), an email to you for every new order, student ID queue (approve or reject with reason, emails sent), prices and stock per grade, add or edit a laptop with photos, coupons, contact messages |
-| Help and policy | `/how-we-test`, `/warranty`, `/returns`, `/shipping`, `/terms`, `/privacy`, `/contact`, `/about`, `/faq` | The pages Razorpay checks before activating live payments |
+| Home | `/` | Hero with a real unit's inspection report, brands, featured, popular (from real views and sales), latest arrivals, deals, budgets, processors, grades, inspection process, warranty, why refurbished, verified reviews (only when real ones exist), students, FAQ, newsletter |
+| Catalogue | `/laptops`, `/brands/<brand>`, `/category/<slug>`, `/deals` | Filters for brand, price, condition, processor, generation, memory, storage, screen, use and availability; sorts by recommended, popularity, price, newest arrivals, newest models, biggest saving; all kept in the URL |
+| Product | `/laptops/<model>` | Official manufacturer photos; grade tabs; **choose the exact unit** (battery %, cycles, SSD %, cosmetic notes, report link); memory/storage upgrades; warranty extension; quantity up to the units available; EMI table; PIN code delivery check; share; wishlist; compare; specs; verified reviews; similar, more from the brand, recently viewed; Product JSON-LD (rating only when real reviews exist) |
+| Unit report | `/units/<code>` | Every check with its result, measured values, parts replaced, inspector and date |
+| Cart | drawer and `/cart` | Stored in the database (guests by cookie, merged on sign-in); edit configuration per unit; sold units flagged |
+| Checkout | `/checkout` | Guest or signed in; saved addresses; PIN auto-fill; GSTIN; coupons; student discount; delivery and COD fees from settings; GST shown; Razorpay or pay on delivery; terms consent |
+| Order | `/orders/<number>` | 8-step tracker, shipment updates, payments and refunds, invoice with GST breakdown, cancel (auto-refund), returns/replacements/warranty/complaints with photos, reviews. Guests open it with a private link |
+| Accounts | `/login`, `/register`, `/forgot`, `/reset/…`, `/verify-email/…`, `/track` | One-time code (SMS or email) or password; email confirmation; password reset; guest order lookup |
+| Customer dashboard | `/account/…` | Overview, orders, returns and repairs, warranty, wishlist, recently viewed, addresses, support conversations, profile and security |
+| Students | `/students` | College email (instant) or ID photo (checked by staff); 10% off for a year |
+| Content | `/terms`, `/privacy`, `/returns`, `/warranty`, `/shipping`, `/grievance`, `/blog`, `/support`, `/business`, `/how-we-test`, `/faq`, `/about`, `/contact` | Policy pages are editable in admin; contact form opens a ticket |
 
-### How money and stock are handled
-
-- Prices are stored in paise. The browser shows prices, but checkout and payment use only what the server calculates from the database.
-- Stock is reserved when an order is placed. Online orders not paid within 30 minutes are cancelled and the stock goes back.
-- Razorpay: the server creates a Razorpay order for the exact total, verifies the payment signature, and a webhook confirms payments even if the customer closes the tab. Each webhook event is processed once.
-- The student discount goes on the most expensive laptop (one per order by default). A coupon and the student discount don't stack: the customer gets whichever saves more.
-
-### Privacy and security
-
-- Login codes are stored as a keyed hash, expire in 10 minutes and allow 5 tries. One code per 30 seconds and 5 per hour per number or email; 30 per hour per network.
-- Sessions are random tokens in an http-only cookie; only their hash is stored.
-- Student ID photos are re-encoded (location and other metadata removed), stored privately, shown only to admins, and deleted 30 days after the decision.
-- Every server action checks who is calling; admin actions require an admin.
+**Admin** (`/admin`, permissions by role: super admin, inventory manager, order manager, support)
+| Module | What it does |
+|---|---|
+| Overview | Work queue; KPIs, daily revenue chart, orders by status, revenue by brand, best sellers, inventory and ageing; date ranges; margin only for units with a recorded cost; go-live warnings |
+| Orders | Filters and search; fulfilment steps with courier/AWB; Shiprocket booking when connected; partial or full refunds (Razorpay or manual); payment reconciliation; packing slip and label; history and audit trail |
+| Inventory units | Receive units (serial, cost, source, location); inspections with all 32 checks; parts replaced; status lifecycle intake → inspection → refurbishing → available → reserved → sold, plus returned, RMA, hold, scrapped; price override; history |
+| Laptop models | Grade prices, visibility, featured; full editor with photos, categories, tags, extra specs, SEO |
+| Brands and categories | Each has its own store page |
+| Coupons | Percent or fixed; minimum order; cap; total and per-customer limits; first order only; brand or model restrictions; start and end dates |
+| Returns and warranty | Requests with photos; status flow; public or internal notes (emailed) |
+| Customers, staff and roles | Search, history, switch accounts off; add staff and set roles |
+| Support tickets, reviews, student IDs | Reply (emailed), internal notes; publish or hide reviews, public replies; approve or reject IDs |
+| Pages and blog | Markdown editor with placeholders; "reviewed by a lawyer" flag per page |
+| Notifications | Edit every email/SMS/WhatsApp template; test sends; delivery log |
+| Newsletter, settings, audit log | CSV export; business details, shipping/COD, GST; every staff action and money movement |
 
 ---
 
@@ -49,81 +54,45 @@ npm install
 npm run dev        # http://localhost:3100
 ```
 
-No accounts or keys are needed. Without them the store runs in **demo mode**: the database is created on your computer (in `~/.refurb-store`), sign-in codes are shown on screen, and payments open a stand-in window where you choose success or failure. A banner at the top says so.
+No accounts or keys are needed. Without them the store runs in **demo mode**: the database is created on your computer (in `~/.refurb-store`), sample units are created (serials start with `DEMO-`), sign-in codes are shown on screen, and payments open a stand-in window. A banner says so. To open `/admin`, put `ADMIN_EMAILS=you@example.com` in `store/.env.local`, restart, and sign in with that email.
 
-To open `/admin` locally, put `ADMIN_EMAILS=you@example.com` in `store/.env.local`, restart, and sign in with that email.
+| Command | What it does |
+|---|---|
+| `npm run build` | Production build |
+| `npm run typecheck` | TypeScript check |
+| `npm run test:unit` | 25 checks: prices, upgrades, coupons, shipping, GST, signatures, passwords, roles, order flow, filters, Markdown safety |
+| `npm run test:e2e` | 25 browser steps through guest and member purchases, admin inventory and fulfilment, refunds, returns, reviews, tickets and student verification (needs the dev server and Playwright) |
+| `npm run db:generate` | New migration after changing `src/lib/db/schema.ts` |
+| `npm run db:setup` | Migrate and seed the database in `DATABASE_URL` |
 
-Other commands: `npm run build`, `npm run typecheck`, `npm run test:unit` (price rules, coupons, EMI, Razorpay signatures, sign-in parsing), `npm run test:e2e` (a browser run through a purchase, a student verification and the admin; needs Playwright and the dev server running), `npm run db:generate` (after changing `src/lib/db/schema.ts`), `npm run db:setup` (migrate and seed the database in `DATABASE_URL`).
-
----
-
-## Going live: what you need to set up
-
-Every setting is listed in `store/.env.example`. In order:
-
-1. **Supabase** (database and ID photo storage). Create a project in the Mumbai region. Copy the *Transaction pooler* connection string into `DATABASE_URL`, and the project URL and *service role* key into `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`. Tables and the private `student-ids` bucket are created automatically on first start.
-2. **Vercel** (hosting). Import this GitHub repository, set **Root Directory** to `store`, add the environment variables, deploy. Every push then gets its own preview link.
-3. **Razorpay**. Sign up; test keys (`rzp_test_…`) work immediately. Add `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`, then create a webhook to `https://<your domain>/api/razorpay/webhook` with events `payment.captured`, `payment.failed`, `refund.processed`, and put its secret in `RAZORPAY_WEBHOOK_SECRET`. For live mode, Razorpay checks your business documents and the website's contact, terms, refund, shipping and privacy pages (all built).
-4. **Resend** (emails: codes, order confirmations, shipping, student decisions). Add `RESEND_API_KEY`, verify your domain in Resend, and set `EMAIL_FROM`.
-5. **MSG91** (SMS codes). Indian SMS needs DLT registration of your sender ID and an OTP template; that takes a few days. Then set `MSG91_AUTH_KEY` and `MSG91_OTP_TEMPLATE_ID`. Until then, leave phone sign-in off by not setting them: customers sign in with email, and phone sign-in shows a clear message.
-6. Set `AUTH_SECRET` (a long random string), `NEXT_PUBLIC_SITE_URL`, and `ADMIN_EMAILS` / `ADMIN_PHONES`. Leave `DEMO_MODE` empty in production (set it to `1` for a public demo deployment without keys).
+Product photos are the manufacturers' official images, downloaded by the GitHub Action in `.github/workflows/store-product-images.yml` from the list in `scripts/product-image-sources.json` and committed to `public/products/`. Photos uploaded in admin replace them.
 
 ---
 
-## Morning checklist: decisions only you can make
+## Decisions only you can make
 
-Everything below is a working default chosen during the build, marked `[CONFIRM]` in the code. Most live in `src/lib/config.ts`.
-
-**Brand and business**
-- [ ] **Name**: `BRAND.name` (currently "Encore"). The logo, emails, order numbers (first two letters) and page titles all follow it.
-- [ ] **Domain**: `NEXT_PUBLIC_SITE_URL`.
-- [ ] **Contact details**: phone, WhatsApp and email are IT Rentals' for now (`CONTACT`).
-- [ ] **Legal entity, GSTIN and grievance officer** for invoices, terms and privacy (`LEGAL`). The Consumer Protection (E-Commerce) Rules require a named grievance officer.
-- [ ] **GST on refurbished laptops**: regular 18% or the margin scheme. The invoice currently shows prices inclusive of GST without a split; ask your accountant.
-
-**Prices and stock** (in `/admin/products` once live, or `src/lib/catalogue.ts` before the first start)
-- [ ] **Every price** is a placeholder worked out from processor generation and model line.
-- [ ] **Stock counts** are placeholders.
-- [ ] **"Price when new"** figures (used for "you save X%") are approximate; Apple's are launch prices.
-- [ ] **Which models to list**: 39 are seeded (Dell Latitude, HP EliteBook and ProBook, Lenovo ThinkPad, MacBook Air and Pro).
-- [ ] **Upgrade prices**: memory +₹2,500 (16 GB) / +₹6,500 (32 GB); SSD +₹2,000 (512 GB) / +₹5,500 (1 TB).
-- [ ] **Photos**: laptops are drawn illustrations until you upload photos in `/admin/products/<model>` (first photo leads; up to 8).
-
-**Promises**
-- [ ] Warranty: **12 months** included; extension to **2 years for ₹2,499**.
-- [ ] Returns: **10 days** after delivery, free pickup.
-- [ ] Dispatch: **1–2 working days**; transit times by region in `src/lib/delivery.ts`.
-- [ ] Pay on delivery: **on, no fee, up to ₹60,000**.
-- [ ] EMI estimate shown at **15% a year**, 3/6/9/12 months (no-cost EMI would need Razorpay's subvention setup).
-- [ ] Grade battery minimums: **Pristine 85%, Excellent 80%, Good 75%**; SSD health **90%** for all.
-- [ ] The **32 checks** list (`CHECKS`), and "data wiped to NIST 800-88".
-- [ ] Warranty covers the battery if health falls below **50%**.
-
-**Student discount**
-- [ ] **10%**, no cap per laptop (`maxDiscountPerUnit`), **1 discounted laptop per order**, valid **12 months**.
-- [ ] Auto-approved email endings: .ac.in, .edu.in, .edu, .ernet.in, .res.in, .ac.uk, .edu.au. Add colleges on other domains to `extraDomains`.
-- [ ] ID photos deleted **30 days** after the decision.
-
----
+Everything marked `[CONFIRM]` in the code is a working default. The full list, with where to change each, is in [`docs/CHECKLIST.md`](docs/CHECKLIST.md#blocked-on-you). The most important: business name and domain, legal entity, GSTIN and grievance officer (Admin → Settings), GST scheme for refurbished goods, every price, the warranty and return promises, and a lawyer's review of the policy pages.
 
 ## Where things are
 
 | What | File |
 |---|---|
-| Business settings and promises | `src/lib/config.ts` |
-| Starting catalogue and placeholder prices | `src/lib/catalogue.ts` |
+| Promises (warranty, returns, grades, checks, student rules) | `src/lib/config.ts` |
+| Business settings with defaults (contact, shipping, COD, GST) | `src/lib/settings.ts` (edited in Admin → Settings) |
 | Database tables | `src/lib/db/schema.ts` (migrations in `drizzle/`) |
-| Price rules (grades, upgrades, student, coupons, EMI) | `src/lib/pricing.ts` |
-| Orders, stock, payment status, order emails | `src/lib/orders.ts` |
-| Sign-in codes and sessions | `src/lib/auth/` |
-| Razorpay, email, SMS, file storage | `src/lib/providers/` |
-| Design tokens (colours, type, the tag) | `src/app/globals.css` |
-| Drawn laptops and lids | `src/components/LaptopArt.tsx`, `src/components/LidMarks.tsx` |
+| Units, inspections, status rules | `src/lib/inventory.ts` |
+| Prices, discounts, shipping, EMI | `src/lib/pricing.ts`; GST in `src/lib/tax.ts` |
+| Orders, payments, refunds, fulfilment, warranties | `src/lib/orders.ts` |
+| Cart | `src/lib/cart.ts` |
+| Roles and permissions | `src/lib/rbac.ts` |
+| Message templates and sending | `src/lib/templates.ts`, `src/lib/notify.ts` |
+| Razorpay, email, SMS, WhatsApp, storage | `src/lib/providers/` |
+| Shiprocket | `src/lib/shipping.ts` |
+| Design tokens | `src/app/globals.css` |
 
 ## Design
 
-- **Idea:** the condition tag. Every laptop carries a yellow tag with its grade and minimum battery and SSD health, the way refurbishers label units on the bench. It's the price tag on catalogue cards, the condition report on product pages, and the hero's moment on the home page.
-- **Colour:** bench `#ECEFEA` (page), spruce `#0F3D33` (ink and dark bands), tag yellow `#F5C84C` (the one accent), pass green `#237A52` (health and success only).
-- **Type:** Bricolage Grotesque for headings and prices (prices use its narrower width), Instrument Sans for text. Both self-hosted.
-- **Motion:** one orchestrated moment (the hero scan), checks that tick as they scroll into view, and motion that answers actions (grade changes, filters reflowing, cart, price counting). Reduced-motion settings are respected.
-- Checked with axe (WCAG 2.2 AA and best practice) on every public page at 1440 px and 390 px.
+- **Idea:** the inspection report. Manufacturer photos sit on white "studio" surfaces; each unit carries a perforated certificate with its measured battery and SSD health and a saffron seal showing checks passed.
+- **Colour:** white surfaces on cool grey `#F3F4F6`, near-black ink `#0E0F12`, one saffron accent `#F5A524` (savings, seals, highlights). Status colours only for states.
+- **Type:** Funnel Display for headings and prices, Funnel Sans for text, Geist Mono for unit codes, serials and measurements. All self-hosted.
+- **Motion:** restrained: card lift on hover, catalogue reflow, drawers and sheets, price changes. Reduced-motion settings are respected.
