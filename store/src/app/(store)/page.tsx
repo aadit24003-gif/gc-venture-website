@@ -93,6 +93,8 @@ export default async function Home() {
     return Number.isFinite(v) ? `From ${rupees(v)}` : null;
   };
   const cut = (slug: string) => `/products/${slug}/cutout.webp`;
+  /** Upright front view, screen only (scripts/make-front.cjs). */
+  const front = (slug: string) => `/products/${slug}/front.webp`;
   const steps: [typeof Video, string, string][] = [
     [MousePointerClick, 'Choose your model', 'Pick the exact unit you want. Its grade, battery health and every mark are listed on its own report.'],
     [Wallet, book ? `Book it for ${book}` : 'Place your order', book ? 'Reserve it with a small online payment. It comes off the price, and the laptop is taken off sale for you.' : 'Pay online or choose pay on delivery. The laptop is taken off sale for you.'],
@@ -103,9 +105,9 @@ export default async function Home() {
   const saveFor = (brand: string) => { const v = Math.max(0, ...inStock.filter((c) => c.brand === brand).map((c) => savedPct(c.fromPrice, c.newPrice) ?? 0)); return v > 0 ? v : null; };
   const tiles = [
     { dark: true, title: 'Dell Latitude', sub: 'Built for the workday. Priced for yours.', from: fromLine('dell-latitude-5440', 'Dell'), save: saveFor('Dell'), href: '/brands/dell', img: cut('dell-latitude-5440'), alt: 'Dell Latitude 5440' },
-    { dark: false, title: 'HP EliteBook', sub: 'Slim aluminium, all-day comfort.', from: fromLine('hp-elitebook-840-g10', 'HP'), save: saveFor('HP'), href: '/brands/hp', img: cut('hp-elitebook-840-g10'), alt: 'HP EliteBook 840 G10' },
-    { dark: false, title: 'ThinkPad', sub: 'The keyboard everyone misses.', from: fromLine('lenovo-thinkpad-t14s-gen-2', 'Lenovo'), save: saveFor('Lenovo'), href: '/brands/lenovo', img: cut('lenovo-thinkpad-t14s-gen-2'), alt: 'Lenovo ThinkPad T14s' },
-    { dark: true, title: 'MacBook Air', sub: 'Light. Silent. Ready for anything.', from: fromLine('apple-macbook-air-m3', 'Apple'), save: saveFor('Apple'), href: '/laptops?brand=Apple&q=air', img: cut('apple-macbook-air-m3'), alt: 'Apple MacBook Air' },
+    { dark: false, title: 'HP EliteBook', sub: 'Slim aluminium, all-day comfort.', from: fromLine('hp-elitebook-840-g10', 'HP'), save: saveFor('HP'), href: '/brands/hp', img: front('hp-elitebook-840-g10'), alt: 'HP EliteBook 840 G10' },
+    { dark: false, title: 'ThinkPad', sub: 'The keyboard everyone misses.', from: fromLine('lenovo-thinkpad-e14-gen-4', 'Lenovo'), save: saveFor('Lenovo'), href: '/brands/lenovo', img: front('lenovo-thinkpad-e14-gen-4'), alt: 'Lenovo ThinkPad E14' },
+    { dark: true, title: 'MacBook Air', sub: 'Light. Silent. Ready for anything.', from: fromLine('apple-macbook-air-m3', 'Apple'), save: saveFor('Apple'), href: '/laptops?brand=Apple&q=air', img: front('apple-macbook-air-m3'), alt: 'Apple MacBook Air' },
   ];
   const maxSave = Math.max(0, ...deals.map((x) => x.s)) || 60;
   const lowest = inStock.length ? Math.min(...inStock.map((c) => c.fromPrice)) : null;
