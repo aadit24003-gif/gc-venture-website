@@ -346,7 +346,7 @@ export default async function Home() {
       </section>
 
       {/* FAQ + newsletter */}
-      <section className="wrap mt-24 grid gap-10 lg:grid-cols-[1fr_1.4fr]" aria-labelledby="faq-h">
+      <section className="wrap mt-24 grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]" aria-labelledby="faq-h">
         <div>
           <SectionHead id="faq-h" eyebrow="Questions" title="Good to know" />
           <p className="mt-4 text-mute">More in the <Link href="/faq" className="link">full FAQ</Link>, or ask us on WhatsApp.</p>
