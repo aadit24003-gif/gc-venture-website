@@ -7,7 +7,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { CartView } from '@/lib/cart';
-import { addToCartAction, removeCartAction, updateCartAction, refreshCartAction } from '@/app/cart/actions';
+import { addToCartAction, removeCartAction, updateCartAction, refreshCartAction } from '@/app/(store)/cart/actions';
 
 type Sel = { ramGb: number; ssdGb: number; warrantyMonths: number };
 type Ctx = {

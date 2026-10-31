@@ -1,64 +1,54 @@
 import Link from 'next/link';
-import { and, desc, eq, ilike, inArray, or, type SQL } from 'drizzle-orm';
+import { and, desc, eq, ilike, inArray, or, sql, type SQL } from 'drizzle-orm';
+import { requireStaff } from '@/lib/auth/session';
 import { db } from '@/lib/db';
-import { orders } from '@/lib/db/schema';
-import { STATUS } from '@/lib/orders';
-import { formatDate, rupees } from '@/lib/format';
-import Pill from '@/components/admin/Pill';
+import { orderItems, orders } from '@/lib/db/schema';
+import { PAYMENT_STATUS, STATUS } from '@/lib/order-status';
+import { formatDate, formatPhone, rupees } from '@/lib/format';
+import { Filters, PageHead, Pager, Table, td } from '../ui';
 
-const FILTERS = [
-  { key: '', label: 'All' },
-  { key: 'confirmed', label: 'To pack', statuses: ['confirmed'] },
-  { key: 'packed', label: 'To ship', statuses: ['packed'] },
-  { key: 'shipped', label: 'Shipped', statuses: ['shipped'] },
-  { key: 'delivered', label: 'Delivered', statuses: ['delivered'] },
-  { key: 'unpaid', label: 'Unpaid', statuses: ['awaiting_payment', 'payment_failed'] },
-  { key: 'closed', label: 'Cancelled or returned', statuses: ['cancelled', 'returned'] },
-];
+export const metadata = { title: 'Orders' };
+const PER = 30;
 
-export default async function AdminOrders({ searchParams }: { searchParams: Promise<{ status?: string; q?: string }> }) {
+export default async function AdminOrders({ searchParams }: { searchParams: Promise<{ status?: string; pay?: string; q?: string; page?: string }> }) {
+  await requireStaff('orders.view');
   const sp = await searchParams;
-  const f = FILTERS.find((x) => x.key === (sp.status ?? '')) ?? FILTERS[0];
+  const page = Math.max(1, Number(sp.page) || 1);
+  const conds: SQL[] = [];
+  if (sp.status === 'to_ship') conds.push(inArray(orders.status, ['confirmed', 'quality_check', 'packed']));
+  else if (sp.status && STATUS[sp.status]) conds.push(eq(orders.status, sp.status));
+  if (sp.pay && PAYMENT_STATUS[sp.pay]) conds.push(eq(orders.paymentStatus, sp.pay));
   const q = (sp.q ?? '').trim();
-  const where: SQL[] = [];
-  if (f.statuses) where.push(inArray(orders.status, f.statuses));
-  if (q) where.push(or(ilike(orders.number, `%${q}%`), ilike(orders.phone, `%${q.replace(/\D/g, '') || q}%`), ilike(orders.email, `%${q}%`))!);
+  if (q) conds.push(or(ilike(orders.number, `%${q}%`), ilike(orders.email, `%${q}%`), ilike(orders.phone, `%${q.replace(/\D/g, '') || q}%`), sql`${orders.address}->>'name' ilike ${`%${q}%`}`)!);
+  const where = conds.length ? and(...conds) : undefined;
   const d = await db();
-  const rows = await d.select().from(orders).where(where.length ? and(...where) : undefined).orderBy(desc(orders.createdAt)).limit(200);
-
+  const [[{ n }], rows] = await Promise.all([
+    d.select({ n: sql<number>`count(*)::int` }).from(orders).where(where),
+    d.select().from(orders).where(where).orderBy(desc(orders.createdAt)).limit(PER).offset((page - 1) * PER),
+  ]);
+  const items = rows.length ? await d.select({ orderId: orderItems.orderId, title: orderItems.title, unitCode: orderItems.unitCode }).from(orderItems).where(inArray(orderItems.orderId, rows.map((r) => r.id))) : [];
   return (
     <div>
-      <h1 className="text-[38px]">Orders</h1>
-      <div className="mt-5 flex flex-wrap items-center gap-2">
-        {FILTERS.map((x) => (
-          <Link key={x.key} href={`/admin/orders${x.key ? `?status=${x.key}` : ''}`} className="chip !min-h-[36px] !text-[14px]" data-on={x.key === f.key}>{x.label}</Link>
+      <PageHead title="Orders" intro={`${n} ${n === 1 ? 'order' : 'orders'}${sp.status || sp.pay || q ? ' match these filters' : ''}.`} />
+      <Filters action="/admin/orders">
+        <label className="text-[12.5px] text-mute">Search<input name="q" defaultValue={q} placeholder="Number, name, email, phone" className="field !min-h-9 w-[260px] text-[13.5px]" /></label>
+        <label className="text-[12.5px] text-mute">Status<select name="status" defaultValue={sp.status ?? ''} className="field !min-h-9 text-[13.5px]"><option value="">Any</option><option value="to_ship">To pack and ship</option>{Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}</select></label>
+        <label className="text-[12.5px] text-mute">Payment<select name="pay" defaultValue={sp.pay ?? ''} className="field !min-h-9 text-[13.5px]"><option value="">Any</option>{Object.entries(PAYMENT_STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}</select></label>
+      </Filters>
+      <Table head={['Order', 'Customer', 'Laptops', 'Total', 'Payment', 'Status', 'Placed']} empty={rows.length ? false : 'No orders match.'}>
+        {rows.map((o) => (
+          <tr key={o.id} className="hover:bg-canvas/50">
+            <td className={td}><Link href={`/admin/orders/${o.number}`} className="mono font-semibold hover:underline">{o.number}</Link></td>
+            <td className={td}>{o.address.name}<br /><span className="text-mute">{o.address.city} · {formatPhone(o.phone ?? o.address.phone)}</span>{!o.userId && <span className="pill pill-done ml-1 !h-5">guest</span>}</td>
+            <td className={td}>{items.filter((i) => i.orderId === o.id).map((i, k) => <span key={k} className="block">{i.title} <span className="mono text-[11.5px] text-mute">{i.unitCode}</span></span>)}</td>
+            <td className={`${td} mono`}>{rupees(o.total)}</td>
+            <td className={td}><span className={`pill pill-${PAYMENT_STATUS[o.paymentStatus]?.tone ?? 'info'}`}>{PAYMENT_STATUS[o.paymentStatus]?.label ?? o.paymentStatus}</span><br /><span className="text-[12px] text-mute">{o.paymentMethod}</span></td>
+            <td className={td}><span className={`pill pill-${STATUS[o.status]?.tone ?? 'info'}`}>{STATUS[o.status]?.label ?? o.status}</span></td>
+            <td className={`${td} whitespace-nowrap text-mute`}>{formatDate(o.createdAt, true)}</td>
+          </tr>
         ))}
-        <form className="ml-auto flex gap-2" action="/admin/orders">
-          {f.key && <input type="hidden" name="status" value={f.key} />}
-          <label htmlFor="oq" className="sr-only">Search orders</label>
-          <input id="oq" name="q" defaultValue={q} placeholder="Order number, phone or email" className="field !min-h-[40px] !w-[260px]" />
-          <button className="btn btn-ghost btn-sm">Search</button>
-        </form>
-      </div>
-      <div className="sheet mt-5 overflow-x-auto p-2">
-        {rows.length === 0 ? <p className="p-6 text-mute">No orders match.</p> : (
-          <table className="w-full min-w-[760px] text-[14.5px]">
-            <thead><tr className="text-left text-[13px] text-mute"><th className="px-4 py-3 font-medium">Order</th><th className="px-4 py-3 font-medium">Customer</th><th className="px-4 py-3 font-medium">Payment</th><th className="px-4 py-3 font-medium">Status</th><th className="px-4 py-3 text-right font-medium">Total</th></tr></thead>
-            <tbody>
-              {rows.map((o) => (
-                <tr key={o.id} className="border-t border-line hover:bg-bench/60">
-                  <td className="px-4 py-3"><Link href={`/admin/orders/${o.number}`} className="font-semibold text-spruce hover:underline">{o.number}</Link><br /><span className="text-[13px] text-mute">{formatDate(o.createdAt, true)}</span></td>
-                  <td className="px-4 py-3">{o.address.name}<br /><span className="text-[13px] text-mute">{o.address.city}, {o.address.pincode}</span></td>
-                  <td className="px-4 py-3">{o.paymentMethod === 'cod' ? 'On delivery' : o.paymentMethod === 'demo' ? 'Online (demo)' : 'Online'}<br /><span className="text-[13px] text-mute">{o.paymentStatus === 'cod_due' ? 'Due on delivery' : o.paymentStatus}</span></td>
-                  <td className="px-4 py-3"><Pill status={o.status} /></td>
-                  <td className="px-4 py-3 text-right font-semibold">{rupees(o.total)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-      <p className="hint mt-3">{rows.length} shown{rows.length === 200 ? ' (latest 200)' : ''}. Statuses: {Object.values(STATUS).map((s) => s.label).join(', ')}.</p>
+      </Table>
+      <Pager page={page} pages={Math.ceil(n / PER)} base="/admin/orders" params={{ status: sp.status, pay: sp.pay, q }} />
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Mail, Smartphone } from 'lucide-react';
-import { requestLoginCode, saveName, verifyLoginCode } from '@/app/login/actions';
+import { requestLoginCode, saveName, verifyLoginCode } from '@/app/(store)/login/actions';
 import CodeInput from './CodeInput';
 
 type Step = 'ask' | 'code' | 'name';

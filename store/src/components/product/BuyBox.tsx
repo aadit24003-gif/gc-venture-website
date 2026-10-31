@@ -12,7 +12,7 @@ import { emiFrom, emiPerMonth, linePrice, savedPct, studentUnitDiscount, upgrade
 import { gb, rupees } from '@/lib/format';
 import { useCart } from '../cart/CartContext';
 import { toast } from '../Toaster';
-import { checkPincode, type PinResult } from '@/app/laptops/[slug]/actions';
+import { checkPincode, type PinResult } from '@/app/(store)/laptops/[slug]/actions';
 import NewsletterForm from '../NewsletterForm';
 import AnimatedNumber from '../AnimatedNumber';
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { decideStudent } from '../actions';
+import { decideStudent } from './actions';
 import { toast } from '@/components/Toaster';
 
 const REASONS = [

@@ -2,37 +2,67 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { GraduationCap, Inbox, LayoutGrid, Laptop, Package, Ticket } from 'lucide-react';
+import { BarChart3, Boxes, FileText, GraduationCap, History, LifeBuoy, Mail, MessageSquareQuote, Package, RotateCcw, Settings, Shield, Tags, Ticket, Users, Laptop, Bell } from 'lucide-react';
 
-const ITEMS = [
-  { href: '/admin', label: 'Overview', icon: LayoutGrid },
-  { href: '/admin/orders', label: 'Orders', icon: Package },
-  { href: '/admin/students', label: 'Student IDs', icon: GraduationCap },
-  { href: '/admin/products', label: 'Prices and stock', icon: Laptop },
-  { href: '/admin/coupons', label: 'Coupons', icon: Ticket },
-  { href: '/admin/messages', label: 'Messages', icon: Inbox },
+type Badges = { students: number; tickets: number; requests: number; orders: number; reviews: number };
+const GROUPS: { title: string; items: { href: string; label: string; icon: typeof Package; perm?: string; badge?: keyof Badges }[] }[] = [
+  { title: '', items: [{ href: '/admin', label: 'Overview', icon: BarChart3 }] },
+  { title: 'Sales', items: [
+    { href: '/admin/orders', label: 'Orders', icon: Package, perm: 'orders.view', badge: 'orders' },
+    { href: '/admin/returns', label: 'Returns and warranty', icon: RotateCcw, perm: 'service.manage', badge: 'requests' },
+    { href: '/admin/customers', label: 'Customers', icon: Users, perm: 'customers.view' },
+    { href: '/admin/coupons', label: 'Coupons', icon: Ticket, perm: 'coupons.manage' },
+  ] },
+  { title: 'Catalogue', items: [
+    { href: '/admin/inventory', label: 'Inventory units', icon: Boxes, perm: 'inventory.manage' },
+    { href: '/admin/products', label: 'Laptop models', icon: Laptop, perm: 'catalogue.manage' },
+    { href: '/admin/catalogue', label: 'Brands and categories', icon: Tags, perm: 'catalogue.manage' },
+  ] },
+  { title: 'Customers', items: [
+    { href: '/admin/tickets', label: 'Support tickets', icon: LifeBuoy, perm: 'tickets.manage', badge: 'tickets' },
+    { href: '/admin/reviews', label: 'Reviews', icon: MessageSquareQuote, perm: 'reviews.moderate', badge: 'reviews' },
+    { href: '/admin/students', label: 'Student IDs', icon: GraduationCap, perm: 'students.review', badge: 'students' },
+  ] },
+  { title: 'Content', items: [
+    { href: '/admin/content', label: 'Pages and blog', icon: FileText, perm: 'content.manage' },
+    { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, perm: 'newsletter.view' },
+  ] },
+  { title: 'System', items: [
+    { href: '/admin/notifications', label: 'Notifications', icon: Bell, perm: 'notifications.manage' },
+    { href: '/admin/staff', label: 'Staff and roles', icon: Shield, perm: 'staff.manage' },
+    { href: '/admin/settings', label: 'Settings', icon: Settings, perm: 'settings.manage' },
+    { href: '/admin/audit', label: 'Audit log', icon: History, perm: 'audit.view' },
+  ] },
 ];
 
-export default function AdminNav({ pendingStudents }: { pendingStudents: number }) {
+export default function AdminNav({ perms, badges }: { perms: Record<string, boolean>; badges: Badges }) {
   const path = usePathname();
   return (
-    <nav aria-label="Admin" className="lg:sticky lg:top-24 lg:self-start">
-      <p className="mb-3 hidden text-[13px] font-semibold text-mute lg:block">Store admin</p>
-      <ul className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:px-0">
-        {ITEMS.map(({ href, label, icon: I }) => {
-          const on = href === '/admin' ? path === href : path.startsWith(href);
-          return (
-            <li key={href} className="shrink-0">
-              <Link href={href} aria-current={on ? 'page' : undefined} className={`flex h-11 items-center gap-3 rounded-xl px-3.5 text-[15px] font-medium ${on ? 'bg-spruce text-white' : 'text-ink hover:bg-white'}`}>
-                <I size={18} /> {label}
-                {href === '/admin/students' && pendingStudents > 0 && (
-                  <span className={`ml-auto rounded-full px-2 py-0.5 text-[12px] font-bold ${on ? 'bg-tag text-spruce' : 'bg-tag text-spruce'}`}>{pendingStudents}</span>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+    <nav aria-label="Admin" className="px-3 pb-4">
+      {GROUPS.map((g) => {
+        const items = g.items.filter((i) => !i.perm || perms[i.perm]);
+        if (!items.length) return null;
+        return (
+          <div key={g.title || 'top'} className="mt-3">
+            {g.title && <p className="mono px-3 pb-1.5 pt-2 text-[10.5px] uppercase tracking-[0.1em] text-white/40">{g.title}</p>}
+            <ul className="space-y-0.5">
+              {items.map(({ href, label, icon: I, badge }) => {
+                const on = href === '/admin' ? path === href : path.startsWith(href);
+                const n = badge ? badges[badge] : 0;
+                return (
+                  <li key={href}>
+                    <Link href={href} aria-current={on ? 'page' : undefined}
+                      className={`flex h-9 items-center gap-2.5 rounded-lg px-3 text-[14px] transition ${on ? 'bg-white/12 font-semibold text-white' : 'hover:bg-white/6 hover:text-white'}`}>
+                      <I size={16} aria-hidden="true" /> <span className="flex-1">{label}</span>
+                      {n > 0 && <span className="mono rounded-md bg-accent px-1.5 text-[11px] font-semibold text-ink">{n}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
     </nav>
   );
 }

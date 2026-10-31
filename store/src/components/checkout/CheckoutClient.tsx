@@ -8,7 +8,7 @@ import { BadgePercent, Banknote, Check, Lock, MapPin, Plus, ShieldCheck, Wallet 
 import { useCart } from '../cart/CartContext';
 import LoginFlow from '../auth/LoginFlow';
 import ProductImage from '../ui/ProductImage';
-import { getQuote, placeOrder, type AddressInput } from '@/app/checkout/actions';
+import { getQuote, placeOrder, type AddressInput } from '@/app/(store)/checkout/actions';
 import { usePayment } from './usePayment';
 import { GRADES, STUDENT } from '@/lib/config';
 import { formatPhone, gb, rupees } from '@/lib/format';

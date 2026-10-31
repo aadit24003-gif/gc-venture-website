@@ -1,11 +1,9 @@
-import { layout, sendEmail } from './providers/email';
-import { STUDENT } from './config';
+import { BRAND } from './config';
+import { formatDate } from './format';
+import { notify } from './notify';
+import { approvedUntilFromNow } from './students';
 
-export async function notifyApproved(to: string, name: string) {
-  await sendEmail({
-    to,
-    subject: `You’re verified: ${STUDENT.percent}% off for students`,
-    text: `Hi ${name}, your student status is verified. ${STUDENT.percent}% off applies automatically at checkout for the next ${STUDENT.validityMonths} months.`,
-    html: layout('You’re verified', `<p style="font-size:15px;line-height:1.6">Hi ${name}, your student status is verified. ${STUDENT.percent}% off now applies automatically at checkout, for the next ${STUDENT.validityMonths} months.</p>`),
-  });
+/** Tells a student their discount is active (template: student_approved). */
+export async function notifyApproved(to: string, name: string, until: Date = approvedUntilFromNow()) {
+  await notify('student_approved', { email: to }, { name, valid_until: formatDate(until), shop_url: `${BRAND.url}/category/student` }, 'student');
 }

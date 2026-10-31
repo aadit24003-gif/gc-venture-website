@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Camera, Check, Clock, IdCard, Mail, Upload } from 'lucide-react';
 import LoginFlow from '../auth/LoginFlow';
 import CodeInput from '../auth/CodeInput';
-import { confirmCollegeCode, sendCollegeCode, submitStudentId } from '@/app/students/actions';
+import { confirmCollegeCode, sendCollegeCode, submitStudentId } from '@/app/(store)/students/actions';
 import { STUDENT } from '@/lib/config';
 import { formatDate } from '@/lib/format';
 

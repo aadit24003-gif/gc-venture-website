@@ -10,20 +10,17 @@ import { GRADES, GRADE_ORDER } from '@/lib/config';
 import type { ProductImage } from '@/lib/db/schema';
 import { arrangePhotos, saveLaptop, uploadPhotos, type DetailsInput } from './editor-actions';
 
-type Form = Omit<DetailsInput, 'grades' | 'highlights'> & { highlights: string[]; grades: { grade: string; price: number; stock: number; active: boolean }[] };
+export type Form = Omit<DetailsInput, 'grades' | 'highlights' | 'categories' | 'tags' | 'specs' | 'seoTitle' | 'seoDescription' | 'featured' | 'active'> & {
+  highlights: string[]; grades: { grade: string; price: number; stock?: number; active: boolean }[];
+  categories: string[]; tags: string; specs: string; seoTitle: string | null; seoDescription: string | null; featured: boolean; active: boolean;
+};
 
 const STYLES = [['thinkpad', 'ThinkPad'], ['latitude', 'Latitude'], ['elitebook', 'EliteBook'], ['probook', 'ProBook'], ['macbook-air', 'MacBook Air'], ['macbook-pro', 'MacBook Pro']] as const;
 const COLOURS = [['black', 'Black'], ['graphite', 'Graphite'], ['silver', 'Silver'], ['space-grey', 'Space grey'], ['midnight', 'Midnight'], ['starlight', 'Starlight']] as const;
 const USES = [['study', 'Studying'], ['code', 'Coding'], ['design', 'Design and video'], ['office', 'Office work'], ['travel', 'Light to carry']] as const;
 
-export const BLANK: Form = {
-  id: null, brand: 'Dell', family: 'Latitude', model: '', year: new Date().getFullYear() - 3, cpu: '', cpuShort: '', cpuTier: 'i5', cpuGen: 11,
-  gpu: 'Intel Iris Xe', screenIn: 14, screenRes: 'Full HD 1920×1080', touch: false, weightKg: 1.4, ramGb: 8, maxRamGb: 32, ssdGb: 256,
-  ports: 'USB-C, 2× USB-A, HDMI', description: '', highlights: ['', '', ''], uses: ['study', 'office'], style: 'latitude', colour: 'graphite', notch: false,
-  newPrice: null, grades: GRADE_ORDER.map((g) => ({ grade: g, price: 0, stock: 0, active: true })),
-};
 
-export default function ProductEditor({ initial, photos: initialPhotos }: { initial: Form; photos?: ProductImage[] }) {
+export default function ProductEditor({ initial, photos: initialPhotos, categories = [], units = {} }: { initial: Form; photos?: ProductImage[]; categories?: { slug: string; name: string }[]; units?: Record<string, number> }) {
   const router = useRouter();
   const [f, setF] = useState<Form>(initial);
   const [photos, setPhotos] = useState<ProductImage[]>(initialPhotos ?? []);
@@ -132,7 +129,8 @@ export default function ProductEditor({ initial, photos: initialPhotos }: { init
         </section>
 
         <section className="sheet p-6" aria-label="Prices and stock">
-          <h2 className="text-[22px]">Prices and stock</h2>
+          <h2 className="text-[22px]">Grade prices</h2>
+          <p className="mt-1 text-[13.5px] text-mute">The price of a unit in each grade (a unit can override it). Stock is the units listed in Inventory.</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {f.grades.map((g, i) => (
               <div key={g.grade} className="rounded-2xl bg-bench p-3">
@@ -141,8 +139,8 @@ export default function ProductEditor({ initial, photos: initialPhotos }: { init
                   <label className="flex items-center gap-1.5 text-[13px] text-mute"><input type="checkbox" className="accent-[var(--color-spruce)]" checked={g.active} onChange={(e) => set('grades', f.grades.map((x, j) => (j === i ? { ...x, active: e.target.checked } : x)))} />Offered</label>
                 </div>
                 <div className="mt-2 grid grid-cols-[1.4fr_1fr] gap-2">
+                  <p className="text-[12.5px] text-mute">{units[g.grade] ?? 0} on sale</p>
                   <label className="text-[12.5px] text-mute">Price ₹<input className="field !min-h-[40px] !px-2 text-[15px] text-ink" inputMode="numeric" value={g.price || ''} onChange={(e) => set('grades', f.grades.map((x, j) => (j === i ? { ...x, price: Number(e.target.value.replace(/\D/g, '')) } : x)))} /></label>
-                  <label className="text-[12.5px] text-mute">Stock<input className="field !min-h-[40px] !px-2 text-[15px] text-ink" inputMode="numeric" value={String(g.stock)} onChange={(e) => set('grades', f.grades.map((x, j) => (j === i ? { ...x, stock: Number(e.target.value.replace(/\D/g, '')) } : x)))} /></label>
                 </div>
               </div>
             ))}
@@ -151,6 +149,26 @@ export default function ProductEditor({ initial, photos: initialPhotos }: { init
             <label htmlFor="f-new" className="label">Approximate price when new, ₹</label>
             <input id="f-new" className="field" inputMode="numeric" value={f.newPrice ?? ''} onChange={(e) => set('newPrice', num(e.target.value.replace(/\D/g, '')))} />
             <p className="hint">Used for “you save X%”. Leave empty to hide it.</p>
+          </div>
+        </section>
+
+        <section className="sheet p-6" aria-label="Merchandising and search">
+          <h2 className="text-[22px]">Merchandising and search</h2>
+          <div className="mt-4 flex flex-wrap gap-5 text-[14px]">
+            <label className="flex items-center gap-2"><input type="checkbox" className="check" checked={f.active} onChange={(e) => set('active', e.target.checked)} /> Shown in the store</label>
+            <label className="flex items-center gap-2"><input type="checkbox" className="check" checked={f.featured} onChange={(e) => set('featured', e.target.checked)} /> Featured on the home page</label>
+          </div>
+          {categories.length > 0 && (
+            <fieldset className="mt-4">
+              <legend className="label">Categories</legend>
+              <div className="flex flex-wrap gap-2">{categories.map((c) => <button key={c.slug} type="button" className="chip" aria-pressed={f.categories.includes(c.slug)} onClick={() => set('categories', f.categories.includes(c.slug) ? f.categories.filter((x) => x !== c.slug) : [...f.categories, c.slug])}>{c.name}</button>)}</div>
+            </fieldset>
+          )}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2"><label htmlFor="f-tags" className="label">Tags</label><input id="f-tags" className="field" value={f.tags} onChange={(e) => set('tags', e.target.value)} placeholder="thunderbolt, backlit, 16:10" /><p className="hint">Comma-separated. Searchable.</p></div>
+            <div className="sm:col-span-2"><label htmlFor="f-specs" className="label">Extra specifications</label><textarea id="f-specs" className="field" value={f.specs} onChange={(e) => set('specs', e.target.value)} placeholder={'Battery: 57 Wh\nWebcam: 720p with shutter'} /><p className="hint">One per line, as Name: value. Shown in the specification table.</p></div>
+            <div><label htmlFor="f-seot" className="label">Search title (optional)</label><input id="f-seot" className="field" maxLength={70} value={f.seoTitle ?? ''} onChange={(e) => set('seoTitle', e.target.value || null)} /></div>
+            <div><label htmlFor="f-seod" className="label">Search description (optional)</label><input id="f-seod" className="field" maxLength={170} value={f.seoDescription ?? ''} onChange={(e) => set('seoDescription', e.target.value || null)} /></div>
           </div>
         </section>
 

@@ -3,7 +3,7 @@
 import { Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { toggleWishlistAction } from '@/app/account/wishlist-actions';
+import { toggleWishlistAction } from '@/app/(store)/account/wishlist-actions';
 import { toast } from './Toaster';
 
 export default function WishButton({ productId, title, initial, variant = 'icon' }: { productId: string; title: string; initial: boolean; variant?: 'icon' | 'button' }) {

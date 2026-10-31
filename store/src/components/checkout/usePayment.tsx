@@ -7,7 +7,7 @@
 import { useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { CreditCard, Smartphone } from 'lucide-react';
-import { beginPayment, completeDemoPayment, confirmRazorpayPayment, reportPaymentFailure } from '@/app/checkout/actions';
+import { beginPayment, completeDemoPayment, confirmRazorpayPayment, reportPaymentFailure } from '@/app/(store)/checkout/actions';
 import { rupees } from '@/lib/format';
 
 type Outcome = 'paid' | 'failed' | 'dismissed';

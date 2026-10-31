@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { subscribe } from '@/app/newsletter/actions';
+import { subscribe } from '@/app/(store)/newsletter/actions';
 
 export default function NewsletterForm({ tone = 'dark', source = 'footer' }: { tone?: 'dark' | 'light'; source?: string }) {
   const [email, setEmail] = useState('');
