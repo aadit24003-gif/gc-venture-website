@@ -65,9 +65,11 @@ type Props = {
   /** Hide the drop shadow (e.g. when the art sits on a dark band). */
   flat?: boolean;
   title?: string;
+  /** Leave out SVG text (for the share-image renderer, which can't draw it). */
+  noText?: boolean;
 };
 
-export default function LaptopArt({ art, brand, slug, className, flat, title }: Props) {
+export default function LaptopArt({ art, brand, slug, className, flat, title, noText }: Props) {
   const b = BODY[art.colour];
   const h = seed(slug);
   const scene = SCENES[h % SCENES.length];
@@ -129,7 +131,7 @@ export default function LaptopArt({ art, brand, slug, className, flat, title }: 
           <path d={mark} fill="#8a9196" />
         </svg>
       )}
-      {art.style === 'thinkpad' && (
+      {art.style === 'thinkpad' && !noText && (
         <text x="92" y="219" fontSize="8.5" fontFamily="Arial, sans-serif" fill="#7d8489" letterSpacing=".4">Lenovo</text>
       )}
 

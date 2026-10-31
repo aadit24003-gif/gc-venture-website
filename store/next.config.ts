@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   // The database migrations are read at runtime on first start, so ship them with every function.
-  outputFileTracingIncludes: { '/**/*': ['./drizzle/**/*'] },
+  outputFileTracingIncludes: { '/**/*': ['./drizzle/**/*', './src/lib/og-fonts/*'] },
   turbopack: { root: path.join(import.meta.dirname) },
   experimental: {
     serverActions: { bodySizeLimit: '12mb' },

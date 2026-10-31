@@ -4,6 +4,7 @@ import { GRADES, GRADE_ORDER } from '@/lib/config';
 import { gb, rupees } from '@/lib/format';
 import { emiFrom, savedPct } from '@/lib/pricing';
 import LaptopArt from './LaptopArt';
+import CompareToggle from './compare/CompareToggle';
 
 /**
  * Catalogue card. The yellow price tag hangs off the laptop like a shelf tag:
@@ -37,6 +38,7 @@ export default function ProductCard({ p, priority }: { p: CardProduct; priority?
             )}
           </div>
         </div>
+        <CompareToggle slug={p.slug} title={p.title} className="absolute bottom-3 left-3 z-20 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100 sm:aria-pressed:opacity-100" />
         {p.featured && p.inStock && (
           <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-[12px] font-semibold text-spruce backdrop-blur">Popular</span>
         )}

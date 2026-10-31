@@ -15,6 +15,7 @@ import AnimatedNumber from '../AnimatedNumber';
 import LaptopArt from '../LaptopArt';
 import LidMarks from '../LidMarks';
 import ConditionTag, { skuFor } from '../ConditionTag';
+import CompareToggle from '../compare/CompareToggle';
 
 export type ViewProduct = {
   id: string; slug: string; title: string; brand: string; model: string; year: number | null;
@@ -141,7 +142,10 @@ export default function ProductView({ p, student, initial }: { p: ViewProduct; s
 
       {/* Configuration */}
       <div>
-        <p className="text-[14px] text-mute">{p.brand}{p.year ? `, ${p.year} model` : ''}, certified refurbished</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[14px] text-mute">{p.brand}{p.year ? `, ${p.year} model` : ''}, certified refurbished</p>
+          <CompareToggle slug={p.slug} title={p.title} className="!bg-white" />
+        </div>
         <h1 className="mt-1 text-[38px] md:text-[50px]">{p.title}</h1>
         <p className="mt-2 text-[16px] text-mute">{p.summary}</p>
 

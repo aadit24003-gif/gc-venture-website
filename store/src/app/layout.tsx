@@ -8,6 +8,7 @@ import CartDrawer from '@/components/cart/CartDrawer';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Toaster } from '@/components/Toaster';
+import CompareTray from '@/components/compare/CompareTray';
 import { razorpayConfigured } from '@/lib/providers/razorpay';
 
 const bricolage = localFont({
@@ -51,6 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Header viewer={viewer ? { name: viewer.user.name, isAdmin: viewer.isAdmin } : null} />
           <main id="main" className="flex-1">{children}</main>
           <Footer />
+          <CompareTray />
           <CartDrawer />
           <Toaster />
         </CartProvider>
