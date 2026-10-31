@@ -14,13 +14,15 @@ Built with Next.js 16 (App Router), React 19, Tailwind CSS 4, Motion, Drizzle OR
 | Catalogue | `/laptops` | Filters for brand, budget, processor, memory, screen and grade, plus use-case chips; sorting; filters kept in the URL so links can be shared; animated reflow; mobile filter sheet |
 | Product | `/laptops/<model>` | Grade cards (price, stock, battery minimum), memory/storage upgrades, warranty extension, live price, student price, EMI plans, delivery estimate by PIN code, condition report tag, lid view per grade, specs, similar laptops, sticky buy bar on phones, Product structured data |
 | Search | Ctrl/⌘ K or `/` | Instant search across models, processors, memory and "under 30000" style budgets |
+| Compare | `/compare` | Pick up to three laptops from any card or product page; a tray collects them; the table marks the best price, memory, weight and year |
+| Link previews | automatic | Every laptop has a generated share image (model, price, savings, condition tag) for WhatsApp, X and LinkedIn; the site has its own |
 | Cart | drawer | Kept in the browser; quantities limited to stock |
 | Sign in | `/login` | 6-digit code by SMS (MSG91) or email (Resend); no passwords; rate-limited, hashed, 5 tries |
 | Checkout | `/checkout` | Sign in inline, saved addresses, PIN code auto-fill, GSTIN, coupon, student discount, pay online (Razorpay) or on delivery; server recomputes every price |
 | Orders | `/orders/<number>` | Progress timeline, tracking, items, totals, retry payment, printable invoice |
 | Account | `/account` | Orders, student status, profile, saved addresses |
 | Students | `/students` | Verify by college email code (instant for .ac.in, .edu.in, .edu) or ID photo (checked by staff); status; picks with student prices |
-| Admin | `/admin` | Overview, orders (pack, ship with tracking, deliver, cancel), student ID queue (approve or reject with reason, emails sent), prices and stock per grade, coupons, contact messages |
+| Admin | `/admin` | Overview, orders (pack, ship with tracking, deliver, cancel), student ID queue (approve or reject with reason, emails sent), prices and stock per grade, add or edit a laptop with photos, coupons, contact messages |
 | Help and policy | `/how-we-test`, `/warranty`, `/returns`, `/shipping`, `/terms`, `/privacy`, `/contact`, `/about`, `/faq` | The pages Razorpay checks before activating live payments |
 
 ### How money and stock are handled
@@ -85,7 +87,7 @@ Everything below is a working default chosen during the build, marked `[CONFIRM]
 - [ ] **"Price when new"** figures (used for "you save X%") are approximate; Apple's are launch prices.
 - [ ] **Which models to list**: 39 are seeded (Dell Latitude, HP EliteBook and ProBook, Lenovo ThinkPad, MacBook Air and Pro).
 - [ ] **Upgrade prices**: memory +₹2,500 (16 GB) / +₹6,500 (32 GB); SSD +₹2,000 (512 GB) / +₹5,500 (1 TB).
-- [ ] **Photos**: laptops are drawn illustrations for now; real photos can be added per product.
+- [ ] **Photos**: laptops are drawn illustrations until you upload photos in `/admin/products/<model>` (first photo leads; up to 8).
 
 **Promises**
 - [ ] Warranty: **12 months** included; extension to **2 years for ₹2,499**.

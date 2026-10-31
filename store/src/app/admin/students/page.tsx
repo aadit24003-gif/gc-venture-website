@@ -65,7 +65,7 @@ export default async function AdminStudents() {
       )}
 
       <h2 className="mt-10 text-[24px]">Recent decisions</h2>
-      <div className="sheet mt-4 overflow-x-auto p-2">
+      <div className="sheet mt-4 overflow-x-auto p-2" tabIndex={0} role="region" aria-label="Recent decisions, scrollable">
         {recent.length === 0 ? <p className="p-5 text-mute">None yet.</p> : (
           <table className="w-full min-w-[640px] text-[14.5px]">
             <tbody>

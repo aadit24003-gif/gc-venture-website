@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const d = await db();
   const [{ n }] = await d.select({ n: sql<number>`count(*)::int` }).from(studentVerifications).where(eq(studentVerifications.status, 'pending'));
   return (
-    <div className="wrap grid gap-8 pb-10 pt-8 lg:grid-cols-[220px_1fr]">
+    <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-8 pb-10 pt-8 lg:grid-cols-[220px_minmax(0,1fr)]">
       <AdminNav pendingStudents={n} />
       <div className="min-w-0">{children}</div>
     </div>
