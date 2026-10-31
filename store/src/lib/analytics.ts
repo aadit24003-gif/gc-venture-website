@@ -2,7 +2,7 @@
  * Dashboard numbers, all computed from the database for a date range.
  * Profit is reported only for units with a recorded purchase cost, and says how many that covers.
  */
-import { and, eq, gte, inArray, isNotNull, lt, sql } from 'drizzle-orm';
+import { and, eq, gte, inArray, isNotNull, lt, sql, isNull } from 'drizzle-orm';
 import { db } from './db';
 import { inventoryUnits, orderItems, orders, productViews, products, refunds, serviceRequests, studentVerifications, tickets, users } from './db/schema';
 import { OPEN_SERVICE } from './service';
@@ -101,13 +101,14 @@ export async function analytics(r: Range) {
 /** Work waiting for staff right now. */
 export async function workQueue() {
   const d = await db();
-  const [[toShip], [awaitingPay], [returns], [openTickets], [students], [lowStock]] = await Promise.all([
+  const [[toShip], [awaitingPay], [returns], [openTickets], [students], [lowStock], [videoCalls]] = await Promise.all([
     d.select({ n: sql<number>`count(*)::int` }).from(orders).where(inArray(orders.status, ['confirmed', 'quality_check', 'packed'])),
     d.select({ n: sql<number>`count(*)::int` }).from(orders).where(eq(orders.status, 'awaiting_payment')),
     d.select({ n: sql<number>`count(*)::int` }).from(serviceRequests).where(inArray(serviceRequests.status, OPEN_SERVICE)),
     d.select({ n: sql<number>`count(*)::int` }).from(tickets).where(eq(tickets.status, 'open')),
     d.select({ n: sql<number>`count(*)::int` }).from(studentVerifications).where(eq(studentVerifications.status, 'pending')),
     d.select({ n: sql<number>`count(*)::int` }).from(inventoryUnits).where(and(inArray(inventoryUnits.status, ['intake', 'inspection', 'refurbishing']), isNotNull(inventoryUnits.id))),
+    d.select({ n: sql<number>`count(*)::int` }).from(orders).where(and(inArray(orders.status, ['confirmed', 'quality_check', 'packed']), isNull(orders.videoCallAt))),
   ]);
-  return { toShip: toShip.n, awaitingPay: awaitingPay.n, returns: returns.n, tickets: openTickets.n, students: students.n, inWorkshop: lowStock.n };
+  return { toShip: toShip.n, awaitingPay: awaitingPay.n, returns: returns.n, tickets: openTickets.n, students: students.n, inWorkshop: lowStock.n, videoCalls: videoCalls.n };
 }

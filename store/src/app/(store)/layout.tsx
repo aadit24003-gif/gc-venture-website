@@ -9,9 +9,12 @@ import CompareTray from '@/components/compare/CompareTray';
 import { razorpayConfigured } from '@/lib/providers/razorpay';
 import Scenes from '@/components/Scenes';
 import { getSettings } from '@/lib/settings';
+import { eq } from 'drizzle-orm';
+import { db } from '@/lib/db';
+import { brands } from '@/lib/db/schema';
 
 export default async function StoreLayout({ children }: { children: React.ReactNode }) {
-  const [viewer, cart, settings] = await Promise.all([getViewer(), getCart(), getSettings()]);
+  const [viewer, cart, settings, brandRows] = await Promise.all([getViewer(), getCart(), getSettings(), db().then((d) => d.select({ slug: brands.slug, name: brands.name }).from(brands).where(eq(brands.active, true)).orderBy(brands.sort, brands.name))]);
   return (
     <CartProvider initial={cart}>
       {isDemo() && (
@@ -19,7 +22,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
           <p className="wrap py-1.5 text-center">Demo mode: sample stock, sign-in codes on screen{razorpayConfigured() ? '' : ', simulated payments'}. Nothing is charged.</p>
         </aside>
       )}
-      <Header viewer={viewer ? { name: viewer.user.name, isStaff: viewer.isStaff } : null} bookingAmount={settings.shipping.bookingEnabled ? settings.shipping.bookingAmount : null} />
+      <Header viewer={viewer ? { name: viewer.user.name, isStaff: viewer.isStaff } : null} bookingAmount={settings.shipping.bookingEnabled ? settings.shipping.bookingAmount : null} brands={brandRows.slice(0, 6)} />
       <main id="main" className="flex-1">{children}</main>
       <Footer />
       <CompareTray />

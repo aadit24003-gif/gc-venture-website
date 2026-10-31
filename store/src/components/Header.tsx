@@ -43,11 +43,15 @@ const QUICK = [
   ['New arrivals', '/laptops?sort=new'],
 ] as const;
 
-export default function Header({ viewer, bookingAmount = null }: { viewer: Viewer; /** paise; null when booking is off */ bookingAmount?: number | null }) {
+export default function Header({ viewer, bookingAmount = null, brands: brandLinks }: { viewer: Viewer; /** paise; null when booking is off */ bookingAmount?: number | null; /** active brands from Admin → Brands and categories */ brands?: { slug: string; name: string }[] }) {
   const { count, setOpen } = useCart();
   const [search, setSearch] = useState(false);
   const [menu, setMenu] = useState(false);
   const path = usePathname();
+  // Brand links follow the brands set up in admin; the fixed list is only a fallback.
+  const nav = brandLinks?.length
+    ? [NAV[0], ...brandLinks.map((b) => ({ href: `/brands/${b.slug}`, label: b.slug === 'apple' ? 'MacBook' : b.name })), ...NAV.filter((n) => !n.href.startsWith('/brands/') && n.href !== '/laptops')]
+    : NAV;
 
   useEffect(() => { setMenu(false); }, [path]);
   useEffect(() => {
@@ -69,7 +73,7 @@ export default function Header({ viewer, bookingAmount = null }: { viewer: Viewe
           <button type="button" className={`${icon} -ml-3 lg:hidden`} aria-label="Open menu" aria-expanded={menu} onClick={() => setMenu(true)}><Menu size={20} /></button>
           <Link href="/" aria-label={`${BRAND.name} home`} className="shrink-0"><Logo tone="light" compact /></Link>
           <nav aria-label="Main" className="mx-auto hidden items-center gap-1 lg:flex">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <Link key={n.href} href={n.href} aria-current={path === n.href ? 'page' : undefined}
                 className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[13.5px] transition-colors hover:text-white aria-[current=page]:text-white ${n.href === '/deals' ? 'text-gold-hi' : 'text-white/75'}`}>
                 {n.label}
@@ -79,7 +83,8 @@ export default function Header({ viewer, bookingAmount = null }: { viewer: Viewe
           <div className="ml-auto flex items-center lg:ml-0">
             <button type="button" className={icon} aria-label="Search" onClick={() => setSearch(true)}><Search size={19} /></button>
             <Link href={viewer ? '/account/wishlist' : '/login?next=/account/wishlist'} className={`${icon} hidden sm:grid`} aria-label="Wishlist"><Heart size={19} /></Link>
-            <Link href={viewer ? (viewer.isStaff ? '/admin' : '/account') : '/login'} className={`${icon} hidden sm:grid`} aria-label={viewer ? (viewer.isStaff ? 'Admin' : 'Your account') : 'Sign in'} title={viewer ? (viewer.isStaff ? 'Admin' : viewer.name ?? 'Account') : 'Sign in'}><User size={19} /></Link>
+            {viewer?.isStaff && <Link href="/admin" className="mr-1 hidden rounded-full border border-white/20 px-3 py-1 text-[12.5px] font-semibold text-white/85 hover:border-white/50 hover:text-white sm:inline-flex">Admin</Link>}
+            <Link href={viewer ? '/account' : '/login'} className={`${icon} hidden sm:grid`} aria-label={viewer ? 'Your account' : 'Sign in'} title={viewer ? viewer.name ?? 'Your account' : 'Sign in'}><User size={19} /></Link>
             <button type="button" onClick={() => setOpen(true)} className={`${icon} relative -mr-2`} aria-label={`Cart, ${count} ${count === 1 ? 'item' : 'items'}`}>
               <ShoppingBag size={19} aria-hidden="true" />
               {count > 0 && <span className="num absolute right-1 top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-accent px-1 text-[11px] font-bold text-white">{count}</span>}
@@ -103,17 +108,18 @@ export default function Header({ viewer, bookingAmount = null }: { viewer: Viewe
               className="absolute left-0 top-0 flex h-full w-[86%] max-w-[360px] flex-col overflow-y-auto bg-white p-5">
               <div className="flex items-center justify-between"><Logo compact /><button type="button" className="btn btn-quiet btn-icon" aria-label="Close menu" onClick={() => setMenu(false)}><X size={22} /></button></div>
               <ul className="mt-6 space-y-1">
-                {NAV.map((n) => <li key={n.href}><Link href={n.href} className="block rounded-xl px-3 py-3 text-[17px] font-semibold hover:bg-canvas">{n.label}</Link></li>)}
+                {nav.map((n) => <li key={n.href}><Link href={n.href} className="block rounded-xl px-3 py-3 text-[17px] font-semibold hover:bg-canvas">{n.label}</Link></li>)}
               </ul>
               <p className="eyebrow mt-6 px-3">Brands</p>
               <ul className="mt-2 grid grid-cols-2 gap-2">
-                {BRANDS.map((b) => <li key={b.slug}><Link href={`/brands/${b.slug}`} className="block rounded-xl border border-line px-3 py-3 font-semibold">{b.name}</Link></li>)}
+                {(brandLinks?.length ? brandLinks : BRANDS).map((b) => <li key={b.slug}><Link href={`/brands/${b.slug}`} className="block rounded-xl border border-line px-3 py-3 font-semibold">{b.name}</Link></li>)}
               </ul>
               <p className="eyebrow mt-6 px-3">Shortcuts</p>
               <div className="mt-2 flex flex-wrap gap-2">{QUICK.map(([label, href]) => <Link key={href} href={href} className="chip">{label}</Link>)}</div>
               <div className="mt-auto space-y-2 pt-6 text-[15px]">
                 <Link href="/track" className="block px-3 py-1.5">Track an order</Link>
                 <Link href="/support" className="block px-3 py-1.5">Help and support</Link>
+                {viewer?.isStaff && <Link href="/admin" className="btn btn-ghost mt-2 w-full">Admin panel</Link>}
                 <Link href={viewer ? '/account' : '/login'} className="btn btn-primary mt-2 w-full">{viewer ? 'Your account' : 'Sign in or create account'}</Link>
               </div>
             </motion.nav>

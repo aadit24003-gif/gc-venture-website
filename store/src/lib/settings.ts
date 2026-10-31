@@ -50,10 +50,35 @@ export const TaxSchema = z.object({
   hsn: z.string().trim().max(10),
 });
 
+/** One brand tile on the home page. image: a path such as /products/<model>/front.webp, or /media/cutout/<model> (made automatically). */
+export const HomeTileSchema = z.object({
+  title: z.string().trim().min(2).max(40),
+  subtitle: z.string().trim().max(80),
+  /** Model whose lowest price is shown ("From ₹…"); empty uses the brand's lowest. */
+  product: z.string().trim().max(80),
+  /** Brand used for the price fallback and the "up to …% off" tag. */
+  brand: z.string().trim().max(30),
+  href: z.string().trim().regex(/^\/[\w\-/?=&%.]*$/, 'Links must start with /').max(160),
+  image: z.string().trim().regex(/^(\/[\w\-/.?=]*|https:\/\/\S+)$/, 'Use a path starting with / or an https:// address.').max(300),
+  dark: z.boolean(),
+});
+export const HomeSchema = z.object({
+  /** {save} is replaced by the biggest saving against new, e.g. 81. */
+  badge: z.string().trim().max(120),
+  headline: z.string().trim().min(2).max(80),
+  accent: z.string().trim().max(80),
+  /** {from} is replaced by the lowest price in stock. */
+  subline: z.string().trim().max(260),
+  tiles: z.array(HomeTileSchema).min(1).max(8),
+  studentsTile: z.boolean(),
+});
+export type HomeTile = z.infer<typeof HomeTileSchema>;
+export type HomeSettings = z.infer<typeof HomeSchema>;
+
 export type BusinessSettings = z.infer<typeof BusinessSchema>;
 export type ShippingSettings = z.infer<typeof ShippingSchema>;
 export type TaxSettings = z.infer<typeof TaxSchema>;
-export type Settings = { business: BusinessSettings; shipping: ShippingSettings; tax: TaxSettings };
+export type Settings = { business: BusinessSettings; shipping: ShippingSettings; tax: TaxSettings; home: HomeSettings };
 
 export const DEFAULT_SETTINGS: Settings = {
   business: {
@@ -84,9 +109,22 @@ export const DEFAULT_SETTINGS: Settings = {
     pickupPincode: '122018',
   },
   tax: { gstRate: 18, scheme: 'regular', sellerState: 'Haryana', hsn: '8471' },
+  home: {
+    badge: 'Business-grade laptops · up to {save}% below new',
+    headline: 'Premium laptops.',
+    accent: 'Surprisingly low prices.',
+    subline: 'ThinkPad, Latitude, EliteBook and MacBook from {from}. Imported, inspected, and shown to you on video before you pay in full.',
+    tiles: [
+      { title: 'Dell Latitude', subtitle: 'Built for the workday. Priced for yours.', product: 'dell-latitude-5440', brand: 'Dell', href: '/brands/dell', image: '/products/dell-latitude-5440/cutout.webp', dark: true },
+      { title: 'HP EliteBook', subtitle: 'Slim aluminium, all-day comfort.', product: 'hp-elitebook-840-g10', brand: 'HP', href: '/brands/hp', image: '/products/hp-elitebook-840-g10/front.webp', dark: false },
+      { title: 'ThinkPad', subtitle: 'The keyboard everyone misses.', product: 'lenovo-thinkpad-e14-gen-4', brand: 'Lenovo', href: '/brands/lenovo', image: '/products/lenovo-thinkpad-e14-gen-4/front.webp', dark: false },
+      { title: 'MacBook Air', subtitle: 'Light. Silent. Ready for anything.', product: 'apple-macbook-air-m3', brand: 'Apple', href: '/laptops?brand=Apple&q=air', image: '/products/apple-macbook-air-m3/front.webp', dark: true },
+    ],
+    studentsTile: true,
+  },
 };
 
-const SCHEMAS = { business: BusinessSchema, shipping: ShippingSchema, tax: TaxSchema } as const;
+const SCHEMAS = { business: BusinessSchema, shipping: ShippingSchema, tax: TaxSchema, home: HomeSchema } as const;
 export type SettingsKey = keyof typeof SCHEMAS;
 
 type Holder = { at: number; value: Settings } | null;

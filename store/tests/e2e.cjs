@@ -8,7 +8,8 @@
  *   guest: browse, filter, pick a specific unit, cart, guest checkout booked with a small simulated
  *   payment (balance on delivery), order page with the serial number; admin records the video call;
  *   member: create an account with a password, wishlist, pay on delivery, support ticket;
- *   student: ID upload; admin: approve the student, receive and inspect a new unit and list it,
+ *   student: ID upload; admin: every admin page opens, add a brand and a model with a photo, edit the
+ *   home page, approve the student, receive and inspect a new unit and list it,
  *   move the guest order through all fulfilment steps, issue a partial refund;
  *   after delivery: the guest requests a return, the member reviews, the admin publishes it.
  * Prints one line per step. BASE_URL overrides http://localhost:3100.
@@ -67,6 +68,13 @@ async function addFirstUnit(page, slug) {
   let guestOrder = '';
   let guestUrl = '';
   let memberOrder = '';
+  // Models with stock to spare, so the test also passes on a database earlier runs have sold from.
+  const catalogue = await (await fetch(`${BASE}/api/catalogue`)).json();
+  const pick = (slug, brand) => catalogue.find((x) => x.slug === slug && x.unitsOnSale >= 2)
+    ?? catalogue.filter((x) => x.brand === brand && x.unitsOnSale >= 2).sort((a, b) => b.unitsOnSale - a.unitsOnSale)[0];
+  const GUEST = pick('lenovo-thinkpad-t14-gen-2', 'Lenovo');
+  const MEMBER = pick('dell-latitude-5420', 'Dell');
+  if (!GUEST || !MEMBER) throw new Error('Not enough demo stock: reset the local database (delete ~/.refurb-store) and restart.');
   try {
     /* ── Guest ─────────────────────────────────────────────── */
     const guest = await (await ctx()).newPage();
@@ -87,7 +95,7 @@ async function addFirstUnit(page, slug) {
     });
     let unitCode = '';
     await step('product page: choose a specific unit and add it to the cart', async () => {
-      unitCode = await addFirstUnit(guest, 'lenovo-thinkpad-t14-gen-2');
+      unitCode = await addFirstUnit(guest, GUEST.slug);
       if (!/^U-/.test(unitCode)) throw new Error(`unexpected unit code ${unitCode}`);
     });
     await step('unit’s public inspection report opens', async () => {
@@ -112,7 +120,7 @@ async function addFirstUnit(page, slug) {
       await guest.waitForSelector('text=Match the serial number on delivery');
     });
     await step('the sold unit is no longer offered', async () => {
-      await guest.goto(`${BASE}/laptops/lenovo-thinkpad-t14-gen-2`, { waitUntil: 'networkidle' });
+      await guest.goto(`${BASE}/laptops/${GUEST.slug}`, { waitUntil: 'networkidle' });
       if (await guest.locator(`text=Unit ${unitCode}`).count()) throw new Error('sold unit still listed');
     });
 
@@ -130,14 +138,14 @@ async function addFirstUnit(page, slug) {
       await member.waitForSelector('text=Your account is ready');
     });
     await step('save a laptop to the wishlist', async () => {
-      await member.goto(BASE + '/laptops/dell-latitude-5420', { waitUntil: 'networkidle' });
+      await member.goto(`${BASE}/laptops/${MEMBER.slug}`, { waitUntil: 'networkidle' });
       await member.click('button:has-text("Save")');
       await member.waitForSelector('button[aria-pressed=true]:has-text("Saved")');
       await member.goto(BASE + '/account/wishlist', { waitUntil: 'networkidle' });
-      await member.waitForSelector('text=Latitude 5420');
+      await member.waitForSelector(`text=${MEMBER.model}`);
     });
     await step('member orders with pay on delivery', async () => {
-      await addFirstUnit(member, 'dell-latitude-5420');
+      await addFirstUnit(member, MEMBER.slug);
       await member.goto(BASE + '/checkout', { waitUntil: 'networkidle' });
       await fillAddress(member, { name: 'Member Tester', phone: `97${run}34`.slice(0, 10), pin: '122018', city: 'Gurugram', line1: 'Tower B3, Spaze iTech Park', state: 'Haryana' });
       await member.getByRole('radio', { name: /Pay on delivery/ }).check();
@@ -178,6 +186,68 @@ async function addFirstUnit(page, slug) {
       await codeSignIn(admin, 'admin@example.com', 'Store Admin');
       await admin.waitForURL((u) => u.pathname === '/admin', { timeout: 20000 });
       await admin.waitForSelector('text=To pack and ship');
+    });
+    await step('every admin page opens without errors', async () => {
+      const pages = ['/admin', '/admin/orders', '/admin/orders?status=video', '/admin/returns', '/admin/customers', '/admin/coupons', '/admin/inventory', '/admin/inventory/new',
+        '/admin/products', '/admin/products/new', '/admin/catalogue', '/admin/tickets', '/admin/reviews', '/admin/students', '/admin/home', '/admin/content',
+        '/admin/newsletter', '/admin/notifications', '/admin/staff', '/admin/settings', '/admin/audit'];
+      for (const url of pages) {
+        const res = await admin.goto(BASE + url, { waitUntil: 'domcontentloaded' });
+        if (!res || res.status() >= 400) throw new Error(`${url} returned ${res?.status()}`);
+        await admin.waitForSelector('main h1', { timeout: 15000 }).catch(() => { throw new Error(`${url} has no heading`); });
+        if (await admin.locator('text=/Application error|Something went wrong/').count()) throw new Error(`${url} shows an error`);
+      }
+    });
+    const newBrand = `Testbrand${run}`;
+    let newModelSlug = '';
+    await step('admin adds a brand, then a laptop model with a photo', async () => {
+      await admin.goto(BASE + '/admin/catalogue', { waitUntil: 'networkidle' });
+      await admin.click('summary:has-text("Add a brand")');
+      await admin.fill('#b-new-n', newBrand);
+      await admin.locator('details[open] button:has-text("Save")').first().click();
+      await admin.waitForSelector(`text=${newBrand}`);
+      await admin.goto(BASE + '/admin/products/new', { waitUntil: 'networkidle' });
+      await admin.selectOption('#f-brand', newBrand);
+      await admin.fill('#f-family', 'Testline');
+      await admin.fill('#f-model', `Model ${run}`);
+      await admin.fill('#f-cpu', 'Intel Core i5-1145G7');
+      await admin.fill('#f-cpuShort', 'Core i5 11th Gen');
+      await admin.fill('#f-desc', 'A dependable test laptop for office work and study.');
+      const prices = admin.locator('label:has-text("Price ₹") input');
+      for (const [i, v] of ['34000', '30000', '26000'].entries()) await prices.nth(i).fill(v);
+      await admin.click('button:has-text("Add laptop")');
+      await admin.waitForURL((u) => /^\/admin\/products\/(?!new$)[\w-]+$/.test(u.pathname), { timeout: 20000 });
+      newModelSlug = `${newBrand}-model-${run}`.toLowerCase();
+      await admin.setInputFiles('#photos', path.join(__dirname, '..', 'public', 'products', 'dell-latitude-5440', '1.webp'));
+      await admin.waitForSelector('ul li img', { timeout: 20000 });
+      const page = await admin.request.get(`${BASE}/laptops/${newModelSlug}`);
+      if (page.status() !== 200) throw new Error(`store page for the new model returned ${page.status()}`);
+      const cut = await admin.request.get(`${BASE}/media/cutout/${newModelSlug}`);
+      if (cut.status() !== 200 || !/webp/.test(cut.headers()['content-type'] ?? '')) throw new Error(`automatic cut-out returned ${cut.status()}`);
+      // Tidy up: hide the test model and brand so they don't show in the store.
+      await admin.getByLabel('Shown in the store').uncheck();
+      await admin.click('button:has-text("Save changes")');
+      await admin.waitForSelector('text=Saved');
+      await admin.goto(BASE + '/admin/catalogue', { waitUntil: 'networkidle' });
+      const b = admin.locator('details', { hasText: newBrand }).first();
+      await b.locator('summary').click();
+      await b.getByLabel('Visible').uncheck();
+      await b.locator('button:has-text("Save")').click();
+      await admin.waitForSelector('text=Saved.');
+    });
+    await step('admin edits the home page and the store shows it', async () => {
+      await admin.goto(BASE + '/admin/home', { waitUntil: 'networkidle' });
+      const original = await admin.inputValue('#h-head');
+      await admin.fill('#h-head', `Test headline ${run}.`);
+      await admin.click('button:has-text("Save home page")');
+      await admin.waitForSelector('text=Home page saved.');
+      const p = await (await admin.context().newPage());
+      await p.goto(BASE + '/', { waitUntil: 'networkidle' });
+      await p.waitForSelector(`text=Test headline ${run}.`);
+      await p.close();
+      await admin.fill('#h-head', original);
+      await admin.click('button:has-text("Save home page")');
+      await admin.waitForSelector('text=Home page saved.');
     });
     await step('admin approves the student', async () => {
       await admin.goto(BASE + '/admin/students', { waitUntil: 'networkidle' });
@@ -288,7 +358,7 @@ async function addFirstUnit(page, slug) {
       await admin.goto(BASE + '/admin/reviews', { waitUntil: 'networkidle' });
       await admin.locator('li', { hasText: `Test review ${run}` }).locator('button:has-text("Publish")').click();
       await admin.waitForSelector('text=Published.');
-      await guest.goto(`${BASE}/laptops/dell-latitude-5420`, { waitUntil: 'networkidle' });
+      await guest.goto(`${BASE}/laptops/${MEMBER.slug}`, { waitUntil: 'networkidle' });
       await guest.waitForSelector(`text=Test review ${run}`);
     });
     await step('admin replies to the member’s ticket', async () => {
@@ -302,7 +372,7 @@ async function addFirstUnit(page, slug) {
       await member.waitForSelector('text=matching charger');
     });
     await step('approved student sees the student price', async () => {
-      await student.goto(BASE + '/laptops/dell-latitude-5420', { waitUntil: 'networkidle' });
+      await student.goto(`${BASE}/laptops/${MEMBER.slug}`, { waitUntil: 'networkidle' });
       await student.waitForSelector('text=Your student price');
     });
     await step('no script errors in the browser', async () => {

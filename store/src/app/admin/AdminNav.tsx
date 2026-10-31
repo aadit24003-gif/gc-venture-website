@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart3, Boxes, FileText, GraduationCap, History, LifeBuoy, Mail, MessageSquareQuote, Package, RotateCcw, Settings, Shield, Tags, Ticket, Users, Laptop, Bell } from 'lucide-react';
+import { BarChart3, Boxes, FileText, GraduationCap, History, LifeBuoy, Mail, MessageSquareQuote, Package, RotateCcw, Settings, Shield, Tags, Ticket, Users, Laptop, Bell, LayoutTemplate } from 'lucide-react';
 
 type Badges = { students: number; tickets: number; requests: number; orders: number; reviews: number };
 const GROUPS: { title: string; items: { href: string; label: string; icon: typeof Package; perm?: string; badge?: keyof Badges }[] }[] = [
@@ -24,6 +24,7 @@ const GROUPS: { title: string; items: { href: string; label: string; icon: typeo
     { href: '/admin/students', label: 'Student IDs', icon: GraduationCap, perm: 'students.review', badge: 'students' },
   ] },
   { title: 'Content', items: [
+    { href: '/admin/home', label: 'Home page', icon: LayoutTemplate, perm: 'content.manage' },
     { href: '/admin/content', label: 'Pages and blog', icon: FileText, perm: 'content.manage' },
     { href: '/admin/newsletter', label: 'Newsletter', icon: Mail, perm: 'newsletter.view' },
   ] },

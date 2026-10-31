@@ -59,8 +59,9 @@ export default async function Overview({ searchParams }: { searchParams: Promise
       <PageHead title="Overview" intro={`Signed in as ${v.user.name ?? v.user.email ?? v.user.phone}. Every number on this page comes from the database.`} />
       {sp.notice === 'forbidden' && <p className="mb-5 rounded-xl bg-warn-soft p-3 text-[14px] text-warn">Your role can’t open that page.</p>}
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-7">
         {[
+          ['Video calls to make', q.videoCalls, '/admin/orders?status=video', 'orders.view'],
           ['To pack and ship', q.toShip, '/admin/orders?status=to_ship', 'orders.view'],
           ['Awaiting payment', q.awaitingPay, '/admin/orders?status=awaiting_payment', 'orders.view'],
           ['Open returns / claims', q.returns, '/admin/returns', 'service.manage'],

@@ -342,8 +342,7 @@ html:not(.scenes) .steps-fill { transform: none; }
 
 /* Product photo that grows into place as its section scrolls up (Apple-style). */
 html.scenes [data-scene='zoom'] [data-zoom] {
-  transform: translate3d(0, calc((1 - var(--p, 1)) * 70px), 0) scale(calc(0.88 + var(--p, 1) * 0.12));
-  opacity: calc(0.35 + var(--p, 1) * 0.65);
+  transform: translate3d(0, calc((1 - var(--p, 1)) * 50px), 0) scale(calc(0.92 + var(--p, 1) * 0.08));
   will-change: transform;
 }
 

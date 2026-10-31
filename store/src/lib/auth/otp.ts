@@ -35,6 +35,9 @@ export type SendResult = { ok: true; demoCode?: string } | { ok: false; error: s
 export async function sendCode(input: { purpose: Purpose; channel: Channel; destination: string; ip: string; userId?: string }): Promise<SendResult> {
   const d = await db();
   const hourAgo = new Date(Date.now() - 3_600_000);
+  // Demo mode shows codes on screen, so the hourly caps are relaxed there (repeated local test runs).
+  // Production keeps 5 per address and 30 per network.
+  const caps = isDemo() ? { perDest: 40, perIp: 400 } : { perDest: 5, perIp: 30 };
 
   const recent = await d.select({ createdAt: otps.createdAt }).from(otps)
     .where(and(eq(otps.destination, input.destination), gt(otps.createdAt, hourAgo)))
@@ -42,10 +45,10 @@ export async function sendCode(input: { purpose: Purpose; channel: Channel; dest
   if (recent[0] && Date.now() - recent[0].createdAt.getTime() < 30_000) {
     return { ok: false, error: 'A code was just sent. Wait 30 seconds before asking for another.' };
   }
-  if (recent.length >= 5) return { ok: false, error: 'Too many codes requested. Try again in an hour, or use your email instead.' };
+  if (recent.length >= caps.perDest) return { ok: false, error: 'Too many codes requested. Try again in an hour, or use your email instead.' };
 
   const [{ n }] = await d.select({ n: sql<number>`count(*)::int` }).from(otps).where(and(eq(otps.ip, input.ip), gt(otps.createdAt, hourAgo)));
-  if (n >= 30) return { ok: false, error: 'Too many attempts from this network. Try again later.' };
+  if (n >= caps.perIp) return { ok: false, error: 'Too many attempts from this network. Try again later.' };
 
   const demo = isDemo();
   const live = input.channel === 'sms' ? smsConfigured() : emailConfigured();

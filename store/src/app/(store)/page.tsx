@@ -86,15 +86,7 @@ export default async function Home() {
 
   const book = settings.shipping.bookingEnabled ? rupees(settings.shipping.bookingAmount) : null;
   const card = (slug: string) => cards.find((c) => c.slug === slug && c.inStock) ?? null;
-  const brandFrom = (b: string) => brands.find((x) => x.brand === b)?.from ?? Infinity;
-  const fromLine = (slug: string, brand: string) => {
-    const c = card(slug);
-    const v = c ? c.fromPrice : brandFrom(brand);
-    return Number.isFinite(v) ? `From ${rupees(v)}` : null;
-  };
-  const cut = (slug: string) => `/products/${slug}/cutout.webp`;
-  /** Upright front view, screen only (scripts/make-front.cjs). */
-  const front = (slug: string) => `/products/${slug}/front.webp`;
+  const brandFrom = (b: string) => Math.min(...inStock.filter((c) => c.brand === b).map((c) => c.fromPrice), Infinity);
   const steps: [typeof Video, string, string][] = [
     [MousePointerClick, 'Choose your model', 'Pick the exact unit you want. Its grade, battery health and every mark are listed on its own report.'],
     [Wallet, book ? `Book it for ${book}` : 'Place your order', book ? 'Reserve it with a small online payment. It comes off the price, and the laptop is taken off sale for you.' : 'Pay online or choose pay on delivery. The laptop is taken off sale for you.'],
@@ -103,14 +95,22 @@ export default async function Home() {
     [BadgeCheck, 'Then finalise', book ? `Pay the rest on delivery only if it matches. ${POLICY.returnDays}-day returns and a ${POLICY.warrantyMonths}-month warranty.` : `${POLICY.returnDays}-day returns and a ${POLICY.warrantyMonths}-month warranty from the day it arrives.`],
   ];
   const saveFor = (brand: string) => { const v = Math.max(0, ...inStock.filter((c) => c.brand === brand).map((c) => savedPct(c.fromPrice, c.newPrice) ?? 0)); return v > 0 ? v : null; };
-  const tiles = [
-    { dark: true, title: 'Dell Latitude', sub: 'Built for the workday. Priced for yours.', from: fromLine('dell-latitude-5440', 'Dell'), save: saveFor('Dell'), href: '/brands/dell', img: cut('dell-latitude-5440'), alt: 'Dell Latitude 5440' },
-    { dark: false, title: 'HP EliteBook', sub: 'Slim aluminium, all-day comfort.', from: fromLine('hp-elitebook-840-g10', 'HP'), save: saveFor('HP'), href: '/brands/hp', img: front('hp-elitebook-840-g10'), alt: 'HP EliteBook 840 G10' },
-    { dark: false, title: 'ThinkPad', sub: 'The keyboard everyone misses.', from: fromLine('lenovo-thinkpad-e14-gen-4', 'Lenovo'), save: saveFor('Lenovo'), href: '/brands/lenovo', img: front('lenovo-thinkpad-e14-gen-4'), alt: 'Lenovo ThinkPad E14' },
-    { dark: true, title: 'MacBook Air', sub: 'Light. Silent. Ready for anything.', from: fromLine('apple-macbook-air-m3', 'Apple'), save: saveFor('Apple'), href: '/laptops?brand=Apple&q=air', img: front('apple-macbook-air-m3'), alt: 'Apple MacBook Air' },
-  ];
+  const home = settings.home;
+  const tiles = home.tiles.map((t) => {
+    const model = rows.find((r) => r.slug === t.product);
+    const fromP = model ? card(model.slug)?.fromPrice ?? brandFrom(t.brand) : brandFrom(t.brand);
+    return {
+      dark: t.dark, title: t.title, sub: t.subtitle, href: t.href, img: t.image, alt: model?.title ?? t.title,
+      from: Number.isFinite(fromP) ? `From ${rupees(fromP)}` : null, save: t.brand ? saveFor(t.brand) : null,
+    };
+  });
   const maxSave = Math.max(0, ...deals.map((x) => x.s)) || 60;
   const lowest = inStock.length ? Math.min(...inStock.map((c) => c.fromPrice)) : null;
+  /** Placeholders in the admin-edited home text: {save} counts up on screen, {from} is the lowest price. */
+  const fill = (text: string) => text.split(/(\{save\}|\{from\})/).map((part, i) =>
+    part === '{save}' ? <b key={i} className="text-white"><span data-count={maxSave}>{maxSave}</span></b>
+    : part === '{from}' ? <span key={i}>{lowest ? rupees(lowest) : 'low prices'}</span>
+    : <span key={i}>{part}</span>);
 
   return (
     <>
@@ -121,13 +121,13 @@ export default async function Home() {
         <div className="orb orb-3 bottom-[-10%] left-[30%] h-[420px] w-[620px] bg-white/10" aria-hidden="true" />
         <div className="wrap relative pb-8 pt-10 text-center md:pt-14">
           <p className="glass-dark mx-auto inline-flex animate-[fade_.8s_both] items-center gap-2 rounded-full px-4 py-1.5 text-[13.5px] text-white/85">
-            <Sparkles size={15} className="text-gold-hi" aria-hidden="true" /> Business-grade laptops · up to <b className="text-white"><span data-count={maxSave}>{maxSave}</span>% below new</b>
+            <Sparkles size={15} className="text-gold-hi" aria-hidden="true" /> {fill(home.badge)}
           </p>
           <h1 id="hero-h" className="mx-auto mt-5 max-w-[18ch] animate-[rise_.9s_.08s_both] text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] text-white sm:text-[46px] md:text-[56px]">
-            Premium laptops. <span className="bg-gradient-to-r from-[#ffb08a] via-accent to-[#ff8a5c] bg-clip-text text-transparent">Surprisingly low prices.</span>
+            {home.headline} {home.accent ? <span className="bg-gradient-to-r from-[#ffb08a] via-accent to-[#ff8a5c] bg-clip-text text-transparent">{home.accent}</span> : null}
           </h1>
           <p className="mx-auto mt-4 max-w-[56ch] animate-[rise_.9s_.16s_both] text-[16px] text-white/65 md:text-[18px]">
-            ThinkPad, Latitude, EliteBook and MacBook{lowest ? <> from {rupees(lowest)}</> : null}. Imported, inspected, and shown to you on video before you pay in full.
+            {fill(home.subline)}
           </p>
         </div>
         <div data-reveal className="wrap relative grid gap-4 pb-6 md:grid-cols-2">
@@ -144,17 +144,17 @@ export default async function Home() {
                 <Link href="/compare" className="btn btn-line btn-sm">Compare</Link>
               </div>
               <div data-zoom className="relative mx-auto mt-8 aspect-[16/10] w-full max-w-[520px]">
-                <Image src={t.img} alt={t.alt} fill sizes="(min-width: 768px) 520px, 90vw" className="object-contain object-bottom drop-shadow-[0_30px_40px_rgba(0,0,0,.45)] transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:-translate-y-2 group-hover:scale-[1.03]" />
+                {t.img ? <Image src={t.img} alt={t.alt} fill unoptimized={!t.img.startsWith('/products/')} sizes="(min-width: 768px) 520px, 90vw" className="object-contain object-bottom drop-shadow-[0_30px_40px_rgba(0,0,0,.45)] transition-transform duration-700 ease-[var(--ease-out-soft)] group-hover:-translate-y-2 group-hover:scale-[1.03]" /> : null}
               </div>
             </div>
           ))}
-          <Link href="/students" data-reveal-item data-spot className="spot tile-dark glass-dark group relative flex flex-col items-center justify-center overflow-hidden rounded-[32px] px-6 py-12 text-center md:col-span-2">
+          {home.studentsTile && <Link href="/students" data-reveal-item data-spot className="spot tile-dark glass-dark group relative flex flex-col items-center justify-center overflow-hidden rounded-[32px] px-6 py-12 text-center md:col-span-2">
             <span className="pointer-events-none absolute inset-x-0 -bottom-24 mx-auto h-48 w-2/3 rounded-full bg-accent/30 blur-3xl transition-opacity duration-500 group-hover:opacity-100 md:opacity-60" aria-hidden="true" />
             <GraduationCap size={38} className="relative text-gold-hi transition-transform duration-500 group-hover:-translate-y-1 group-hover:rotate-[-6deg]" aria-hidden="true" />
             <p className="relative mt-3 text-[30px] font-semibold tracking-[-0.03em] md:text-[42px]">Students save {STUDENT.percent}%.</p>
             <p className="relative mt-1 text-[16px] text-white/65 md:text-[19px]">Verify once with your college email or ID. The price applies for a year.</p>
             <span className="btn btn-accent btn-sm shine relative mt-5">Verify now</span>
-          </Link>
+          </Link>}
         </div>
 
         {/* Why trust us: the next scroll */}

@@ -31,15 +31,16 @@ More detail:
 **Admin** (`/admin`, permissions by role: super admin, inventory manager, order manager, support)
 | Module | What it does |
 |---|---|
-| Overview | Work queue; KPIs, daily revenue chart, orders by status, revenue by brand, best sellers, inventory and ageing; date ranges; margin only for units with a recorded cost; go-live warnings |
+| Overview | Work queue (including video calls still to make); KPIs, daily revenue chart, orders by status, revenue by brand, best sellers, inventory and ageing; date ranges; margin only for units with a recorded cost; go-live warnings |
 | Orders | Filters and search; fulfilment steps with courier/AWB; Shiprocket booking when connected; partial or full refunds (Razorpay or manual); payment reconciliation; packing slip and label; history and audit trail |
 | Inventory units | Receive units (serial, cost, source, location); inspections with all 32 checks; parts replaced; status lifecycle intake → inspection → refurbishing → available → reserved → sold, plus returned, RMA, hold, scrapped; price override; history |
 | Laptop models | Grade prices, visibility, featured; full editor with photos, categories, tags, extra specs, SEO |
-| Brands and categories | Each has its own store page |
+| Brands and categories | Each has its own store page; visible brands appear in the store’s top menu and in the laptop editor |
 | Coupons | Percent or fixed; minimum order; cap; total and per-customer limits; first order only; brand or model restrictions; start and end dates |
 | Returns and warranty | Requests with photos; status flow; public or internal notes (emailed) |
 | Customers, staff and roles | Search, history, switch accounts off; add staff and set roles |
 | Support tickets, reviews, student IDs | Reply (emailed), internal notes; publish or hide reviews, public replies; approve or reject IDs |
+| Home page | Headline, label and line under it; the brand tiles (title, subtitle, model for the price and photo, link, dark or light, order); students tile on or off. Photos can be made automatically from any model's photo without its background |
 | Pages and blog | Markdown editor with placeholders; "reviewed by a lawyer" flag per page |
 | Notifications | Edit every email/SMS/WhatsApp template; test sends; delivery log |
 | Newsletter, settings, audit log | CSV export; business details, shipping/COD, GST; every staff action and money movement |
@@ -61,7 +62,7 @@ No accounts or keys are needed. Without them the store runs in **demo mode**: th
 | `npm run build` | Production build |
 | `npm run typecheck` | TypeScript check |
 | `npm run test:unit` | 25 checks: prices, upgrades, coupons, shipping, GST, signatures, passwords, roles, order flow, filters, Markdown safety |
-| `npm run test:e2e` | 26 browser steps through a booked guest purchase with the video call, a member purchase, admin inventory and fulfilment, refunds, returns, reviews, tickets and student verification (needs the dev server and Playwright) |
+| `npm run test:e2e` | 29 browser steps: a booked guest purchase with the video call, a member purchase, every admin page, adding a brand and a model, editing the home page, admin inventory and fulfilment, refunds, returns, reviews, tickets and student verification (needs the dev server and Playwright) |
 | `npm run db:generate` | New migration after changing `src/lib/db/schema.ts` |
 | `npm run db:setup` | Migrate and seed the database in `DATABASE_URL` |
 

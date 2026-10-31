@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { and, desc, eq, ilike, inArray, or, sql, type SQL } from 'drizzle-orm';
+import { and, desc, eq, ilike, inArray, or, sql, type SQL, isNull } from 'drizzle-orm';
 import { requireStaff } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { orderItems, orders } from '@/lib/db/schema';
@@ -16,6 +16,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
   const page = Math.max(1, Number(sp.page) || 1);
   const conds: SQL[] = [];
   if (sp.status === 'to_ship') conds.push(inArray(orders.status, ['confirmed', 'quality_check', 'packed']));
+  else if (sp.status === 'video') conds.push(inArray(orders.status, ['confirmed', 'quality_check', 'packed']), isNull(orders.videoCallAt));
   else if (sp.status && STATUS[sp.status]) conds.push(eq(orders.status, sp.status));
   if (sp.pay && PAYMENT_STATUS[sp.pay]) conds.push(eq(orders.paymentStatus, sp.pay));
   const q = (sp.q ?? '').trim();
@@ -32,7 +33,7 @@ export default async function AdminOrders({ searchParams }: { searchParams: Prom
       <PageHead title="Orders" intro={`${n} ${n === 1 ? 'order' : 'orders'}${sp.status || sp.pay || q ? ' match these filters' : ''}.`} />
       <Filters action="/admin/orders">
         <label className="text-[12.5px] text-mute">Search<input name="q" defaultValue={q} placeholder="Number, name, email, phone" className="field !min-h-9 w-[260px] text-[13.5px]" /></label>
-        <label className="text-[12.5px] text-mute">Status<select name="status" defaultValue={sp.status ?? ''} className="field !min-h-9 text-[13.5px]"><option value="">Any</option><option value="to_ship">To pack and ship</option>{Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}</select></label>
+        <label className="text-[12.5px] text-mute">Status<select name="status" defaultValue={sp.status ?? ''} className="field !min-h-9 text-[13.5px]"><option value="">Any</option><option value="to_ship">To pack and ship</option><option value="video">Video call to make</option>{Object.entries(STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}</select></label>
         <label className="text-[12.5px] text-mute">Payment<select name="pay" defaultValue={sp.pay ?? ''} className="field !min-h-9 text-[13.5px]"><option value="">Any</option>{Object.entries(PAYMENT_STATUS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}</select></label>
       </Filters>
       <Table head={['Order', 'Customer', 'Laptops', 'Total', 'Payment', 'Status', 'Placed']} empty={rows.length ? false : 'No orders match.'}>

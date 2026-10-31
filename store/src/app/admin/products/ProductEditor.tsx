@@ -20,7 +20,7 @@ const COLOURS = [['black', 'Black'], ['graphite', 'Graphite'], ['silver', 'Silve
 const USES = [['study', 'Studying'], ['code', 'Coding'], ['design', 'Design and video'], ['office', 'Office work'], ['travel', 'Light to carry']] as const;
 
 
-export default function ProductEditor({ initial, photos: initialPhotos, categories = [], units = {} }: { initial: Form; photos?: ProductImage[]; categories?: { slug: string; name: string }[]; units?: Record<string, number> }) {
+export default function ProductEditor({ initial, photos: initialPhotos, categories = [], units = {}, brands = [] }: { initial: Form; photos?: ProductImage[]; categories?: { slug: string; name: string }[]; units?: Record<string, number>; /** brand names from Admin → Brands and categories */ brands?: string[] }) {
   const router = useRouter();
   const [f, setF] = useState<Form>(initial);
   const [photos, setPhotos] = useState<ProductImage[]>(initialPhotos ?? []);
@@ -70,7 +70,7 @@ export default function ProductEditor({ initial, photos: initialPhotos, categori
           <div>
             <label htmlFor="f-brand" className="label">Brand</label>
             <select id="f-brand" className="field" value={f.brand} onChange={(e) => set('brand', e.target.value)}>
-              {['Dell', 'HP', 'Lenovo', 'Apple', 'Asus', 'Acer', 'Microsoft'].map((b) => <option key={b}>{b}</option>)}
+              {[...new Set([...(brands.length ? brands : ['Dell', 'HP', 'Lenovo', 'Apple']), f.brand].filter(Boolean))].map((b) => <option key={b}>{b}</option>)}
             </select>
           </div>
           {text({ k: 'family', label: 'Line', hint: 'Latitude, EliteBook, ThinkPad, MacBook Air…' })}

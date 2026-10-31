@@ -1,6 +1,6 @@
 # Build checklist
 
-Status of every part of the brief. **Done** means built and exercised (unit tests, the 26-step browser test, or a manual run in demo mode). **Built, untested live** means the code exists but can't be proven until you add the account keys. **Blocked on you** needs a decision or an account only you can provide.
+Status of every part of the brief. **Done** means built and exercised (unit tests, the 29-step browser test, or a manual run in demo mode). **Built, untested live** means the code exists but can't be proven until you add the account keys. **Blocked on you** needs a decision or an account only you can provide.
 
 ## Done
 
@@ -49,7 +49,8 @@ Status of every part of the brief. **Done** means built and exercised (unit test
 - [x] Editable policy pages (with "reviewed by a lawyer" flag) and blog
 - [x] Notification templates (email, SMS, WhatsApp) with log and test sends
 - [x] Newsletter list with CSV export and signed unsubscribe links
-- [x] Settings (business, shipping, GST) and audit log
+- [x] Settings (business, shipping, booking, GST) and audit log
+- [x] Home page editor (headline and brand tiles, automatic background-free photos for any model); store menu and laptop editor follow the brands set up in admin; “video calls to make” queue
 - [x] Packing slip and address label
 
 **SEO and platform**
@@ -57,7 +58,7 @@ Status of every part of the brief. **Done** means built and exercised (unit test
 - [x] Sitemap (pages, brands, categories, models with images, posts), robots, canonical URLs, share images per model
 - [x] Security headers, http-only cookies, hashed tokens, private file storage, Markdown rendered without raw HTML
 - [x] Health check `/api/health`
-- [x] 25 unit tests, 26-step browser test (including booking and the video call), clean production build
+- [x] 25 unit tests, 29-step browser test (including booking, the video call, every admin page, adding a brand and a model with a photo, and editing the home page), clean production build
 
 ## Built, untested live (needs your keys)
 - [ ] Razorpay live payments, refunds and webhooks (tested with signatures and in demo mode only)
