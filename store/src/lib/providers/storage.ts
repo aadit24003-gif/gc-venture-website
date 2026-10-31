@@ -30,7 +30,9 @@ async function localDir() {
   throw new Error('No writable folder for uploads');
 }
 
-const safe = (key: string) => key.replace(/[^a-zA-Z0-9/_.-]/g, '');
+/** Keeps keys to plain relative paths: no odd characters, no "." or ".." segments. */
+const safe = (key: string) =>
+  key.replace(/[^a-zA-Z0-9/_.-]/g, '').split('/').filter((seg) => seg && seg !== '.' && seg !== '..').join('/');
 
 let bucketReady = false;
 async function ensureBucket(s: { url: string; key: string }) {

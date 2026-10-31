@@ -11,7 +11,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/db-setup.ts --migrate",
     "db:seed": "tsx scripts/db-setup.ts --seed",
-    "db:setup": "tsx scripts/db-setup.ts --migrate --seed"
+    "db:setup": "tsx scripts/db-setup.ts --migrate --seed",
+    "test:e2e": "node tests/e2e.cjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.13",
